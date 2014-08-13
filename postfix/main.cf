@@ -1,0 +1,63 @@
+smtpd_banner = $myhostname
+biff = no
+append_dot_mydomain = no
+readme_directory = /usr/share/doc/postfix
+smtpd_tls_cert_file = /etc/postfix/sslcert/mail.domain.tld.bundle.crt
+smtpd_tls_key_file = /etc/postfix/sslcert/mail.domain.tld.key
+smtpd_tls_CAfile = /etc/postfix/sslcert/RapidSSL_CA_bundle.pem
+smtpd_use_tls=yes
+smtp_tls_cert_file = /etc/postfix/sslcert/mail.domain.tld.bundle.crt
+smtp_tls_key_file = /etc/postfix/sslcert/mail.domain.tld.key
+smtp_tls_security_level=may
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+myhostname = mail.domain.tld
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
+myorigin = /etc/mailname
+mydestination = mail.domain.tld, localhost.domain.tld, , localhost
+relayhost = 
+mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+mailbox_size_limit = 0
+recipient_delimiter = +
+inet_interfaces = all
+disable_vrfy_command = yes
+smtpd_sasl_type=dovecot
+smtpd_sasl_path=private/auth_dovecot
+smtpd_sasl_auth_enable = yes
+smtpd_sasl_authenticated_header = yes
+broken_sasl_auth_clients = yes
+proxy_read_maps = $local_recipient_maps $mydestination $virtual_alias_maps $virtual_alias_domains $virtual_mailbox_maps $virtual_mailbox_domains $relay_recipient_maps $relay_domains $canonical_maps $sender_canonical_maps $recipient_canonical_maps $relocated_maps $transport_maps $mynetworks $smtpd_sender_login_maps
+smtpd_sender_restrictions = reject_authenticated_sender_login_mismatch,
+   reject_unknown_sender_domain,
+   permit_sasl_authenticated
+smtpd_recipient_restrictions = check_client_access pcre:/etc/postfix/filter_trusted,
+   permit_sasl_authenticated,
+   permit_mynetworks,
+   reject_rbl_client zen.spamhaus.org,
+   reject_unauth_destination,
+   reject_unknown_reverse_client_hostname,
+   pcre:/etc/postfix/filter_default
+fuglu_trusted_destination_recipient_limit=1
+fuglu_default_destination_recipient_limit=1
+virtual_mailbox_base = /var/vmail/
+virtual_mailbox_domains = proxy:mysql:/etc/postfix/sql/mysql_virtual_domains_maps.cf
+virtual_alias_maps =
+   proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_maps.cf,
+   proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_domain_maps.cf,
+   proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf
+virtual_mailbox_maps =
+   proxy:mysql:/etc/postfix/sql/mysql_virtual_mailbox_maps.cf,
+   proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_domain_mailbox_maps.cf
+virtual_minimum_uid = 104
+virtual_uid_maps = static:5000
+virtual_gid_maps = static:5000
+virtual_transport = lmtp:unix:private/dovecot-lmtp
+html_directory = /usr/share/doc/postfix/html
+smtpd_sender_login_maps = proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_maps.cf
+maximal_queue_lifetime = 96h
+maximal_backoff_time = 15m
+minimal_backoff_time = 5m
+queue_run_delay = 5m
+bounce_queue_lifetime = 48h
+

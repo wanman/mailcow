@@ -1,0 +1,8 @@
+# mysql_virtual_mailbox_maps.cf
+user = postfix
+password = my_postfix_pass
+hosts = localhost
+dbname = postfixdb
+query           = SELECT maildir FROM mailbox WHERE username='%s' AND active = '1'
+#expansion_limit = 100
+
