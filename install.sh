@@ -193,31 +193,31 @@ service postfix stop; service postfix start;
 }
 
 
-read -p "Press any key to set hostname..."
+read -p "Press [ENTER] to set hostname..."
 sethostname
-read -p "Press any key to install the required packages (fuglu will be installed from git)..."
+read -p "Press [ENTER] to install the required packages (fuglu will be installed from git)..."
 installpackages
-read -p "Press any key to create a self-signed certificate..."
+read -p "Press [ENTER] to create a self-signed certificate..."
 selfsignedcert
-read -p "Press any key to setup mysql..."
+read -p "Press [ENTER] to setup mysql..."
 mysqlconfiguration
-read -p "Press any key to install and setup fuglu..."
+read -p "Press [ENTER] to install and setup fuglu..."
 fuglusetup
-read -p "Press any key to setup postfix..."
+read -p "Press [ENTER] to setup postfix..."
 postfixconfig
-read -p "Press any key to setup dovecot..."
+read -p "Press [ENTER] to setup dovecot..."
 dovecotconfig
-read -p "Press any key to setup clamav..."
+read -p "Press [ENTER] to setup clamav..."
 clamavconfig
-read -p "Press any key to setup spamassassin..."
+read -p "Press [ENTER] to setup spamassassin..."
 spamassassinconfig
-read -p "Press any key to setup nginx and php5..."
+read -p "Press [ENTER] to setup nginx and php5..."
 websrvconfig
-read -p "Press any key to setup postfixadmin..."
+read -p "Press [ENTER] to setup postfixadmin..."
 pfadminconfig
-read -p "Press any key to setup fail2ban..."
+read -p "Press [ENTER] to setup fail2ban..."
 fail2banconfig
-read -p "Press any key to setup rsyslogd..."
+read -p "Press [ENTER] to setup rsyslogd..."
 rsyslogdconfig
-read -p "Press any key to restart all depending services..."
+read -p "Press [ENTER] to restart all depending services..."
 restartservices
