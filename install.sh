@@ -17,6 +17,12 @@ my_rootpw=`genpasswd 20`
 ############ CONFIG END ############
 #### do not edit any line below ####
 
+# log generated passwords
+echo ---------- > installer.log
+echo Postfix password: $my_postfixpass >> installer.log
+echo MySQL root password: $my_rootpw >> installer.log
+echo ---------- >> installer.log
+
 # set hostname
 cat > hosts<<'EOF'
 127.0.0.1 localhost
@@ -28,17 +34,62 @@ echo `wget -q4O- ip.appspot.com` $sys_hostname.$sys_domain $sys_hostname >> host
 echo $sys_hostname > /etc/hostname
 service hostname.sh start
 
-# log generated passwords
-echo ---------- > installer.log
-echo Postfix password: $my_postfixpass >> installer.log
-echo MySQL root password: $my_rootpw >> installer.log
-echo ---------- >> installer.log
+# installation
+DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install python-sqlalchemy python-beautifulsoup python-setuptools python-magic openssl \
+php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
+php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap \
+php5-intl php5-mcrypt php5-mysql php5-sqlite mysql-client mysql-server nginx dovecot-common dovecot-core \
+dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d postfix \
+postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin fail2ban
+
+# certificate
+mkdir /etc/ssl/mail
+openssl req -new -newkey rsa:4096 -days 1095 -nodes -x509 -subj "/C=DE/ST=SESI/L=SESI/O=SESI/CN=$sys_hostname.$sys_domain" -keyout /etc/ssl/mail/mail.key  -out /etc/ssl/mail/mail.crt
+chmod 600 /etc/ssl/mail/mail.key
+
+# mysql
+mysqladmin -u root password $my_rootpw
+mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_postfixdb; CREATE USER '$my_postfixuser'@'localhost' IDENTIFIED BY '$my_postfixpass'; GRANT ALL PRIVILEGES ON `$my_postfixdb` . * TO '$my_postfixuser'@'localhost';"
 
 # fuglu
 mkdir /var/log/fuglu
 rm /tmp/fuglu_control.sock
-chown nobody /var/log/fuglu
+chown nobody:nogroup /var/log/fuglu
 git clone https://github.com/gryphius/fuglu.git fuglu_git
 cd fuglu_git/fuglu
 python setup.py install
-cp -R fuglu/* /etc/fuglu/
+cd ../../
+find /etc/fuglu -type f -name '*.dist' -print0 | xargs -0 rename 's/.dist$//'
+sed -i '/^group=/s/=.*/=nogroup/' /etc/fuglu/fuglu.conf
+cp fuglu_git/fuglu/scripts/startscripts/debian/7/fuglu /etc/init.d/fuglu
+chmod +x /etc/init.d/fuglu
+update-rc.d fuglu defaults
+
+# postfix
+cp -R postfix/* /etc/postfix
+chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf"
+chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_maps.cf"
+chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_mailbox_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_mailbox_maps.cf"
+chown root:postfix "/etc/postfix/sql/mysql_virtual_mailbox_limit_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_mailbox_limit_maps.cf"
+chown root:postfix "/etc/postfix/sql/mysql_virtual_mailbox_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_mailbox_maps.cf"
+chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_maps.cf"
+chown root:postfix "/etc/postfix/sql/mysql_virtual_domains_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_domains_maps.cf"
+chown root:root "/etc/postfix/filter_default"; chmod 644 "/etc/postfix/filter_default"
+chown root:root "/etc/postfix/master.cf"; chmod 644 "/etc/postfix/master.cf"
+chown root:root "/etc/postfix/filter_trusted"; chmod 644 "/etc/postfix/filter_trusted"
+chown root:root "/etc/postfix/main.cf"; chmod 644 "/etc/postfix/main.cf"
+sed -i "s/mail.domain.tld/$sys_hostname.$sys_domain/g" /etc/postfix/*
+sed -i "s/my_postfix_pass/$my_postfix_pass/g" /etc/postfix/sql/*
+
+# dovecot
+chown root:dovecot "/etc/dovecot/dovecot-dict-sql.conf"; chmod 640 "/etc/dovecot/dovecot-dict-sql.conf"
+chown root:vmail "/etc/dovecot/dovecot-mysql.conf"; chmod 640 "/etc/dovecot/dovecot-mysql.conf"
+chown root:root "/etc/dovecot/dovecot.conf"; chmod 644 "/etc/dovecot/dovecot.conf"
+sed -i "s/mail.domain.tld/$sys_hostname.$sys_domain/g" /etc/dovecot/*
+sed -i "s/my_postfix_pass/$my_postfix_pass/g" /etc/dovecot/*
+groupadd -g 5000 vmail
+useradd -g vmail -u 5000 vmail -d /var/vmail
+mkdir -p /var/vmail/sieve
+cp misc/*.sieve /var/vmail/sieve/
+sievec /var/vmail/sieve/spam-global.sieve
+chown -R vmail:vmail /var/vmail
