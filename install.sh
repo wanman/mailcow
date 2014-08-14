@@ -61,6 +61,8 @@ python setup.py install
 cd ../../
 find /etc/fuglu -type f -name '*.dist' -print0 | xargs -0 rename 's/.dist$//'
 sed -i '/^group=/s/=.*/=nogroup/' /etc/fuglu/fuglu.conf
+
+
 cp fuglu_git/fuglu/scripts/startscripts/debian/7/fuglu /etc/init.d/fuglu
 chmod +x /etc/init.d/fuglu
 update-rc.d fuglu defaults
@@ -96,7 +98,8 @@ sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/dovecot/*
 groupadd -g 5000 vmail
 useradd -g vmail -u 5000 vmail -d /var/vmail
 mkdir -p /var/vmail/sieve
-cp misc/*.sieve /var/vmail/sieve/
+cp misc/spam-global.sieve_dovecot /var/vmail/sieve/spam-global.sieve
+cp misc/default.sieve_dovecot /var/vmail/sieve/default.sieve
 sievec /var/vmail/sieve/spam-global.sieve
 chown -R vmail:vmail /var/vmail
 
@@ -112,6 +115,10 @@ service clamav-daemon start
 # spamassassin
 sed -i '/rewrite_header/c\rewrite_header Subject [SPAM]' /etc/spamassassin/local.cf
 sed -i '/report_safe/c\report_safe 2' /etc/spamassassin/local.cf
+sed -i '/^OPTIONS=/s/=.*/="--create-prefs --max-children 5 --helper-home-dir --username debian-spamd"/' /etc/default/spamassassin
+sed -i '/^CRON=/s/=.*/="1"/' /etc/default/spamassassin
+sed -i '/^ENABLED=/s/=.*/="1"/' /etc/default/spamassassin
+service spamassassin restart
 
 # nginx, php5
 rm -rf /etc/php5/fpm/pool.d/*
@@ -129,6 +136,7 @@ sed -i "s/my_postfixuser/$my_postfixuser/g" /usr/share/nginx/mail/pfadmin/config
 sed -i "s/my_postfixdb/$my_postfixdb/g" /usr/share/nginx/mail/pfadmin/config.local.php
 sed -i "s/domain.tld/$sys_domain/g" /usr/share/nginx/mail/pfadmin/config.local.php
 sed -i "s/change-this-to-your.domain.tld/$sys_domain/g" /usr/share/nginx/mail/pfadmin/config.inc.php
+chown -R www-data: /usr/share/nginx/
 
 # fail2ban
 cp misc/jail.local_fail2ban /etc/fail2ban/jail.local
