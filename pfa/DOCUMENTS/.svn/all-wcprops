@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/p/postfixadmin/code/!svn/ver/1682/trunk/DOCUMENTS
+END
+BACKUP_MX.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/p/postfixadmin/code/!svn/ver/669/trunk/DOCUMENTS/BACKUP_MX.txt
+END
+HORDE.txt
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/p/postfixadmin/code/!svn/ver/226/trunk/DOCUMENTS/HORDE.txt
+END
+POSTFIX_CONF.txt
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/p/postfixadmin/code/!svn/ver/1682/trunk/DOCUMENTS/POSTFIX_CONF.txt
+END
+DOVECOT.txt
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/p/postfixadmin/code/!svn/ver/1628/trunk/DOCUMENTS/DOVECOT.txt
+END
+LANGUAGE.txt
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/p/postfixadmin/code/!svn/ver/330/trunk/DOCUMENTS/LANGUAGE.txt
+END
+POSTFIXADMIN.txt
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/p/postfixadmin/code/!svn/ver/350/trunk/DOCUMENTS/POSTFIXADMIN.txt
+END
+FAQ.txt
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/p/postfixadmin/code/!svn/ver/541/trunk/DOCUMENTS/FAQ.txt
+END
+SECURITY.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/p/postfixadmin/code/!svn/ver/1157/trunk/DOCUMENTS/SECURITY.txt
+END
+SUPERADMIN.txt
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/p/postfixadmin/code/!svn/ver/1157/trunk/DOCUMENTS/SUPERADMIN.txt
+END
+UPGRADE.txt
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/p/postfixadmin/code/!svn/ver/941/trunk/DOCUMENTS/UPGRADE.txt
+END

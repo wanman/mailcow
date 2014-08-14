@@ -1,0 +1,95 @@
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/p/postfixadmin/code/!svn/ver/1681/trunk/ADDITIONS
+END
+mailbox_remover.pl
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/p/postfixadmin/code/!svn/ver/211/trunk/ADDITIONS/mailbox_remover.pl
+END
+virtualmaildel.php
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/p/postfixadmin/code/!svn/ver/211/trunk/ADDITIONS/virtualmaildel.php
+END
+fetchmail.pl
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/p/postfixadmin/code/!svn/ver/1681/trunk/ADDITIONS/fetchmail.pl
+END
+change_password.tgz
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/p/postfixadmin/code/!svn/ver/1/trunk/ADDITIONS/change_password.tgz
+END
+README.TXT
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/p/postfixadmin/code/!svn/ver/211/trunk/ADDITIONS/README.TXT
+END
+convert-passwd-to-postfixadmin.pl
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/p/postfixadmin/code/!svn/ver/1558/trunk/ADDITIONS/convert-passwd-to-postfixadmin.pl
+END
+postfixadmin-mailbox-postdeletion.sh
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/p/postfixadmin/code/!svn/ver/211/trunk/ADDITIONS/postfixadmin-mailbox-postdeletion.sh
+END
+postfixadmin-mailbox-postcreation.sh
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/p/postfixadmin/code/!svn/ver/467/trunk/ADDITIONS/postfixadmin-mailbox-postcreation.sh
+END
+import_users_from_csv.py
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/p/postfixadmin/code/!svn/ver/1158/trunk/ADDITIONS/import_users_from_csv.py
+END
+cleanupdirs.pl
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/p/postfixadmin/code/!svn/ver/649/trunk/ADDITIONS/cleanupdirs.pl
+END
+quota_usage.pl
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/p/postfixadmin/code/!svn/ver/547/trunk/ADDITIONS/quota_usage.pl
+END
+pfa_maildir_cleanup.pl
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/p/postfixadmin/code/!svn/ver/211/trunk/ADDITIONS/pfa_maildir_cleanup.pl
+END
+postfixadmin-domain-postdeletion.sh
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/p/postfixadmin/code/!svn/ver/211/trunk/ADDITIONS/postfixadmin-domain-postdeletion.sh
+END
+delete-mailq-by-domain.pl
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/p/postfixadmin/code/!svn/ver/1160/trunk/ADDITIONS/delete-mailq-by-domain.pl
+END
+mkeveryone.pl
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/p/postfixadmin/code/!svn/ver/211/trunk/ADDITIONS/mkeveryone.pl
+END

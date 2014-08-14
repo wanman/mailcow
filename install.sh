@@ -35,9 +35,9 @@ echo $sys_hostname > /etc/hostname
 service hostname.sh start
 
 # installation
-DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install python-sqlalchemy python-beautifulsoup python-setuptools python-magic openssl \
-php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
-php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap \
+DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install python-sqlalchemy python-beautifulsoup python-setuptools \
+python-magic openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
+php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap svn \
 php5-intl php5-mcrypt php5-mysql php5-sqlite mysql-client mysql-server nginx dovecot-common dovecot-core \
 dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d postfix \
 postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin fail2ban
@@ -79,14 +79,14 @@ chown root:root "/etc/postfix/master.cf"; chmod 644 "/etc/postfix/master.cf"
 chown root:root "/etc/postfix/filter_trusted"; chmod 644 "/etc/postfix/filter_trusted"
 chown root:root "/etc/postfix/main.cf"; chmod 644 "/etc/postfix/main.cf"
 sed -i "s/mail.domain.tld/$sys_hostname.$sys_domain/g" /etc/postfix/*
-sed -i "s/my_postfix_pass/$my_postfix_pass/g" /etc/postfix/sql/*
+sed -i "s/my_postfix_pass/$my_postfixpass/g" /etc/postfix/sql/*
 
 # dovecot
 chown root:dovecot "/etc/dovecot/dovecot-dict-sql.conf"; chmod 640 "/etc/dovecot/dovecot-dict-sql.conf"
 chown root:vmail "/etc/dovecot/dovecot-mysql.conf"; chmod 640 "/etc/dovecot/dovecot-mysql.conf"
 chown root:root "/etc/dovecot/dovecot.conf"; chmod 644 "/etc/dovecot/dovecot.conf"
 sed -i "s/mail.domain.tld/$sys_hostname.$sys_domain/g" /etc/dovecot/*
-sed -i "s/my_postfix_pass/$my_postfix_pass/g" /etc/dovecot/*
+sed -i "s/my_postfix_pass/$my_postfixpass/g" /etc/dovecot/*
 groupadd -g 5000 vmail
 useradd -g vmail -u 5000 vmail -d /var/vmail
 mkdir -p /var/vmail/sieve
@@ -107,3 +107,18 @@ service clamav-daemon start
 sed -i '/rewrite_header/c\rewrite_header Subject [SPAM]' /etc/spamassassin/local.cf
 sed -i '/report_safe/c\report_safe 2' /etc/spamassassin/local.cf
 
+# nginx, php5
+rm -rf /etc/php5/fpm/pool.d/*
+rm -rf /etc/nginx/{sites-available,sites-enabled}/*
+cp misc/mail_nginx /etc/nginx/sites-available/
+cp misc/mail.conf_fpm /etc/php5/fpm/pool.d/mail.conf
+sed -i '/server_tokens/c\server_tokens off;' /etc/nginx/nginx.conf
+
+# pfadmin
+mkdir /usr/share/nginx/mail
+svn co http://svn.code.sf.net/p/postfixadmin/code/trunk /usr/share/nginx/mail/pfadmin
+cp misc/config.local.php_pfadmin /usr/share/nginx/mail/pfadmin/config.local.php
+sed -i "s/my_postfixpass/$my_postfixpass/g" /usr/share/nginx/mail/pfadmin/config.local.php
+sed -i "s/my_postfixuser/$my_postfixuser/g" /usr/share/nginx/mail/pfadmin/config.local.php
+sed -i "s/my_postfixdb/$my_postfixdb/g" /usr/share/nginx/mail/pfadmin/config.local.php
+sed -i "s/domain.tld/$sys_domain/g" /usr/share/nginx/mail/pfadmin/config.local.php

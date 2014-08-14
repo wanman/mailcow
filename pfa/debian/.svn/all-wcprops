@@ -1,0 +1,137 @@
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/p/postfixadmin/code/!svn/ver/1670/trunk/debian
+END
+postfixadmin.install
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/p/postfixadmin/code/!svn/ver/1666/trunk/debian/postfixadmin.install
+END
+README.txt
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/p/postfixadmin/code/!svn/ver/880/trunk/debian/README.txt
+END
+README.Debian
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/p/postfixadmin/code/!svn/ver/1409/trunk/debian/README.Debian
+END
+control
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/p/postfixadmin/code/!svn/ver/1376/trunk/debian/control
+END
+postfixadmin.examples
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/p/postfixadmin/code/!svn/ver/805/trunk/debian/postfixadmin.examples
+END
+compat
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/p/postfixadmin/code/!svn/ver/598/trunk/debian/compat
+END
+postfixadmin.links
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/p/postfixadmin/code/!svn/ver/653/trunk/debian/postfixadmin.links
+END
+changelog
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/p/postfixadmin/code/!svn/ver/1670/trunk/debian/changelog
+END
+postfixadmin.postinst
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/p/postfixadmin/code/!svn/ver/1296/trunk/debian/postfixadmin.postinst
+END
+postfixadmin.postrm
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/p/postfixadmin/code/!svn/ver/1312/trunk/debian/postfixadmin.postrm
+END
+postfixadmin.prerm
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/p/postfixadmin/code/!svn/ver/671/trunk/debian/postfixadmin.prerm
+END
+rules
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/p/postfixadmin/code/!svn/ver/1667/trunk/debian/rules
+END
+postfixadmin.docs
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/p/postfixadmin/code/!svn/ver/1304/trunk/debian/postfixadmin.docs
+END
+README.source
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/p/postfixadmin/code/!svn/ver/805/trunk/debian/README.source
+END
+templates
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/p/postfixadmin/code/!svn/ver/653/trunk/debian/templates
+END
+lighttpd.conf
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/p/postfixadmin/code/!svn/ver/653/trunk/debian/lighttpd.conf
+END
+TODO
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/p/postfixadmin/code/!svn/ver/1376/trunk/debian/TODO
+END
+apache.conf
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/p/postfixadmin/code/!svn/ver/862/trunk/debian/apache.conf
+END
+postfixadmin.dirs
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/p/postfixadmin/code/!svn/ver/598/trunk/debian/postfixadmin.dirs
+END
+watch
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/p/postfixadmin/code/!svn/ver/1376/trunk/debian/watch
+END
+copyright
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/p/postfixadmin/code/!svn/ver/653/trunk/debian/copyright
+END
+postfixadmin.config
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/p/postfixadmin/code/!svn/ver/653/trunk/debian/postfixadmin.config
+END

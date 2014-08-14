@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/p/postfixadmin/code/!svn/ver/800/trunk/ADDITIONS/squirrelmail-plugin/debian
+END
+changelog
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/p/postfixadmin/code/!svn/ver/800/trunk/ADDITIONS/squirrelmail-plugin/debian/changelog
+END
+conffiles
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/p/postfixadmin/code/!svn/ver/800/trunk/ADDITIONS/squirrelmail-plugin/debian/conffiles
+END
+copyright
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/p/postfixadmin/code/!svn/ver/800/trunk/ADDITIONS/squirrelmail-plugin/debian/copyright
+END
+docs
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/p/postfixadmin/code/!svn/ver/800/trunk/ADDITIONS/squirrelmail-plugin/debian/docs
+END
+rules
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/p/postfixadmin/code/!svn/ver/800/trunk/ADDITIONS/squirrelmail-plugin/debian/rules
+END
+postfixadmin-squirrelmail.dirs
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/p/postfixadmin/code/!svn/ver/800/trunk/ADDITIONS/squirrelmail-plugin/debian/postfixadmin-squirrelmail.dirs
+END
+README.Debian
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/p/postfixadmin/code/!svn/ver/800/trunk/ADDITIONS/squirrelmail-plugin/debian/README.Debian
+END
+control
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/p/postfixadmin/code/!svn/ver/800/trunk/ADDITIONS/squirrelmail-plugin/debian/control
+END
+files
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/p/postfixadmin/code/!svn/ver/800/trunk/ADDITIONS/squirrelmail-plugin/debian/files
+END
+postinst
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/p/postfixadmin/code/!svn/ver/800/trunk/ADDITIONS/squirrelmail-plugin/debian/postinst
+END

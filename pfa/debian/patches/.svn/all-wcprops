@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/p/postfixadmin/code/!svn/ver/1669/trunk/debian/patches
+END
+series
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/p/postfixadmin/code/!svn/ver/1296/trunk/debian/patches/series
+END
+db_credentials
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/p/postfixadmin/code/!svn/ver/1669/trunk/debian/patches/db_credentials
+END
