@@ -93,3 +93,17 @@ mkdir -p /var/vmail/sieve
 cp misc/*.sieve /var/vmail/sieve/
 sievec /var/vmail/sieve/spam-global.sieve
 chown -R vmail:vmail /var/vmail
+
+# clamv
+service clamav-daemon stop
+service clamav-freshclam stop
+freshclam
+echo TCPSocket 3310 >> /etc/clamav/clamd.conf
+echo TCPAddr 127.0.0.1 >> /etc/clamav/clamd.conf
+service clamav-freshclam start
+service clamav-daemon start
+
+# spamassassin
+sed -i '/rewrite_header/c\rewrite_header Subject [SPAM]' /etc/spamassassin/local.cf
+sed -i '/report_safe/c\report_safe 2' /etc/spamassassin/local.cf
+
