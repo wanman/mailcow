@@ -25,13 +25,18 @@ echo ---------- >> installer.log
 
 # set hostname
 function sethostname {
-cat > hosts<<'EOF'
+cat > /etc/hosts<<'EOF'
 127.0.0.1 localhost
 ::1 localhost ip6-localhost ip6-loopback
 ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 EOF
-echo `wget -q4O- ip.appspot.com` $sys_hostname.$sys_domain $sys_hostname >> hosts
+getpublicip=`wget -q4O- ip.appspot.com`
+if [[ $getpublicip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+echo $getpublicip $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
+else
+echo cannot set your hostname;
+fi
 echo $sys_hostname > /etc/hostname
 # we need to start this now
 service hostname.sh start
@@ -56,8 +61,9 @@ chmod 600 /etc/ssl/mail/mail.key
 
 # mysql
 function mysqlconfiguration {
+mysql --defaults-file=/etc/mysql/debian.cnf -e "SET PASSWORD FOR root@localhost=PASSWORD(''); DROP DATABASE IF EXISTS $my_postfixdb;"
 mysqladmin -u root password $my_rootpw
-mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_postfixdb; CREATE USER '$my_postfixuser'@'localhost' IDENTIFIED BY '$my_postfixpass'; GRANT ALL PRIVILEGES ON `$my_postfixdb` . * TO '$my_postfixuser'@'localhost';"
+mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_postfixdb; GRANT ALL PRIVILEGES ON $my_postfixdb.* TO '$my_postfixuser'@'localhost' IDENTIFIED BY '$my_postfixpass';"
 }
 
 # fuglu
@@ -78,7 +84,7 @@ update-rc.d fuglu defaults
 
 # postfix
 function postfixconfig {
-cp -R postfix/* /etc/postfix2/
+cp -R postfix/* /etc/postfix/
 chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf"
 chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_maps.cf"
 chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_mailbox_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_mailbox_maps.cf"
@@ -98,6 +104,8 @@ sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/postfix/sql/*
 
 # dovecot
 function dovecotconfig {
+rm -rf /etc/dovecot/*
+cp -R dovecot/* /etc/dovecot/
 chown root:dovecot "/etc/dovecot/dovecot-dict-sql.conf"; chmod 640 "/etc/dovecot/dovecot-dict-sql.conf"
 chown root:vmail "/etc/dovecot/dovecot-mysql.conf"; chmod 640 "/etc/dovecot/dovecot-mysql.conf"
 chown root:root "/etc/dovecot/dovecot.conf"; chmod 644 "/etc/dovecot/dovecot.conf"
@@ -119,8 +127,10 @@ function clamavconfig {
 service clamav-daemon stop
 service clamav-freshclam stop
 freshclam
+if [[ -z `cat /etc/clamav/clamd.conf | grep -i -e TCPSocket -e TCPAddr` ]]; then
 echo TCPSocket 3310 >> /etc/clamav/clamd.conf
 echo TCPAddr 127.0.0.1 >> /etc/clamav/clamd.conf
+fi
 service clamav-freshclam start
 service clamav-daemon start
 }
@@ -138,13 +148,15 @@ sed -i '/^ENABLED=/s/=.*/="1"/' /etc/default/spamassassin
 function websrvconfig {
 rm -rf /etc/php5/fpm/pool.d/*
 rm -rf /etc/nginx/{sites-available,sites-enabled}/*
-cp misc/mail_nginx /etc/nginx/sites-available/
+cp misc/mail_nginx /etc/nginx/sites-available/mail
+ln -s /etc/nginx/sites-available/mail /etc/nginx/sites-enabled/mail
 cp misc/mail.conf_fpm /etc/php5/fpm/pool.d/mail.conf
 sed -i '/server_tokens/c\server_tokens off;' /etc/nginx/nginx.conf
 }
 
 # pfadmin
 function pfadminconfig {
+rm -rf /usr/share/nginx/mail
 mkdir /usr/share/nginx/mail
 svn co http://svn.code.sf.net/p/postfixadmin/code/trunk /usr/share/nginx/mail/pfadmin
 cp misc/config.local.php_pfadmin /usr/share/nginx/mail/pfadmin/config.local.php
@@ -160,20 +172,37 @@ chown -R www-data: /usr/share/nginx/
 function fail2banconfig {
 cp misc/jail.local_fail2ban /etc/fail2ban/jail.local
 cp misc/sasl.conf_fail2ban /etc/fail2ban/filter.d/sasl.conf
-cp misc/dovecot-pop3imap.conf_fail2ban /etc/fail2ban/dovecot-pop3imap.conf
+cp misc/dovecot-pop3imap.conf_fail2ban /etc/fail2ban/filter.d/dovecot-pop3imap.conf
 }
 
 # rsyslogd
-function rsyslogd {
+function rsyslogdconfig {
 sed "s/*.*;auth,authpriv.none/*.*;auth,mail.none,authpriv.none/" -i /etc/rsyslog.conf
 }
 
 function restartservices {
-service fail2ban restart
-service nginx restart
-service fail2ban restart
-service dovecot restart
-service postfix restart
-service fuglu restart
-service spamassassin restart
+service fail2ban stop; service fail2ban stop;
+service nginx stop; service nginx start;
+service php5-fpm stop; service php5-fpm start;
+service clamav-daemon stop; service clamav-daemon start;
+service clamav-freshclam stop; service clamav-freshclam start;
+service spamassassin stop; service spamassassin start;
+service fuglu restart; service fuglu start;
+service dovecot stop; service dovecot start;
+service postfix stop; service postfix start;
 }
+
+#sethostname
+#installpackages
+#selfsignedcert
+#mysqlconfiguration
+#fuglusetup
+#postfixconfig
+#dovecotconfig
+#clamavconfig
+#spamassassinconfig
+#websrvconfig
+#pfadminconfig
+#fail2banconfig
+#rsyslogdconfig
+#restartservices

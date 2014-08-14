@@ -1,9 +1,4 @@
 server {
-       listen 80;
-       rewrite        ^ https://$server_name$request_uri? permanent;
-}
-
-server {
         listen 443;
 
 	server_name _;
