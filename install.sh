@@ -192,17 +192,32 @@ service dovecot stop; service dovecot start;
 service postfix stop; service postfix start;
 }
 
-#sethostname
-#installpackages
-#selfsignedcert
-#mysqlconfiguration
-#fuglusetup
-#postfixconfig
-#dovecotconfig
-#clamavconfig
-#spamassassinconfig
-#websrvconfig
-#pfadminconfig
-#fail2banconfig
-#rsyslogdconfig
-#restartservices
+
+read -p "Press any key to set hostname..."
+sethostname
+read -p "Press any key to install the required packages (fuglu will be installed from git)..."
+installpackages
+read -p "Press any key to create a self-signed certificate..."
+selfsignedcert
+read -p "Press any key to setup mysql..."
+mysqlconfiguration
+read -p "Press any key to install and setup fuglu..."
+fuglusetup
+read -p "Press any key to setup postfix..."
+postfixconfig
+read -p "Press any key to setup dovecot..."
+dovecotconfig
+read -p "Press any key to setup clamav..."
+clamavconfig
+read -p "Press any key to setup spamassassin..."
+spamassassinconfig
+read -p "Press any key to setup nginx and php5..."
+websrvconfig
+read -p "Press any key to setup postfixadmin..."
+pfadminconfig
+read -p "Press any key to setup fail2ban..."
+fail2banconfig
+read -p "Press any key to setup rsyslogd..."
+rsyslogdconfig
+read -p "Press any key to restart all depending services..."
+restartservices
