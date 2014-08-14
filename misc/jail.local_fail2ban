@@ -1,0 +1,12 @@
+[dovecot-pop3imap]
+enabled = true
+filter = dovecot-pop3imap
+port = pop3,pop3s,imap,imaps
+action = iptables-multiport[name=dovecot-pop3imap, port="pop3,pop3s,imap,imaps", protocol=tcp]
+logpath = /var/log/mail.log
+
+[sasl]
+enabled = true
+port = smtp,ssmtp,imap2,imap3,imaps
+filter = sasl
+logpath = /var/log/mail.log
