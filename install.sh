@@ -117,8 +117,8 @@ sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/dovecot/*
 groupadd -g 5000 vmail
 useradd -g vmail -u 5000 vmail -d /var/vmail
 mkdir -p /var/vmail/sieve
-cp misc/spam-global.sieve_dovecot /var/vmail/sieve/spam-global.sieve
-cp misc/default.sieve_dovecot /var/vmail/sieve/default.sieve
+cp dovecot/spam-global.sieve /var/vmail/sieve/spam-global.sieve
+cp dovecot/default.sieve /var/vmail/sieve/default.sieve
 sievec /var/vmail/sieve/spam-global.sieve
 chown -R vmail:vmail /var/vmail
 }
@@ -149,9 +149,9 @@ sed -i '/^ENABLED=/s/=.*/="1"/' /etc/default/spamassassin
 function websrvconfig {
 rm -rf /etc/php5/fpm/pool.d/*
 rm -rf /etc/nginx/{sites-available,sites-enabled}/*
-cp misc/mail_nginx /etc/nginx/sites-available/mail
+cp nginx/sites-available/mail /etc/nginx/sites-available/mail
 ln -s /etc/nginx/sites-available/mail /etc/nginx/sites-enabled/mail
-cp misc/mail.conf_fpm /etc/php5/fpm/pool.d/mail.conf
+cp php5-fpm/mail.conf /etc/php5/fpm/pool.d/mail.conf
 sed -i '/server_tokens/c\server_tokens off;' /etc/nginx/nginx.conf
 }
 
@@ -160,7 +160,7 @@ function pfadminconfig {
 rm -rf /usr/share/nginx/mail
 mkdir -p /usr/share/nginx/mail
 svn co http://svn.code.sf.net/p/postfixadmin/code/trunk /usr/share/nginx/mail/pfadmin
-cp misc/config.local.php_pfadmin /usr/share/nginx/mail/pfadmin/config.local.php
+cp pfadmin/config.local.php /usr/share/nginx/mail/pfadmin/config.local.php
 sed -i "s/my_postfixpass/$my_postfixpass/g" /usr/share/nginx/mail/pfadmin/config.local.php
 sed -i "s/my_postfixuser/$my_postfixuser/g" /usr/share/nginx/mail/pfadmin/config.local.php
 sed -i "s/my_postfixdb/$my_postfixdb/g" /usr/share/nginx/mail/pfadmin/config.local.php
@@ -171,9 +171,9 @@ chown -R www-data: /usr/share/nginx/
 
 # fail2ban
 function fail2banconfig {
-cp misc/jail.local_fail2ban /etc/fail2ban/jail.local
-cp misc/sasl.conf_fail2ban /etc/fail2ban/filter.d/sasl.conf
-cp misc/dovecot-pop3imap.conf_fail2ban /etc/fail2ban/filter.d/dovecot-pop3imap.conf
+cp fail2ban/jail.local /etc/fail2ban/jail.local
+cp fail2ban/filter.d/sasl.conf /etc/fail2ban/filter.d/sasl.conf
+cp fail2ban/filter.d/dovecot-pop3imap.conf /etc/fail2ban/filter.d/dovecot-pop3imap.conf
 }
 
 # rsyslogd
