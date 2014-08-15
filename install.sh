@@ -122,7 +122,7 @@ sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/postfix/sql/*
 # dovecot
 function dovecotconfig {
 rm -rf /etc/dovecot/*
-cp -R dovecot/* /etc/dovecot/
+cp -R dovecot/*.conf /etc/dovecot/
 groupadd -g 5000 vmail
 useradd -g vmail -u 5000 vmail -d /var/vmail
 chown root:dovecot "/etc/dovecot/dovecot-dict-sql.conf"; chmod 640 "/etc/dovecot/dovecot-dict-sql.conf"
