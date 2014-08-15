@@ -10,10 +10,16 @@ genpasswd() {
 ########### CONFIG START ###########
 sys_hostname="mail"
 sys_domain="domain.tld"
+
 my_postfixdb="postfixdb"
 my_postfixuser="postfix"
 my_postfixpass=`genpasswd 20`
 my_rootpw=`genpasswd 20`
+
+cert_country="DE"
+cert_state="NRW"
+cert_city="DUS"
+cert_org="MAIL"
 ############ CONFIG END ############
 #### do not edit any line below ####
 
@@ -25,21 +31,21 @@ echo ---------- >> installer.log
 
 # set hostname
 function sethostname {
+getpublicip=`wget -q4O- ip.appspot.com`
+if [[ $getpublicip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
 cat > /etc/hosts<<'EOF'
 127.0.0.1 localhost
 ::1 localhost ip6-localhost ip6-loopback
 ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 EOF
-getpublicip=`wget -q4O- ip.appspot.com`
-if [[ $getpublicip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
 echo $getpublicip $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
-else
-echo cannot set your hostname;
-fi
 echo $sys_hostname > /etc/hostname
-# we need to start this now
+# need to trigger this pseudo service now
 service hostname.sh start
+else
+echo "cannot set your hostname";
+fi
 }
 
 # installation
@@ -56,7 +62,7 @@ unset DEBIAN_FRONTEND
 # certificate
 function selfsignedcert {
 mkdir /etc/ssl/mail
-openssl req -new -newkey rsa:4096 -days 1095 -nodes -x509 -subj "/C=DE/ST=SESI/L=SESI/O=SESI/CN=$sys_hostname.$sys_domain" -keyout /etc/ssl/mail/mail.key  -out /etc/ssl/mail/mail.crt
+openssl req -new -newkey rsa:4096 -days 1095 -nodes -x509 -subj "/C=$cert_country/ST=$cert_state/L=$cert_city/O=$cert_org/CN=$sys_hostname.$sys_domain" -keyout /etc/ssl/mail/mail.key  -out /etc/ssl/mail/mail.crt
 chmod 600 /etc/ssl/mail/mail.key
 }
 
