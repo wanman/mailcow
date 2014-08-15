@@ -10,6 +10,7 @@ genpasswd() {
 ########### CONFIG START ###########
 sys_hostname="mail"
 sys_domain="domain.tld"
+sys_timezone="Europe/Berlin"
 
 my_postfixdb="postfixdb"
 my_postfixuser="postfix"
@@ -30,7 +31,7 @@ echo MySQL root password: $my_rootpw >> installer.log
 echo ---------- >> installer.log
 
 # set hostname
-function sethostname {
+function systemenvironment {
 getpublicip=`wget -q4O- ip.appspot.com`
 if [[ $getpublicip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
 cat > /etc/hosts<<'EOF'
@@ -44,13 +45,22 @@ echo $sys_hostname > /etc/hostname
 # need to trigger this pseudo service now
 service hostname.sh start
 else
-echo "cannot set your hostname";
+echo "cannot set your hostname: cannot resolve ip.appspot.com";
+fi
+if [[ -f /usr/share/zoneinfo/$sys_timezone ]] ; then
+echo $sys_timezone > /etc/timezone
+dpkg-reconfigure -f noninteractive tzdata
+else
+echo "cannot set your timezone: timezone is unknown";
+fi
+if [[ -z `dig -x $getpublicip @8.8.8.8 | grep -i $sys_hostname.$sys_domain` ]]; then
+echo "remember to setup a ptr record: $getpublicip does not point to $sys_hostname.$sys_domain (google dns)"
 fi
 }
 
 # installation
 function installpackages {
-DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install python-sqlalchemy python-beautifulsoup python-setuptools \
+DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
 python-magic openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite mysql-client mysql-server nginx dovecot-common dovecot-core mailutils \
@@ -158,6 +168,7 @@ rm -rf /etc/nginx/{sites-available,sites-enabled}/*
 cp nginx/sites-available/mail /etc/nginx/sites-available/mail
 ln -s /etc/nginx/sites-available/mail /etc/nginx/sites-enabled/mail
 cp php5-fpm/mail.conf /etc/php5/fpm/pool.d/mail.conf
+sed -i "/date.timezone/c\php_admin_value[date.timezone] = $sys_timezone" /etc/php5/fpm/pool.d/mail.conf
 sed -i '/server_tokens/c\server_tokens off;' /etc/nginx/nginx.conf
 }
 
@@ -200,8 +211,8 @@ service postfix stop; service postfix start;
 }
 
 
-read -p "Press [ENTER] to set hostname..."
-sethostname
+read -p "Press [ENTER] to setup your system environment..."
+systemenvironment
 read -p "Press [ENTER] to install the required packages (fuglu will be installed from git)..."
 installpackages
 read -p "Press [ENTER] to create a self-signed certificate..."
