@@ -17,6 +17,9 @@ my_postfixuser="postfix"
 my_postfixpass=`genpasswd 20`
 my_rootpw=`genpasswd 20`
 
+pfadmin_adminuser="pfadmin@domain.tld"
+pfadmin_adminpass=`genpasswd 20`
+
 cert_country="DE"
 cert_state="NRW"
 cert_city="DUS"
@@ -26,8 +29,12 @@ cert_org="MAIL"
 
 # log generated passwords
 echo ---------- > installer.log
-echo Postfix password: $my_postfixpass >> installer.log
+echo MySQL $my_postfixuser password: $my_postfixpass >> installer.log
 echo MySQL root password: $my_rootpw >> installer.log
+echo ---------- >> installer.log
+echo Postfix Administrator Login >> installer.log
+echo Username: $my_postfixuser >> installer.log
+echo Password: $my_postfixpass >> installer.log
 echo ---------- >> installer.log
 
 # set hostname
@@ -214,6 +221,11 @@ fi
 if [[ -z `dig $sys_hostname.$sys_domain @8.8.8.8 | grep -i $getpublicip` ]]; then
 echo "WARNING: Remember to setup an A record for $sys_hostname.$sys_domain pointing to $getpublicip (checked by Google DNS)"
 fi
+}
+
+function setupsuperadmin {
+wget --quiet --no-check-certificate -O /dev/null https://localhost/pfadmin/setup.php
+php /usr/share/nginx/mail/pfadmin/scripts/postfixadmin-cli.php admin add $pfadmin_adminuser --password $pfadmin_adminpass --password2 $pfadmin_adminpass --superadmin
 }
 
 read -p "Press [ENTER] to setup your system environment..."
