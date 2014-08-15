@@ -53,9 +53,6 @@ dpkg-reconfigure -f noninteractive tzdata
 else
 echo "cannot set your timezone: timezone is unknown";
 fi
-if [[ -z `dig -x $getpublicip @8.8.8.8 | grep -i $sys_hostname.$sys_domain` ]]; then
-echo "remember to setup a ptr record: $getpublicip does not point to $sys_hostname.$sys_domain (google dns)"
-fi
 }
 
 # installation
@@ -121,7 +118,7 @@ sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/postfix/sql/*
 
 # dovecot
 function dovecotconfig {
-rm -rf /etc/dovecot/*
+rm -rf /etc/dovecot/* 2> /dev/null
 cp -R dovecot/*.conf /etc/dovecot/
 groupadd -g 5000 vmail
 useradd -g vmail -u 5000 vmail -d /var/vmail
@@ -163,8 +160,8 @@ sed -i '/^ENABLED=/s/=.*/="1"/' /etc/default/spamassassin
 
 # nginx, php5
 function websrvconfig {
-rm -rf /etc/php5/fpm/pool.d/*
-rm -rf /etc/nginx/{sites-available,sites-enabled}/*
+rm -rf /etc/php5/fpm/pool.d/* 2> /dev/null
+rm -rf /etc/nginx/{sites-available,sites-enabled}/* 2> /dev/null
 cp nginx/sites-available/mail /etc/nginx/sites-available/mail
 ln -s /etc/nginx/sites-available/mail /etc/nginx/sites-enabled/mail
 cp php5-fpm/mail.conf /etc/php5/fpm/pool.d/mail.conf
@@ -174,7 +171,7 @@ sed -i '/server_tokens/c\server_tokens off;' /etc/nginx/nginx.conf
 
 # pfadmin
 function pfadminconfig {
-rm -rf /usr/share/nginx/mail
+rm -rf /usr/share/nginx/mail 2> /dev/null
 mkdir -p /usr/share/nginx/mail
 svn co http://svn.code.sf.net/p/postfixadmin/code/trunk /usr/share/nginx/mail/pfadmin
 cp pfadmin/config.local.php /usr/share/nginx/mail/pfadmin/config.local.php
@@ -210,6 +207,14 @@ service dovecot stop; service dovecot start;
 service postfix stop; service postfix start;
 }
 
+function checkdns {
+if [[ -z `dig -x $getpublicip @8.8.8.8 | grep -i $sys_hostname.$sys_domain` ]]; then
+echo "WARNING: Remember to setup a PTR record: $getpublicip does not point to $sys_hostname.$sys_domain (checked by Google DNS)"
+fi
+if [[ -z `dig $sys_hostname.$sys_domain @8.8.8.8 | grep -i $getpublicip` ]]; then
+echo "WARNING: Remember to setup an A record for $sys_hostname.$sys_domain pointing to $getpublicip (checked by Google DNS)"
+fi
+}
 
 read -p "Press [ENTER] to setup your system environment..."
 systemenvironment
