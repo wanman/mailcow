@@ -123,6 +123,8 @@ sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/postfix/sql/*
 function dovecotconfig {
 rm -rf /etc/dovecot/*
 cp -R dovecot/* /etc/dovecot/
+groupadd -g 5000 vmail
+useradd -g vmail -u 5000 vmail -d /var/vmail
 chown root:dovecot "/etc/dovecot/dovecot-dict-sql.conf"; chmod 640 "/etc/dovecot/dovecot-dict-sql.conf"
 chown root:vmail "/etc/dovecot/dovecot-mysql.conf"; chmod 640 "/etc/dovecot/dovecot-mysql.conf"
 chown root:root "/etc/dovecot/dovecot.conf"; chmod 644 "/etc/dovecot/dovecot.conf"
@@ -130,8 +132,6 @@ sed -i "s/mail.domain.tld/$sys_hostname.$sys_domain/g" /etc/dovecot/*
 sed -i "s/my_postfixpass/$my_postfixpass/g" /etc/dovecot/*
 sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/dovecot/*
 sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/dovecot/*
-groupadd -g 5000 vmail
-useradd -g vmail -u 5000 vmail -d /var/vmail
 mkdir -p /var/vmail/sieve
 cp dovecot/spam-global.sieve /var/vmail/sieve/spam-global.sieve
 cp dovecot/default.sieve /var/vmail/sieve/default.sieve
