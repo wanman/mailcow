@@ -5,6 +5,12 @@ genpasswd() {
       	tr -cd '[:alnum:]' < /dev/urandom | fold -w${l} | head -n1
 }
 
+function returnok {
+echo "`tput setaf 2``tput bold`------------`tput sgr0`";
+echo "`tput setaf 2``tput bold`--- [OK] ---`tput sgr0`";
+echo "`tput setaf 2``tput bold`------------`tput sgr0`";
+}
+
 [[ ! -z `ss -lnt | awk '$1 == "LISTEN" && $4 ~ ":25" || $4 ~ ":143" || $4 ~ ":993" || $4 ~ ":587" || $4 ~ ":485" || $4 ~ ":80" || $4 ~ ":443" || $4 ~ ":995"'` ]] && { echo "please remove any mail and web services before running this script"; exit 1; }
 
 ########### CONFIG START ###########
@@ -180,7 +186,7 @@ sed -i '/server_tokens/c\server_tokens off;' /etc/nginx/nginx.conf
 function pfadminconfig {
 rm -rf /usr/share/nginx/mail 2> /dev/null
 mkdir -p /usr/share/nginx/mail
-svn co http://svn.code.sf.net/p/postfixadmin/code/trunk /usr/share/nginx/mail/pfadmin
+svn --quiet --non-interactive co http://svn.code.sf.net/p/postfixadmin/code/trunk /usr/share/nginx/mail/pfadmin
 cp pfadmin/config.local.php /usr/share/nginx/mail/pfadmin/config.local.php
 sed -i "s/my_postfixpass/$my_postfixpass/g" /usr/share/nginx/mail/pfadmin/config.local.php
 sed -i "s/my_postfixuser/$my_postfixuser/g" /usr/share/nginx/mail/pfadmin/config.local.php
@@ -230,6 +236,7 @@ php /usr/share/nginx/mail/pfadmin/scripts/postfixadmin-cli.php admin add $pfadmi
 
 read -p "Press [ENTER] to setup your system environment..."
 systemenvironment
+echo "`tput setaf 2``tput bold`[OK]`tput sgr0`"
 read -p "Press [ENTER] to install the required packages (fuglu will be installed from git)..."
 installpackages
 read -p "Press [ENTER] to create a self-signed certificate..."
