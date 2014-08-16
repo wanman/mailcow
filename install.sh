@@ -186,8 +186,8 @@ sed -i '/server_tokens/c\server_tokens off;' /etc/nginx/nginx.conf
 function pfadminconfig {
 rm -rf /usr/share/nginx/mail 2> /dev/null
 mkdir -p /usr/share/nginx/mail
-svn --quiet --non-interactive co http://svn.code.sf.net/p/postfixadmin/code/trunk /usr/share/nginx/mail/pfadmin
 echo checking out postfixadmin, please wait...
+svn --quiet --non-interactive co http://svn.code.sf.net/p/postfixadmin/code/trunk /usr/share/nginx/mail/pfadmin
 cp pfadmin/config.local.php /usr/share/nginx/mail/pfadmin/config.local.php
 sed -i "s/my_postfixpass/$my_postfixpass/g" /usr/share/nginx/mail/pfadmin/config.local.php
 sed -i "s/my_postfixuser/$my_postfixuser/g" /usr/share/nginx/mail/pfadmin/config.local.php
