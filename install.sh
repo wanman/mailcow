@@ -23,7 +23,7 @@ my_postfixuser="postfix"
 my_postfixpass=`genpasswd 20`
 my_rootpw=`genpasswd 20`
 
-pfadmin_adminuser="pfadmin@domain.tld"
+pfadmin_adminuser="pfadmin@$sys_domain"
 pfadmin_adminpass=`genpasswd 20`
 
 cert_country="DE"
@@ -39,8 +39,8 @@ echo MySQL $my_postfixuser password: $my_postfixpass >> installer.log
 echo MySQL root password: $my_rootpw >> installer.log
 echo ---------- >> installer.log
 echo Postfix Administrator Login >> installer.log
-echo Username: $my_postfixuser >> installer.log
-echo Password: $my_postfixpass >> installer.log
+echo Username: $pfadmin_adminuser >> installer.log
+echo Password: $pfadmin_adminpass >> installer.log
 echo ---------- >> installer.log
 
 # set hostname
@@ -209,6 +209,7 @@ function rsyslogdconfig {
 sed "s/*.*;auth,authpriv.none/*.*;auth,mail.none,authpriv.none/" -i /etc/rsyslog.conf
 }
 
+# restart services
 function restartservices {
 service fail2ban stop; service fail2ban stop;
 service nginx stop; service nginx start;
@@ -221,6 +222,7 @@ service dovecot stop; service dovecot start;
 service postfix stop; service postfix start;
 }
 
+# check dns settings for domain
 function checkdns {
 if [[ -z `dig -x $getpublicip @8.8.8.8 | grep -i $sys_hostname.$sys_domain` ]]; then
 echo "WARNING: Remember to setup a PTR record: $getpublicip does not point to $sys_hostname.$sys_domain (checked by Google DNS)"
@@ -230,6 +232,7 @@ echo "WARNING: Remember to setup an A record for $sys_hostname.$sys_domain point
 fi
 }
 
+# setup an administrator for postfixadmin
 function setupsuperadmin {
 wget --quiet --no-check-certificate -O /dev/null https://localhost/pfadmin/setup.php
 php /usr/share/nginx/mail/pfadmin/scripts/postfixadmin-cli.php admin add $pfadmin_adminuser --password $pfadmin_adminpass --password2 $pfadmin_adminpass --superadmin
@@ -237,30 +240,49 @@ php /usr/share/nginx/mail/pfadmin/scripts/postfixadmin-cli.php admin add $pfadmi
 
 read -p "Press [ENTER] to setup your system environment..."
 systemenvironment
-echo "`tput setaf 2``tput bold`[OK]`tput sgr0`"
+returnok
 read -p "Press [ENTER] to install the required packages (fuglu will be installed from git)..."
 installpackages
+returnok
 read -p "Press [ENTER] to create a self-signed certificate..."
 selfsignedcert
+returnok
 read -p "Press [ENTER] to setup mysql..."
 mysqlconfiguration
+returnok
 read -p "Press [ENTER] to install and setup fuglu..."
 fuglusetup
+returnok
 read -p "Press [ENTER] to setup postfix..."
 postfixconfig
+returnok
 read -p "Press [ENTER] to setup dovecot..."
 dovecotconfig
+returnok
 read -p "Press [ENTER] to setup clamav..."
 clamavconfig
+returnok
 read -p "Press [ENTER] to setup spamassassin..."
 spamassassinconfig
+returnok
 read -p "Press [ENTER] to setup nginx and php5..."
 websrvconfig
+returnok
 read -p "Press [ENTER] to setup postfixadmin..."
 pfadminconfig
+returnok
 read -p "Press [ENTER] to setup fail2ban..."
 fail2banconfig
+returnok
 read -p "Press [ENTER] to setup rsyslogd..."
 rsyslogdconfig
+returnok
 read -p "Press [ENTER] to restart all depending services..."
 restartservices
+returnok
+read -p "Press [ENTER] to complete postfixadmin setup..."
+setupsuperadmin
+returnok
+echo
+checkdns
+
