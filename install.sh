@@ -235,35 +235,35 @@ php /usr/share/nginx/mail/pfadmin/scripts/postfixadmin-cli.php admin add $pfadmi
 }
 
 systemenvironment
-returnok "System environment"
+returnwait "System environment"
 installpackages
-returnok "Package installation"
+returnwait "Package installation"
 selfsignedcert
-returnok "Self-signed certificate"
+returnwait "Self-signed certificate"
 mysqlconfiguration
-returnok "MySQL configuration"
+returnwait "MySQL configuration"
 fuglusetup
-returnok "FuGlu setup"
+returnwait "FuGlu setup"
 postfixconfig
-returnok "Postfix configuration"
+returnwait "Postfix configuration"
 dovecotconfig
-returnok "Dovecot configuration"
+returnwait "Dovecot configuration"
 clamavconfig
-returnok "ClamAV configuration"
+returnwait "ClamAV configuration"
 spamassassinconfig
-returnok "Spamassassin configuration"
+returnwait "Spamassassin configuration"
 websrvconfig
-returnok "Nginx configuration"
+returnwait "Nginx configuration"
 pfadminconfig
-returnok "Postfixadmin configuration"
+returnwait "Postfixadmin configuration"
 fail2banconfig
-returnok "Fail2ban configuration"
+returnwait "Fail2ban configuration"
 rsyslogdconfig
-returnok "Rsyslogd configuration"
+returnwait "Rsyslogd configuration"
 restartservices
-returnok "Restarting services"
+returnwait "Restarting services"
 setupsuperadmin
-returnok "Completing Postfixadmin setup"
+returnwait "Completing Postfixadmin setup"
 checkdns
 
 echo "LOGGED OUTPUT TO: installer.log"
