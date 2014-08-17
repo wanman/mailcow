@@ -216,6 +216,7 @@ service spamassassin stop; service spamassassin start;
 service fuglu restart; service fuglu start;
 service dovecot stop; service dovecot start;
 service postfix stop; service postfix start;
+service mysql stop; service mysql start;
 }
 
 # check dns settings for domain
