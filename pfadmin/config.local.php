@@ -15,6 +15,7 @@ $CONF['default_aliases'] = array (
 $CONF['aliases'] = '10240';
 $CONF['mailboxes'] = '10240';
 $CONF['maxquota'] = '10240';
+$CONF['domain_quota_default'] = '20480';
 $CONF['quota'] = 'YES';
 $CONF['backup'] = 'YES';
 $CONF['fetchmail'] = 'NO';

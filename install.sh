@@ -213,6 +213,7 @@ sed "s/*.*;auth,authpriv.none/*.*;auth,mail.none,authpriv.none/" -i /etc/rsyslog
 # restart services
 function restartservices {
 service fail2ban stop; service fail2ban stop;
+service rsyslog stop; service rsyslog stop;
 service nginx stop; service nginx start;
 service php5-fpm stop; service php5-fpm start;
 service clamav-daemon stop; service clamav-daemon start;
@@ -220,13 +221,14 @@ service clamav-freshclam stop; service clamav-freshclam start;
 service spamassassin stop; echo "Sleeping 3 seconds..."; sleep 3; service spamassassin start;
 service fuglu stop; service fuglu start;
 service dovecot stop; service dovecot start;
+cat /dev/null > /var/log/mail.err # error line when installing unattended
 service postfix stop; service postfix start;
 service mysql stop; service mysql start;
 }
 
 # check dns settings for domain
 function checkdns {
-if [[ -z `dig -x $getpublicip @8.8.8.8 | grep -i $sys_hostname.$sys_domain` ]]; then
+if [[ -z `dig -x $getpublicip @8.8.8.8 | grep -i $sys_domain` ]]; then
 echo "WARNING: Remember to setup a PTR record: $getpublicip does not point to $sys_hostname.$sys_domain (checked by Google DNS)"
 fi
 if [[ -z `dig $sys_hostname.$sys_domain @8.8.8.8 | grep -i $getpublicip` ]]; then
@@ -271,5 +273,11 @@ returnwait "Restarting services"
 setupsuperadmin
 returnwait "Completing Postfixadmin setup"
 checkdns
-
-echo "LOGGED OUTPUT TO: installer.log"
+echo
+chmod 600 installer.log
+echo "LOGGED CREDENTIALS TO: installer.log"
+echo
+echo "Visit \"https://$sys_hostname.$sys_domain/pfadmin\" to setup a mailbox"
+echo
+echo "Change Postfixadmin default values in \"/usr/share/nginx/mail/pfadmin/config.local.php\"."
+echo
