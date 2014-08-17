@@ -12,7 +12,7 @@ read -p "Press ENTER to continue or CTRL+C to cancel installation"
 
 ########### CONFIG START ###########
 sys_hostname="mail"
-sys_domain="domain.tld"
+sys_domain="domain.com"
 sys_timezone="Europe/Berlin"
 
 my_postfixdb="postfixdb"
@@ -212,7 +212,7 @@ service nginx stop; service nginx start;
 service php5-fpm stop; service php5-fpm start;
 service clamav-daemon stop; service clamav-daemon start;
 service clamav-freshclam stop; service clamav-freshclam start;
-service spamassassin stop; service spamassassin start;
+service spamassassin stop; echo "Sleeping 3 seconds..."; sleep 3; service spamassassin start;
 service fuglu restart; service fuglu start;
 service dovecot stop; service dovecot start;
 service postfix stop; service postfix start;
