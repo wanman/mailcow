@@ -1,4 +1,7 @@
 #!/bin/bash
+/bin/bash logo.sh
+echo
+echo
 genpasswd() {
 tr -cd '[:alnum:]' < /dev/urandom | fold -w22 | head -n1 | echo `cat - `$RANDOM
 }
@@ -8,7 +11,7 @@ echo "`tput setaf 4``tput bold`$1`tput sgr0` - `tput setaf 2``tput bold`[OK]`tpu
 read -p "Press ENTER to continue or CTRL+C to cancel installation"
 }
 
-[[ ! -z `ss -lnt | awk '$1 == "LISTEN" && $4 ~ ":25" || $4 ~ ":143" || $4 ~ ":993" || $4 ~ ":587" || $4 ~ ":485" || $4 ~ ":80" || $4 ~ ":443" || $4 ~ ":995"'` ]] && { echo "please remove any mail and web services before running this script"; exit 1; }
+[[ ! -z `ss -lnt | awk '$1 == "LISTEN" && $4 ~ ":25" || $4 ~ ":143" || $4 ~ ":993" || $4 ~ ":587" || $4 ~ ":485" || $4 ~ ":80" || $4 ~ ":443" || $4 ~ ":995"'` ]] && { echo "`tput setaf 1``tput bold`Please remove any mail and web services before running this script.`tput sgr0`"; exit 1; }
 
 ########### CONFIG START ###########
 sys_hostname="mail"
@@ -41,7 +44,7 @@ echo ---------- >> installer.log
 
 # set hostname
 function systemenvironment {
-getpublicip=`wget -q4O- ip.appspot.com`
+getpublicip=`wget -q4O- ip4.telize.com`
 if [[ $getpublicip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
 cat > /etc/hosts<<'EOF'
 127.0.0.1 localhost
@@ -66,6 +69,7 @@ fi
 
 # installation
 function installpackages {
+echo "Installing packages unattended, please stand by, errors will be reported."
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
 python-magic openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap subversion \
@@ -91,12 +95,13 @@ mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_postfixdb; G
 
 # fuglu
 function fuglusetup {
-mkdir /var/log/fuglu
-rm /tmp/fuglu_control.sock
+mkdir /var/log/fuglu 2> /dev/null
+rm /tmp/fuglu_control.sock 2> /dev/null
 chown nobody:nogroup /var/log/fuglu
+rm -rf fuglu_git 2> /dev/null
 git clone https://github.com/gryphius/fuglu.git fuglu_git
 cd fuglu_git/fuglu
-python setup.py install
+python setup.py -q install
 cd ../../
 find /etc/fuglu -type f -name '*.dist' -print0 | xargs -0 rename 's/.dist$//'
 sed -i '/^group=/s/=.*/=nogroup/' /etc/fuglu/fuglu.conf
