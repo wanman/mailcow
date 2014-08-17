@@ -229,7 +229,7 @@ service mysql stop; service mysql start;
 # check dns settings for domain
 function checkdns {
 if [[ -z `dig -x $getpublicip @8.8.8.8 | grep -i $sys_domain` ]]; then
-echo "WARNING: Remember to setup a PTR record: $getpublicip does not point to $sys_hostname.$sys_domain (checked by Google DNS)"
+echo "WARNING: Remember to setup a PTR record: $getpublicip does not point to $sys_domain (checked by Google DNS)"
 fi
 if [[ -z `dig $sys_hostname.$sys_domain @8.8.8.8 | grep -i $getpublicip` ]]; then
 echo "WARNING: Remember to setup an A record for $sys_hostname.$sys_domain pointing to $getpublicip (checked by Google DNS)"
@@ -238,7 +238,9 @@ fi
 
 # setup an administrator for postfixadmin
 function setupsuperadmin {
+# init database silently
 wget --quiet --no-check-certificate -O /dev/null https://localhost/pfadmin/setup.php
+# creating admin account
 php /usr/share/nginx/mail/pfadmin/scripts/postfixadmin-cli.php admin add $pfadmin_adminuser --password $pfadmin_adminpass --password2 $pfadmin_adminpass --superadmin
 }
 
