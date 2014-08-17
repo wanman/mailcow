@@ -71,7 +71,7 @@ python-magic openssl php-auth-sasl php-http-request php-mail php-mail-mime php-m
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite mysql-client mysql-server nginx dovecot-common dovecot-core mailutils \
 dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d postfix \
-postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin fail2ban
+postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin fail2ban >/dev/null
 unset DEBIAN_FRONTEND
 }
 
@@ -213,7 +213,7 @@ service php5-fpm stop; service php5-fpm start;
 service clamav-daemon stop; service clamav-daemon start;
 service clamav-freshclam stop; service clamav-freshclam start;
 service spamassassin stop; echo "Sleeping 3 seconds..."; sleep 3; service spamassassin start;
-service fuglu restart; service fuglu start;
+service fuglu stop; service fuglu start;
 service dovecot stop; service dovecot start;
 service postfix stop; service postfix start;
 service mysql stop; service mysql start;
