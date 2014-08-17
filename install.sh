@@ -1,14 +1,11 @@
 #!/bin/bash
 genpasswd() {
-	local l=$1
-       	[ "$l" == "" ] && l=16
-      	tr -cd '[:alnum:]' < /dev/urandom | fold -w${l} | head -n1
+tr -cd '[:alnum:]' < /dev/urandom | fold -w22 | head -n1 | echo `cat - `$RANDOM
 }
 
-function returnok {
-echo "`tput setaf 2``tput bold`------------`tput sgr0`";
-echo "`tput setaf 2``tput bold`--- [OK] ---`tput sgr0`";
-echo "`tput setaf 2``tput bold`------------`tput sgr0`";
+function returnwait {
+echo "`tput setaf 4``tput bold`$1`tput sgr0` - `tput setaf 2``tput bold`[OK]`tput sgr0`";
+read -p "Press ENTER to continue or CTRL+C to cancel installation"
 }
 
 [[ ! -z `ss -lnt | awk '$1 == "LISTEN" && $4 ~ ":25" || $4 ~ ":143" || $4 ~ ":993" || $4 ~ ":587" || $4 ~ ":485" || $4 ~ ":80" || $4 ~ ":443" || $4 ~ ":995"'` ]] && { echo "please remove any mail and web services before running this script"; exit 1; }
@@ -20,19 +17,18 @@ sys_timezone="Europe/Berlin"
 
 my_postfixdb="postfixdb"
 my_postfixuser="postfix"
-my_postfixpass=`genpasswd 20`
-my_rootpw=`genpasswd 20`
+my_postfixpass=`genpasswd`
+my_rootpw=`genpasswd`
 
 pfadmin_adminuser="pfadmin@$sys_domain"
-pfadmin_adminpass=`genpasswd 20`
+pfadmin_adminpass=`genpasswd`
 
 cert_country="DE"
 cert_state="NRW"
 cert_city="DUS"
 cert_org="MAIL"
 ############ CONFIG END ############
-#### do not edit any line below ####
-
+## do not edit any line below ####
 # log generated passwords
 echo ---------- > installer.log
 echo MySQL $my_postfixuser password: $my_postfixpass >> installer.log
@@ -238,51 +234,36 @@ wget --quiet --no-check-certificate -O /dev/null https://localhost/pfadmin/setup
 php /usr/share/nginx/mail/pfadmin/scripts/postfixadmin-cli.php admin add $pfadmin_adminuser --password $pfadmin_adminpass --password2 $pfadmin_adminpass --superadmin
 }
 
-read -p "Press [ENTER] to setup your system environment..."
 systemenvironment
-returnok
-read -p "Press [ENTER] to install the required packages (fuglu will be installed from git)..."
+returnok "System environment"
 installpackages
-returnok
-read -p "Press [ENTER] to create a self-signed certificate..."
+returnok "Package installation"
 selfsignedcert
-returnok
-read -p "Press [ENTER] to setup mysql..."
+returnok "Self-signed certificate"
 mysqlconfiguration
-returnok
-read -p "Press [ENTER] to install and setup fuglu..."
+returnok "MySQL configuration"
 fuglusetup
-returnok
-read -p "Press [ENTER] to setup postfix..."
+returnok "FuGlu setup"
 postfixconfig
-returnok
-read -p "Press [ENTER] to setup dovecot..."
+returnok "Postfix configuration"
 dovecotconfig
-returnok
-read -p "Press [ENTER] to setup clamav..."
+returnok "Dovecot configuration"
 clamavconfig
-returnok
-read -p "Press [ENTER] to setup spamassassin..."
+returnok "ClamAV configuration"
 spamassassinconfig
-returnok
-read -p "Press [ENTER] to setup nginx and php5..."
+returnok "Spamassassin configuration"
 websrvconfig
-returnok
-read -p "Press [ENTER] to setup postfixadmin..."
+returnok "Nginx configuration"
 pfadminconfig
-returnok
-read -p "Press [ENTER] to setup fail2ban..."
+returnok "Postfixadmin configuration"
 fail2banconfig
-returnok
-read -p "Press [ENTER] to setup rsyslogd..."
+returnok "Fail2ban configuration"
 rsyslogdconfig
-returnok
-read -p "Press [ENTER] to restart all depending services..."
+returnok "Rsyslogd configuration"
 restartservices
-returnok
-read -p "Press [ENTER] to complete postfixadmin setup..."
+returnok "Restarting services"
 setupsuperadmin
-returnok
-echo
+returnok "Completing Postfixadmin setup"
 checkdns
 
+echo "LOGGED OUTPUT TO: installer.log"
