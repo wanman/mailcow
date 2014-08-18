@@ -101,13 +101,13 @@ echo $sys_hostname > /etc/hostname
 # need to trigger this pseudo service now
 service hostname.sh start
 else
-echo "WARNING: Cannot set your hostname"
+echo "`tput bold`WARNING`tput sgr0`: Cannot set your hostname"
 fi
 if [[ -f /usr/share/zoneinfo/$sys_timezone ]] ; then
 echo $sys_timezone > /etc/timezone
 dpkg-reconfigure -f noninteractive tzdata
 else
-echo "WARNING: Cannot set your timezone: timezone is unknown";
+echo "`tput bold`WARNING`tput sgr0`: Cannot set your timezone: timezone is unknown";
 fi
 }
 
@@ -277,10 +277,10 @@ service mysql stop; service mysql start;
 # check dns settings for domain
 function checkdns {
 if [[ -z `dig -x $getpublicip @8.8.8.8 | grep -i $sys_domain` ]]; then
-echo "WARNING: Remember to setup a PTR record: $getpublicip does not point to $sys_domain (checked by Google DNS)"
+echo "`tput bold`WARNING`tput sgr0`: Remember to setup a PTR record: $getpublicip does not point to $sys_domain (checked by Google DNS)"
 fi
 if [[ -z `dig $sys_hostname.$sys_domain @8.8.8.8 | grep -i $getpublicip` ]]; then
-echo "WARNING: Remember to setup an A record for $sys_hostname.$sys_domain pointing to $getpublicip (checked by Google DNS)"
+echo "`tput bold`WARNING`tput sgr0`: Remember to setup an A record for $sys_hostname.$sys_domain pointing to $getpublicip (checked by Google DNS)"
 fi
 }
 
