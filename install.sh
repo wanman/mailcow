@@ -63,13 +63,13 @@ echo "
 Please review your configuration
 ---------------------------------
 FQDN: $sys_hostname.$sys_domain
-Timezone $sys_timezone
+Timezone: $sys_timezone
 
 Postfix MySQL database name: $my_postfixdb
 Postfix MySQL database user: $my_postfixuser
 
-Postfixadmin Administrator Login: $pfadmin_adminuser"
-
+Postfixadmin Administrator Login: $pfadmin_adminuser
+---------------------------------"
 
 # log generated passwords
 echo ---------- > installer.log
