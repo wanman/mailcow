@@ -138,6 +138,7 @@ mkdir /var/log/fuglu 2> /dev/null
 rm /tmp/fuglu_control.sock 2> /dev/null
 chown nobody:nogroup /var/log/fuglu
 rm -rf fuglu_git 2> /dev/null
+rm -rf /etc/fuglu 2> /dev/null
 git clone https://github.com/gryphius/fuglu.git fuglu_git
 cd fuglu_git/fuglu
 python setup.py -q install
