@@ -251,8 +251,8 @@ sed "s/*.*;auth,authpriv.none/*.*;auth,mail.none,authpriv.none/" -i /etc/rsyslog
 
 # restart services
 function restartservices {
-service fail2ban stop; service fail2ban stop;
-service rsyslog stop; service rsyslog stop;
+service fail2ban stop; service fail2ban start;
+service rsyslog stop; service rsyslog start;
 service nginx stop; service nginx start;
 service php5-fpm stop; service php5-fpm start;
 service clamav-daemon stop; service clamav-daemon start;
