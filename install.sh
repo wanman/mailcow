@@ -163,7 +163,8 @@ chown root:root "/etc/postfix/filter_default"; chmod 644 "/etc/postfix/filter_de
 chown root:root "/etc/postfix/master.cf"; chmod 644 "/etc/postfix/master.cf"
 chown root:root "/etc/postfix/filter_trusted"; chmod 644 "/etc/postfix/filter_trusted"
 chown root:root "/etc/postfix/main.cf"; chmod 644 "/etc/postfix/main.cf"
-sed -i "s/mail.domain.tld/$sys_hostname.$sys_domain/g" /etc/postfix/*
+sed -i "s/mail.domain.tld/$sys_hostname.$sys_domain/g" /etc/postfix/* 2> /dev/null
+sed -i "s/domain.tld/$sys_domain/g" /etc/postfix/* 2> /dev/null
 sed -i "s/my_postfixpass/$my_postfixpass/g" /etc/postfix/sql/*
 sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/postfix/sql/*
 sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/postfix/sql/*
@@ -179,6 +180,7 @@ chown root:dovecot "/etc/dovecot/dovecot-dict-sql.conf"; chmod 640 "/etc/dovecot
 chown root:vmail "/etc/dovecot/dovecot-mysql.conf"; chmod 640 "/etc/dovecot/dovecot-mysql.conf"
 chown root:root "/etc/dovecot/dovecot.conf"; chmod 644 "/etc/dovecot/dovecot.conf"
 sed -i "s/mail.domain.tld/$sys_hostname.$sys_domain/g" /etc/dovecot/*
+sed -i "s/domain.tld/$sys_domain/g" /etc/dovecot/*
 sed -i "s/my_postfixpass/$my_postfixpass/g" /etc/dovecot/*
 sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/dovecot/*
 sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/dovecot/*
