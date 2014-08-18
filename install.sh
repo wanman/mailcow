@@ -101,13 +101,13 @@ echo $sys_hostname > /etc/hostname
 # need to trigger this pseudo service now
 service hostname.sh start
 else
-echo "cannot set your hostname: cannot resolve ip.appspot.com";
+echo "WARNING: Cannot set your hostname"
 fi
 if [[ -f /usr/share/zoneinfo/$sys_timezone ]] ; then
 echo $sys_timezone > /etc/timezone
 dpkg-reconfigure -f noninteractive tzdata
 else
-echo "cannot set your timezone: timezone is unknown";
+echo "WARNING: Cannot set your timezone: timezone is unknown";
 fi
 }
 
