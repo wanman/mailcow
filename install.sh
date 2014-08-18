@@ -1,5 +1,30 @@
 #!/bin/bash
-/bin/bash logo.sh
+echo  '
+                    .hddddddh
+                   `sdddddddd+
+        `//:       .dddddddddd-`      -//`
+      `+hdddyo/./syyyso++++osyhhs/.:oyddddo`
+    `+hddddddddy+:.` `......` `.:ohdddddddddo
+    `sddddddh+. `-+shhddddddhys/-` -ohdddddds
+     `ydddd+` .+hddddddddddddddddh+. .+ddddy`
+       ddy- .oddddddddddddddddddddddo` -ydd
+      /dy` :hddddddddddddddddddddddddh- `yd.
+    `.hy. -dddddhhhhddddddddddhhhhddddh- .hh.`
+/ssyddd/ `yddd+.    `:sddddy/`    ./hddy` +dddyss/
+ddddddd` :ddd/  .+o:   yddh.  -++-  -hdd: .ddddddd
+ddddddh` /ddh-  /ddh.  oddy   sddo  `hdd/ `ddddddd
+ddddddd` :ddh-   .-`.::oyys::``..   `hdd: .ddddddd
+/osdddd/ .ydh-      `/oooooo/       `hdy` /ddddso/
+   ``+dy. :dh-       `:oooo:        `hd- .hh/``
+      /ds` :y-         :oo-         `s- `yd/
+       sdy. ..          ..          `` -yds
+     `ydddh+`                        `+ddddy`
+    `sddddddh+.                    .+hdddddds`
+    `+hddddddddy+-`            `:+yddddddddh+`
+      `+hddddy+/+ydhso++//++oyhdy+/+yddddh+`
+        `++-`     `-dddddddddd-`     `-+o`
+                   `sdddddddd+
+                    :dddddddh.'
 echo
 echo
 genpasswd() {
@@ -32,6 +57,20 @@ cert_city="DUS"
 cert_org="MAIL"
 ############ CONFIG END ############
 ## do not edit any line below ####
+
+echo "
+---------------------------------
+Please review your configuration
+---------------------------------
+FQDN: $sys_hostname.$sys_domain
+Timezone $sys_timezone
+
+Postfix MySQL database name: $my_postfixdb
+Postfix MySQL database user: $my_postfixuser
+
+Postfixadmin Administrator Login: $pfadmin_adminuser"
+
+
 # log generated passwords
 echo ---------- > installer.log
 echo MySQL $my_postfixuser password: $my_postfixpass >> installer.log
