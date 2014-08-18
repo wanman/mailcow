@@ -76,7 +76,7 @@ echo ---------- > installer.log
 echo MySQL $my_postfixuser password: $my_postfixpass >> installer.log
 echo MySQL root password: $my_rootpw >> installer.log
 echo ---------- >> installer.log
-echo Postfix Administrator Login >> installer.log
+echo Postfixadmin Superuser >> installer.log
 echo Username: $pfadmin_adminuser >> installer.log
 echo Password: $pfadmin_adminpass >> installer.log
 echo ---------- >> installer.log
@@ -230,6 +230,7 @@ rm -rf /usr/share/nginx/mail 2> /dev/null
 mkdir -p /usr/share/nginx/mail
 echo checking out postfixadmin, please wait...
 svn --quiet --non-interactive co http://svn.code.sf.net/p/postfixadmin/code/trunk /usr/share/nginx/mail/pfadmin
+echo Postfixadmin revision: `svn info /usr/share/nginx/mail/pfadmin/ | grep "Revision" | awk '{print $2}'` >> installer.log
 cp pfadmin/config.local.php /usr/share/nginx/mail/pfadmin/config.local.php
 sed -i "s/my_postfixpass/$my_postfixpass/g" /usr/share/nginx/mail/pfadmin/config.local.php
 sed -i "s/my_postfixuser/$my_postfixuser/g" /usr/share/nginx/mail/pfadmin/config.local.php
