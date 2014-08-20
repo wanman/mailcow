@@ -250,6 +250,7 @@ chown -R www-data: /usr/share/nginx/
 function fail2banconfig {
 git clone https://github.com/fail2ban/fail2ban fail2ban_git
 cd fail2ban_git
+rm -rf /etc/fail2ban/  2> /dev/null
 python setup.py -q install
 cd ..
 wget https://raw.githubusercontent.com/fail2ban/fail2ban/debian/debian/fail2ban.init -O /etc/init.d/fail2ban
