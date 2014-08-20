@@ -119,7 +119,7 @@ python-magic openssl php-auth-sasl php-http-request php-mail php-mail-mime php-m
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite mysql-client mysql-server nginx dovecot-common dovecot-core mailutils \
 dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d postfix \
-postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin fail2ban >/dev/null
+postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin  >/dev/null
 unset DEBIAN_FRONTEND
 }
 
@@ -248,9 +248,19 @@ chown -R www-data: /usr/share/nginx/
 
 # fail2ban
 function fail2banconfig {
+git clone https://github.com/fail2ban/fail2ban fail2ban_git
+cd fail2ban_git
+python setup.py -q install
+cd ..
+wget https://raw.githubusercontent.com/fail2ban/fail2ban/debian/debian/fail2ban.init -O /etc/init.d/fail2ban
+# i prefere creating symlinks to /usr/bin...
+ln -s /usr/local/bin/fail2ban-* /usr/bin/
+# ...we could use sed to change the init script, too
+#sed -i '/^DAEMON=/s/=.*/=\/usr\/local\/bin\/$NAME-client/' /etc/init.d/fail2ban
+#sed -i '/^PATH=/s/=.*/=\/usr\/sbin\:\/usr\/bin\:\/sbin\:\/bin\:\/usr\/local\/bin/' /etc/init.d/fail2ban
+chmod +x /etc/init.d/fail2ban
+update-rc.d fail2ban defaults
 cp fail2ban/jail.local /etc/fail2ban/jail.local
-cp fail2ban/filter.d/sasl.conf /etc/fail2ban/filter.d/sasl.conf
-cp fail2ban/filter.d/dovecot-pop3imap.conf /etc/fail2ban/filter.d/dovecot-pop3imap.conf
 }
 
 # rsyslogd
