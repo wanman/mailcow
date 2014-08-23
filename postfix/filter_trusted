@@ -1,2 +1,0 @@
-# filter for authenticated users
-/./ FILTER fuglu_trusted:[127.0.0.1]:10099
