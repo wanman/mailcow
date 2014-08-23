@@ -196,6 +196,7 @@ cp dovecot/spam-global.sieve /var/vmail/sieve/spam-global.sieve
 cp dovecot/default.sieve /var/vmail/sieve/default.sieve
 sievec /var/vmail/sieve/spam-global.sieve
 chown -R vmail:vmail /var/vmail
+cp dovecot/doverecalcq /etc/cron.daily/; chmod 755 /etc/cron.daily/doverecalcq
 }
 
 # clamv
