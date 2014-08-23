@@ -150,6 +150,8 @@ python setup.py -q install
 cd ../../
 find /etc/fuglu -type f -name '*.dist' -print0 | xargs -0 rename 's/.dist$//'
 sed -i '/^group=/s/=.*/=nogroup/' /etc/fuglu/fuglu.conf
+sed -i '/^defaultvirusaction=/s/=.*/=REJECT/' /etc/fuglu/fuglu.conf
+sed -i '/^blockaction=/s/=.*/=REJECT/' /etc/fuglu/fuglu.conf
 cp fuglu_git/fuglu/scripts/startscripts/debian/7/fuglu /etc/init.d/fuglu
 chmod +x /etc/init.d/fuglu
 update-rc.d fuglu defaults
@@ -165,9 +167,7 @@ chown root:postfix "/etc/postfix/sql/mysql_virtual_mailbox_limit_maps.cf"; chmod
 chown root:postfix "/etc/postfix/sql/mysql_virtual_mailbox_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_mailbox_maps.cf"
 chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_maps.cf"
 chown root:postfix "/etc/postfix/sql/mysql_virtual_domains_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_domains_maps.cf"
-chown root:root "/etc/postfix/filter_default"; chmod 644 "/etc/postfix/filter_default"
 chown root:root "/etc/postfix/master.cf"; chmod 644 "/etc/postfix/master.cf"
-chown root:root "/etc/postfix/filter_trusted"; chmod 644 "/etc/postfix/filter_trusted"
 chown root:root "/etc/postfix/main.cf"; chmod 644 "/etc/postfix/main.cf"
 sed -i "s/mail.domain.tld/$sys_hostname.$sys_domain/g" /etc/postfix/* 2> /dev/null
 sed -i "s/domain.tld/$sys_domain/g" /etc/postfix/* 2> /dev/null

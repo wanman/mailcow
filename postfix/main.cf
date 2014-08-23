@@ -41,8 +41,6 @@ smtpd_recipient_restrictions = check_client_access pcre:/etc/postfix/filter_trus
    reject_unauth_destination,
    reject_unknown_reverse_client_hostname,
    pcre:/etc/postfix/filter_default
-fuglu_trusted_destination_recipient_limit=1
-fuglu_default_destination_recipient_limit=1
 virtual_mailbox_base = /var/vmail/
 virtual_mailbox_domains = proxy:mysql:/etc/postfix/sql/mysql_virtual_domains_maps.cf
 virtual_alias_maps =
