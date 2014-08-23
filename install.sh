@@ -152,6 +152,7 @@ find /etc/fuglu -type f -name '*.dist' -print0 | xargs -0 rename 's/.dist$//'
 sed -i '/^group=/s/=.*/=nogroup/' /etc/fuglu/fuglu.conf
 sed -i '/^defaultvirusaction=/s/=.*/=REJECT/' /etc/fuglu/fuglu.conf
 sed -i '/^blockaction=/s/=.*/=REJECT/' /etc/fuglu/fuglu.conf
+sed -i '/^incomingport=/s/=.*/=esmtp:10025,10099,10888/' /etc/fuglu/fuglu.conf
 cp fuglu_git/fuglu/scripts/startscripts/debian/7/fuglu /etc/init.d/fuglu
 chmod +x /etc/init.d/fuglu
 update-rc.d fuglu defaults
