@@ -250,12 +250,12 @@ chown -R www-data: /usr/share/nginx/
 function fail2banconfig {
 git clone https://github.com/fail2ban/fail2ban fail2ban_git
 cd fail2ban_git
-rm -rf /etc/fail2ban/  2> /dev/null
+rm -rf /etc/fail2ban/ 2> /dev/null
 python setup.py -q install
 cd ..
 wget https://raw.githubusercontent.com/fail2ban/fail2ban/debian/debian/fail2ban.init -O /etc/init.d/fail2ban
 # i prefere creating symlinks to /usr/bin...
-ln -s /usr/local/bin/fail2ban-* /usr/bin/
+ln -s /usr/local/bin/fail2ban-* /usr/bin/  2> /dev/null
 # ...we could use sed to change the init script, too
 #sed -i '/^DAEMON=/s/=.*/=\/usr\/local\/bin\/$NAME-client/' /etc/init.d/fail2ban
 #sed -i '/^PATH=/s/=.*/=\/usr\/sbin\:\/usr\/bin\:\/sbin\:\/bin\:\/usr\/local\/bin/' /etc/init.d/fail2ban
