@@ -107,3 +107,38 @@ Added `TCPSocket 3310` and `TCPAddr 127.0.0.1` to create a TCP socket:
 
 Added `rewrite_header Subject [SPAM]` and `report_safe 2` to prefix [SPAM] to junk mail and forward spam as attachment instead of original message (text/plain):
 * **/etc/spamassassin/local.cf**
+
+### Postfix
+The files "main.cf" and "master.cf" contain a lot of changes. You should now what you do if you modify these files.
+* **/etc/postfix/main.cf
+* **/etc/postfix/master.cf
+You also find the SQL based maps for virtual transport here:
+* **/etc/postfix/sql/*.cf**
+To pick some of the most important changes in "main.cf".
+```
+#SSL based:
+smtpd_tls_auth_only = yes
+smtpd_tls_mandatory_protocols = !SSLv2, !SSLv3
+smtpd_tls_mandatory_ciphers=high
+smtp_tls_security_level=may
+smtpd_tls_cert_file = /etc/ssl/mail/mail.crt
+smtpd_tls_key_file = /etc/ssl/mail/mail.key
+smtpd_use_tls=yes
+smtp_tls_cert_file = /etc/ssl/mail/mail.crt
+smtp_tls_key_file = /etc/ssl/mail/mail.key
+
+# Recipient restrictions
+reject_rbl_client zen.spamhaus.org # ZEN blacklist
+reject_unknown_reverse_client_hostname # Reject mails if no PTR is set or does not match
+
+# Sender restrictions
+reject_authenticated_sender_login_mismatch # Refuse to send mails when FROM address is not owned by sender (only matches for authenticated users.)
+reject_unknown_sender_domain # Refuse to send mails from unknown domains
+
+# Queue handling
+maximal_queue_lifetime = 1d
+bounce_queue_lifetime = 1d
+queue_run_delay = 300s
+maximal_backoff_time = 1800s
+minimal_backoff_time = 300s
+```
