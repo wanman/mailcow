@@ -3,7 +3,7 @@ fufix
 A mailserver install script for **Debian and Debian based distributions**. 
 This installer is permanently **tested on Debians stable branch** but is reported to run on newer branches, too. Debian Squeeze (old-stable) is not supported.
 
-Please see https://www.debinux.de/2014/08/fufix-mailserver-installer-auf-basis-von-postfix-und-dovecot/ for any further information.
+Please see https://www.debinux.de/2014/08/fufix-mailserver-installer-auf-basis-von-postfix-und-Dovecot/ for any further information.
 Feel free to leave a comment or question (best in English or German).
 
 ## Introduction
@@ -208,3 +208,41 @@ $CONF['used_quotas'] = 'YES';
 You can change some values to your personal needs by just editing them. No need to reload any service afterwards.
 
 **Default quotas in MB.**
+
+### Dovecot
+If you really need to edit Dovecots configuration, you can find the required files in `/etc/dovecot`.
+
+`/etc/dovecot/dovecot.conf` holds the default configuration. To keep it simple I chose not to split the configuration into multiple files. 
+Some options you may want to find:
+```
+ssl_cipher_list = xyz # What ciphers are allowed? 
+sieve_before = /var/vmail/sieve/spam-global.sieve # Sieve script to move messages prefixed by "[SPAM]" to junk, globally defined for every user and cannot be deleted or modified by those
+sieve_max_script_size = 1M
+sieve_quota_max_scripts = 0
+sieve_quota_max_storage = 0
+special_use = xyz # RFC 6154 tags
+```
+Dovecots SQL parameters can be found in either `/etc/dovecot/dovecot-dict-sql.conf` or `/etc/dovecot/dovecot-mysql.conf`.
+"dovecot-dict-sql.conf" holds instructions for reading a users quota.
+
+"dovecot-mysql.conf" contains some basic SQL commands:
+
+* **driver** - What database
+* **connect** - How to connect to the MySQL database
+* **default_pass_scheme** - Password scheme. If you edit this you also need to adjust Postfixadmin!
+* **password_query** - Validate passwords.
+* **user_query** - Validate users.
+* **iterate_query** - Iterate users, also needed by a lot of "doveadm" commands.
+
+
+Furthermore a script "doverecalcq" is copied to `/etc/cron.daily` to recalculate quotas of all users daily. 
+A system with a very large amount of virtual users should not do this on a daily basis. I recommend to move the script to "cron.weekly" then.
+
+## Debugging
+
+Most important files for debugging:
+**/var/log/mail.log**
+
+**/var/log/mail.warn**
+
+**/var/log/mail.err**
