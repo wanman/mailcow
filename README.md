@@ -248,7 +248,7 @@ Dovecots SQL parameters can be found in either `/etc/dovecot/dovecot-dict-sql.co
 Furthermore a script "doverecalcq" is copied to `/etc/cron.daily` to recalculate quotas of all users daily. 
 A system with a very large amount of virtual users should not do this on a daily basis. I recommend to move the script to "cron.weekly" then.
 
-*Dovecot saves messages to `/var/vmail/DOMAINNAME/USERNAME`* in maildir format*
+*Dovecot saves messages to `/var/vmail/DOMAINNAME/USERNAME` in maildir format*
 
 ## Debugging
 
