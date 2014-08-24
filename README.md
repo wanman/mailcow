@@ -89,14 +89,15 @@ Just be patient and confirm every step by pressing [ENTER] or CTRL-C to interrup
 More debugging is about to come. Though everything should work as intended.
 ## Configuration files used by fufix
 To help you modify the configuration, I created a little index to get you started.
+
 ### FuGlu
 Basic configuration
-**/etc/fuglu/fuglu.conf**
+* **/etc/fuglu/fuglu.conf**
 
 Define attachments to deny/allow:
-**/etc/fuglu/rules/default-filenames.conf**
-**/etc/fuglu/rules/default-filetypes.conf**
+* **/etc/fuglu/rules/default-filenames.conf**
+* **/etc/fuglu/rules/default-filetypes.conf**
 
 Mail template for the bounce to inform sender about blocked attachment:
-**/etc/fuglu/templates/blockedfile.tmpl**
+* **/etc/fuglu/templates/blockedfile.tmpl**
 
