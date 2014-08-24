@@ -1,6 +1,6 @@
 fufix
 =====
-A mailserver install script for **Debian and Debian based distributions**. 
+A mail server install script for **Debian and Debian based distributions**. 
 This installer is permanently **tested on Debians stable branch** but is reported to run on newer branches, too. Debian Squeeze (old-stable) is not supported.
 
 Please see https://www.debinux.de/2014/08/fufix-mailserver-installer-auf-basis-von-postfix-und-Dovecot/ for any further information.
@@ -242,6 +242,9 @@ A system with a very large amount of virtual users should not do this on a daily
 
 Most important files for debugging:
 
-- **/var/log/mail.log**
-- **/var/log/mail.warn**
-- **/var/log/mail.err**
+* **/var/log/mail.log**
+* **/var/log/mail.warn**
+* **/var/log/mail.err**
+* **/var/log/syslog**
+
+Please always see these files when troubleshooting your mail server.
