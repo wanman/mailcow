@@ -287,3 +287,46 @@ Most important files for debugging:
 * **/var/log/mysql.err**
 
 Please always see these files when troubleshooting your mail server.
+
+## Maintenance
+To help you administrate some basic tasks I decided to add a section "Maintenance".
+A lot of work on mailboxes can be done by Dovecots "doveadm" tool.
+### Queries
+
+For example searching for inbox messages saved in the past 3 days for user "Bob.Cat":
+```
+doveadm search -u bob.cat@domain.com mailbox inbox savedsince 2d
+```
+
+Or search Bobs inbox for subject "important":
+```
+doveadm search -u bob.cat@domain.com mailbox inbox subject important
+```
+
+Want to delete Bobs messages older than 100 days?
+```
+doveadm expunge -u bob.cat@domain.com mailbox inbox savedsince 100d
+```
+
+From Dovecots wiki: Move jane's messages - received in September 2011 - from her INBOX into her archive.
+```
+doveadm move -u jane Archive/2011/09 mailbox INBOX BEFORE 2011-10-01 SINCE 01-Sep-2011
+```
+
+You find some more useful search queries and much more here: http://wiki2.dovecot.org/Tools/Doveadm
+
+### Backup 
+
+If you want to create a backup of Bobs maildir to /var/mailbackup, just go ahead and create the backup destination with proper rights:
+
+```
+mkdir /var/mailbackup
+chown vmail:vmail /var/mailbackup/
+```
+
+Afterwards you can start a full backup:
+```dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/```
+
+For more information about dsync (like the difference between backups and mirrors) visit http://wiki2.dovecot.org/Tools/Dsync
+
+
