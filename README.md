@@ -1,6 +1,6 @@
 fufix
 =====
-A Mailserver installer for **Debian and Debian based distributions**. 
+A mailserver install script for **Debian and Debian based distributions**. 
 This installer is permanently **tested on Debians stable branch** but is reported to run on newer branches, too. Debian Squeeze (old-stable) is not supported.
 
 Please see https://www.debinux.de/2014/08/fufix-mailserver-installer-auf-basis-von-postfix-und-dovecot/ for any further information.
