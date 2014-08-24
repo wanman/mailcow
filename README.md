@@ -245,6 +245,7 @@ Most important files for debugging:
 * **/var/log/mail.log**
 * **/var/log/mail.warn**
 * **/var/log/mail.err**
-* **/var/log/syslog**
-
+* **/var/log/syslog* **
+* **/var/log/fuglu/fuglu.log* **
+* **/var/log/nginx/error.log* **
 Please always see these files when troubleshooting your mail server.
