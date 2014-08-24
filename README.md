@@ -101,3 +101,9 @@ Define attachments to deny/allow:
 Mail template for the bounce to inform sender about blocked attachment:
 * **/etc/fuglu/templates/blockedfile.tmpl**
 
+### ClamAV and Spamassassin
+Added `TCPSocket 3310` and `TCPAddr 127.0.0.1` to create a TCP socket;
+* **/etc/clamav/clamd.conf**
+
+Added `rewrite_header Subject [SPAM]` and `report_safe 2` to prefix [SPAM] to junk mail and forward spam as attachment instead of original message (text/plain)
+* **/etc/spamassassin/local.cf**
