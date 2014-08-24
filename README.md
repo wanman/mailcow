@@ -35,16 +35,11 @@ This installer is permanently **tested on Debians stable branch** but is reporte
 Please see https://www.debinux.de/2014/08/fufix-mailserver-installer-auf-basis-von-postfix-und-Dovecot/ for any further information.
 Feel free to leave a comment or question (best in English or German).
 
-<script async="async" src="https://www.paypalobjects.com/js/external/paypal-button.min.js?merchant=andre.peters@outlook.com" 
-    data-button="donate" 
-    data-name="fufix donation" 
-    data-currency="EUR" 
-    data-callback="https://www.debinux.de"
-></script>
-
 ## Introduction
 A summary of what software is installed with which features enabled.
+
 **System setup**
+
 * Setting the Hostname & Fully Qualified Domain Name
 * Timezone adjustment
 * Automatically generated passwords with high complexity
@@ -128,7 +123,7 @@ You are ready to start the script:
 Just be patient and confirm every step by pressing [ENTER] or CTRL-C to interrupt the installation.
 More debugging is about to come. Though everything should work as intended.
 ## Configuration files used by fufix
-To help you modify the configuration, I created a little index to get you started.
+To help you modify the configuration, I created this little overview to get you started.
 
 ### FuGlu
 Basic configuration. Set `group=nogroup` to run as nobody:nogroup (instead of group nobody). Set `defaultvirusaction` and `blockaction` to REJECT. Enabled ESMTP in `incomingport`:
