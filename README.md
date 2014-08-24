@@ -1,7 +1,7 @@
 fufix
 =====
-A Mailserver installer for Debian and Debian based distributions. 
-This installer is permanently tested on Debians stable branch but is reported to run on newer branches, too. Debian Squeeze (old-stable) is not supported.
+A Mailserver installer for **Debian and Debian based distributions**. 
+This installer is permanently **tested on Debians stable branch** but is reported to run on newer branches, too. Debian Squeeze (old-stable) is not supported.
 
 ## Introduction
 A summary of what software is installed with which features enabled.
