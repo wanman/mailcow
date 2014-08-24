@@ -1,7 +1,7 @@
 <?php
 $CONF['configured'] = true;
 $CONF['setup_password'] = 'changeme';
-$CONF['default_language'] = 'de';
+$CONF['default_language'] = 'en';
 $CONF['database_user'] = 'my_postfixuser';
 $CONF['database_password'] = 'my_postfixpass';
 $CONF['database_name'] = 'my_postfixdb';
