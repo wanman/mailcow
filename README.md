@@ -196,4 +196,4 @@ $CONF['used_quotas'] = 'YES';
 ```
 You can change some values to your personal needs by just editing them. No need to reload any service afterwards.
 
-**Quotas in MB.**
+**Default quotas in MB.**
