@@ -35,6 +35,7 @@ A summary of what software is installed with which features enabled.
 * Automatic superuser configuration
 * Full quota support
 * "config.local.php" preconfigured
+* **Until a stable version 3.x is released, postfixadmin is pulled from SVN**
 
 ## Before you begin
 **Please remove any web- and mail services** running on your server. I recommend using a clean Debian minimal installation.
@@ -146,6 +147,7 @@ minimal_backoff_time = 300s
 ```
 ### Nginx
 A site for mail is copied to `/etc/nginx/sites-available` and enabled via symbolic link to `/etc/nginx/sites-enabled`.
+The sites root location is `/usr/share/nginx/mail`. Any default site installed by apt-get is removed.
 
 A PHP socket configuration is located at `/etc/php5/fpm/pool.d/mail.conf`.
 
@@ -166,4 +168,32 @@ enabled = true
 Ban time is set to 1h, a jail for Postfix SASL (authentication) and - why not - SSHd is enabled.
 Default configuration parameters can be reviewed in `/etc/fail2ban/jail.conf`. I recommend to add further/modify existing parameters in "jail.local" to override those in "jail.conf".
 
+### Postfixadmin
+The file "config.local.php" is copied to the target directory `/usr/share/nginx/mail/pfadmin`. Some parameters like "domain.tld" are dummies and replaced by the installer.
+```
+$CONF['configured'] = true;
+$CONF['setup_password'] = 'changeme';
+$CONF['default_language'] = 'de';
+$CONF['database_user'] = 'my_postfixuser';
+$CONF['database_password'] = 'my_postfixpass';
+$CONF['database_name'] = 'my_postfixdb';
+$CONF['admin_email'] = 'mailer@domain.tld';
+$CONF['default_aliases'] = array (
+    'abuse' => 'abuse@domain.tld',
+    'hostmaster' => 'hostmaster@domain.tld',
+    'postmaster' => 'postmaster@domain.tld',
+    'webmaster' => 'webmaster@domain.tld'
+);
+$CONF['aliases'] = '10240';
+$CONF['mailboxes'] = '10240';
+$CONF['maxquota'] = '10240';
+$CONF['domain_quota_default'] = '20480';
+$CONF['quota'] = 'YES';
+$CONF['backup'] = 'YES';
+$CONF['fetchmail'] = 'NO';
+$CONF['show_footer_text'] = 'NO';
+$CONF['used_quotas'] = 'YES';
+```
+You can change some values to your personal needs by just editing them. No need to reload any service afterwards.
 
+**Quotas in MB.**
