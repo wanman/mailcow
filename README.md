@@ -3,6 +3,9 @@ fufix
 A Mailserver installer for **Debian and Debian based distributions**. 
 This installer is permanently **tested on Debians stable branch** but is reported to run on newer branches, too. Debian Squeeze (old-stable) is not supported.
 
+Please see https://www.debinux.de/2014/08/fufix-mailserver-installer-auf-basis-von-postfix-und-dovecot/ for any further information.
+Feel free to leave a comment or question (best in English or German).
+
 ## Introduction
 A summary of what software is installed with which features enabled.
 **System setup**
@@ -149,8 +152,16 @@ minimal_backoff_time = 300s
 A site for mail is copied to `/etc/nginx/sites-available` and enabled via symbolic link to `/etc/nginx/sites-enabled`.
 The sites root location is `/usr/share/nginx/mail`. Any default site installed by apt-get is removed.
 
-A PHP socket configuration is located at `/etc/php5/fpm/pool.d/mail.conf`.
-
+A PHP socket configuration is located at `/etc/php5/fpm/pool.d/mail.conf`. 
+Some PHP parameters are set right here to override those in `/etc/php5/fpm/php.ini` :
+```
+php_admin_value[short_open_tag] = on # Allow "<?" tags
+php_admin_value[magic_quotes_runtime] = off
+php_admin_value[register_globals] = off
+php_admin_value[magic_quotes_gpc] = off
+php_admin_value[date.timezone] = Europe/Berlin # This is just an example and replaced by the installer
+php_admin_value[expose_php] = off # Do not display PHP version
+```
 Server tokens are turned off in Nginx default configuration file `/etc/nginx/nginx.conf`.
 
 ### Fail2ban
