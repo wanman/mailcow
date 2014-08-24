@@ -37,7 +37,7 @@ A summary of what software is installed with which features enabled.
 * "config.local.php" preconfigured
 
 ## Before you begin
-**Please remove any web- and mail service** running on your server. I recommend using a clean Debian minimal installation.
+**Please remove any web- and mail services** running on your server. I recommend using a clean Debian minimal installation.
 Remember to purge Debians default MTA Exim4:
 ```
 apt-get purge exim4*
@@ -52,3 +52,31 @@ If there is any firewall, unblock the following ports for incoming connections:
 | Dovecot IMAPS       | TCP      | 993  |
 | Dovecot ManageSieve | TCP      | 4190 |
 | Nginx HTTPS         | TCP      | 443  |
+
+## Installation
+**Please run all these commands as root**
+
+Install git to download fufix:
+```
+apt-get install git
+```
+
+Clone fufix into whichever directory (using ~/build here):
+```
+mkdir ~/build
+git clone https://github.com/andryyy/fufix
+cd fufix
+```
+
+**Now edit install.sh to fit your needs!**
+```
+nano install.sh
+```
+
+* **sys_hostname** - Hostname without domain
+* **sys_domain** - Domain name. "$sys_hostname.$sys_domain" equals to FQDN.
+* **sys_timezone - The timezone must be definied in a valid format (Europe/Berlin, America/New_York etc.)
+* **my_postfixdb, my_postfixuser, my_postfixpass** - MySQL database name, username and password for use with Postfix. **You can use the default values.**
+* **my_rootpw** - MySQL root password is generated automatically by default. You can define a complex password here if you want to.
+* **pfadmin_adminuser and pfadmin_adminpass** - Postfixadmin superuser definition: **Username MUST end with a valid domain name** but **does NOT need to be yours**. "yourname@outlook.com" is fine, "yourname@domain.invalid" or "yourname@aname" is not. Password policy: minimum length 5 chars, must contain at least 3 characters, must contain at least 2 digits. **You can use the default values**
+* **"cert-" vars**
