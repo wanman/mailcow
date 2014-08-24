@@ -80,3 +80,23 @@ nano install.sh
 * **my_rootpw** - MySQL root password is generated automatically by default. You can define a complex password here if you want to.
 * **pfadmin_adminuser and pfadmin_adminpass** - Postfixadmin superuser definition: **Username MUST end with a valid domain name** but **does NOT need to be yours**. "yourname@outlook.com" is fine, "yourname@domain.invalid" or "yourname@aname" is not. Password policy: minimum length 5 chars, must contain at least 3 characters, must contain at least 2 digits. **You can use the default values**
 * **"cert-" vars** - Used for the self-signed certificate. CN will be the servers FQDN.
+
+You are ready to start the script:
+```
+./install.sh
+```
+Just be patient and confirm every step by pressing [ENTER] or CTRL-C to interrupt the installation.
+More debugging is about to come. Though everything should work as intended.
+## Configuration files used by fufix
+To help you modify the configuration, I created a little index to get you started.
+### FuGlu
+Basic configuration
+**/etc/fuglu/fuglu.conf**
+
+Define attachments to deny/allow:
+**/etc/fuglu/rules/default-filenames.conf**
+**/etc/fuglu/rules/default-filetypes.conf**
+
+Mail template for the bounce to inform sender about blocked attachment:
+**/etc/fuglu/templates/blockedfile.tmpl**
+
