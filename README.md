@@ -149,4 +149,21 @@ A site for mail is copied to `/etc/nginx/sites-available` and enabled via symbol
 
 A PHP socket configuration is located at `/etc/php5/fpm/pool.d/mail.conf`.
 
-Server tokens are turned in Nginx default configuration file `/etc/nginx/nginx.conf`.
+Server tokens are turned off in Nginx default configuration file `/etc/nginx/nginx.conf`.
+
+### Fail2ban
+A file `/etc/fail2ban/jail.local` is created with the following content:
+```
+[DEFAULT]
+bantime = 3600
+
+[sshd]
+enabled = true
+
+[postfix-sasl]
+enabled = true
+```
+Ban time is set to 1h, a jail for Postfix SASL (authentication) and - why not - SSHd is enabled.
+Default configuration parameters can be reviewed in `/etc/fail2ban/jail.conf`. I recommend to add further/modify existing parameters in "jail.local" to override those in "jail.conf".
+
+
