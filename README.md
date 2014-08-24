@@ -110,8 +110,8 @@ Added `rewrite_header Subject [SPAM]` and `report_safe 2` to prefix [SPAM] to ju
 
 ### Postfix
 The files "main.cf" and "master.cf" contain a lot of changes. You should now what you do if you modify these files.
-* **/etc/postfix/main.cf
-* **/etc/postfix/master.cf
+* **/etc/postfix/main.cf**
+* **/etc/postfix/master.cf**
 You also find the SQL based maps for virtual transport here:
 * **/etc/postfix/sql/*.cf**
 To pick some of the most important changes in "main.cf".
