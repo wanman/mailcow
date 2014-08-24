@@ -36,7 +36,7 @@ A summary of what software is installed with which features enabled.
 * Full quota support
 * "config.local.php" preconfigured
 
-## Before you start
+## Before you begin
 **Please remove any web- and mail service** running on your server. I recommend using a clean Debian minimal installation.
 Remember to purge Debians default MTA Exim4:
 ```
