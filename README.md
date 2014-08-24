@@ -91,7 +91,10 @@ More debugging is about to come. Though everything should work as intended.
 To help you modify the configuration, I created a little index to get you started.
 
 ### FuGlu
-Basic configuration
+Basic configuration. 
+Set `group=nogroup` to run as nobody:nogroup (instead of group nobody).
+Set `defaultvirusaction` and `blockaction` to REJECT.
+Enabled ESMTP in `incomingport`.
 * **/etc/fuglu/fuglu.conf**
 
 Define attachments to deny/allow:
