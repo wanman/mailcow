@@ -112,8 +112,8 @@ Added `TCPSocket 3310` and `TCPAddr 127.0.0.1` to create a TCP socket:
 Added `rewrite_header Subject [SPAM]` and `report_safe 2` to prefix [SPAM] to junk mail and forward spam as attachment instead of original message (text/plain):
 * **/etc/spamassassin/local.cf**
 
-Modified `/etc/default/spamassassin`:
 Enabled "spamd" by `ENABLED=1`, enabled cronjob by setting `CRON=1` modified OPTIONS line: `OPTIONS="--create-prefs --max-children 5 --helper-home-dir --username debian-spamd"`
+* **/etc/default/spamassassin**
 
 ### Postfix
 The files "main.cf" and "master.cf" contain a lot of changes. You should now what you do if you modify these files.
