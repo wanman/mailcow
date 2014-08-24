@@ -325,7 +325,9 @@ chown vmail:vmail /var/mailbackup/
 ```
 
 Afterwards you can start a full backup:
-```dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/```
+```
+dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
+```
 
 For more information about dsync (like the difference between backups and mirrors) visit http://wiki2.dovecot.org/Tools/Dsync
 
