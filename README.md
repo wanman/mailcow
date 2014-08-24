@@ -43,10 +43,12 @@ Remember to purge Debians default MTA Exim4:
 apt-get purge exim4*
 ``` 
 If there is any firewall, unblock the following ports for incoming connections:
-| Service | Protocol | Port |
-Postfix Submission | TCP | 587
-Postfix SMTP | TCP | 25
-Dovecot IMAP | TCP | 143
-Dovecot IMAPS | TCP | 993
-Dovecot ManageSieve | TCP | 4190
-Nginx HTTPS | TCP | 443 
+
+| Service             | Protocol | Port |
+| ------------------- |:--------:|:-----|
+| Postfix Submission  | TCP      | 587  |
+| Postfix SMTP        | TCP      | 25   |
+| Dovecot IMAP        | TCP      | 143  |
+| Dovecot IMAPS       | TCP      | 993  |
+| Dovecot ManageSieve | TCP      | 4190 |
+| Nginx HTTPS         | TCP      | 443  |
