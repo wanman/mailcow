@@ -39,4 +39,6 @@ A summary of what software is installed with which features enabled.
 ## Before you start
 **Please remove any web- and mail service** running on your server. I recommend using a clean Debian minimal installation.
 Remember to purge Debians default MTA Exim4:
-``` apt-get purge exim4* ``` 
+```
+apt-get purge exim4*
+``` 
