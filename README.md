@@ -144,3 +144,9 @@ queue_run_delay = 300s
 maximal_backoff_time = 1800s
 minimal_backoff_time = 300s
 ```
+### Nginx
+A site for mail is copied to `/etc/nginx/sites-available` and enabled via symbolic link to `/etc/nginx/sites-enabled`.
+
+A PHP socket configuration is located at `/etc/php5/fpm/pool.d/mail.conf`.
+
+Server tokens are turned in Nginx default configuration file `/etc/nginx/nginx.conf`.
