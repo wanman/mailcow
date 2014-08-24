@@ -241,8 +241,7 @@ A system with a very large amount of virtual users should not do this on a daily
 ## Debugging
 
 Most important files for debugging:
+
 **/var/log/mail.log**
-
 **/var/log/mail.warn**
-
 **/var/log/mail.err**
