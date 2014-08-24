@@ -6,8 +6,6 @@ This installer is permanently **tested on Debians stable branch** but is reporte
 Please see https://www.debinux.de/2014/08/fufix-mailserver-installer-auf-basis-von-postfix-und-Dovecot/ for any further information.
 Feel free to leave a comment or question (best in English or German).
 
-Donation? :-)
-
 <script async="async" src="https://www.paypalobjects.com/js/external/paypal-button.min.js?merchant=andre.peters@outlook.com" 
     data-button="donate" 
     data-name="fufix donation" 
