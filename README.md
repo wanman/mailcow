@@ -35,7 +35,7 @@ This installer is permanently **tested on Debians stable branch** but is reporte
 Please see https://www.debinux.de/2014/08/fufix-mailserver-installer-auf-basis-von-postfix-und-Dovecot/ for any further information.
 Feel free to leave a comment or question (best in English or German).
 
-## Introduction
+# Introduction
 A summary of what software is installed with which features enabled.
 
 **System setup**
@@ -71,7 +71,7 @@ A summary of what software is installed with which features enabled.
 * "config.local.php" preconfigured
 * **Until a stable version 3.x is released, postfixadmin is pulled from SVN**
 
-## Before you begin
+# Before you begin
 **Please remove any web- and mail services** running on your server. I recommend using a clean Debian minimal installation.
 Remember to purge Debians default MTA Exim4:
 ```
@@ -88,8 +88,8 @@ If there is any firewall, unblock the following ports for incoming connections:
 | Dovecot ManageSieve | TCP      | 4190 |
 | Nginx HTTPS         | TCP      | 443  |
 
-## Installation
-**Please run all these commands as root**
+# Installation
+**Please run all commands as root**
 
 Install git to download fufix:
 ```
@@ -125,7 +125,7 @@ More debugging is about to come. Though everything should work as intended.
 ## Configuration files used by fufix
 To help you modify the configuration, I created this little overview to get you started.
 
-### FuGlu
+## FuGlu
 Basic configuration. Set `group=nogroup` to run as nobody:nogroup (instead of group nobody). Set `defaultvirusaction` and `blockaction` to REJECT. Enabled ESMTP in `incomingport`:
 * **/etc/fuglu/fuglu.conf**
 
@@ -136,7 +136,7 @@ Define attachments to deny/allow:
 Mail template for the bounce to inform sender about blocked attachment:
 * **/etc/fuglu/templates/blockedfile.tmpl**
 
-### ClamAV and Spamassassin
+## ClamAV and Spamassassin
 Added `TCPSocket 3310` and `TCPAddr 127.0.0.1` to create a TCP socket:
 * **/etc/clamav/clamd.conf**
 
@@ -146,7 +146,7 @@ Added `rewrite_header Subject [SPAM]` and `report_safe 2` to prefix [SPAM] to ju
 Enabled "spamd" by `ENABLED=1`, enabled cronjob by setting `CRON=1` and modified OPTIONS line `OPTIONS="--create-prefs --max-children 5 --helper-home-dir --username debian-spamd"` in:
 * **/etc/default/spamassassin**
 
-### Postfix
+## Postfix
 The files "main.cf" and "master.cf" contain a lot of changes. You should now what you do if you modify these files.
 * **/etc/postfix/main.cf**
 * **/etc/postfix/master.cf**
@@ -182,7 +182,7 @@ queue_run_delay = 300s
 maximal_backoff_time = 1800s
 minimal_backoff_time = 300s
 ```
-### Nginx
+## Nginx
 A site for mail is copied to `/etc/nginx/sites-available` and enabled via symbolic link to `/etc/nginx/sites-enabled`.
 The sites root location is `/usr/share/nginx/mail`. Any default site installed by apt-get is removed.
 
@@ -198,7 +198,7 @@ php_admin_value[expose_php] = off # Do not display PHP version
 ```
 Server tokens are turned off in Nginx default configuration file `/etc/nginx/nginx.conf`.
 
-### Fail2ban
+## Fail2ban
 A file `/etc/fail2ban/jail.local` is created with the following content:
 ```
 [DEFAULT]
@@ -213,7 +213,7 @@ enabled = true
 Ban time is set to 1h, a jail for Postfix SASL (authentication) and - why not - SSHd is enabled.
 Default configuration parameters can be reviewed in `/etc/fail2ban/jail.conf`. I recommend to add further/modify existing parameters in "jail.local" to override those in "jail.conf".
 
-### Postfixadmin
+## Postfixadmin
 The file "config.local.php" is copied to the target directory `/usr/share/nginx/mail/pfadmin`. Some parameters like "domain.tld" are dummies and replaced by the installer.
 ```
 $CONF['configured'] = true;
@@ -243,7 +243,7 @@ You can change some values to your personal needs by just editing them. No need 
 
 **Default quotas in MB.**
 
-### Dovecot
+## Dovecot
 If you really need to edit Dovecots configuration, you can find the required files in `/etc/dovecot`.
 
 `/etc/dovecot/dovecot.conf` holds the default configuration. To keep it simple I chose not to split the configuration into multiple files. 
@@ -274,7 +274,7 @@ A system with a very large amount of virtual users should not do this on a daily
 
 *Dovecot saves messages to `/var/vmail/DOMAINNAME/USERNAME` in maildir format.*
 
-## Debugging
+# Debugging
 
 Most important files for debugging:
 
@@ -288,10 +288,10 @@ Most important files for debugging:
 
 Please always see these files when troubleshooting your mail server.
 
-## Maintenance
+# Maintenance
 To help you administrate some basic tasks I decided to add a section "Maintenance".
 A lot of work on mailboxes can be done by Dovecots "doveadm" tool.
-### Queries
+## Queries
 
 For example searching for inbox messages saved in the past 3 days for user "Bob.Cat":
 ```
@@ -315,7 +315,7 @@ doveadm move -u jane Archive/2011/09 mailbox INBOX BEFORE 2011-10-01 SINCE 01-Se
 
 You find some more useful search queries and much more here: http://wiki2.dovecot.org/Tools/Doveadm
 
-### Backup 
+## Backup 
 
 If you want to create a backup of Bobs maildir to /var/mailbackup, just go ahead and create the backup destination with proper rights:
 
