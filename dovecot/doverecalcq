@@ -1,2 +1,2 @@
 #!/bin/bash
-/bin/su dovecot -c "/usr/bin/doveadm quota recalc -A"
+/usr/bin/doveadm quota recalc -A
