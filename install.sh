@@ -140,8 +140,11 @@ mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_postfixdb; G
 # fuglu
 function fuglusetup {
 mkdir /var/log/fuglu 2> /dev/null
+groupadd fuglu
+useradd -g fuglu -s /bin/false fuglu
+usermod -a -G clamav fuglu
 rm /tmp/fuglu_control.sock 2> /dev/null
-chown nobody:nogroup /var/log/fuglu
+chown fuglu:fuglu /var/log/fuglu
 rm -rf fuglu_git 2> /dev/null
 git clone https://github.com/gryphius/fuglu.git fuglu_git
 cd fuglu_git/fuglu
@@ -278,10 +281,12 @@ service clamav-daemon stop; service clamav-daemon start;
 service clamav-freshclam stop; service clamav-freshclam start;
 service spamassassin stop; echo "Sleeping 3 seconds..."; sleep 3; service spamassassin start;
 service fuglu stop; service fuglu start;
-service dovecot stop; service dovecot start;
-cat /dev/null > /var/log/mail.err # error line when installing unattended
-service postfix stop; service postfix start;
 service mysql stop; service mysql start;
+cat /dev/null > /var/log/mail.err
+cat /dev/null > /var/log/mail.warn
+cat /dev/null > /var/log/mail.log
+service dovecot stop; service dovecot start;
+service postfix stop; service postfix start;
 }
 
 # check dns settings for domain
