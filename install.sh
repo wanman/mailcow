@@ -295,6 +295,9 @@ fi
 if [[ -z `dig $sys_hostname.$sys_domain @8.8.8.8 | grep -i $getpublicip` ]]; then
 echo "`tput bold`WARNING`tput sgr0`: Remember to setup an A record for $sys_hostname.$sys_domain pointing to $getpublicip (checked by Google DNS)"
 fi
+if [[ -z `dig $sys_domain txt @8.8.8.8 | grep -i spf` ]]; then
+echo "`tput bold`HINT`tput sgr0`: You may want to setup a TXT record for SPF, see spfwizard.com for further information (checked by Google DNS)"
+fi
 }
 
 # setup an administrator for postfixadmin
