@@ -143,16 +143,11 @@ mkdir /var/log/fuglu 2> /dev/null
 rm /tmp/fuglu_control.sock 2> /dev/null
 chown nobody:nogroup /var/log/fuglu
 rm -rf fuglu_git 2> /dev/null
-rm -rf /etc/fuglu 2> /dev/null
 git clone https://github.com/gryphius/fuglu.git fuglu_git
 cd fuglu_git/fuglu
 python setup.py -q install
 cd ../../
-find /etc/fuglu -type f -name '*.dist' -print0 | xargs -0 rename 's/.dist$//'
-sed -i '/^group=/s/=.*/=nogroup/' /etc/fuglu/fuglu.conf
-sed -i '/^defaultvirusaction=/s/=.*/=REJECT/' /etc/fuglu/fuglu.conf
-sed -i '/^blockaction=/s/=.*/=REJECT/' /etc/fuglu/fuglu.conf
-sed -i '/^incomingport=/s/=.*/=esmtp:10025,10099,10888/' /etc/fuglu/fuglu.conf
+cp -R fuglu/* /etc/fuglu/
 cp fuglu_git/fuglu/scripts/startscripts/debian/7/fuglu /etc/init.d/fuglu
 chmod +x /etc/init.d/fuglu
 update-rc.d fuglu defaults
@@ -208,6 +203,8 @@ if [[ -z `cat /etc/clamav/clamd.conf | grep -i -e TCPSocket -e TCPAddr` ]]; then
 echo TCPSocket 3310 >> /etc/clamav/clamd.conf
 echo TCPAddr 127.0.0.1 >> /etc/clamav/clamd.conf
 fi
+sed -i '/MaxFileSize/c\MaxFileSize 25M' /etc/clamav/clamd.conf
+sed -i '/StreamMaxLength/c\StreamMaxLength 25M' /etc/clamav/clamd.conf
 service clamav-freshclam start
 service clamav-daemon start
 }
@@ -277,8 +274,8 @@ service fail2ban stop; service fail2ban start;
 service rsyslog stop; service rsyslog start;
 service nginx stop; service nginx start;
 service php5-fpm stop; service php5-fpm start;
-service clamav-daemon stop; service clamav-daemon start;
-service clamav-freshclam stop; service clamav-freshclam start;
+service clamav-daemon start;
+service clamav-freshclam start;
 service spamassassin stop; echo "Sleeping 3 seconds..."; sleep 3; service spamassassin start;
 service fuglu stop; service fuglu start;
 service dovecot stop; service dovecot start;
