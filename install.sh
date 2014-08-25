@@ -217,7 +217,7 @@ service clamav-daemon start
 function spamassassinconfig {
 sed -i '/rewrite_header/c\rewrite_header Subject [SPAM]' /etc/spamassassin/local.cf
 sed -i '/report_safe/c\report_safe 2' /etc/spamassassin/local.cf
-sed -i '/^OPTIONS=/s/=.*/="--create-prefs --max-children 5 --helper-home-dir --username debian-spamd --socketpath /var/run/spamd.sock --socketowner debian-spamd --socketgroup debian-spamd"/' /etc/default/spamassassin
+sed -i '/^OPTIONS=/s/=.*/="--create-prefs --max-children 5 --helper-home-dir --username debian-spamd --socketpath \/var\/run\/spamd.sock --socketowner debian-spamd --socketgroup debian-spamd"/' /etc/default/spamassassin
 sed -i '/^CRON=/s/=.*/="1"/' /etc/default/spamassassin
 sed -i '/^ENABLED=/s/=.*/="1"/' /etc/default/spamassassin
 }
