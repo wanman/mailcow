@@ -34,6 +34,22 @@ This installer is permanently **tested on Debians stable branch** but is reporte
 
 Please see https://www.debinux.de/2014/08/fufix-mailserver-installer-auf-basis-von-postfix-und-Dovecot/ for any further information.
 Feel free to leave a comment or question (best in English or German).
+# Table Of Contents
+1. [Introduction](https://github.com/andryyy/fufix#introduction)
+2. [Before You Begin](https://github.com/andryyy/fufix#before-you-begin)
+3. [Installation](https://github.com/andryyy/fufix#installation)
+4. [Configuration Files Used By fufix](https://github.com/andryyy/fufix#configuration-files-used-by-fufix)
+  * [FuGlu](https://github.com/andryyy/fufix#fuglu)
+  * [ClamAV and Spamassassin](https://github.com/andryyy/fufix#clamav-and-spamassassin)
+  * [Postfix](https://github.com/andryyy/fufix#postfix)
+  * [Nginx](https://github.com/andryyy/fufix#nginx)
+  * [Fail2ban](https://github.com/andryyy/fufix#fail2ban)
+  * [Postfixadmin](https://github.com/andryyy/fufix#postfixadmin)
+  * [Dovecot](https://github.com/andryyy/fufix#dovecot)
+5. [Debugging](https://github.com/andryyy/fufix#debugging)
+6. [Maintenance](https://github.com/andryyy/fufix#maintenance)
+  * [Queries](https://github.com/andryyy/fufix#queries)
+  * [Backup](https://github.com/andryyy/fufix#backup)
 
 # Introduction
 A summary of what software is installed with which features enabled.
@@ -71,7 +87,7 @@ A summary of what software is installed with which features enabled.
 * "config.local.php" preconfigured
 * **Until a stable version 3.x is released, postfixadmin is pulled from SVN**
 
-# Before you begin
+# Before You Begin
 **Please remove any web- and mail services** running on your server. I recommend using a clean Debian minimal installation.
 Remember to purge Debians default MTA Exim4:
 ```
