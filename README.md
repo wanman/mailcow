@@ -47,7 +47,7 @@ Feel free to leave a comment or question (best in English or German).
   * [Postfixadmin](https://github.com/andryyy/fufix#postfixadmin)
   * [Dovecot](https://github.com/andryyy/fufix#dovecot)
 5. [Debugging](https://github.com/andryyy/fufix#debugging)
-6. [Maintenance](https://github.com/andryyy/fufix#maintenance)
+6. [Maintenance And Common Tasks](https://github.com/andryyy/fufix#maintenance-and-common-tasks)
   * [Queries](https://github.com/andryyy/fufix#queries)
   * [Backup](https://github.com/andryyy/fufix#backup)
   * [SSL certificate](https://github.com/andryyy/fufix#ssl-certificate)
