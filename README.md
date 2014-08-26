@@ -347,4 +347,8 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 
 For more information about dsync (like the difference between backups and mirrors) visit http://wiki2.dovecot.org/Tools/Dsync
 
+## SSL certificate
 
+The SSL certificate is located at `/etc/ssl/mail/mail.{key,crt}`.
+You can replace it by just copying over your own files. 
+Services effected and necessary to restart are `postfix`, `dovecot` and `nginx`.
