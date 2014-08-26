@@ -305,7 +305,7 @@ Most important files for debugging:
 
 Please always see these files when troubleshooting your mail server.
 
-# Maintenance
+# Maintenance And Common Tasks
 To help you administrate some basic tasks I decided to add a section "Maintenance".
 A lot of work on mailboxes can be done by Dovecots "doveadm" tool.
 ## Queries
