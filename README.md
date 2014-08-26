@@ -71,7 +71,7 @@ A summary of what software is installed with which features enabled.
 * SMTPS disabled
 * Require TLS Authentification
 * Included ZEN blocklist
-* Spam- and virus protection by [FuGlu Mail Content Scanner](http://www.fuglu.org)  with ClamAV and Spamassassin backend: Reject infected mails (<v0.2: delete), mark spam and move to "Junk"
+* Spam-  and virus protection plus attachment filter by [FuGlu Mail Content Scanner](http://www.fuglu.org)  with ClamAV and Spamassassin backend: Reject infected mails (<v0.2: delete), mark spam and move to "Junk"
 * SSL based on BetterCrypto (but no definition of "high" ciphers for compatibility reasons)
 
 **Dovecot**
@@ -353,3 +353,39 @@ For more information about dsync (like the difference between backups and mirror
 The SSL certificate is located at `/etc/ssl/mail/mail.{key,crt}`.
 You can replace it by just copying over your own files. 
 Services effected and necessary to restart are `postfix`, `dovecot` and `nginx`.
+
+## Action override with FuGlu
+You can use FuGlus Action Override plugin to create custom filters.  
+To add an action open the file `/etc/fuglu/actionrules.regex`.  
+Use the following syntax:
+```
+<headername> <regex> <argument>
+``` 
+Valid header names (a email header name, eg Received, To, From, Subject ... also supports ‘*’ as wildcard character):
+> mime:headername (to get mime Headers in the message payload eg: mime:Content-Disposition)
+> envelope_from (the envelope from address)
+> from_domain (domain part of envelope_from)
+> envelope_to (envelope to address)
+> to_domain (domain part of envelope_to)
+> a message Tag prepended by the @ symbol, eg. @incomingport
+> body:raw (to match the the decoded message body (only applies to text/* partsl))
+> body:stripped or just body (to match the the message body (only applies to text/* parts), with stripped tags and newlines replaced with space (similar to SpamAssassin body rules))
+> body:full (to match the full body)
+Valid arguments:
+> DUNNO : This plugin decides not to take any final action, continue with the next plugin (this is the most common case)
+> ACCEPT : Whitelist this message, don’t run any remaining plugins
+> DELETE : Silently delete this message (The sender will think it has been delivered)
+> DEFER : Temporary Reject (4xx error), used for error conditions in after-queue mode or things like greylisting in before-queue mode
+> REJECT : Reject this message, should only be used in before-queue mode (in after-queue mode this would produce a bounce / backscatter)
+Some examples with regex:
+```
+# Reject mails with "Hello" in the subject:
+Subject Hello REJECT
+
+# Delete mail sent from domain.org or any subdomain
+from_domain (\.)?domain.org$ DELETE
+
+# Reject if a X-Spam-<something> header exists
+X-Spam-* .* REJECT
+```
+See more details at http://gryphius.github.io/fuglu/plugins-index.html
