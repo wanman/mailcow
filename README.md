@@ -50,6 +50,7 @@ Feel free to leave a comment or question (best in English or German).
 6. [Maintenance](https://github.com/andryyy/fufix#maintenance)
   * [Queries](https://github.com/andryyy/fufix#queries)
   * [Backup](https://github.com/andryyy/fufix#backup)
+  * [SSL certificate](https://github.com/andryyy/fufix#ssl-certificate)
 
 # Introduction
 A summary of what software is installed with which features enabled.
