@@ -378,6 +378,7 @@ Valid arguments:
 > - DELETE : Silently delete this message (The sender will think it has been delivered)
 > - DEFER : Temporary Reject (4xx error), used for error conditions in after-queue mode or things like greylisting in before-queue mode
 > - REJECT : Reject this message, should only be used in before-queue mode (in after-queue mode this would produce a bounce / backscatter)
+
 Some examples with regex:
 
 ```
