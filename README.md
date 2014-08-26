@@ -51,6 +51,7 @@ Feel free to leave a comment or question (best in English or German).
   * [Queries](https://github.com/andryyy/fufix#queries)
   * [Backup](https://github.com/andryyy/fufix#backup)
   * [SSL certificate](https://github.com/andryyy/fufix#ssl-certificate)
+  * [Filter mail](https://github.com/andryyy/fufix#filter-mail)
 
 # Introduction
 A summary of what software is installed with which features enabled.
@@ -354,7 +355,7 @@ The SSL certificate is located at `/etc/ssl/mail/mail.{key,crt}`.
 You can replace it by just copying over your own files. 
 Services effected and necessary to restart are `postfix`, `dovecot` and `nginx`.
 
-## Action override with FuGlu
+## Filter mail
 You can use FuGlus Action Override plugin to create custom filters.  
 To add an action open the file `/etc/fuglu/actionrules.regex`.  
 Use the following syntax:
