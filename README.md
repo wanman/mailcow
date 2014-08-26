@@ -362,22 +362,24 @@ Use the following syntax:
 <headername> <regex> <argument>
 ``` 
 Valid header names (a email header name, eg Received, To, From, Subject ... also supports ‘*’ as wildcard character):
-> mime:headername (to get mime Headers in the message payload eg: mime:Content-Disposition)
-> envelope_from (the envelope from address)
-> from_domain (domain part of envelope_from)
-> envelope_to (envelope to address)
-> to_domain (domain part of envelope_to)
-> a message Tag prepended by the @ symbol, eg. @incomingport
-> body:raw (to match the the decoded message body (only applies to text/* partsl))
-> body:stripped or just body (to match the the message body (only applies to text/* parts), with stripped tags and newlines replaced with space (similar to SpamAssassin body rules))
-> body:full (to match the full body)
+
+> - mime:headername (to get mime Headers in the message payload eg: mime:Content-Disposition)
+> - envelope_from (the envelope from address)
+> - from_domain (domain part of envelope_from)
+> - envelope_to (envelope to address)
+> - to_domain (domain part of envelope_to)
+> - a message Tag prepended by the @ symbol, eg. @incomingport
+> - body:raw (to match the the decoded message body (only applies to text/* partsl))
+> - body:stripped or just body (to match the the message body (only applies to text/* parts), with stripped tags and newlines replaced with space (similar to SpamAssassin body rules))
+> - body:full (to match the full body)
 Valid arguments:
-> DUNNO : This plugin decides not to take any final action, continue with the next plugin (this is the most common case)
-> ACCEPT : Whitelist this message, don’t run any remaining plugins
-> DELETE : Silently delete this message (The sender will think it has been delivered)
-> DEFER : Temporary Reject (4xx error), used for error conditions in after-queue mode or things like greylisting in before-queue mode
-> REJECT : Reject this message, should only be used in before-queue mode (in after-queue mode this would produce a bounce / backscatter)
+> - DUNNO : This plugin decides not to take any final action, continue with the next plugin (this is the most common case)
+> - ACCEPT : Whitelist this message, don’t run any remaining plugins
+> - DELETE : Silently delete this message (The sender will think it has been delivered)
+> - DEFER : Temporary Reject (4xx error), used for error conditions in after-queue mode or things like greylisting in before-queue mode
+> - REJECT : Reject this message, should only be used in before-queue mode (in after-queue mode this would produce a bounce / backscatter)
 Some examples with regex:
+
 ```
 # Reject mails with "Hello" in the subject:
 Subject Hello REJECT
@@ -388,6 +390,7 @@ from_domain (\.)?domain.org$ DELETE
 # Reject if a X-Spam-<something> header exists
 X-Spam-* .* REJECT
 ```
+
 **You do not need to restart/reload FuGlus service!**  
 The file actionrules.regex will be reloaded automatically.
 
