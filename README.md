@@ -388,4 +388,7 @@ from_domain (\.)?domain.org$ DELETE
 # Reject if a X-Spam-<something> header exists
 X-Spam-* .* REJECT
 ```
+**You do not need to restart/reload FuGlus service!**  
+The file actionrules.regex will be reloaded automatically.
+
 See more details at http://gryphius.github.io/fuglu/plugins-index.html
