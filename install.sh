@@ -32,7 +32,7 @@ ddddddd` :ddh-   .-`.::oyys::``..   `hdd: .ddddddd
 echo
 echo
 genpasswd() {
-tr -cd '[:alnum:]' < /dev/urandom | fold -w22 | head -n1 | echo `cat - `$RANDOM
+tr -cd A-Za-z0-9 < /dev/urandom | fold -w22 | head -n1 | echo `cat - `$RANDOM
 }
 
 function returnwait {
