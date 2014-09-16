@@ -31,8 +31,17 @@ ddddddd` :ddh-   .-`.::oyys::``..   `hdd: .ddddddd
                     :dddddddh.'
 echo
 echo
+
 genpasswd() {
-tr -cd A-Za-z0-9 < /dev/urandom | fold -w22 | head -n1 | echo `cat - `$RANDOM
+# While loop to make sure a password with at least 3 numbers is generated
+# Replaced alnum by A-Za-z0-9 due to unexpected behaviour when LC_ALL is not C.
+count=0
+while [ $count -lt 3 ]
+do
+pw_valid=$(tr -cd A-Za-z0-9 < /dev/urandom | fold -w22 | head -n1)
+count=$(grep -o "[0-9]" <<< $pw_valid | wc -l)
+done
+echo $pw_valid
 }
 
 function returnwait {
