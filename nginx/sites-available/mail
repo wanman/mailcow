@@ -13,7 +13,7 @@ server {
 	add_header Strict-Transport-Security max-age=15768000;
 
         root /usr/share/nginx/mail;
-        index index.html index.htm index.php /_h5ai/server/php/index.php;
+        index index.html index.htm index.php;
 
 	location ~ /(\.ht) {
 		deny all;
