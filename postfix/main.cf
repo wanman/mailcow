@@ -21,8 +21,8 @@ html_directory = /usr/share/doc/postfix/html
 smtpd_tls_cert_file = /etc/ssl/mail/mail.crt
 smtpd_tls_key_file = /etc/ssl/mail/mail.key
 
-# Mandatory TLS encryption, this implies TLS auth only!
-smtpd_tls_security_level=encrypt
+# Opportunistic TLS. TLS auth only.
+smtpd_tls_security_level=may
 smtpd_tls_auth_only=yes
 
 # TLS session cache for SMTPd
