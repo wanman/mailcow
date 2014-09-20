@@ -121,15 +121,15 @@ echo --------------------------------- >> installer.log
 
 # set hostname
 function systemenvironment {
-getpublicip=`wget -q4O- ip4.telize.com`
-if [[ $getpublicip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+getpublicipv4=`wget -q4O- ip4.telize.com`
+if [[ $getpublicipv4 =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
 cat > /etc/hosts<<'EOF'
 127.0.0.1 localhost
 ::1 localhost ip6-localhost ip6-loopback
 ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 EOF
-echo $getpublicip $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
+echo $getpublicipv4 $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
 echo $sys_hostname > /etc/hostname
 # need to trigger this pseudo service now
 service hostname.sh start
@@ -318,11 +318,11 @@ service postfix stop; service postfix start;
 
 # check dns settings for domain
 function checkdns {
-if [[ -z `dig -x $getpublicip @8.8.8.8 | grep -i $sys_domain` ]]; then
-echo "`tput bold`WARNING`tput sgr0`: Remember to setup a PTR record: $getpublicip does not point to $sys_domain (checked by Google DNS)"
+if [[ -z `dig -x $getpublicipv4 @8.8.8.8 | grep -i $sys_domain` ]]; then
+echo "`tput bold`WARNING`tput sgr0`: Remember to setup a PTR record: $getpublicipv4 does not point to $sys_domain (checked by Google DNS)"
 fi
-if [[ -z `dig $sys_hostname.$sys_domain @8.8.8.8 | grep -i $getpublicip` ]]; then
-echo "`tput bold`WARNING`tput sgr0`: Remember to setup an A record for $sys_hostname.$sys_domain pointing to $getpublicip (checked by Google DNS)"
+if [[ -z `dig $sys_hostname.$sys_domain @8.8.8.8 | grep -i $getpublicipv4` ]]; then
+echo "`tput bold`WARNING`tput sgr0`: Remember to setup an A record for $sys_hostname.$sys_domain pointing to $getpublicipv4 (checked by Google DNS)"
 fi
 if [[ -z `dig $sys_domain txt @8.8.8.8 | grep -i spf` ]]; then
 echo "`tput bold`HINT`tput sgr0`: You may want to setup a TXT record for SPF, see spfwizard.com for further information (checked by Google DNS)"
