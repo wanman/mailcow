@@ -306,11 +306,12 @@ service php5-fpm stop; service php5-fpm start;
 service clamav-daemon stop; service clamav-daemon start;
 service clamav-freshclam stop; service clamav-freshclam start;
 service spamassassin stop; echo "Sleeping 3 seconds..."; sleep 3; service spamassassin start;
-service fuglu stop; service fuglu start;
+service fuglu stop; sleep 1; service fuglu start;
 service mysql stop; service mysql start;
 cat /dev/null > /var/log/mail.err
 cat /dev/null > /var/log/mail.warn
 cat /dev/null > /var/log/mail.log
+cat /dev/null > /var/log/mail.info
 service dovecot stop; service dovecot start;
 service postfix stop; service postfix start;
 }
