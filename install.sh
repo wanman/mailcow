@@ -44,14 +44,10 @@ done
 echo $pw_valid
 }
 
-function returnwait {
-echo "`tput setaf 4``tput bold`$1`tput sgr0` - `tput setaf 2``tput bold`[OK]`tput sgr0`";
-read -p "Press ENTER to continue or CTRL+C to cancel installation"
-}
-
-[[ ! -z `ss -lnt | awk '$1 == "LISTEN" && $4 ~ ":25" || $4 ~ ":143" || $4 ~ ":993" || $4 ~ ":587" || $4 ~ ":485" || $4 ~ ":80" || $4 ~ ":443" || $4 ~ ":995"'` ]] && { echo "`tput setaf 1``tput bold`Please remove any mail and web services before running this script.`tput sgr0`"; echo "(Dovecot, Postfix, Sendmail, Apache2, Nginx etc.)"; exit 1; }
-
+####################################
 ########### CONFIG START ###########
+####################################
+
 sys_hostname="mail"
 sys_domain="domain.com"
 sys_timezone="Europe/Berlin"
@@ -68,12 +64,30 @@ cert_country="DE"
 cert_state="NRW"
 cert_city="DUS"
 cert_org="MAIL"
+
+####################################
 ############ CONFIG END ############
-## do not edit any line below ####
+####################################
+#### do not edit any line below ####
+####################################
+
+[[ ! -z `ss -lnt | awk '$1 == "LISTEN" && $4 ~ ":25" || $4 ~ ":143" || $4 ~ ":993" || $4 ~ ":587" || $4 ~ ":485" || $4 ~ ":80" || $4 ~ ":443" || $4 ~ ":995"'` ]] && { echo "`tput setaf 1``tput bold`Please remove any mail and web services before running this script.`tput sgr0`"; echo "(Dovecot, Postfix, Sendmail, Apache2, Nginx etc.)"; exit 1; }
+
+function returnwait {
+echo "`tput setaf 4``tput bold`$1`tput sgr0` - `tput setaf 2``tput bold`[OK]`tput sgr0`";
+read -p "Press ENTER to continue or CTRL+C to cancel installation"
+}
+
+
+fuglu_version="0.6.2"
+fail2ban_version="0.9.0a2-800"
+postfixadmin_revision="1689"
 
 echo "
 ---------------------------------
 Please review your configuration
+---------------------------------
+Passwords will not be displayed
 ---------------------------------
 FQDN: $sys_hostname.$sys_domain
 Timezone: $sys_timezone
@@ -85,15 +99,25 @@ Postfixadmin Superuser: $pfadmin_adminuser
 ---------------------------------"
 read -p "Press ENTER to continue or CTRL+C to cancel installation"
 
-# log generated passwords
+# log generated data
 echo --------------------------------- > installer.log
-echo MySQL password for user $my_postfixuser: $my_postfixpass >> installer.log
+echo MySQL database name: $my_postfixdb >> installer.log
+echo MySQL username $my_postfixuser >> installer.log
+echo MySQL password $my_postfixpass >> installer.log
 echo MySQL root password: $my_rootpw >> installer.log
 echo --------------------------------- >> installer.log
 echo Postfixadmin Superuser >> installer.log
 echo Username: $pfadmin_adminuser >> installer.log
 echo Password: $pfadmin_adminpass >> installer.log
 echo --------------------------------- >> installer.log
+echo FQDN: $sys_hostname.$sys_domain >> installer.log
+echo Timezone: $sys_timezone >> installer.log
+echo --------------------------------- >> installer.log
+echo FuGlu version: $fuglu_version >> installer.log
+echo Fail2ban version: $fail2ban_version >> installer.log
+echo Postfixadmin Revision: $postfixadmin_revision >> installer.log
+echo --------------------------------- >> installer.log
+
 
 # set hostname
 function systemenvironment {
@@ -123,13 +147,12 @@ fi
 # installation
 function installpackages {
 echo "Installing packages unattended, please stand by, errors will be reported."
-DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
+DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install git dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
 python-magic openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite mysql-client mysql-server nginx dovecot-common dovecot-core mailutils \
 dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d postfix \
 postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin  >/dev/null
-unset DEBIAN_FRONTEND
 }
 
 # certificate
@@ -155,20 +178,18 @@ usermod -a -G debian-spamd fuglu
 usermod -a -G clamav fuglu
 rm /tmp/fuglu_control.sock 2> /dev/null
 chown fuglu:fuglu /var/log/fuglu
-rm -rf fuglu_git 2> /dev/null
-git clone https://github.com/gryphius/fuglu.git fuglu_git
-cd fuglu_git/fuglu
-python setup.py -q install
-cd ../../
-cp -R fuglu/* /etc/fuglu/
-cp fuglu_git/fuglu/scripts/startscripts/debian/7/fuglu /etc/init.d/fuglu
+tar xf fuglu/inst/$fuglu_version.tar -C fuglu/inst/ 2> /dev/null
+(cd fuglu/inst/$fuglu_version ; python setup.py -q install)
+cp -R fuglu/conf/* /etc/fuglu/
+cp fuglu/inst/$fuglu_version/scripts/startscripts/debian/7/fuglu /etc/init.d/fuglu
 chmod +x /etc/init.d/fuglu
 update-rc.d fuglu defaults
+rm -rf fuglu/inst/$fuglu_version
 }
 
 # postfix
 function postfixconfig {
-cp -R postfix/* /etc/postfix/
+cp -R postfix/conf/* /etc/postfix/
 chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf"
 chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_maps.cf"
 chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_mailbox_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_mailbox_maps.cf"
@@ -188,7 +209,7 @@ sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/postfix/sql/*
 # dovecot
 function dovecotconfig {
 rm -rf /etc/dovecot/* 2> /dev/null
-cp -R dovecot/*.conf /etc/dovecot/
+cp -R dovecot/conf/*.conf /etc/dovecot/
 groupadd -g 5000 vmail
 useradd -g vmail -u 5000 vmail -d /var/vmail
 chown root:dovecot "/etc/dovecot/dovecot-dict-sql.conf"; chmod 640 "/etc/dovecot/dovecot-dict-sql.conf"
@@ -200,11 +221,11 @@ sed -i "s/my_postfixpass/$my_postfixpass/g" /etc/dovecot/*
 sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/dovecot/*
 sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/dovecot/*
 mkdir -p /var/vmail/sieve
-cp dovecot/spam-global.sieve /var/vmail/sieve/spam-global.sieve
-cp dovecot/default.sieve /var/vmail/sieve/default.sieve
+cp dovecot/conf/spam-global.sieve /var/vmail/sieve/spam-global.sieve
+cp dovecot/conf/default.sieve /var/vmail/sieve/default.sieve
 sievec /var/vmail/sieve/spam-global.sieve
 chown -R vmail:vmail /var/vmail
-cp dovecot/doverecalcq /etc/cron.daily/; chmod 755 /etc/cron.daily/doverecalcq
+cp dovecot/conf/doverecalcq /etc/cron.daily/; chmod 755 /etc/cron.daily/doverecalcq
 }
 
 # clamv
@@ -235,9 +256,9 @@ sed -i '/^ENABLED=/s/=.*/="1"/' /etc/default/spamassassin
 function websrvconfig {
 rm -rf /etc/php5/fpm/pool.d/* 2> /dev/null
 rm -rf /etc/nginx/{sites-available,sites-enabled}/* 2> /dev/null
-cp nginx/sites-available/mail /etc/nginx/sites-available/mail
+cp nginx/conf/sites-available/mail /etc/nginx/sites-available/mail
 ln -s /etc/nginx/sites-available/mail /etc/nginx/sites-enabled/mail
-cp php5-fpm/mail.conf /etc/php5/fpm/pool.d/mail.conf
+cp php5-fpm/conf/mail.conf /etc/php5/fpm/pool.d/mail.conf
 sed -i "/date.timezone/c\php_admin_value[date.timezone] = $sys_timezone" /etc/php5/fpm/pool.d/mail.conf
 sed -i '/server_tokens/c\server_tokens off;' /etc/nginx/nginx.conf
 }
@@ -245,35 +266,30 @@ sed -i '/server_tokens/c\server_tokens off;' /etc/nginx/nginx.conf
 # pfadmin
 function pfadminconfig {
 rm -rf /usr/share/nginx/mail 2> /dev/null
-mkdir -p /usr/share/nginx/mail
-echo checking out postfixadmin, please wait...
-svn --quiet --non-interactive co http://svn.code.sf.net/p/postfixadmin/code/trunk /usr/share/nginx/mail/pfadmin
-echo Postfixadmin revision: `svn info /usr/share/nginx/mail/pfadmin/ | grep "Revision" | awk '{print $2}'` >> installer.log
-cp pfadmin/config.local.php /usr/share/nginx/mail/pfadmin/config.local.php
+mkdir -p /usr/share/nginx/mail/pfadmin
+cp nginx/conf/index.php /usr/share/nginx/mail/
+tar xf pfadmin/inst/$postfixadmin_revision.tar -C pfadmin/inst/
+mv pfadmin/inst/$postfixadmin_revision/* /usr/share/nginx/mail/pfadmin/
+cp pfadmin/conf/config.local.php /usr/share/nginx/mail/pfadmin/config.local.php
 sed -i "s/my_postfixpass/$my_postfixpass/g" /usr/share/nginx/mail/pfadmin/config.local.php
 sed -i "s/my_postfixuser/$my_postfixuser/g" /usr/share/nginx/mail/pfadmin/config.local.php
 sed -i "s/my_postfixdb/$my_postfixdb/g" /usr/share/nginx/mail/pfadmin/config.local.php
 sed -i "s/domain.tld/$sys_domain/g" /usr/share/nginx/mail/pfadmin/config.local.php
 sed -i "s/change-this-to-your.domain.tld/$sys_domain/g" /usr/share/nginx/mail/pfadmin/config.inc.php
 chown -R www-data: /usr/share/nginx/
+rm -r pfadmin/inst/$postfixadmin_revision
 }
 
 # fail2ban
 function fail2banconfig {
-git clone https://github.com/fail2ban/fail2ban fail2ban_git
-cd fail2ban_git
+tar xf fail2ban/inst/$fail2ban_version.tar -C fail2ban/inst/
 rm -rf /etc/fail2ban/ 2> /dev/null
-python setup.py -q install
-cd ..
-wget https://raw.githubusercontent.com/fail2ban/fail2ban/debian/debian/fail2ban.init -O /etc/init.d/fail2ban
-# i prefere creating symlinks to /usr/bin...
-ln -s /usr/local/bin/fail2ban-* /usr/bin/  2> /dev/null
-# ...we could use sed to change the init script, too
-#sed -i '/^DAEMON=/s/=.*/=\/usr\/local\/bin\/$NAME-client/' /etc/init.d/fail2ban
-#sed -i '/^PATH=/s/=.*/=\/usr\/sbin\:\/usr\/bin\:\/sbin\:\/bin\:\/usr\/local\/bin/' /etc/init.d/fail2ban
+(cd fail2ban/inst/$fail2ban_version ; python setup.py -q install 2> /dev/null)
+cp fail2ban/conf/fail2ban.init /etc/init.d/fail2ban
+cp fail2ban/conf/jail.local /etc/fail2ban/jail.local
 chmod +x /etc/init.d/fail2ban
 update-rc.d fail2ban defaults
-cp fail2ban/jail.local /etc/fail2ban/jail.local
+rm -rf fail2ban/inst/$fail2ban_version
 }
 
 # rsyslogd
@@ -353,9 +369,7 @@ returnwait "Completing Postfixadmin setup"
 checkdns
 echo
 chmod 600 installer.log
-echo "LOGGED CREDENTIALS TO: installer.log"
+echo "LOGGED CREDENTIALS AND FURTHER INFORMATION TO: installer.log - only readable by root"
 echo
-echo "Visit \"https://$sys_hostname.$sys_domain/pfadmin\" to setup a mailbox"
-echo
-echo "Change Postfixadmin default values in \"/usr/share/nginx/mail/pfadmin/config.local.php\"."
+echo "Visit \"https://$sys_hostname.$sys_domain\", select \"System Settings\" and login as Postfixadmin Superuser to create a mailbox."
 echo

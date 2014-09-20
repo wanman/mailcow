@@ -1,0 +1,11 @@
+# mysql_virtual_domains_maps.cf
+user = my_postfixuser
+password = my_postfixpass
+hosts = localhost
+dbname = my_postfixdb
+query          = SELECT domain FROM domain WHERE domain='%s' AND active = '1'
+#query          = SELECT domain FROM domain WHERE domain='%s'
+#optional query to use when relaying for backup MX
+#query           = SELECT domain FROM domain WHERE domain='%s' AND backupmx = '0' AND active = '1'
+#expansion_limit = 100
+

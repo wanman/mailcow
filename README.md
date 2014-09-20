@@ -52,6 +52,7 @@ Feel free to leave a comment or question (best in English or German).
   * [Backup](https://github.com/andryyy/fufix#backup)
   * [SSL certificate](https://github.com/andryyy/fufix#ssl-certificate)
   * [Filter mail](https://github.com/andryyy/fufix#filter-mail)
+7. [Uninstall](https://github.com/andryyy/fufix#Uninstall)
 
 # Introduction
 A summary of what software is installed with which features enabled.
@@ -257,7 +258,7 @@ $CONF['fetchmail'] = 'NO';
 $CONF['show_footer_text'] = 'NO';
 $CONF['used_quotas'] = 'YES';
 ```
-You can change some values to your personal needs by just editing them. No need to reload any service afterwards.
+You can change some values to your personal needs by just editing or adding them to this file. All changes to "config.local.php" override the global configuration file of Postfixadmin. No need to reload any service afterwards. 
 
 **Default quotas in MB.**
 
@@ -397,3 +398,6 @@ X-Spam-* .* REJECT
 The file actionrules.regex will be reloaded automatically.
 
 See more details at http://gryphius.github.io/fuglu/plugins-index.html
+
+## Uninstall
+Run `misc/purge.sh` from within fufix directory to completly purge fufix, mailboxes, databases and any related service.

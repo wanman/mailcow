@@ -1,0 +1,8 @@
+# mysql_virtual_alias_maps.cf
+user = my_postfixuser
+password = my_postfixpass
+hosts = localhost
+dbname = my_postfixdb
+query = SELECT goto FROM alias WHERE address='%s' AND active = '1'
+#expansion_limit = 100
+
