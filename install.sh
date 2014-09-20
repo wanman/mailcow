@@ -147,7 +147,7 @@ fi
 # installation
 function installpackages {
 echo "Installing packages unattended, please stand by, errors will be reported."
-DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install git dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
+DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
 python-magic openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite mysql-client mysql-server nginx dovecot-common dovecot-core mailutils \
