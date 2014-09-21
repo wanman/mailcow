@@ -71,7 +71,7 @@ cert_org="MAIL"
 #### do not edit any line below ####
 ####################################
 
-[[ ! -z `ss -lnt | awk '$1 == "LISTEN" && $4 ~ ":25" || $4 ~ ":143" || $4 ~ ":993" || $4 ~ ":587" || $4 ~ ":485" || $4 ~ ":80" || $4 ~ ":443" || $4 ~ ":995"'` ]] && { echo "`tput setaf 1``tput bold`Please remove any mail and web services before running this script.`tput sgr0`"; echo "(Dovecot, Postfix, Sendmail, Apache2, Nginx etc.)"; exit 1; }
+[[ ! -z `ss -lnt | awk '$1 == "LISTEN" && $4 ~ ":25" || $4 ~ ":143" || $4 ~ ":993" || $4 ~ ":587" || $4 ~ ":485" || $4 ~ ":80" || $4 ~ ":443" || $4 ~ ":995"'` ]] && { echo "`tput setaf 1``tput bold`Please remove any mail and web services before running this script.`tput sgr0`"; echo ; echo ; echo "netstat -tulpen" ; echo "---------------" ; echo ; netstat -tulpen ; exit 1; }
 
 function returnwait {
 echo "`tput setaf 4``tput bold`$1`tput sgr0` - `tput setaf 2``tput bold`[OK]`tput sgr0`";
