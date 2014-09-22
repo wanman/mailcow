@@ -2,31 +2,15 @@ fufix
 =====
 
 ```
-                    .hddddddh
-                   `sdddddddd+
-        `//:       .dddddddddd-`      -//`
-      `+hdddyo/./syyyso++++osyhhs/.:oyddddo`
-    `+hddddddddy+:.` `......` `.:ohdddddddddo
-    `sddddddh+. `-+shhddddddhys/-` -ohdddddds
-     `ydddd+` .+hddddddddddddddddh+. .+ddddy`
-       ddy- .oddddddddddddddddddddddo` -ydd
-      /dy` :hddddddddddddddddddddddddh- `yd.
-    `.hy. -dddddhhhhddddddddddhhhhddddh- .hh.`
-/ssyddd/ `yddd+.    `:sddddy/`    ./hddy` +dddyss/
-ddddddd` :ddd/  .+o:   yddh.  -++-  -hdd: .ddddddd
-ddddddh` /ddh-  /ddh.  oddy   sddo  `hdd/ `ddddddd
-ddddddd` :ddh-   .-`.::oyys::``..   `hdd: .ddddddd
-/osdddd/ .ydh-      `/oooooo/       `hdy` /ddddso/
-   ``+dy. :dh-       `:oooo:        `hd- .hh/``
-      /ds` :y-         :oo-         `s- `yd/
-       sdy. ..          ..          `` -yds
-     `ydddh+`                        `+ddddy`
-    `sddddddh+.                    .+hdddddds`
-    `+hddddddddy+-`            `:+yddddddddh+`
-      `+hddddy+/+ydhso++//++oyhdy+/+yddddh+`
-        `++-`     `-dddddddddd-`     `-+o`
-                   `sdddddddd+
-                    :dddddddh.
+
+
+   m""           m""    "
+ mm#mm  m   m  mm#mm  mmm    m   m
+   #    #   #    #      #     #m#
+   #    #   #    #      #     m#m
+   #    "mm"#    #    mm#mm  m" "m
+
+
 ```
 
 A mail server install script for **Debian and Debian based distributions**. 
@@ -268,7 +252,7 @@ $CONF['used_quotas'] = 'YES';
 ```
 You can change some values to your personal needs by just editing or adding them to this file. All changes to "config.local.php" override the global configuration file of Postfixadmin. No need to reload any service afterwards. 
 
-**Default quotas in MB.**
+**Default quotas in MiB.**
 
 ## Dovecot
 If you really need to edit Dovecots configuration, you can find the required files in `/etc/dovecot`.
