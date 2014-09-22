@@ -147,6 +147,8 @@ More debugging is about to come. Though everything should work as intended.
 
 See [this image](https://www.debinux.de/wp-content/uploads/tbird.png) to get an overview of Thunderbird configuration.
 
+A small landing page is active at **https://hostname.domain.tld**.
+
 ## Configuration files used by fufix
 To help you modify the configuration, I created this little overview to get you started.
 
