@@ -32,8 +32,9 @@ php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl
 php5-intl php5-mcrypt php5-mysql php5-sqlite mysql-client mysql-server nginx dovecot-common dovecot-core mailutils \
 dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d postfix \
 postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin
-# running autoremove two times to purge dovecot
+apt-get -y purge dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-pop3d dovecot-sieve
 apt-get -y autoremove --purge
+apt-get -y purge dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-pop3d dovecot-sieve
 apt-get -y autoremove --purge
 killall -u vmail
 userdel vmail
