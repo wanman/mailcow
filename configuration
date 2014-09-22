@@ -1,0 +1,34 @@
+# Your servers new hostname and timezone.
+# FQDN would be mail.domain.com
+# Example for valid timezone data: https://www.vmware.com/support/developer/vc-sdk/visdk400pubs/ReferenceGuide/timezone.html
+
+sys_hostname="mail"
+sys_domain="domain.com"
+sys_timezone="Europe/Berlin"
+
+# MySQL configuration.
+# Password policy: Not empty.
+# Recommended setting: Leave "genpasswd" to generate a secure password.
+
+my_postfixdb="postfixdb"
+my_postfixuser="postfix"
+my_postfixpass=`genpasswd`
+my_rootpw=`genpasswd`
+
+# Postfixadmin - Admin Login
+# Password policy: At least 8 characters long, including 2 numbers, an uppercase letter, and a lowercase letter.
+# Recommended settings: Leave "genpasswd" to generate a secure password.
+
+pfadmin_adminuser="pfadmin@$sys_domain"
+pfadmin_adminpass=`genpasswd`
+
+# Self-signed certificate
+# "cert_country" needs to be a valid 2 letter country code. See https://www.digicert.com/ssl-certificate-country-codes.htm
+
+cert_country="DE"
+cert_state="NRW"
+cert_city="DUS"
+cert_org="MAIL"
+
+# Done?
+conf_done="no"
