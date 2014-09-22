@@ -94,6 +94,18 @@ If there is any firewall, unblock the following ports for incoming connections:
 # Installation
 **Please run all commands as root**
 
+**Option 1: Download a stable release**
+
+Download fufix to whichever directory (using ~/build here).
+Replace "v0.x" with the tag of the latest release: https://github.com/andryyy/fufix/releases/latest
+```
+mkdir ~/build ; cd ~/build
+wget -O - https://github.com/andryyy/fufix/archive/v0.x.tar.gz | tar xfz -
+cd fufix-*
+```
+
+**Option 2: Install from git**
+
 Install git to download fufix:
 ```
 apt-get install git
@@ -105,7 +117,6 @@ mkdir ~/build
 git clone https://github.com/andryyy/fufix
 cd fufix
 ```
-
 **Now edit "configuration" file to fit your needs!**
 ```
 nano configuration
