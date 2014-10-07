@@ -299,7 +299,7 @@ protocol imap {
 
 Default file size limit is set to 25 MB. If you want to change this, you need to change three files:
 
-1. Open `/etc/php5/fpm/pool.d/mail.conf` and set "upload_max_filesize" to your new value. Change `post_max_size` to the same value + ~1M:
+1. Open `/etc/php5/fpm/pool.d/mail.conf` and set `upload_max_filesize` to your new value. Change `post_max_size` to the same value + ~1M:
 
 ```
 php_admin_value[upload_max_filesize] = 25M
