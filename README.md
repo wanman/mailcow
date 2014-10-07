@@ -299,14 +299,14 @@ protocol imap {
 
 Default file size limit is set to 25 MB. If you want to change this, you need to change three files:
 
-1. Open `/etc/php5/fpm/pool.d/mail.conf` and set "upload_max_filesize" to your new value. Change "post_max_size" to the same value + ~1M:
+1. Open `/etc/php5/fpm/pool.d/mail.conf` and set "upload_max_filesize" to your new value. Change `post_max_size` to the same value + ~1M:
 
 ```
 php_admin_value[upload_max_filesize] = 25M
 php_admin_value[post_max_size] = 26M
 ```
 
-2. Open Nginx' main configuration file `/etc/nginx/nginx.conf` and change the value of `client_max_body_size` to the value of "upload_max_filesize".
+2. Open Nginx' main configuration file `/etc/nginx/nginx.conf` and change the value of `client_max_body_size` to the value of `upload_max_filesize`.
 
 3. Change `message_size_limit = 26214400` n `/etc/postfix/main.cf` according to your needs in bytes.
 
