@@ -139,6 +139,7 @@ nano configuration
 * **sys_domain** - Domain name. "$sys_hostname.$sys_domain" equals to FQDN.
 * **sys_timezone** - The timezone must be definied in a valid format (Europe/Berlin, America/New_York etc.)
 * **my_postfixdb, my_postfixuser, my_postfixpass** - MySQL database name, username and password for use with Postfix. **You can use the default values.**
+* **my_rcdb, my_rcuser, my_rcpass** - MySQL database name, username and password for Roundcube. **You can use the default values.**
 * **my_rootpw** - MySQL root password is generated automatically by default. You can define a complex password here if you want to.
 * **pfadmin_adminuser and pfadmin_adminpass** - Postfixadmin superuser definition: **Username MUST end with a valid domain name** but **does NOT need to be yours**. "yourname@outlook.com" is fine, "yourname@domain.invalid" or "yourname@aname" is not. Password policy: minimum length 8 chars, must contain uppercase and lowercase letters and at least 2 digits. **You can use the default values**
 * **"cert-" vars** - Used for the self-signed certificate. CN will be the servers FQDN. "cert_country" must be a vaild two letter country code.
