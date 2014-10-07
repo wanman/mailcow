@@ -29,7 +29,7 @@ update-rc.d -f fuglu remove
 apt-get -y purge php5 git dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
 python-magic openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap subversion \
-php5-intl php5-mcrypt php5-mysql php5-sqlite mysql-client mysql-server nginx dovecot-common dovecot-core mailutils \
+php5-intl php5-mcrypt php5-mysql php5-sqlite mysql-client mysql-server nginx nginx-common nginx-extras dovecot-common dovecot-core mailutils \
 dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d postfix \
 postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin
 apt-get -y purge dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-pop3d dovecot-sieve
@@ -75,3 +75,4 @@ rm -f /var/log/mail*gz
 rm -rf /var/log/nginx/
 rm -rf /var/log/clamav/
 rm -rf /var/log/mysql*
+

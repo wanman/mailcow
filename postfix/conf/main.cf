@@ -152,3 +152,6 @@ queue_run_delay = 300s
 # The maximal/minimal time between attempts to deliver a deferred message.
 maximal_backoff_time = 1800s
 minimal_backoff_time = 300s
+
+# Maximum mail size
+message_size_limit = 2602140400

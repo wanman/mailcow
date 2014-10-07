@@ -10,10 +10,15 @@ sys_timezone="Europe/Berlin"
 # Password policy: Not empty.
 # Recommended setting: Leave "genpasswd" to generate a secure password.
 
+my_rootpw=`genpasswd`
+
 my_postfixdb="postfixdb"
 my_postfixuser="postfix"
 my_postfixpass=`genpasswd`
-my_rootpw=`genpasswd`
+
+my_rcdb="roundcubedb"
+my_rcuser="roundcube"
+my_rcpass=`genpasswd`
 
 # Postfixadmin - Admin Login
 # Password policy: At least 8 characters long, including 2 numbers, an uppercase letter, and a lowercase letter.

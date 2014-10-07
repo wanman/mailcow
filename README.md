@@ -16,7 +16,7 @@ fufix
 A mail server install script for **Debian and Debian based distributions**. 
 This installer is permanently **tested on Debians stable branch** but is reported to run on newer branches, too. Debian Squeeze (old-stable) is not supported.
 
-Please see https://www.debinux.de/2014/08/fufix-mailserver-installer-auf-basis-von-postfix-und-Dovecot/ for any further information.
+Please see https://www.debinux.de/fufix for any further information.
 Feel free to leave a comment or question (best in English or German).
 # Table Of Contents
 1. [Introduction](https://github.com/andryyy/fufix#introduction)
@@ -30,9 +30,12 @@ Feel free to leave a comment or question (best in English or German).
   * [Fail2ban](https://github.com/andryyy/fufix#fail2ban)
   * [Postfixadmin](https://github.com/andryyy/fufix#postfixadmin)
   * [Dovecot](https://github.com/andryyy/fufix#dovecot)
+  * [Roundcube](https://github.com/andryyy/fufix#roundcube)
 5. [Debugging](https://github.com/andryyy/fufix#debugging)
 6. [Maintenance And Common Tasks](https://github.com/andryyy/fufix#maintenance-and-common-tasks)
-  * [Queries](https://github.com/andryyy/fufix#queries)
+  * [Disallow insecure IMAP connections](https://github.com/andryyy/fufix#disallow-insecure-imap-connections)
+  * [File size limitation](https://github.com/andryyy/fufix#file-size-limitation)
+  * [Dovecot Queries](https://github.com/andryyy/fufix#dovecot-queries)
   * [Backup](https://github.com/andryyy/fufix#backup)
   * [SSL certificate](https://github.com/andryyy/fufix#ssl-certificate)
   * [Filter mail](https://github.com/andryyy/fufix#filter-mail)
@@ -41,23 +44,24 @@ Feel free to leave a comment or question (best in English or German).
 # Introduction
 A summary of what software is installed with which features enabled.
 
-**System setup**
-
+**General setup**
 * Setting the Hostname & Fully Qualified Domain Name
 * Timezone adjustment
 * Automatically generated passwords with high complexity
 * Self-signed SSL certificate for all supported services
-* Nginx (+php5-fpm) installation with a site for Postfixadmin (SSL only, based on BetterCrypto)
+* Nginx (+php5-fpm) installation with a site for Postfixadmin (SSL only [Redirect 80 to 443], based on BetterCrypto)
+* Nginx and PHP5 FPM fully optimized
 * MySQL installation as backend for mail service
-* DNS check via Google DNS to verify PTR and A Record
-* Free Rsyslog from mail logs (mail.* only)
+* DNS check via Google DNS to verify PTR and A records, displays a hint to add a TXT record for VSF if needed.
+* Disabled mail.* spam in global Syslog
+* A Dashboard via https://mail.domain.tld/
 
 **Postfix**
 * Submission activated (TCP/587)
 * SMTPS disabled
 * Require TLS Authentification
 * Included ZEN blocklist
-* Spam-  and virus protection plus attachment filter by [FuGlu Mail Content Scanner](http://www.fuglu.org)  with ClamAV and Spamassassin backend: Reject infected mails (<v0.2: delete), mark spam and move to "Junk"
+* Spam- and virus protection plus attachment filter by [FuGlu Mail Content Scanner](http://www.fuglu.org)  with ClamAV and Spamassassin backend: Reject infected mails (<v0.2: delete), mark spam and move to "Junk"
 * SSL based on BetterCrypto (but no definition of "high" ciphers for compatibility reasons)
 
 **Dovecot**
@@ -72,7 +76,15 @@ A summary of what software is installed with which features enabled.
 * Automatic superuser configuration
 * Full quota support
 * "config.local.php" preconfigured
-* **Until a stable version 3.x is released, postfixadmin is pulled from SVN**
+* **Using tested revisions via SVN until a version "3.N" is released.**
+
+**Roundcube**
+* ManageSieve support (with vacation)
+* Change password via Webmail
+* Attachment reminder (for multiple locales)
+* Zip download marked messages
+* 25M attachment size (see "File size limitation")
+* Unattended installation
 
 # Before You Begin
 **Please remove any web- and mail services** running on your server. I recommend using a clean Debian minimal installation.
@@ -82,14 +94,15 @@ apt-get purge exim4*
 ``` 
 If there is any firewall, unblock the following ports for incoming connections:
 
-| Service             | Protocol | Port |
-| ------------------- |:--------:|:-----|
-| Postfix Submission  | TCP      | 587  |
-| Postfix SMTP        | TCP      | 25   |
-| Dovecot IMAP        | TCP      | 143  |
-| Dovecot IMAPS       | TCP      | 993  |
-| Dovecot ManageSieve | TCP      | 4190 |
-| Nginx HTTPS         | TCP      | 443  |
+| Service               | Protocol | Port |
+| -------------------   |:--------:|:-----|
+| Postfix Submission    | TCP      | 587  |
+| Postfix SMTP          | TCP      | 25   |
+| Dovecot IMAP          | TCP      | 143  |
+| Dovecot IMAPS         | TCP      | 993  |
+| Dovecot ManageSieve   | TCP      | 4190 |
+| Nginx HTTPS           | TCP      | 443  |
+| Nginx HTTP (Redirect) | TCP      | 80   |
 
 # Installation
 **Please run all commands as root**
@@ -173,111 +186,44 @@ The files "main.cf" and "master.cf" contain a lot of changes. You should now wha
 * **/etc/postfix/main.cf**
 * **/etc/postfix/master.cf**
 
+I try to comment as much as possible inside these files to help you understand the configuration.
+
 You also find the SQL based maps for virtual transport here:
 * **/etc/postfix/sql/*.cf**
 
-To pick some of the most important changes in "main.cf".
-```
-#SSL based:
-smtpd_tls_auth_only = yes
-smtpd_tls_mandatory_protocols = !SSLv2, !SSLv3
-smtpd_tls_mandatory_ciphers=high
-smtp_tls_security_level=may
-smtpd_tls_cert_file = /etc/ssl/mail/mail.crt
-smtpd_tls_key_file = /etc/ssl/mail/mail.key
-smtpd_use_tls=yes
-smtp_tls_cert_file = /etc/ssl/mail/mail.crt
-smtp_tls_key_file = /etc/ssl/mail/mail.key
-
-# Recipient restrictions
-reject_rbl_client zen.spamhaus.org # ZEN blacklist
-reject_unknown_reverse_client_hostname # Reject mails if no PTR is set or does not match
-
-# Sender restrictions
-reject_authenticated_sender_login_mismatch # Refuse to send mails when FROM address is not owned by sender (only matches for authenticated users.)
-reject_unknown_sender_domain # Refuse to send mails from unknown domains
-
-# Queue handling
-maximal_queue_lifetime = 1d
-bounce_queue_lifetime = 1d
-queue_run_delay = 300s
-maximal_backoff_time = 1800s
-minimal_backoff_time = 300s
-```
 ## Nginx
 A site for mail is copied to `/etc/nginx/sites-available` and enabled via symbolic link to `/etc/nginx/sites-enabled`.
-The sites root location is `/usr/share/nginx/mail`. Any default site installed by apt-get is removed.
+The sites root location is `/usr/share/nginx/mail/`. Any default site installed by "apt-get" is removed.
 
 A PHP socket configuration is located at `/etc/php5/fpm/pool.d/mail.conf`. 
-Some PHP parameters are set right here to override those in `/etc/php5/fpm/php.ini` :
-```
-php_admin_value[short_open_tag] = on # Allow "<?" tags
-php_admin_value[magic_quotes_runtime] = off
-php_admin_value[register_globals] = off
-php_admin_value[magic_quotes_gpc] = off
-php_admin_value[date.timezone] = Europe/Berlin # This is just an example and replaced by the installer
-php_admin_value[expose_php] = off # Do not display PHP version
-```
-Server tokens are turned off in Nginx default configuration file `/etc/nginx/nginx.conf`.
+Some PHP parameters are set right here to override those in `/etc/php5/fpm/php.ini`.
+
+Nginx' default configuration file `/etc/nginx/nginx.conf` contains changes to enable chunking, a connection rate limit and more.
 
 ## Fail2ban
-A file `/etc/fail2ban/jail.local` is created with the following content:
-```
-[DEFAULT]
-bantime = 3600
+A file `/etc/fail2ban/jail.local` is created with some pre-configured jails.
 
-[sshd]
-enabled = true
+Ban time is set to 1h. "Jails" are created to lock unauthorized users (Postfix SASL [authentication], Sieve. etc.).
+Default configuration parameters (example: retry count) can be reviewed in `/etc/fail2ban/jail.conf`.
 
-[postfix-sasl]
-enabled = true
-```
-Ban time is set to 1h, a jail for Postfix SASL (authentication) and - why not - SSHd is enabled.
-Default configuration parameters can be reviewed in `/etc/fail2ban/jail.conf`. I recommend to add further/modify existing parameters in "jail.local" to override those in "jail.conf".
+I recommend to use `/etc/fail2ban/jail.local` to add or modify the configuration. 
+`jail.local` has higher priority than `jail.conf`.
 
 ## Postfixadmin
 The file "config.local.php" is copied to the target directory `/usr/share/nginx/mail/pfadmin`. Some parameters like "domain.tld" are dummies and replaced by the installer.
-```
-$CONF['configured'] = true;
-$CONF['setup_password'] = 'changeme';
-$CONF['default_language'] = 'de';
-$CONF['database_user'] = 'my_postfixuser';
-$CONF['database_password'] = 'my_postfixpass';
-$CONF['database_name'] = 'my_postfixdb';
-$CONF['admin_email'] = 'mailer@domain.tld';
-$CONF['default_aliases'] = array (
-    'abuse' => 'abuse@domain.tld',
-    'hostmaster' => 'hostmaster@domain.tld',
-    'postmaster' => 'postmaster@domain.tld',
-    'webmaster' => 'webmaster@domain.tld'
-);
-$CONF['aliases'] = '10240';
-$CONF['mailboxes'] = '10240';
-$CONF['maxquota'] = '10240';
-$CONF['domain_quota_default'] = '20480';
-$CONF['quota'] = 'YES';
-$CONF['backup'] = 'YES';
-$CONF['fetchmail'] = 'NO';
-$CONF['show_footer_text'] = 'NO';
-$CONF['used_quotas'] = 'YES';
-```
-You can change some values to your personal needs by just editing or adding them to this file. All changes to "config.local.php" override the global configuration file of Postfixadmin. No need to reload any service afterwards. 
 
-**Default quotas in MiB.**
+You can change some of these values to fit your personal needs by just editing or adding them to this file. 
+All values inside "config.local.php" override the global configuration file (`config.inc.php`) of Postfixadmin. No need to reload any service afterwards. 
+
+**Default quotas in MiB (Trash folder: 200% of quota, see below.)**
 
 ## Dovecot
 If you really need to edit Dovecots configuration, you can find the required files in `/etc/dovecot`.
 
 `/etc/dovecot/dovecot.conf` holds the default configuration. To keep it simple I chose not to split the configuration into multiple files. 
-Some options you may want to find:
-```
-ssl_cipher_list = xyz # What ciphers are allowed? 
-sieve_before = /var/vmail/sieve/spam-global.sieve # Sieve script to move messages prefixed by "[SPAM]" to junk, globally defined for every user and cannot be deleted or modified by those
-sieve_max_script_size = 1M
-sieve_quota_max_scripts = 0
-sieve_quota_max_storage = 0
-special_use = xyz # RFC 6154 tags
-```
+
+The folder "Trash" is configured to allow an extra 100% of the set quota to allow moving mails to trash when a mailbox reaches >=51% of its quota. (See `quota_rule2 = Trash:storage=+100%%` in main configuration).
+
 Dovecots SQL parameters can be found in either `/etc/dovecot/dovecot-dict-sql.conf` or `/etc/dovecot/dovecot-mysql.conf`.
 "dovecot-dict-sql.conf" holds instructions for reading a users quota.
 
@@ -296,6 +242,17 @@ A system with a very large amount of virtual users should not do this on a daily
 
 *Dovecot saves messages to `/var/vmail/DOMAINNAME/USERNAME` in maildir format.*
 
+## Roundcube
+
+Roundcube is configured by multiple configuration files.
+
+There are two files for the general configuration:
+
+`/usr/share/nginx/mail/rc/config/defaults.php.inc` and `/usr/share/nginx/mail/rc/config/config.php.inc`. 
+The later file is the one you want to edit. Every parameter set in `config.php.inc` will override the parameter set in `defaults.php.inc`.
+
+Some plug-ins come with a seperate "config.inc.php" file. You can find them in `/usr/share/nginx/mail/rc/plugins/PLUGIN_NAME/`.
+
 # Debugging
 
 Most important files for debugging:
@@ -307,13 +264,55 @@ Most important files for debugging:
 * **/var/log/fuglu/fuglu.log**
 * **/var/log/nginx/error.log**
 * **/var/log/mysql.err**
+* **/usr/share/nginx/mail/rc/logs/errors**
+* **/var/log/php5-fpm.log**
 
 Please always see these files when troubleshooting your mail server.
+
+Keep in mind that you may need to enable debugging options for affected services!
 
 # Maintenance And Common Tasks
 To help you administrate some basic tasks I decided to add a section "Maintenance".
 A lot of work on mailboxes can be done by Dovecots "doveadm" tool.
-## Queries
+
+## Disallow insecure IMAP connections
+
+Some people want to disable unencrypted authentication methods and require their users to either use SSL on Port 993 or STARTTLS on Port 143. To do so you need to change...
+
+```
+protocol imap {
+  mail_plugins = quota imap_quota
+}
+```
+
+...to...
+
+```
+protocol imap {
+  mail_plugins = quota imap_quota
+  ssl = required
+  disable_plaintext_auth = yes
+}
+```
+
+## File size limitation
+
+Default file size limit is set to 25 MB. If you want to change this, you need to change three files:
+
+1. Open `/etc/php5/fpm/pool.d/mail.conf` and set "upload_max_filesize" to your new value. Change "post_max_size" to the same value + ~1M:
+
+```
+php_admin_value[upload_max_filesize] = 25M
+php_admin_value[post_max_size] = 26M
+```
+
+2. Open Nginx' main configuration file `/etc/nginx/nginx.conf` and change the value of `client_max_body_size` to the value of "upload_max_filesize".
+
+3. Change `message_size_limit = 26214400` n `/etc/postfix/main.cf` according to your needs in bytes.
+
+Restart "php5-fpm", "postfix" and "nginx" services.
+
+## Dovecot Queries
 
 For example searching for inbox messages saved in the past 3 days for user "Bob.Cat":
 ```
@@ -395,6 +394,9 @@ Subject Hello REJECT
 # Delete mail sent from domain.org or any subdomain
 from_domain (\.)?domain.org$ DELETE
 
+# Whitelist mail sent from domain.org or any subdomain. No plug-in will be run on these mails!
+from_domain (\.)?domain.org$ ACCEPT
+
 # Reject if a X-Spam-<something> header exists
 X-Spam-* .* REJECT
 ```
@@ -405,4 +407,4 @@ The file actionrules.regex will be reloaded automatically.
 See more details at http://gryphius.github.io/fuglu/plugins-index.html
 
 ## Uninstall
-Run `bash misc/purge.sh` from within fufix directory to completely purge fufix, mailboxes, databases and any related service.
+Run `bash misc/purge.sh` from within fufix directory to **completely purge** fufix, mailboxes, databases and any related service.

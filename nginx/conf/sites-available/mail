@@ -1,5 +1,10 @@
 server {
-        listen 443;
+	listen         80;
+	return 301 https://$host$request_uri;
+}
+
+server {
+	listen 443;
 
 	server_name _;
 
@@ -12,20 +17,45 @@ server {
 	ssl_ciphers 'EDH+CAMELLIA:EDH+aRSA:EECDH+aRSA+AESGCM:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH:+CAMELLIA256:+AES256:+CAMELLIA128:+AES128:+SSLv3:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!DSS:!RC4:!SEED:!ECDSA:CAMELLIA256-SHA:AES256-SHA:CAMELLIA128-SHA:AES128-SHA';
 	add_header Strict-Transport-Security max-age=15768000;
 
-        root /usr/share/nginx/mail;
-        index index.html index.htm index.php;
+	root /usr/share/nginx/mail;
+	index index.html index.htm index.php;
+
+	chunkin on;
+
+	error_page 411 = @my_411_error;
+	location @my_411_error {
+	    chunkin_resume;
+	}
 
 	location ~ /(\.ht) {
 		deny all;
 		return 404;
 	}
-        location / {
+
+	location = /favicon.ico {
+		log_not_found off;
+		access_log off;
+	}
+
+	location = /robots.txt {
+		allow all;
+		log_not_found off;
+		access_log off;
+	}
+
+	location / {
 		try_files $uri $uri/ index.php;
-        }
-        location ~ \.php$ {
-                fastcgi_split_path_info ^(.+\.php)(/.+)$;
-                fastcgi_pass unix:/var/run/php5-fpm-mail.sock;
-                fastcgi_index index.php;
-                include fastcgi_params;
-        }
+		limit_req zone=one burst=25 nodelay;
+	}
+
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass unix:/var/run/php5-fpm-mail.sock;
+        fastcgi_index index.php;
+        fastcgi_param HTTPS on;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		fastcgi_read_timeout 630;
+		fastcgi_keep_conn on;
+    }
 }

@@ -23,15 +23,23 @@ Timezone: $sys_timezone
 Postfix MySQL database name: $my_postfixdb
 Postfix MySQL database user: $my_postfixuser
 
+Roundcube MySQL database name: $my_rcdb
+Roundcube MySQL database user: $my_rcuser
+
 Postfixadmin Superuser: $pfadmin_adminuser
 ----------------------------------------------
 "
 read -p "Press ENTER to continue or CTRL+C to cancel installation"
 
 echo --------------------------------- > installer.log
-echo MySQL database name: $my_postfixdb >> installer.log
-echo MySQL username $my_postfixuser >> installer.log
-echo MySQL password $my_postfixpass >> installer.log
+echo MySQL Postfix database: $my_postfixdb >> installer.log
+echo MySQL Postfix username $my_postfixuser >> installer.log
+echo MySQL Postfix password $my_postfixpass >> installer.log
+echo --------------------------------- >> installer.log
+echo MySQL Roundcube database: $my_rcdb >> installer.log
+echo MySQL Roundcube username $my_rcuser >> installer.log
+echo MySQL Roundcube password $my_rcpass >> installer.log
+echo --------------------------------- >> installer.log
 echo MySQL root password: $my_rootpw >> installer.log
 echo --------------------------------- >> installer.log
 echo Postfixadmin Superuser >> installer.log
@@ -44,6 +52,7 @@ echo --------------------------------- >> installer.log
 echo FuGlu version: $fuglu_version >> installer.log
 echo Fail2ban version: $fail2ban_version >> installer.log
 echo Postfixadmin Revision: $postfixadmin_revision >> installer.log
+echo Roundcube version: $roundcube_version >> installer.log
 echo --------------------------------- >> installer.log
 
 
@@ -78,7 +87,10 @@ installtask webserver
 returnwait "Nginx configuration" "Postfixadmin configuration"
 
 installtask postfixadmin
-returnwait "Postfixadmin configuration" "Fail2ban configuration"
+returnwait "Postfixadmin configuration" "Roundcube configuration"
+
+installtask roundcube
+returnwait "Roundcube configuration" "Fail2ban configuration"
 
 installtask fail2ban
 returnwait "Fail2ban configuration" "Rsyslogd configuration"
@@ -102,10 +114,5 @@ echo "Logged credentials and further information to file `tput bold`installer.lo
 echo
 echo "Next steps:"
 echo " * Backup installer.log to a safe place and delete it"
-echo " * Open \"https://$sys_hostname.$sys_domain\", select \"System Settings\" and login as Postfixadmin Superuser to create a mailbox."
+echo " * Open \"https://$sys_hostname.$sys_domain\", select \"System Settings\" and login as Postfix Administrator to create a mailbox."
 echo
-echo "Configure your mail client as follows:"
-echo "  - Incoming: IMAP, server \"$sys_hostname.$sys_domain\", Port 143, STARTTLS, Password/Normal"
-echo "    You can use SSL instead of STARTTLS on Port 993 if you like to."
-echo "  - Outgoing: SMTP, server \"$sys_hostname.$sys_domain\", Port 587, STARTTLS, Password/Normal"
-echo "Use your full mail adress (your.username@$sys_domain) as username for incoming and outgoing mail."

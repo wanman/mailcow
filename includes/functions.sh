@@ -2,7 +2,7 @@ genpasswd() {
     count=0
     while [ $count -lt 3 ]
     do
-        pw_valid=$(tr -cd A-Za-z0-9 < /dev/urandom | fold -w22 | head -n1)
+        pw_valid=$(tr -cd A-Za-z0-9 < /dev/urandom | fold -w24 | head -n1)
         count=$(grep -o "[0-9]" <<< $pw_valid | wc -l)
     done
     echo $pw_valid
@@ -77,7 +77,7 @@ checkconfig() {
         echo "`tput setaf 1``tput bold`[ERR]`tput sgr0` - Country code must contain exactly two characters"
         exit 1
     else
-    for var in sys_hostname sys_domain sys_timezone my_postfixdb my_postfixuser my_postfixpass my_rootpw pfadmin_adminuser pfadmin_adminpass cert_country cert_state cert_city cert_org
+    for var in sys_hostname sys_domain sys_timezone my_postfixdb my_postfixuser my_postfixpass my_rootpw my_rcuser my_rcpass my_rcdb pfadmin_adminuser pfadmin_adminpass cert_country cert_state cert_city cert_org
     do
         if [[ -z ${!var} ]]; then
             echo "`tput setaf 1``tput bold`[ERR]`tput sgr0` - Parameter $var must not be empty."
@@ -110,6 +110,7 @@ ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 EOF
 			echo $getpublicipv4 $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
+			echo $sys_hostname.$sys_domain > /etc/mailname
 			getpublicipv6=`wget -q6O- ip6.telize.com`
             if is_ipv6 $getpublicipv6; then
 				 echo $getpublicipv6 $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
@@ -130,8 +131,8 @@ EOF
 			echo "Installing packages unattended, please stand by, errors will be reported."
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
 python-magic openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
-php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap subversion \
-php5-intl php5-mcrypt php5-mysql php5-sqlite mysql-client mysql-server nginx dovecot-common dovecot-core mailutils \
+php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
+php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server nginx-extras dovecot-common dovecot-core mailutils \
 dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d postfix \
 postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin  >/dev/null
 			;;
@@ -141,9 +142,10 @@ postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spa
 			chmod 600 /etc/ssl/mail/mail.key
 			;;
 		mysql)
-			mysql --defaults-file=/etc/mysql/debian.cnf -e "SET PASSWORD FOR root@localhost=PASSWORD(''); DROP DATABASE IF EXISTS $my_postfixdb;"
+			mysql --defaults-file=/etc/mysql/debian.cnf -e "SET PASSWORD FOR root@localhost=PASSWORD(''); DROP DATABASE IF EXISTS $my_postfixdb; DROP DATABASE IF EXISTS $my_rcdb;"
 			mysqladmin -u root password $my_rootpw
 			mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_postfixdb; GRANT ALL PRIVILEGES ON $my_postfixdb.* TO '$my_postfixuser'@'localhost' IDENTIFIED BY '$my_postfixpass';"
+            mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'localhost' IDENTIFIED BY '$my_rcpass';"
 			;;
 		fuglu)
 			mkdir /var/log/fuglu 2> /dev/null
@@ -223,14 +225,18 @@ postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spa
 			rm -rf /etc/nginx/{sites-available,sites-enabled}/* 2> /dev/null
 			cp nginx/conf/sites-available/mail /etc/nginx/sites-available/mail
 			ln -s /etc/nginx/sites-available/mail /etc/nginx/sites-enabled/mail
-			cp php5-fpm/conf/mail.conf /etc/php5/fpm/pool.d/mail.conf
+			cp php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
+            cp php5-fpm/conf/php-fpm.conf /etc/php5/fpm/php-fpm.conf
+            cp nginx/conf/nginx.conf /etc/nginx/nginx.conf
+			chown -R www-data:www-data /var/lib/php5/
 			sed -i "/date.timezone/c\php_admin_value[date.timezone] = $sys_timezone" /etc/php5/fpm/pool.d/mail.conf
-			sed -i '/server_tokens/c\server_tokens off;' /etc/nginx/nginx.conf
+			sed -i "/worker_processes/c\worker_processes $(($(grep ^processor /proc/cpuinfo | wc -l) *2));" /etc/nginx/nginx.conf
 			;;
 		postfixadmin)
 			rm -rf /usr/share/nginx/mail 2> /dev/null
 			mkdir -p /usr/share/nginx/mail/pfadmin
-			cp nginx/conf/index.php /usr/share/nginx/mail/
+			cp nginx/conf/htdocs/index.php /usr/share/nginx/mail/
+            cp nginx/conf/htdocs/robots.txt /usr/share/nginx/mail/
 			tar xf pfadmin/inst/$postfixadmin_revision.tar -C pfadmin/inst/
 			mv pfadmin/inst/$postfixadmin_revision/* /usr/share/nginx/mail/pfadmin/
 			cp pfadmin/conf/config.local.php /usr/share/nginx/mail/pfadmin/config.local.php
@@ -240,8 +246,26 @@ postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spa
 			sed -i "s/domain.tld/$sys_domain/g" /usr/share/nginx/mail/pfadmin/config.local.php
 			sed -i "s/change-this-to-your.domain.tld/$sys_domain/g" /usr/share/nginx/mail/pfadmin/config.inc.php
 			chown -R www-data: /usr/share/nginx/
-			rm -r pfadmin/inst/$postfixadmin_revision
+			rm -rf pfadmin/inst/$postfixadmin_revision
 			;;
+        roundcube)
+            mkdir -p /usr/share/nginx/mail/rc
+            tar xf roundcube/inst/$roundcube_version.tar -C roundcube/inst/
+            mv roundcube/inst/$roundcube_version/* /usr/share/nginx/mail/rc/
+            cp -R roundcube/conf/* /usr/share/nginx/mail/rc/
+            sed -i "s/my_postfixuser/$my_postfixuser/g" /usr/share/nginx/mail/rc/plugins/password/config.inc.php
+            sed -i "s/my_postfixpass/$my_postfixpass/g" /usr/share/nginx/mail/rc/plugins/password/config.inc.php
+            sed -i "s/my_postfixdb/$my_postfixdb/g" /usr/share/nginx/mail/rc/plugins/password/config.inc.php
+			sed -i "s/my_rcuser/$my_rcuser/g" /usr/share/nginx/mail/rc/config/config.inc.php
+			sed -i "s/my_rcpass/$my_rcpass/g" /usr/share/nginx/mail/rc/config/config.inc.php
+			sed -i "s/my_rcdb/$my_rcdb/g" /usr/share/nginx/mail/rc/config/config.inc.php
+			conf_rcdeskey=$(genpasswd)
+			sed -i "s/conf_rcdeskey/$conf_rcdeskey/g" /usr/share/nginx/mail/rc/config/config.inc.php
+            chown -R www-data: /usr/share/nginx/
+            mysql -u $my_rcuser -p$my_rcpass $my_rcdb < /usr/share/nginx/mail/rc/SQL/mysql.initial.sql
+			rm -rf roundcube/inst/$roundcube_version
+            rm -rf /usr/share/nginx/mail/rc/installer/
+            ;;
 		fail2ban)
 			tar xf fail2ban/inst/$fail2ban_version.tar -C fail2ban/inst/
 			rm -rf /etc/fail2ban/ 2> /dev/null
