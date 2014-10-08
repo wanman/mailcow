@@ -204,10 +204,6 @@ postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spa
 			service clamav-daemon stop
 			service clamav-freshclam stop
 			freshclam
-			if [[ -z `cat /etc/clamav/clamd.conf | grep -i -e TCPSocket -e TCPAddr` ]]; then
-				echo TCPSocket 3310 >> /etc/clamav/clamd.conf
-				echo TCPAddr 127.0.0.1 >> /etc/clamav/clamd.conf
-			fi
 			sed -i '/MaxFileSize/c\MaxFileSize 25M' /etc/clamav/clamd.conf
 			sed -i '/StreamMaxLength/c\StreamMaxLength 25M' /etc/clamav/clamd.conf
 			service clamav-freshclam start

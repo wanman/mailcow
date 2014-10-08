@@ -1,3 +1,38 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+
+- [fufix](#fufix)
+- [Introduction](#introduction)
+- [Before You Begin](#before-you-begin)
+- [Installation](#installation)
+- [Configuration and common tasks](#configuration-and-common-tasks)
+  - [SSL certificate](#ssl-certificate)
+  - [FuGlu](#fuglu)
+     - [Filter mail](#filter-mail)
+     - [Filter statistics](#filter-statistics)
+  - [ClamAV and Spamassassin](#clamav-and-spamassassin)
+     - [Spam rewrite](#spam-rewrite)
+     - [Spamassassin daemon options](#spamassassin-daemon-options)
+  - [Max file size for virus scanning](#max-file-size-for-virus-scanning)
+  - [Postfix](#postfix)
+    - [Message size limit](#message-size-limit)
+  - [Nginx](#nginx)
+  - [Fail2ban](#fail2ban)
+  - [Postfixadmin](#postfixadmin)
+  - [Dovecot](#dovecot)
+     - [Disallow insecure IMAP connections](#disallow-insecure-imap-connections)
+     - [Trash folder quota](#trash-folder-quota)
+     - [Dovecot SQL parameter](#dovecot-sql-parameter)
+     - [Doveadm common tasks](#doveadm-common-tasks)
+     - [Backup mail](#backup-mail)
+  - [Roundcube](#roundcube)
+     - [Attachment size](#attachment-size)
+- [Debugging](#debugging)
+- [Uninstall](#uninstall)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 fufix
 =====
 
@@ -18,28 +53,6 @@ This installer is permanently **tested on Debians stable branch** but is reporte
 
 Please see https://www.debinux.de/fufix for any further information.
 Feel free to leave a comment or question (best in English or German).
-# Table Of Contents
-1. [Introduction](https://github.com/andryyy/fufix#introduction)
-2. [Before You Begin](https://github.com/andryyy/fufix#before-you-begin)
-3. [Installation](https://github.com/andryyy/fufix#installation)
-4. [Configuration Files Used By fufix](https://github.com/andryyy/fufix#configuration-files-used-by-fufix)
-  * [FuGlu](https://github.com/andryyy/fufix#fuglu)
-  * [ClamAV and Spamassassin](https://github.com/andryyy/fufix#clamav-and-spamassassin)
-  * [Postfix](https://github.com/andryyy/fufix#postfix)
-  * [Nginx](https://github.com/andryyy/fufix#nginx)
-  * [Fail2ban](https://github.com/andryyy/fufix#fail2ban)
-  * [Postfixadmin](https://github.com/andryyy/fufix#postfixadmin)
-  * [Dovecot](https://github.com/andryyy/fufix#dovecot)
-  * [Roundcube](https://github.com/andryyy/fufix#roundcube)
-5. [Debugging](https://github.com/andryyy/fufix#debugging)
-6. [Maintenance And Common Tasks](https://github.com/andryyy/fufix#maintenance-and-common-tasks)
-  * [Disallow insecure IMAP connections](https://github.com/andryyy/fufix#disallow-insecure-imap-connections)
-  * [File size limitation](https://github.com/andryyy/fufix#file-size-limitation)
-  * [Dovecot Queries](https://github.com/andryyy/fufix#dovecot-queries)
-  * [Backup](https://github.com/andryyy/fufix#backup)
-  * [SSL certificate](https://github.com/andryyy/fufix#ssl-certificate)
-  * [Filter mail with FuGlu](https://github.com/andryyy/fufix#filter-mail-with-fuglu)
-7. [Uninstall](https://github.com/andryyy/fufix#uninstall)
 
 # Introduction
 A summary of what software is installed with which features enabled.
@@ -158,8 +171,13 @@ See [this image](https://www.debinux.de/wp-content/uploads/tbird.png) to get an 
 
 A small landing page is active at **https://hostname.domain.tld**.
 
-## Configuration files used by fufix
+# Configuration and common tasks
 To help you modify the configuration, I created this little overview to get you started.
+
+## SSL certificate
+The SSL certificate is located at `/etc/ssl/mail/mail.{key,crt}`.
+You can replace it by just copying over your own files. 
+Services effected and necessary to restart are `postfix`, `dovecot` and `nginx`.
 
 ## FuGlu
 Basic configuration. Set `group=nogroup` to run as nobody:nogroup (instead of group nobody). Set `defaultvirusaction` and `blockaction` to REJECT. Enabled ESMTP in `incomingport`:
@@ -172,196 +190,7 @@ Define attachments to deny/allow:
 Mail template for the bounce to inform sender about blocked attachment:
 * **/etc/fuglu/templates/blockedfile.tmpl**
 
-## ClamAV and Spamassassin
-Added `TCPSocket 3310` and `TCPAddr 127.0.0.1` to create a TCP socket:
-* **/etc/clamav/clamd.conf**
-
-Added `rewrite_header Subject [SPAM]` and `report_safe 2` to prefix [SPAM] to junk mail and forward spam as attachment instead of original message (text/plain):
-* **/etc/spamassassin/local.cf**
-
-Enabled "spamd" by `ENABLED=1`, enabled cronjob by setting `CRON=1` and modified OPTIONS line `OPTIONS="--create-prefs --max-children 5 --helper-home-dir --username debian-spamd"` in:
-* **/etc/default/spamassassin**
-
-## Postfix
-The files "main.cf" and "master.cf" contain a lot of changes. You should now what you do if you modify these files.
-* **/etc/postfix/main.cf**
-* **/etc/postfix/master.cf**
-
-I try to comment as much as possible inside these files to help you understand the configuration.
-
-You also find the SQL based maps for virtual transport here:
-* **/etc/postfix/sql/*.cf**
-
-## Nginx
-A site for mail is copied to `/etc/nginx/sites-available` and enabled via symbolic link to `/etc/nginx/sites-enabled`.
-The sites root location is `/usr/share/nginx/mail/`. Any default site installed by "apt-get" is removed.
-
-A PHP socket configuration is located at `/etc/php5/fpm/pool.d/mail.conf`. 
-Some PHP parameters are set right here to override those in `/etc/php5/fpm/php.ini`.
-
-Nginx' default configuration file `/etc/nginx/nginx.conf` contains changes to enable chunking, a connection rate limit and more.
-
-## Fail2ban
-A file `/etc/fail2ban/jail.local` is created with some pre-configured jails.
-
-Ban time is set to 1h. "Jails" are created to lock unauthorized users (Postfix SASL [authentication], Sieve. etc.).
-Default configuration parameters (example: retry count) can be reviewed in `/etc/fail2ban/jail.conf`.
-
-I recommend to use `/etc/fail2ban/jail.local` to add or modify the configuration. 
-`jail.local` has higher priority than `jail.conf`.
-
-## Postfixadmin
-The file "config.local.php" is copied to the target directory `/usr/share/nginx/mail/pfadmin`. Some parameters like "domain.tld" are dummies and replaced by the installer.
-
-You can change some of these values to fit your personal needs by just editing or adding them to this file. 
-All values inside "config.local.php" override the global configuration file (`config.inc.php`) of Postfixadmin. No need to reload any service afterwards. 
-
-**Default quotas in MiB (Trash folder: 200% of quota, see below.)**
-
-## Dovecot
-If you really need to edit Dovecots configuration, you can find the required files in `/etc/dovecot`.
-
-`/etc/dovecot/dovecot.conf` holds the default configuration. To keep it simple I chose not to split the configuration into multiple files. 
-
-The folder "Trash" is configured to allow an extra 100% of the set quota to allow moving mails to trash when a mailbox reaches >=51% of its quota. (See `quota_rule2 = Trash:storage=+100%%` in main configuration).
-
-Dovecots SQL parameters can be found in either `/etc/dovecot/dovecot-dict-sql.conf` or `/etc/dovecot/dovecot-mysql.conf`.
-"dovecot-dict-sql.conf" holds instructions for reading a users quota.
-
-"dovecot-mysql.conf" contains some basic SQL commands:
-
-* **driver** - What database
-* **connect** - How to connect to the MySQL database
-* **default_pass_scheme** - Password scheme. If you edit this you also need to adjust Postfixadmin!
-* **password_query** - Validate passwords.
-* **user_query** - Validate users.
-* **iterate_query** - Iterate users, also needed by a lot of "doveadm" commands.
-
-
-Furthermore a script "doverecalcq" is copied to `/etc/cron.daily` to recalculate quotas of all users daily. 
-A system with a very large amount of virtual users should not do this on a daily basis. I recommend to move the script to "cron.weekly" then.
-
-*Dovecot saves messages to `/var/vmail/DOMAINNAME/USERNAME` in maildir format.*
-
-## Roundcube
-
-Roundcube is configured by multiple configuration files.
-
-There are two files for the general configuration:
-
-`/usr/share/nginx/mail/rc/config/defaults.php.inc` and `/usr/share/nginx/mail/rc/config/config.php.inc`. 
-The later file is the one you want to edit. Every parameter set in `config.php.inc` will override the parameter set in `defaults.php.inc`.
-
-Some plug-ins come with a seperate "config.inc.php" file. You can find them in `/usr/share/nginx/mail/rc/plugins/PLUGIN_NAME/`.
-
-# Debugging
-
-Most important files for debugging:
-
-* **/var/log/mail.log**
-* **/var/log/mail.warn**
-* **/var/log/mail.err**
-* **/var/log/syslog**
-* **/var/log/fuglu/fuglu.log**
-* **/var/log/nginx/error.log**
-* **/var/log/mysql.err**
-* **/usr/share/nginx/mail/rc/logs/errors**
-* **/var/log/php5-fpm.log**
-
-Please always see these files when troubleshooting your mail server.
-
-Keep in mind that you may need to enable debugging options for affected services!
-
-# Maintenance And Common Tasks
-To help you administrate some basic tasks I decided to add a section "Maintenance".
-A lot of work on mailboxes can be done by Dovecots "doveadm" tool.
-
-## Disallow insecure IMAP connections
-
-Some people want to disable unencrypted authentication methods and require their users to either use SSL on Port 993 or STARTTLS on Port 143. To do so you need to change...
-
-```
-protocol imap {
-  mail_plugins = quota imap_quota
-}
-```
-
-...to...
-
-```
-protocol imap {
-  mail_plugins = quota imap_quota
-  ssl = required
-  disable_plaintext_auth = yes
-}
-```
-
-## File size limitation
-
-Default file size limit is set to 25 MB. If you want to change this, you need to change three files:
-
-1. Open `/etc/php5/fpm/pool.d/mail.conf` and set `upload_max_filesize` to your new value. Change `post_max_size` to the same value + ~1M:
-
-```
-php_admin_value[upload_max_filesize] = 25M
-php_admin_value[post_max_size] = 26M
-```
-
-2. Open Nginx' main configuration file `/etc/nginx/nginx.conf` and change the value of `client_max_body_size` to the value of `upload_max_filesize`.
-
-3. Change `message_size_limit = 26214400` n `/etc/postfix/main.cf` according to your needs in bytes.
-
-Restart "php5-fpm", "postfix" and "nginx" services.
-
-## Dovecot Queries
-
-For example searching for inbox messages saved in the past 3 days for user "Bob.Cat":
-```
-doveadm search -u bob.cat@domain.com mailbox inbox savedsince 2d
-```
-
-Or search Bobs inbox for subject "important":
-```
-doveadm search -u bob.cat@domain.com mailbox inbox subject important
-```
-
-Want to delete Bobs messages older than 100 days?
-```
-doveadm expunge -u bob.cat@domain.com mailbox inbox savedsince 100d
-```
-
-From Dovecots wiki: Move jane's messages - received in September 2011 - from her INBOX into her archive.
-```
-doveadm move -u jane Archive/2011/09 mailbox INBOX BEFORE 2011-10-01 SINCE 01-Sep-2011
-```
-
-You find some more useful search queries and much more here: http://wiki2.dovecot.org/Tools/Doveadm
-
-## Backup 
-
-If you want to create a backup of Bobs maildir to /var/mailbackup, just go ahead and create the backup destination with proper rights:
-
-```
-mkdir /var/mailbackup
-chown vmail:vmail /var/mailbackup/
-```
-
-Afterwards you can start a full backup:
-```
-dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
-```
-
-For more information about dsync (like the difference between backups and mirrors) visit http://wiki2.dovecot.org/Tools/Dsync
-
-If you want to see a statistic of FuGlus activity, just run `fuglu_control stats`
-
-## SSL certificate
-
-The SSL certificate is located at `/etc/ssl/mail/mail.{key,crt}`.
-You can replace it by just copying over your own files. 
-Services effected and necessary to restart are `postfix`, `dovecot` and `nginx`.
-
-## Filter mail with FuGlu
+### Filter mail
 You can use FuGlus Action Override plugin to create custom filters.  
 To add an action open the file `/etc/fuglu/actionrules.regex`.  
 Use the following syntax:
@@ -407,5 +236,210 @@ The file actionrules.regex will be reloaded automatically.
 
 See more details at http://gryphius.github.io/fuglu/plugins-index.html
 
-## Uninstall
+### Filter statistics
+If you want to see a statistic of FuGlus activity, just run `fuglu_control stats`
+
+## ClamAV and Spamassassin
+ClamAV main configuration file:
+* **/etc/clamav/clamd.conf**
+
+Spamassassin main configuration file:
+* **/etc/spamassassin/local.cf**
+
+Virus scanning is **enabled for both incoming and outgoing** mail.
+
+The Spam scanner **skips outgoing** mail.
+
+### Spam rewrite
+Fufix adds `rewrite_header Subject [SPAM]` and `report_safe 2` to prefix [SPAM] to junk mail and forward spam as attachment instead of original message (text/plain). 
+
+The prefix "[SPAM]" is not important for the sieve filter and can be changed to whatever text. Spam will be moved when te Spam Flag is set the header.
+
+### Spamassassin daemon options
+Default startup options for Spamassassin in `/etc/default/spamassassin`:
+- Enabled "spamd" by adding `ENABLED=1`
+- Enabled cronjob by setting `CRON=1`
+- Modified OPTIONS line to: 
+
+ `OPTIONS="--create-prefs --max-children 5 --helper-home-dir --username debian-spamd"`.
+
+## Max file size for virus scanning
+The file size limit for incoming attachments is set to 25M. This is defined with `MaxFileSize` in the main configuratin file.
+
+Also there is `StreamMaxLength`. This value should match your mail transport agent’s (MTA) limit for a maximum attachment size (see section "Postfix).
+
+## Postfix
+The files "main.cf" and "master.cf" contain a lot of changes. You should now what you do if you modify these files.
+* **/etc/postfix/main.cf**
+* **/etc/postfix/master.cf**
+
+I try to comment as much as possible inside these files to help you understand the configuration.
+
+You also find the SQL based maps for virtual transport here:
+* **/etc/postfix/sql/*.cf**
+
+### Message size limit
+The parameter `message_size_limit` in `/etc/postfix/main.cf` is set to 26214400 bytes (25M). This has an effect on incoming and outgoing mail.
+
+## Nginx
+A site for mail is copied to `/etc/nginx/sites-available` and enabled via symbolic link to `/etc/nginx/sites-enabled`.
+The sites root location is `/usr/share/nginx/mail/`. Any default site installed by "apt-get" is removed.
+
+A PHP socket configuration is located at `/etc/php5/fpm/pool.d/mail.conf`. 
+Some PHP parameters are set right here to override those in `/etc/php5/fpm/php.ini`.
+
+Nginx' default configuration file `/etc/nginx/nginx.conf` contains changes to enable chunking, a connection rate limit and more.
+
+## Fail2ban
+A file `/etc/fail2ban/jail.local` is created with some pre-configured jails.
+
+Ban time is set to 1h. "Jails" are created to lock unauthorized users (Postfix SASL [authentication], Sieve. etc.).
+Default configuration parameters (example: retry count) can be reviewed in `/etc/fail2ban/jail.conf`.
+
+I recommend to use `/etc/fail2ban/jail.local` to add or modify the configuration. 
+`jail.local` has higher priority than `jail.conf`.
+
+## Postfixadmin
+The file "config.local.php" is copied to the target directory `/usr/share/nginx/mail/pfadmin`. Some parameters like "domain.tld" are dummies and replaced by the installer.
+
+You can change some of these values to fit your personal needs by just editing or adding them to this file. 
+All values inside "config.local.php" override the global configuration file (`config.inc.php`) of Postfixadmin. No need to reload any service afterwards. 
+
+**Default quotas in MiB**
+
+## Dovecot
+If you really need to edit Dovecots configuration, you can find the required files in `/etc/dovecot`.
+
+`/etc/dovecot/dovecot.conf` holds the default configuration. To keep it simple I chose not to split the configuration into multiple files. 
+
+### Disallow insecure IMAP connections
+
+Some people want to disable unencrypted authentication methods and require their users to either use SSL on Port 993 or STARTTLS on Port 143. To do so you need to change...
+
+```
+protocol imap {
+  mail_plugins = quota imap_quota
+}
+```
+
+...to...
+
+```
+protocol imap {
+  mail_plugins = quota imap_quota
+  ssl = required
+  disable_plaintext_auth = yes
+}
+```
+
+### Trash folder quota
+
+The folder "Trash" is configured to allow an extra 100% of the set quota to allow moving mails to trash when a mailbox reaches >=51% of its quota. 
+
+This is defined with `quota_rule2 = Trash:storage=+100%%` in `/etc/dovecot/dovecot.conf`.
+
+### Dovecot SQL parameter
+Dovecots SQL parameters can be found in either `/etc/dovecot/dovecot-dict-sql.conf` or `/etc/dovecot/dovecot-mysql.conf`.
+
+- `dovecot-dict-sql.conf` holds instructions for reading a users quota.
+
+- `dovecot-mysql.con` contains some basic SQL commands:
+**driver** - What database  
+**connect** - How to connect to the MySQL database   **default_pass_scheme** - Password scheme. If you edit this you also need to adjust Postfixadmin!  
+**password_query** - Validate passwords.  
+**user_query** - Validate users.  
+**iterate_query** - Iterate users, also needed by a lot of "doveadm" commands.  
+
+
+Furthermore a script `doverecalcq` is copied to `/etc/cron.daily` to recalculate quotas of all users daily.
+ 
+A system with a very large amount of virtual users should not do this on a daily basis. I recommend to move the script to "cron.weekly" then.
+
+*Dovecot saves messages to `/var/vmail/DOMAINNAME/USERNAME` in maildir format.*
+
+### Doveadm common tasks
+
+For example searching for inbox messages saved in the past 3 days for user "Bob.Cat":
+```
+doveadm search -u bob.cat@domain.com mailbox inbox savedsince 2d
+```
+
+Or search Bobs inbox for subject "important":
+```
+doveadm search -u bob.cat@domain.com mailbox inbox subject important
+```
+
+Want to delete Bobs messages older than 100 days?
+```
+doveadm expunge -u bob.cat@domain.com mailbox inbox savedsince 100d
+```
+
+From Dovecots wiki: Move jane's messages - received in September 2011 - from her INBOX into her archive.
+```
+doveadm move -u jane Archive/2011/09 mailbox INBOX BEFORE 2011-10-01 SINCE 01-Sep-2011
+```
+
+You find some more useful search queries and much more here: http://wiki2.dovecot.org/Tools/Doveadm
+
+### Backup mail
+
+If you want to create a backup of Bobs maildir to /var/mailbackup, just go ahead and create the backup destination with proper rights:
+
+```
+mkdir /var/mailbackup
+chown vmail:vmail /var/mailbackup/
+```
+
+Afterwards you can start a full backup:
+```
+dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
+```
+
+For more information about dsync (like the difference between backups and mirrors) visit http://wiki2.dovecot.org/Tools/Dsync
+
+## Roundcube
+
+Roundcube is configured by multiple configuration files.
+
+There are two files for the general configuration:
+
+`/usr/share/nginx/mail/rc/config/defaults.php.inc` and `/usr/share/nginx/mail/rc/config/config.php.inc`. 
+The later file is the one you want to edit. Every parameter set in `config.php.inc` will override the parameter set in `defaults.php.inc`.
+
+Some plug-ins come with a seperate "config.inc.php" file. You can find them in `/usr/share/nginx/mail/rc/plugins/PLUGIN_NAME/`.
+
+### Attachment size
+Default file size limit is set to 25 MB. If you want to change this, you need to see three files:
+
+1. Open `/etc/php5/fpm/pool.d/mail.conf` and set `upload_max_filesize` to your new value. Change `post_max_size` to the same value + about 1M:
+```
+php_admin_value[upload_max_filesize] = 25M
+php_admin_value[post_max_size] = 26M
+```
+
+2. Open Nginx' main configuration file `/etc/nginx/nginx.conf` and change the value of `client_max_body_size` to the value of `upload_max_filesize`.
+
+3. Make sure `message_size_limit` (defined in bytes) in  `/etc/postfix/main.cf` is set >= `upload_max_filesize` . 
+
+Restart "php5-fpm", "postfix" and "nginx" services.
+
+# Debugging
+
+Most important files for debugging:
+
+* **/var/log/mail.log**
+* **/var/log/mail.warn**
+* **/var/log/mail.err**
+* **/var/log/syslog**
+* **/var/log/fuglu/fuglu.log**
+* **/var/log/nginx/error.log**
+* **/var/log/mysql.err**
+* **/usr/share/nginx/mail/rc/logs/errors**
+* **/var/log/php5-fpm.log**
+
+Please always see these files when troubleshooting your mail server.
+
+Keep in mind that you may need to enable debugging options for affected services!
+
+# Uninstall
 Run `bash misc/purge.sh` from within fufix directory to **completely purge** fufix, mailboxes, databases and any related service.
