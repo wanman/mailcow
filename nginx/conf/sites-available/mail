@@ -27,6 +27,10 @@ server {
 	    chunkin_resume;
 	}
 
+    location ^~ /rc/logs {
+        deny all;
+    }
+
 	location ~ /(\.ht) {
 		deny all;
 		return 404;
