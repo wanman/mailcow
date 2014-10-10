@@ -1,3 +1,9 @@
+textb() { echo $(tput bold)${1}$(tput sgr0); }
+greenb() { echo $(tput bold)$(tput setaf 2)${1}$(tput sgr0); }
+redb() { echo $(tput bold)$(tput setaf 1)${1}$(tput sgr0); }
+yellowb() { echo $(tput bold)$(tput setaf 3)${1}$(tput sgr0); }
+
+
 genpasswd() {
     count=0
     while [ $count -lt 3 ]
@@ -10,9 +16,11 @@ genpasswd() {
 
 returnwait() {
 	echo
-    echo "`tput setaf 4``tput bold`$1`tput sgr0` - `tput setaf 2``tput bold`[OK]`tput sgr0`";
-    echo "Proceeding with \"`tput bold`$2`tput sgr0`\""
-    read -p "Press `tput bold`ENTER`tput sgr0` to continue or CTRL-C to cancel installation"
+    echo "$1 - $(greenb [OK])";
+    echo "Proceeding with $(textb "$2")"
+	if [[ $inst_unattended != "yes" ]]; then
+		read -p "Press ENTER to continue or CTRL-C to cancel installation"
+	fi
 	echo
 }
 
@@ -56,8 +64,8 @@ is_ipv6() {
 checkports() {
 	for port in 25 80 143 443 465 587 993 995
 	do
-	    if [[ ! -z `lsof -iTCP:$port` ]]; then
-	        echo "`tput setaf 1``tput bold`[ERR]`tput sgr0` - An application is blocking the installation on Port `tput bold`$port`tput sgr0`"
+	    if [[ ! -z $(lsof -iTCP:$port) ]]; then
+	        echo "$(redb [ERR]) - An application is blocking the installation on Port $(textb $port)"
 	        lsof -iTCP:$port
 	        echo
 			# Wait until finished to list all blocked ports.
@@ -69,18 +77,18 @@ checkports() {
 
 checkconfig() {
     if [[ $conf_done = "no" ]]; then
-        echo "`tput setaf 1``tput bold`[ERR]`tput sgr0` - Error in configuration file"
+        echo "$(redb [ERR]) - Error in configuration file"
         echo "Is \"conf_done\" set to \"yes\"?"
         echo
         exit 1
     elif [[ ${#cert_country} -ne 2 ]]; then
-        echo "`tput setaf 1``tput bold`[ERR]`tput sgr0` - Country code must contain exactly two characters"
+        echo "$(redb [ERR]) - Country code must contain exactly two characters"
         exit 1
     else
     for var in sys_hostname sys_domain sys_timezone my_postfixdb my_postfixuser my_postfixpass my_rootpw my_rcuser my_rcpass my_rcdb pfadmin_adminuser pfadmin_adminpass cert_country cert_state cert_city cert_org
     do
         if [[ -z ${!var} ]]; then
-            echo "`tput setaf 1``tput bold`[ERR]`tput sgr0` - Parameter $var must not be empty."
+            echo "$(redb [ERR]) - Parameter $var must not be empty."
             echo
             exit 1
         fi
@@ -92,7 +100,7 @@ checkconfig() {
         egrep "[abcdefghijklmnopqrstuvxyz"] | \
         egrep "[0-9]")
     if [[ $pass_count -lt 2 || -z $pass_chars ]]; then
-            echo "`tput setaf 1``tput bold`[ERR]`tput sgr0` - Postfixadmin password does not meet password policy requirements."
+            echo "$(redb [ERR]) - Postfixadmin password does not meet password policy requirements."
             echo
             exit 1
     fi
@@ -101,7 +109,7 @@ checkconfig() {
 installtask() {
 	case $1 in
 		environment)
-			getpublicipv4=`wget -q4O- ip4.telize.com`
+			getpublicipv4=$(wget -q4O- ip4.telize.com)
 			if [[ $getpublicipv4 =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
 				cat > /etc/hosts<<'EOF'
 127.0.0.1 localhost
@@ -111,20 +119,20 @@ ff02::2 ip6-allrouters
 EOF
 			echo $getpublicipv4 $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
 			echo $sys_hostname.$sys_domain > /etc/mailname
-			getpublicipv6=`wget -q6O- ip6.telize.com`
+			getpublicipv6=$(wget -q6O- ip6.telize.com)
             if is_ipv6 $getpublicipv6; then
 				 echo $getpublicipv6 $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
 			fi
 			echo $sys_hostname > /etc/hostname
 			service hostname.sh start
 			else
-				echo "`tput bold`WARNING`tput sgr0`: Cannot set your hostname"
+				echo "$(yellowb WARNING): Cannot set your hostname"
 			fi
 			if [[ -f /usr/share/zoneinfo/$sys_timezone ]] ; then
 				echo $sys_timezone > /etc/timezone
 				dpkg-reconfigure -f noninteractive tzdata
 			else
-				echo "`tput bold`WARNING`tput sgr0`: Cannot set your timezone: timezone is unknown";
+				echo "$(yellowb WARNING): Cannot set your timezone: timezone is unknown";
 			fi
 			;;
 		installpackages)
@@ -288,14 +296,14 @@ postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spa
 			done
 			;;
 		checkdns)
-			if [[ -z `dig -x $getpublicipv4 @8.8.8.8 | grep -i $sys_domain` ]]; then
-				echo "`tput bold`WARNING`tput sgr0`: Remember to setup a PTR record: $getpublicipv4 does not point to $sys_domain (checked by Google DNS)"
+			if [[ -z $(dig -x $getpublicipv4 @8.8.8.8 | grep -i $sys_domain) ]]; then
+				echo "$(yellowb WARNING): Remember to setup a PTR record: $getpublicipv4 does not point to $sys_domain (checked by Google DNS)"
 			fi
-			if [[ -z `dig $sys_hostname.$sys_domain @8.8.8.8 | grep -i $getpublicipv4` ]]; then
-				echo "`tput bold`WARNING`tput sgr0`: Remember to setup an A record for $sys_hostname.$sys_domain pointing to $getpublicipv4 (checked by Google DNS)"
+			if [[ -z $(dig $sys_hostname.$sys_domain @8.8.8.8 | grep -i $getpublicipv4) ]]; then
+				echo "$(yellowb WARNING): Remember to setup an A record for $sys_hostname.$sys_domain pointing to $getpublicipv4 (checked by Google DNS)"
 			fi
-			if [[ -z `dig $sys_domain txt @8.8.8.8 | grep -i spf` ]]; then
-				echo "`tput bold`HINT`tput sgr0`: You may want to setup a TXT record for SPF, see spfwizard.com for further information (checked by Google DNS)"
+			if [[ -z $(dig $sys_domain txt @8.8.8.8 | grep -i spf) ]]; then
+				echo "$(textb HINT): You may want to setup a TXT record for SPF, see spfwizard.com for further information (checked by Google DNS)"
 			fi
 			;;
 		setupsuperadmin)

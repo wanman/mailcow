@@ -37,3 +37,6 @@ cert_org="MAIL"
 
 # Done?
 conf_done="no"
+
+# Do not confirm to proceed
+inst_unattended="no"

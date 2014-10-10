@@ -14,22 +14,15 @@ echo $fufix_banner
 checkconfig
 checkports
 
-echo "`tput bold`Please review your configuration`tput sgr0`
-(Passwords will not be displayed)
-----------------------------------------------
-FQDN: $sys_hostname.$sys_domain
-Timezone: $sys_timezone
-
-Postfix MySQL database name: $my_postfixdb
-Postfix MySQL database user: $my_postfixuser
-
-Roundcube MySQL database name: $my_rcdb
-Roundcube MySQL database user: $my_rcuser
-
-Postfixadmin Superuser: $pfadmin_adminuser
-----------------------------------------------
+echo "
+`tput bold`FQDN`tput sgr0`            $sys_hostname.$sys_domain
+`tput bold`Timezone`tput sgr0`        $sys_timezone
+`tput bold`Postfix MySQL`tput sgr0`   ${my_postfixuser}:HIDDEN/${my_postfixdb}
+`tput bold`Roundcube MySQL`tput sgr0` ${my_rcuser}:HIDDEN/${my_rcdb}
+`tput bold`Postfixadmin`tput sgr0`    $pfadmin_adminuser
 "
-read -p "Press ENTER to continue or CTRL+C to cancel installation"
+
+returnwait "Reading configuration" "System environment"
 
 echo --------------------------------- > installer.log
 echo MySQL Postfix database: $my_postfixdb >> installer.log
@@ -54,7 +47,6 @@ echo Fail2ban version: $fail2ban_version >> installer.log
 echo Postfixadmin Revision: $postfixadmin_revision >> installer.log
 echo Roundcube version: $roundcube_version >> installer.log
 echo --------------------------------- >> installer.log
-
 
 installtask environment
 returnwait "System environment" "Package installation"
