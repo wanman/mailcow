@@ -20,13 +20,6 @@ server {
 	root /usr/share/nginx/mail;
 	index index.html index.htm index.php;
 
-	chunkin on;
-
-	error_page 411 = @my_411_error;
-	location @my_411_error {
-	    chunkin_resume;
-	}
-
     location ^~ /rc/logs {
         deny all;
     }
