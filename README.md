@@ -82,7 +82,7 @@ A summary of what software is installed with which features enabled.
 * Sieve/ManageSieve (TCP/4190)
 * Global sieve filter: Prefix spam with "[SPAM]" and move to "Junk"
 * (IMAP) quotas
-* LMTP (resident daemon)
+* LMTP for Postfix + LDA
 * SSL based on BetterCrypto
 
 **Postfixadmin**
