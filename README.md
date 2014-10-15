@@ -171,6 +171,8 @@ See [this image](https://www.debinux.de/wp-content/uploads/tbird.png) to get an 
 
 A small landing page is active at **https://hostname.domain.tld**.
 
+You should create an alias or a mailbox for postmaster@domain.tld.
+
 # Configuration and common tasks
 To help you modify the configuration, I created this little overview to get you started.
 
