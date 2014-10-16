@@ -119,7 +119,7 @@ ff02::2 ip6-allrouters
 EOF
 			echo $getpublicipv4 $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
 			echo $sys_hostname.$sys_domain > /etc/mailname
-			getpublicipv6=$(wget -q6O- ip6.telize.com)
+			getpublicipv6=$(wget -t2 -T1 -q6O- ip6.telize.com)
             if is_ipv6 $getpublicipv6; then
 				 echo $getpublicipv6 $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
 			fi
