@@ -164,7 +164,7 @@ You are ready to start the script:
 ```
 ./install.sh
 ```
-Just be patient and confirm every step by pressing [ENTER] or CTRL-C to interrupt the installation.
+Just be patient and confirm every step by pressing [ENTER] or [CTRL-C] to interrupt the installation.
 
 More debugging is about to come. Though everything should work as intended.
 
