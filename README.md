@@ -48,7 +48,7 @@ fufix
 
 ```
 
-A mail server install script for **Debian and Debian based distributions**. 
+A mail server install script with a lot of features for **Debian and Debian based distributions**. 
 This installer is permanently **tested on Debians stable branch** but is reported to run on newer branches, too. Debian Squeeze (old-stable) is not supported.
 
 Please see https://www.debinux.de/fufix for further information.
@@ -60,47 +60,43 @@ Feel free to leave a comment or question.
 A summary of what software is installed with which features enabled.
 
 **General setup**
-* Setting the Hostname & Fully Qualified Domain Name
-* Timezone adjustment
+* System environment adjustments (Hostname, Timezone,...)
 * Automatically generated passwords with high complexity
 * Self-signed SSL certificate for all supported services
-* Nginx (+php5-fpm) installation with a site for Postfixadmin (SSL only [Redirect 80 to 443], based on BetterCrypto)
 * Nginx and PHP5 FPM fully optimized
-* MySQL installation as backend for mail service
-* DNS check via Google DNS to verify PTR and A records, displays a hint to add a TXT record for VSF if needed.
-* Disabled mail.* spam in global Syslog
-* A Dashboard via https://mail.domain.tld/
-* Autoconfiguration in Thunderbird
+* MySQL database backend
+* DNS checks via Google DNS after setup
+* Syslog adjustments
+* Autoconfiguration for Thunderbird
+* **A HTTPS Frontend**
 
 **Postfix**
 * Submission activated (TCP/587)
 * SMTPS disabled
 * Require TLS Authentification
 * Included ZEN blocklist
-* Spam- and virus protection plus attachment filter by [FuGlu Mail Content Scanner](http://www.fuglu.org)  with ClamAV and Spamassassin backend: Reject infected mails (<v0.2: delete), mark spam and move to "Junk"
-* SSL based on BetterCrypto (but no definition of "high" ciphers for compatibility reasons)
+* Spam- and virus protection plus attachment filter via [FuGlu Mail Content Scanner](http://www.fuglu.org) (uses ClamAV and Spamassassin backend)
+* Reject infected mails, mark spam
+* SSL based on BetterCrypto (w/o "high" ciphers for compatibility reasons)
 
 **Dovecot**
 * Default mailboxes to subscribe to automatically (Inbox, Sent, Drafts, Trash, Junk - SPECIAL-USE RFC 6154 tags)
 * Sieve/ManageSieve (TCP/4190)
-* Global sieve filter: Prefix spam with "[SPAM]" and move to "Junk"
-* (IMAP) quotas
+* Global sieve filter: Move mail marked as spam into "Junk"
+* (IMAP) Quotas
 * LMTP service for Postfix virtual transport
 * SSL based on BetterCrypto
 
 **Postfixadmin**
-* Automatic superuser configuration
+* Automatically creates an Administrator
 * Full quota support
-* "config.local.php" preconfigured
-* **Using tested revisions via SVN until a version "3.N" is released.**
 
 **Roundcube**
-* ManageSieve support (with vacation)
-* Change password via Webmail
-* Attachment reminder (for multiple locales)
-* Zip download marked messages
+* ManageSieve support (w/ vacation)
+* Change password
+* Attachment reminder (multiple locales)
+* Zip-download marked messages
 * 25M attachment size (see "File size limitation")
-* Unattended installation
 
 # Before You Begin
 **Please remove any web- and mail services** running on your server. I recommend using a clean Debian minimal installation.
@@ -170,9 +166,7 @@ You are ready to start the script:
 Just be patient and confirm every step by pressing [ENTER] or CTRL-C to interrupt the installation.
 More debugging is about to come. Though everything should work as intended.
 
-See [this image](https://www.debinux.de/wp-content/uploads/tbird.png) to get an overview of Thunderbird configuration.
-
-A small landing page is active at **https://hostname.domain.tld**.
+Visit your dashboard @ **https://hostname.domain.tld**.
 
 You should create an alias or a mailbox for postmaster@domain.tld.
 
