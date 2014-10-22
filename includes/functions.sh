@@ -241,6 +241,8 @@ postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spa
 			mkdir -p /usr/share/nginx/mail/pfadmin
 			cp nginx/conf/htdocs/index.php /usr/share/nginx/mail/
             cp nginx/conf/htdocs/robots.txt /usr/share/nginx/mail/
+            cp nginx/conf/htdocs/autoconfig.xml /usr/share/nginx/mail/
+            sed -i "s/fufix_sub/$sys_hostname/g" /usr/share/nginx/mail/autoconfig.xml
 			tar xf pfadmin/inst/$postfixadmin_revision.tar -C pfadmin/inst/
 			mv pfadmin/inst/$postfixadmin_revision/* /usr/share/nginx/mail/pfadmin/
 			cp pfadmin/conf/config.local.php /usr/share/nginx/mail/pfadmin/config.local.php

@@ -1,6 +1,10 @@
 server {
-	listen         80;
-	return 301 https://$host$request_uri;
+	listen 80;
+	root /usr/share/nginx/mail;
+	if ($http_user_agent !~* Thunderbird) {
+		return 301 https://$host$request_uri;
+	}
+	rewrite /.well-known/autoconfig/mail/config-v1.1.xml /autoconfig.xml permanent;
 }
 
 server {
