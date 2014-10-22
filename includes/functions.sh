@@ -154,6 +154,7 @@ postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spa
 			mysqladmin -u root password $my_rootpw
 			mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_postfixdb; GRANT ALL PRIVILEGES ON $my_postfixdb.* TO '$my_postfixuser'@'localhost' IDENTIFIED BY '$my_postfixpass';"
             mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'localhost' IDENTIFIED BY '$my_rcpass';"
+            mysql --defaults-file=/etc/mysql/debian.cnf -e "DELETE FROM mysql.user WHERE Password='';"
 			;;
 		fuglu)
 			mkdir /var/log/fuglu 2> /dev/null
