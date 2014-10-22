@@ -51,8 +51,10 @@ fufix
 A mail server install script for **Debian and Debian based distributions**. 
 This installer is permanently **tested on Debians stable branch** but is reported to run on newer branches, too. Debian Squeeze (old-stable) is not supported.
 
-Please see https://www.debinux.de/fufix for any further information.
-Feel free to leave a comment or question (best in English or German).
+Please see https://www.debinux.de/fufix for further information.
+Feel free to leave a comment or question.
+
+![fufix Frontend](https://www.debinux.de/fufix_frontend.png)
 
 # Introduction
 A summary of what software is installed with which features enabled.
@@ -68,6 +70,7 @@ A summary of what software is installed with which features enabled.
 * DNS check via Google DNS to verify PTR and A records, displays a hint to add a TXT record for VSF if needed.
 * Disabled mail.* spam in global Syslog
 * A Dashboard via https://mail.domain.tld/
+* Autoconfiguration in Thunderbird
 
 **Postfix**
 * Submission activated (TCP/587)
