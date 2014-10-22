@@ -156,6 +156,7 @@ nano configuration
 * **pfadmin_adminuser and pfadmin_adminpass** - Postfixadmin superuser definition: **Username MUST end with a valid domain name** but **does NOT need to be yours**. "yourname@outlook.com" is fine, "yourname@domain.invalid" or "yourname@aname" is not. Password policy: minimum length 8 chars, must contain uppercase and lowercase letters and at least 2 digits. **You can use the default values**
 * **"cert-" vars** - Used for the self-signed certificate. CN will be the servers FQDN. "cert_country" must be a vaild two letter country code.
 * Set **conf_done** to **yes** or anything except "no".
+* An unattended installation is possible, but not recommended ("inst_unattended")
 
 **Empty configuration values are invalid!**
 
@@ -164,11 +165,12 @@ You are ready to start the script:
 ./install.sh
 ```
 Just be patient and confirm every step by pressing [ENTER] or CTRL-C to interrupt the installation.
+
 More debugging is about to come. Though everything should work as intended.
 
-Visit your dashboard @ **https://hostname.domain.tld**.
+After the installation, visit your dashboard @ **https://hostname.domain.tld**, use the logged credentials in `./installer.log`
 
-You should create an alias or a mailbox for postmaster@domain.tld.
+Remember to create an alias- or a mailbox for Postmaster. ;-)
 
 # Configuration and common tasks
 To help you modify the configuration, I created this little overview to get you started.
