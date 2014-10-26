@@ -75,7 +75,7 @@ A summary of what software is installed with which features enabled.
 * SMTPS disabled
 * Require TLS Authentification
 * Included ZEN blocklist
-* Spam- and virus protection plus attachment filter via [FuGlu Mail Content Scanner](http://www.fuglu.org) (uses ClamAV and Spamassassin backend)
+* In- and outgoing spam- and virus protection plus attachment filter via [FuGlu Mail Content Scanner](http://www.fuglu.org) (uses ClamAV and Spamassassin backend)
 * Reject infected mails, mark spam
 * SSL based on BetterCrypto (w/o "high" ciphers for compatibility reasons)
 
