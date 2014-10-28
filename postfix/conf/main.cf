@@ -32,6 +32,13 @@ smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
 smtpd_tls_mandatory_protocols = !SSLv2, !SSLv3
 smtpd_tls_mandatory_ciphers=high
 
+# Log TLS handling
+smtpd_tls_loglevel = 1
+smtp_tls_loglevel = 1
+
+# Enable elliptic curve cryptography, "ultra" needs more cpu time
+smtpd_tls_eecdh_grade = strong
+
 # Sender, recipient and client restrictions
 smtpd_sender_restrictions = reject_authenticated_sender_login_mismatch,
    reject_unknown_sender_domain,
