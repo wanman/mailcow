@@ -64,10 +64,8 @@ is_ipv6() {
 checkports() {
 	for port in 25 80 143 443 465 587 993 995
 	do
-	    if [[ ! -z $(lsof -iTCP:$port) ]]; then
+	    if [[ $(nc -z localhost $port; echo $?) -eq 0 ]]; then
 	        echo "$(redb [ERR]) - An application is blocking the installation on Port $(textb $port)"
-	        lsof -iTCP:$port
-	        echo
 			# Wait until finished to list all blocked ports.
 			blocked_port=1
 	    fi
