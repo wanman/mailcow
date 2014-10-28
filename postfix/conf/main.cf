@@ -32,7 +32,7 @@ smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
 smtpd_tls_mandatory_protocols = !SSLv2, !SSLv3
 smtpd_tls_mandatory_ciphers=high
 
-# Sender and recipient restrictions
+# Sender, recipient and client restrictions
 smtpd_sender_restrictions = reject_authenticated_sender_login_mismatch,
    reject_unknown_sender_domain,
    permit_sasl_authenticated
@@ -41,6 +41,9 @@ smtpd_recipient_restrictions = permit_sasl_authenticated,
    reject_rbl_client zen.spamhaus.org,
    reject_unauth_destination,
    reject_unknown_reverse_client_hostname
+smtpd_client_restrictions = permit_mynetworks,
+   permit_sasl_authenticated,
+   reject
 
 # Determine valid MAIL FROM addresses for a SASL authenticated user.
 smtpd_sender_login_maps = proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_maps.cf
@@ -59,8 +62,8 @@ smtp_tls_security_level=may
 # TLS session cache for SMTP
 smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
 
-# A custom list with secure ciphers. Disabled for now due to compatibility reasons.
-#tls_high_cipherlist=EDH+CAMELLIA:EDH+aRSA:EECDH+aRSA+AESGCM:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH:+CAMELLIA256:+AES256:+CAMELLIA128:+AES128:+SSLv3:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!DSS:!RC4:!SEED:!ECDSA:CAMELLIA256-SHA:AES256\-SHA:CAMELLIA128-SHA:AES128-SHA
+# A custom list with secure ciphers.
+tls_high_cipherlist=EDH+CAMELLIA:EDH+aRSA:EECDH+aRSA+AESGCM:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH:+CAMELLIA256:+AES256:+CAMELLIA128:+AES128:+SSLv3:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!DSS:!RC4:!SEED:!ECDSA:CAMELLIA256-SHA:AES256\-SHA:CAMELLIA128-SHA:AES128-SHA
 
 # Use the FQDN for the hostname!
 myhostname = mail.domain.tld
