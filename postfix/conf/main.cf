@@ -39,7 +39,7 @@ smtp_tls_loglevel = 1
 # Enable elliptic curve cryptography, "ultra" needs more cpu time
 smtpd_tls_eecdh_grade = strong
 
-# Sender, recipient and client restrictions
+# Sender, recipient, client and data restrictions
 smtpd_sender_restrictions = reject_authenticated_sender_login_mismatch,
    reject_unknown_sender_domain,
    permit_sasl_authenticated
@@ -51,6 +51,9 @@ smtpd_recipient_restrictions = permit_sasl_authenticated,
 smtpd_client_restrictions = permit_mynetworks,
    permit_sasl_authenticated,
    reject
+smtpd_data_restrictions =
+   reject_unauth_pipelining,
+   permit
 
 # Determine valid MAIL FROM addresses for a SASL authenticated user.
 smtpd_sender_login_maps = proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_maps.cf
@@ -102,6 +105,9 @@ inet_interfaces = all
 
 # VRFY command is not really needed anymore
 disable_vrfy_command = yes
+
+# Please say hello first...
+smtpd_helo_required = yes
 
 # The SASL plug-in type that the Postfix SMTP server should use for authentication.
 smtpd_sasl_type=dovecot
