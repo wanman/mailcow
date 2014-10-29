@@ -48,9 +48,6 @@ smtpd_recipient_restrictions = permit_sasl_authenticated,
    reject_rbl_client zen.spamhaus.org,
    reject_unauth_destination,
    reject_unknown_reverse_client_hostname
-smtpd_client_restrictions = permit_mynetworks,
-   permit_sasl_authenticated,
-   reject
 smtpd_data_restrictions =
    reject_unauth_pipelining,
    permit
