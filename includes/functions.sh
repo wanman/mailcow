@@ -174,22 +174,6 @@ postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spa
 			update-rc.d fuglu defaults
 			rm -rf fuglu/inst/$fuglu_version
 			;;
-        postfix)
-            cp -R postfix/conf/* /etc/postfix/
-            chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf"
-            chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_maps.cf"
-            chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_mailbox_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_mailbox_maps.cf"
-            chown root:postfix "/etc/postfix/sql/mysql_virtual_mailbox_limit_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_mailbox_limit_maps.cf"
-            chown root:postfix "/etc/postfix/sql/mysql_virtual_mailbox_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_mailbox_maps.cf"
-            chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_maps.cf"
-            chown root:postfix "/etc/postfix/sql/mysql_virtual_domains_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_domains_maps.cf"
-            chown root:root "/etc/postfix/master.cf"; chmod 644 "/etc/postfix/master.cf"
-            chown root:root "/etc/postfix/main.cf"; chmod 644 "/etc/postfix/main.cf"
-            sed -i "s/mail.domain.tld/$sys_hostname.$sys_domain/g" /etc/postfix/* 2> /dev/null
-            sed -i "s/domain.tld/$sys_domain/g" /etc/postfix/* 2> /dev/null
-            sed -i "s/my_postfixpass/$my_postfixpass/g" /etc/postfix/sql/*
-            sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/postfix/sql/*
-            sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/postfix/sql/*
 		postfix)
 			cp -R postfix/conf/* /etc/postfix/
 			chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf"
