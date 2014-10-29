@@ -62,7 +62,7 @@ is_ipv6() {
 }
 
 checkports() {
-    if [[ -z $(which nc1) ]]; then
+    if [[ -z $(which nc) ]]; then
 		echo "$(redb [ERR]) - Please install $(textb netcat) before running this script"
 		exit 1
 	fi
