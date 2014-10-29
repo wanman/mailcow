@@ -318,13 +318,13 @@ postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spa
 			;;
 		checkdns)
 			if [[ -z $(dig -x $getpublicipv4 @8.8.8.8 | grep -i $sys_domain) ]]; then
-				echo "$(yellowb WARNING): Remember to setup a PTR record: $getpublicipv4 does not point to $sys_domain (checked by Google DNS)"
+				echo "$(yellowb WARNING): Remember to setup a PTR record: $getpublicipv4 does not point to $sys_domain (checked by Google DNS)" | tee -a installer.log
 			fi
 			if [[ -z $(dig $sys_hostname.$sys_domain @8.8.8.8 | grep -i $getpublicipv4) ]]; then
-				echo "$(yellowb WARNING): Remember to setup an A record for $sys_hostname.$sys_domain pointing to $getpublicipv4 (checked by Google DNS)"
+				echo "$(yellowb WARNING): Remember to setup an A record for $sys_hostname.$sys_domain pointing to $getpublicipv4 (checked by Google DNS)" | tee -a installer.log
 			fi
 			if [[ -z $(dig $sys_domain txt @8.8.8.8 | grep -i spf) ]]; then
-				echo "$(textb HINT): You may want to setup a TXT record for SPF, see spfwizard.com for further information (checked by Google DNS)"
+				echo "$(textb HINT): You may want to setup a TXT record for SPF, see spfwizard.com for further information (checked by Google DNS)" | tee -a installer.log
 			fi
 			;;
 		setupsuperadmin)
