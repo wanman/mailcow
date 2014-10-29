@@ -141,7 +141,7 @@ EOF
 			echo "Installing packages unattended, please stand by, errors will be reported."
 apt-get -y update >/dev/null
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
-python-magic openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
+python-magic libmail-spf-perl libmail-dkim-perl openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server nginx-extras dovecot-common dovecot-core mailutils \
 dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d postfix \
@@ -174,6 +174,22 @@ postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spa
 			update-rc.d fuglu defaults
 			rm -rf fuglu/inst/$fuglu_version
 			;;
+        postfix)
+            cp -R postfix/conf/* /etc/postfix/
+            chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf"
+            chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_maps.cf"
+            chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_mailbox_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_mailbox_maps.cf"
+            chown root:postfix "/etc/postfix/sql/mysql_virtual_mailbox_limit_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_mailbox_limit_maps.cf"
+            chown root:postfix "/etc/postfix/sql/mysql_virtual_mailbox_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_mailbox_maps.cf"
+            chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_maps.cf"
+            chown root:postfix "/etc/postfix/sql/mysql_virtual_domains_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_domains_maps.cf"
+            chown root:root "/etc/postfix/master.cf"; chmod 644 "/etc/postfix/master.cf"
+            chown root:root "/etc/postfix/main.cf"; chmod 644 "/etc/postfix/main.cf"
+            sed -i "s/mail.domain.tld/$sys_hostname.$sys_domain/g" /etc/postfix/* 2> /dev/null
+            sed -i "s/domain.tld/$sys_domain/g" /etc/postfix/* 2> /dev/null
+            sed -i "s/my_postfixpass/$my_postfixpass/g" /etc/postfix/sql/*
+            sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/postfix/sql/*
+            sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/postfix/sql/*
 		postfix)
 			cp -R postfix/conf/* /etc/postfix/
 			chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf"
