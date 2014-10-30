@@ -20,3 +20,5 @@ $config['plugins'] = array(
 $config['skin'] = 'classic';
 $config['login_autocomplete'] = 2;
 $config['imap_cache'] = 'apc';
+$config['username_domain'] = '%d';
+
