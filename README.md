@@ -409,6 +409,8 @@ The later file is the one you want to edit. Every parameter set in `config.php.i
 
 Some plug-ins come with a seperate "config.inc.php" file. You can find them in `/usr/share/nginx/mail/rc/plugins/PLUGIN_NAME/`.
 
+If no domain is specified for a login address, the webservers domain part will be appended.
+
 ### Attachment size
 Default file size limit is set to 25 MB. If you want to change this, you need to see three files:
 
