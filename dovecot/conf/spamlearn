@@ -1,0 +1,10 @@
+#!/bin/bash
+PATH=/usr/local/bin:/usr/local/sbin:/sbin:/usr/sbin:/bin:/usr/bin:/usr/bin/X11
+
+for domain in $(ls /var/vmail); do
+	if [[ $domain != "sieve" && -d $domain ]]; then
+		for user in $(ls /var/vmail/$domain); do
+			[[ -d /var/vmail/$domain/$user/.Junk/cur ]] && sa-learn --no-sync --spam /var/vmail/$domain/$user/.Junk/cur
+		done
+	fi
+done

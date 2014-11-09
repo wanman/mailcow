@@ -126,7 +126,7 @@ EOF
 				 echo $getpublicipv6 $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
 			fi
 			echo $sys_hostname > /etc/hostname
-			service hostname.sh start
+			[[ -f /lib/systemd/systemd ]] && hostnamectl set-hostname $sys_hostname || service hostname.sh start
 			else
 				echo "$(yellowb WARNING): Cannot set your hostname"
 			fi
@@ -210,6 +210,7 @@ postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spa
 			sievec /var/vmail/sieve/spam-global.sieve
 			chown -R vmail:vmail /var/vmail
 			cp dovecot/conf/doverecalcq /etc/cron.daily/; chmod 755 /etc/cron.daily/doverecalcq
+            cp dovecot/conf/spamlearn /etc/cron.daily/; chmod 755 /etc/cron.daily/spamlearn
 			;;
 		clamav)
 			service clamav-daemon stop
