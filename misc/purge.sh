@@ -25,7 +25,11 @@ service dovecot stop
 service postfix stop
 update-rc.d -f fail2ban remove
 update-rc.d -f fuglu remove
-# dovecot purge fails at first, that is okay
+systemctl disable fail2ban
+systemctl disable fuglu
+rm /lib/systemd/system/fuglu.service
+rm /lib/systemd/system/fail2ban.service
+# dovecot purge fails at first
 apt-get -y purge php5 git dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
 python-magic openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap subversion \

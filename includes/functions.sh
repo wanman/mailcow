@@ -139,13 +139,18 @@ EOF
 			;;
 		installpackages)
 			echo "Installing packages unattended, please stand by, errors will be reported."
-apt-get -y update >/dev/null
+			apt-get -y update >/dev/null
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
 python-magic libmail-spf-perl libmail-dkim-perl openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
-php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server nginx-extras dovecot-common dovecot-core mailutils \
-dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d postfix \
-postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin  >/dev/null
+php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server nginx-extras mailutils \
+postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin >/dev/null
+			mkdir -p /etc/dovecot/private/
+			cp /etc/ssl/certs/ssl-cert-snakeoil.pem /etc/dovecot/dovecot.pem
+			cp /etc/ssl/private/ssl-cert-snakeoil.key /etc/dovecot/dovecot.key
+			cp /etc/ssl/certs/ssl-cert-snakeoil.pem /etc/dovecot/private/dovecot.pem
+			cp /etc/ssl/private/ssl-cert-snakeoil.key /etc/dovecot/private/dovecot.key
+DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dovecot-core dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d >/dev/null
 			;;
 		ssl)
 			mkdir /etc/ssl/mail
@@ -169,9 +174,15 @@ postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spa
 			tar xf fuglu/inst/$fuglu_version.tar -C fuglu/inst/ 2> /dev/null
 			(cd fuglu/inst/$fuglu_version ; python setup.py -q install)
 			cp -R fuglu/conf/* /etc/fuglu/
-			cp fuglu/inst/$fuglu_version/scripts/startscripts/debian/7/fuglu /etc/init.d/fuglu
-			chmod +x /etc/init.d/fuglu
-			update-rc.d fuglu defaults
+            if [[ -f /lib/systemd/systemd ]]; then
+				cp fuglu/inst/$fuglu_version/scripts/startscripts/centos_rhel/7/fuglu.service /lib/systemd/system/fuglu.service
+				ln -s /usr/local/bin/fuglu /usr/bin/fuglu
+				systemctl enable fuglu
+			else
+				cp fuglu/inst/$fuglu_version/scripts/startscripts/debian/7/fuglu /etc/init.d/fuglu
+                chmod +x /etc/init.d/fuglu
+                update-rc.d fuglu defaults
+			fi
 			rm -rf fuglu/inst/$fuglu_version
 			;;
 		postfix)
@@ -280,10 +291,16 @@ postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spa
 			tar xf fail2ban/inst/$fail2ban_version.tar -C fail2ban/inst/
 			rm -rf /etc/fail2ban/ 2> /dev/null
 			(cd fail2ban/inst/$fail2ban_version ; python setup.py -q install 2> /dev/null)
-			cp fail2ban/conf/fail2ban.init /etc/init.d/fail2ban
+            if [[ -f /lib/systemd/systemd ]]; then
+				mkdir -p /var/run/fail2ban
+                cp fail2ban/conf/fail2ban.service /lib/systemd/system/fail2ban.service
+                systemctl enable fail2ban
+            else
+	            cp fail2ban/conf/fail2ban.init /etc/init.d/fail2ban
+	            chmod +x /etc/init.d/fail2ban
+	            update-rc.d fail2ban defaults
+            fi
 			cp fail2ban/conf/jail.local /etc/fail2ban/jail.local
-			chmod +x /etc/init.d/fail2ban
-			update-rc.d fail2ban defaults
 			rm -rf fail2ban/inst/$fail2ban_version
 			;;
 		rsyslogd)
