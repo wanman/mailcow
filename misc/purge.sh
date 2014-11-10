@@ -57,6 +57,7 @@ rm -rf /etc/mysql/
 rm -rf /usr/share/nginx/
 rm -rf /usr/local/lib/python2.7/dist-packages/fuglu/
 rm -f /usr/local/bin/fuglu*
+rm -f /usr/bin/fuglu
 rm -f /usr/local/lib/python2.7/dist-packages/fuglu-0.6.2.egg-info
 rm -rf /usr/local/lib/python2.7/dist-packages/fail2ban-*
 rm -f /usr/local/bin/fail2ban*

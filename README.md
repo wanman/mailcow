@@ -78,7 +78,7 @@ A summary of what software is installed with which features enabled.
 * Included ZEN blocklist
 * In- and outgoing spam- and virus protection plus attachment filter via [FuGlu Mail Content Scanner](http://www.fuglu.org) (uses ClamAV and Spamassassin backend)
 * Reject infected mails, mark spam
-* SSL based on BetterCrypto (w/o "high" ciphers for compatibility reasons)
+* SSL based on BetterCrypto 
 
 **Dovecot**
 * Default mailboxes to subscribe to automatically (Inbox, Sent, Drafts, Trash, Junk - SPECIAL-USE RFC 6154 tags)
