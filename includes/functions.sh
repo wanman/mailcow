@@ -122,7 +122,7 @@ EOF
 			echo $getpublicipv4 $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
 			echo $sys_hostname.$sys_domain > /etc/mailname
 			getpublicipv6=$(wget -t2 -T1 -q6O- ip6.telize.com)
-            if is_ipv6 $getpublicipv6; then
+			if is_ipv6 $getpublicipv6; then
 				 echo $getpublicipv6 $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
 			fi
 			echo $sys_hostname > /etc/hostname
@@ -174,7 +174,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			tar xf fuglu/inst/$fuglu_version.tar -C fuglu/inst/ 2> /dev/null
 			(cd fuglu/inst/$fuglu_version ; python setup.py -q install)
 			cp -R fuglu/conf/* /etc/fuglu/
-            if [[ -f /lib/systemd/systemd ]]; then
+			if [[ -f /lib/systemd/systemd ]]; then
 				cp fuglu/inst/$fuglu_version/scripts/startscripts/centos_rhel/7/fuglu.service /lib/systemd/system/fuglu.service
 				ln -s /usr/local/bin/fuglu /usr/bin/fuglu
 				systemctl enable fuglu
