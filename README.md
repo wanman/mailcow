@@ -248,9 +248,9 @@ ClamAV main configuration file:
 Spamassassin main configuration file:
 * **/etc/spamassassin/local.cf**
 
-Virus scanning is **enabled for both incoming and outgoing** mail.
+Virus and spam filters are **enabled for both incoming and outgoing** mail.
 
-The Spam scanner **skips outgoing** mail.
+Move undetected spam to "Junk" to make Spamassassin autolearn it. This is done by a daily cronjob.
 
 ### Spam rewrite
 Fufix adds `rewrite_header Subject [SPAM]` and `report_safe 2` to prefix [SPAM] to junk mail and forward spam as attachment instead of original message (text/plain). 
