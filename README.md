@@ -69,6 +69,7 @@ A summary of what software is installed with which features enabled.
 * Syslog adjustments
 * Autoconfiguration for Thunderbird
 * **A HTTPS Frontend**
+* Autolearn spam from mail moved to "Junk" folder
 
 **Postfix**
 * Submission activated (TCP/587)
