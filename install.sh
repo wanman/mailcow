@@ -15,27 +15,29 @@ checkconfig
 checkports
 
 echo "
-`tput bold`FQDN`tput sgr0`            $sys_hostname.$sys_domain
-`tput bold`Timezone`tput sgr0`        $sys_timezone
-`tput bold`Postfix MySQL`tput sgr0`   ${my_postfixuser}:HIDDEN/${my_postfixdb}
-`tput bold`Roundcube MySQL`tput sgr0` ${my_rcuser}:HIDDEN/${my_rcdb}
-`tput bold`Postfixadmin`tput sgr0`    $pfadmin_adminuser
+    $(textb "Hostname")        $sys_hostname
+    $(textb "Domain")          $sys_domain
+    $(textb "FQDN")            $sys_hostname.$sys_domain
+    $(textb "Timezone")        $sys_timezone
+    $(textb "Postfix MySQL")   ${my_postfixuser}:${my_postfixpass}/${my_postfixdb}
+    $(textb "Roundcube MySQL") ${my_rcuser}:${my_rcpass}/${my_rcdb}
+    $(textb "Postfixadmin")    ${pfadmin_adminuser}
 "
 
 returnwait "Reading configuration" "System environment"
 
 echo --------------------------------- > installer.log
 echo MySQL Postfix database: $my_postfixdb >> installer.log
-echo MySQL Postfix username $my_postfixuser >> installer.log
-echo MySQL Postfix password $my_postfixpass >> installer.log
+echo MySQL Postfix username: $my_postfixuser >> installer.log
+echo MySQL Postfix password: $my_postfixpass >> installer.log
 echo --------------------------------- >> installer.log
 echo MySQL Roundcube database: $my_rcdb >> installer.log
-echo MySQL Roundcube username $my_rcuser >> installer.log
-echo MySQL Roundcube password $my_rcpass >> installer.log
+echo MySQL Roundcube username: $my_rcuser >> installer.log
+echo MySQL Roundcube password: $my_rcpass >> installer.log
 echo --------------------------------- >> installer.log
 echo MySQL root password: $my_rootpw >> installer.log
 echo --------------------------------- >> installer.log
-echo Postfixadmin Superuser >> installer.log
+echo Postfixadmin Administrator >> installer.log
 echo Username: $pfadmin_adminuser >> installer.log
 echo Password: $pfadmin_adminpass >> installer.log
 echo --------------------------------- >> installer.log
