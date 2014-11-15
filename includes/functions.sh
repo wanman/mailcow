@@ -405,12 +405,15 @@ A BACKUP WILL BE STORED IN ./before_upgrade_$timestamp
     installtask postfixadmin
     returnwait "Postfixadmin configuration" "Roundcube configuration"
 
-    alias mysql=/bin/true
-    installtask roundcube
-    unalias mysql
-    sed -i "s/conf_rcdeskey/$old_des_key_rc/g" /usr/share/nginx/mail/rc/config/config.inc.php
-    /usr/share/nginx/mail/rc/bin/updatedb.sh --package=roundcube --dir=/usr/share/nginx/mail/rc/SQL
-    returnwait "Roundcube configuration" "Fail2ban configuration"
+	# this prevents installtask roundcube from doing any mysql stuff
+	mysql() {
+		return 0
+	}
+	(export -f mysql && installtask roundcube)
+	unset -f mysql
+	sed -i "s/conf_rcdeskey/$old_des_key_rc/g" /usr/share/nginx/mail/rc/config/config.inc.php
+	/usr/share/nginx/mail/rc/bin/updatedb.sh --package=roundcube --dir=/usr/share/nginx/mail/rc/SQL
+	returnwait "Roundcube configuration" "Fail2ban configuration"
 
     installtask fail2ban
     returnwait "Fail2ban configuration" "Restarting services"
