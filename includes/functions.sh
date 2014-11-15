@@ -165,6 +165,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		fuglu)
 			mkdir /var/log/fuglu 2> /dev/null
+			userdel fuglu 2> /dev/null
 			groupadd fuglu
 			useradd -g fuglu -s /bin/false fuglu
 			usermod -a -G debian-spamd fuglu
@@ -205,6 +206,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 		dovecot)
 			rm -rf /etc/dovecot/* 2> /dev/null
 			cp -R dovecot/conf/*.conf /etc/dovecot/
+			userdel vmail 2> /dev/null
 			groupadd -g 5000 vmail
 			useradd -g vmail -u 5000 vmail -d /var/vmail
 			chown root:dovecot "/etc/dovecot/dovecot-dict-sql.conf"; chmod 640 "/etc/dovecot/dovecot-dict-sql.conf"
@@ -333,4 +335,88 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			php /usr/share/nginx/mail/pfadmin/scripts/postfixadmin-cli.php admin add $pfadmin_adminuser --password $pfadmin_adminpass --password2 $pfadmin_adminpass --superadmin
 			;;
 	esac
+}
+upgradetask() {
+        [[ -z $1 || ! -f $1 ]] && echo "Not a valid installer.log file" && return 1
+
+        sys_hostname=$(hostname)
+        sys_domain=$(hostname -d)
+        sys_timezone=$(cat /etc/timezone)
+    timestamp=$(date +%Y%m%d_%H%M%S)
+    old_des_key_rc=$(grep des_key "/usr/share/nginx/mail/rc/config/config.inc.php" | awk '{ print $NF }' | cut -d "'" -f2)
+        while read line
+                do
+                [[ ${line,,} =~ "postfix database" ]] && my_postfixdb=$(echo $line | awk '{ print $NF }')
+                [[ ${line,,} =~ "postfix username" ]] && my_postfixuser=$(echo $line | awk '{ print $NF }')
+                [[ ${line,,} =~ "postfix password" ]] && my_postfixpass=$(echo $line | awk '{ print $NF }')
+                [[ ${line,,} =~ "roundcube database" ]] && my_rcdb=$(echo $line | awk '{ print $NF }')
+                [[ ${line,,} =~ "roundcube username" ]] && my_rcuser=$(echo $line | awk '{ print $NF }')
+                [[ ${line,,} =~ "roundcube password" ]] && my_rcpass=$(echo $line | awk '{ print $NF }')
+        done < $1
+
+    echo -e "The following values were detected.\nPlease review the configuration:"
+        echo "
+$(textb "Hostname")        $sys_hostname
+$(textb "Domain")          $sys_domain
+$(textb "FQDN")            $sys_hostname.$sys_domain
+$(textb "Timezone")        $sys_timezone
+$(textb "Postfix MySQL")   ${my_postfixuser}:${my_postfixpass}/${my_postfixdb}
+$(textb "Roundcube MySQL") ${my_rcuser}:${my_rcpass}/${my_rcdb}
+        "
+    echo "
+-----------------------------------------------------
+THIS UPGRADE WILL WILL RESET YOUR CONFIGURATION FILES
+-----------------------------------------------------
+A BACKUP WILL BE STORED IN ./before_upgrade_$timestamp
+-----------------------------------------------------
+"
+        read -p "Press ENTER to continue or CTRL-C to cancel the upgrade process"
+
+        echo -en "\nStopping services, this may take a few seconds... \t\t"
+        for var in fail2ban rsyslog nginx php5-fpm clamav-daemon clamav-freshclam spamassassin fuglu dovecot postfix
+        do
+                service $var stop > /dev/null 2>&1
+        done
+        echo -e "$(greenb "[OK]")"
+
+    echo -en "Creating backups in ./before_upgrade_$timestamp... \t"
+        mkdir before_upgrade_$timestamp
+        cp -R /usr/share/nginx/mail/ before_upgrade_$timestamp/mail_wwwroot
+        cp -R /etc/{fuglu,postfix,dovecot,spamassassin,fail2ban,nginx,mysql,clamav,php5} before_upgrade_$timestamp/
+    echo -e "$(greenb "[OK]")"
+
+    installtask fuglu
+    returnwait "FuGlu setup" "Postfix configuration"
+
+    installtask postfix
+    returnwait "Postfix configuration" "Dovecot configuration"
+
+    installtask dovecot
+    returnwait "Dovecot configuration" "ClamAV configuration"
+
+    installtask clamav
+    returnwait "ClamAV configuration" "Spamassassin configuration"
+
+    installtask spamassassin
+    returnwait "Spamassassin configuration" "Nginx configuration"
+
+    installtask webserver
+    returnwait "Nginx configuration" "Postfixadmin configuration"
+
+    installtask postfixadmin
+    returnwait "Postfixadmin configuration" "Roundcube configuration"
+
+    alias mysql=/bin/true
+    installtask roundcube
+    unalias mysql
+    sed -i "s/conf_rcdeskey/$old_des_key_rc/g" /usr/share/nginx/mail/rc/config/config.inc.php
+    /usr/share/nginx/mail/rc/bin/updatedb.sh --package=roundcube --dir=/usr/share/nginx/mail/rc/SQL
+    returnwait "Roundcube configuration" "Fail2ban configuration"
+
+    installtask fail2ban
+    returnwait "Fail2ban configuration" "Restarting services"
+
+    installtask restartservices
+    returnwait "Restarting services" "Finish installation"
+
 }
