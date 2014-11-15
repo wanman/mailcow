@@ -355,15 +355,14 @@ upgradetask() {
         done < $1
 
     echo -e "The following values were detected.\nPlease review the configuration:"
-        echo "
-$(textb "Hostname")        $sys_hostname
-$(textb "Domain")          $sys_domain
-$(textb "FQDN")            $sys_hostname.$sys_domain
-$(textb "Timezone")        $sys_timezone
-$(textb "Postfix MySQL")   ${my_postfixuser}:${my_postfixpass}/${my_postfixdb}
-$(textb "Roundcube MySQL") ${my_rcuser}:${my_rcpass}/${my_rcdb}
-        "
-    echo "
+	echo "
+	$(textb "Hostname")        $sys_hostname
+	$(textb "Domain")          $sys_domain
+	$(textb "FQDN")            $sys_hostname.$sys_domain
+	$(textb "Timezone")        $sys_timezone
+	$(textb "Postfix MySQL")   ${my_postfixuser}:${my_postfixpass}/${my_postfixdb}
+	$(textb "Roundcube MySQL") ${my_rcuser}:${my_rcpass}/${my_rcdb}
+
 -----------------------------------------------------
 THIS UPGRADE WILL WILL RESET YOUR CONFIGURATION FILES
 -----------------------------------------------------
