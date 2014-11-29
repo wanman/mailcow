@@ -3,6 +3,17 @@ greenb() { echo $(tput bold)$(tput setaf 2)${1}$(tput sgr0); }
 redb() { echo $(tput bold)$(tput setaf 1)${1}$(tput sgr0); }
 yellowb() { echo $(tput bold)$(tput setaf 3)${1}$(tput sgr0); }
 
+usage() {
+        echo "fufix install script command-line parameters."
+        echo $(textb "Do not append any parameters to run fufix in default mode.")
+        echo "
+        --help | -h
+		Print this text
+
+        --upgrade-from-file installer.log | -u installer.log
+	        Upgrade using a previous \"installer.log\" file
+	"
+}
 
 genpasswd() {
     count=0
@@ -84,7 +95,7 @@ checkconfig() {
         echo
         exit 1
     elif [[ ${#cert_country} -ne 2 ]]; then
-        echo "$(redb [ERR]) - Country code must contain exactly two characters"
+        echo "$(redb [ERR]) - Country code must consist of exactly two characters (DE/US/UK etc.)"
         exit 1
     else
     for var in sys_hostname sys_domain sys_timezone my_postfixdb my_postfixuser my_postfixpass my_rootpw my_rcuser my_rcpass my_rcdb pfadmin_adminuser pfadmin_adminpass cert_country cert_state cert_city cert_org
@@ -337,13 +348,12 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 	esac
 }
 upgradetask() {
-        [[ -z $1 || ! -f $1 ]] && echo "Not a valid installer.log file" && return 1
-
+        [[ -z $1 || ! -f $1 ]] && echo "$(redb [ERR]) - \"$1\" is not a valid file" ; return 1
         sys_hostname=$(hostname)
         sys_domain=$(hostname -d)
         sys_timezone=$(cat /etc/timezone)
-    timestamp=$(date +%Y%m%d_%H%M%S)
-    old_des_key_rc=$(grep des_key "/usr/share/nginx/mail/rc/config/config.inc.php" | awk '{ print $NF }' | cut -d "'" -f2)
+	timestamp=$(date +%Y%m%d_%H%M%S)
+	old_des_key_rc=$(grep des_key "/usr/share/nginx/mail/rc/config/config.inc.php" | awk '{ print $NF }' | cut -d "'" -f2)
         while read line
                 do
                 [[ ${line,,} =~ "postfix database" ]] && my_postfixdb=$(echo $line | awk '{ print $NF }')
@@ -354,7 +364,7 @@ upgradetask() {
                 [[ ${line,,} =~ "roundcube password" ]] && my_rcpass=$(echo $line | awk '{ print $NF }')
         done < $1
 
-    echo -e "The following values were detected.\nPlease review the configuration:"
+	echo -e "The following values were detected.\nPlease review the configuration:"
 	echo "
 	$(textb "Hostname")        $sys_hostname
 	$(textb "Domain")          $sys_domain
@@ -378,32 +388,32 @@ A BACKUP WILL BE STORED IN ./before_upgrade_$timestamp
         done
         echo -e "$(greenb "[OK]")"
 
-    echo -en "Creating backups in ./before_upgrade_$timestamp... \t"
+	echo -en "Creating backups in ./before_upgrade_$timestamp... \t"
         mkdir before_upgrade_$timestamp
         cp -R /usr/share/nginx/mail/ before_upgrade_$timestamp/mail_wwwroot
         cp -R /etc/{fuglu,postfix,dovecot,spamassassin,fail2ban,nginx,mysql,clamav,php5} before_upgrade_$timestamp/
-    echo -e "$(greenb "[OK]")"
+	echo -e "$(greenb "[OK]")"
 
-    installtask fuglu
-    returnwait "FuGlu setup" "Postfix configuration"
+	installtask fuglu
+	returnwait "FuGlu setup" "Postfix configuration"
 
-    installtask postfix
-    returnwait "Postfix configuration" "Dovecot configuration"
+	installtask postfix
+	returnwait "Postfix configuration" "Dovecot configuration"
 
-    installtask dovecot
-    returnwait "Dovecot configuration" "ClamAV configuration"
+	installtask dovecot
+	returnwait "Dovecot configuration" "ClamAV configuration"
 
-    installtask clamav
-    returnwait "ClamAV configuration" "Spamassassin configuration"
+	installtask clamav
+	returnwait "ClamAV configuration" "Spamassassin configuration"
 
-    installtask spamassassin
-    returnwait "Spamassassin configuration" "Nginx configuration"
+	installtask spamassassin
+	returnwait "Spamassassin configuration" "Nginx configuration"
 
-    installtask webserver
-    returnwait "Nginx configuration" "Postfixadmin configuration"
+	installtask webserver
+	returnwait "Nginx configuration" "Postfixadmin configuration"
 
-    installtask postfixadmin
-    returnwait "Postfixadmin configuration" "Roundcube configuration"
+	installtask postfixadmin
+	returnwait "Postfixadmin configuration" "Roundcube configuration"
 
 	# this prevents installtask roundcube from doing any mysql stuff
 	mysql() {
@@ -415,10 +425,9 @@ A BACKUP WILL BE STORED IN ./before_upgrade_$timestamp
 	/usr/share/nginx/mail/rc/bin/updatedb.sh --package=roundcube --dir=/usr/share/nginx/mail/rc/SQL
 	returnwait "Roundcube configuration" "Fail2ban configuration"
 
-    installtask fail2ban
-    returnwait "Fail2ban configuration" "Restarting services"
+	installtask fail2ban
+	returnwait "Fail2ban configuration" "Restarting services"
 
-    installtask restartservices
-    returnwait "Restarting services" "Finish installation"
-
+	installtask restartservices
+	returnwait "Restarting services" "Finish installation"
 }

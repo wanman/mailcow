@@ -11,6 +11,18 @@ source configuration
 
 echo $fufix_banner
 
+case $1 in
+	"-u" | "--upgrade-from-file" )
+		shift
+		upgradetask $1
+		exit 0
+		;;
+        "-h" | "--help" )
+                usage
+                exit 0
+                ;;
+esac
+
 checkconfig
 checkports
 
