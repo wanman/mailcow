@@ -260,7 +260,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			cp php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
 			cp php5-fpm/conf/php-fpm.conf /etc/php5/fpm/php-fpm.conf
 			cp nginx/conf/nginx.conf /etc/nginx/nginx.conf
-			chown -R www-data:www-data /var/lib/php5/
+			mkdir /var/lib/php5/sessions 2> /dev/null
+			chown -R www-data:www-data /var/lib/php5/sessions
 			sed -i "/date.timezone/c\php_admin_value[date.timezone] = $sys_timezone" /etc/php5/fpm/pool.d/mail.conf
 			sed -i "/worker_processes/c\worker_processes $(($(grep ^processor /proc/cpuinfo | wc -l) *2));" /etc/nginx/nginx.conf
 			;;
