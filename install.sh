@@ -7,7 +7,6 @@ fi
 cat includes/banner
 source includes/versions
 source includes/functions.sh
-source configuration
 
 echo $fufix_banner
 
@@ -17,12 +16,13 @@ case $1 in
 		upgradetask $1
 		exit 0
 		;;
-        "-h" | "--help" )
-                usage
-                exit 0
-                ;;
+	"-h" | "--help" )
+		usage
+		exit 0
+        ;;
 esac
 
+source configuration
 checkconfig
 checkports
 

@@ -4,14 +4,14 @@ redb() { echo $(tput bold)$(tput setaf 1)${1}$(tput sgr0); }
 yellowb() { echo $(tput bold)$(tput setaf 3)${1}$(tput sgr0); }
 
 usage() {
-        echo "fufix install script command-line parameters."
-        echo $(textb "Do not append any parameters to run fufix in default mode.")
-        echo "
-        --help | -h
+	echo "fufix install script command-line parameters."
+	echo $(textb "Do not append any parameters to run fufix in default mode.")
+	echo "
+	--help | -h
 		Print this text
 
-        --upgrade-from-file installer.log | -u installer.log
-	        Upgrade using a previous \"installer.log\" file
+	--upgrade-from-file installer.log | -u installer.log
+		Upgrade using a previous \"installer.log\" file
 	"
 }
 
@@ -109,14 +109,14 @@ checkconfig() {
     fi
     pass_count=$(grep -o "[0-9]" <<< $pfadmin_adminpass | wc -l)
     pass_chars=$(echo $pfadmin_adminpass | egrep "^.{8,255}" | \
-        egrep "[ABCDEFGHIJKLMNOPQRSTUVXYZ]" | \
-        egrep "[abcdefghijklmnopqrstuvxyz"] | \
-        egrep "[0-9]")
+	egrep "[ABCDEFGHIJKLMNOPQRSTUVXYZ]" | \
+	egrep "[abcdefghijklmnopqrstuvxyz"] | \
+	egrep "[0-9]")
     if [[ $pass_count -lt 2 || -z $pass_chars ]]; then
-            echo "$(redb [ERR]) - Postfixadmin password does not meet password policy requirements."
-            echo
-            exit 1
-    fi
+		echo "$(redb [ERR]) - Postfixadmin password does not meet password policy requirements."
+		echo
+		exit 1
+	fi
 }
 
 installtask() {
@@ -164,6 +164,7 @@ postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spa
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dovecot-core dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d >/dev/null
 			;;
 		ssl)
+			rm /etc/ssl/mail/* 2> /dev/null
 			mkdir /etc/ssl/mail
 			openssl req -new -newkey rsa:4096 -days 1095 -nodes -x509 -subj "/C=$cert_country/ST=$cert_state/L=$cert_city/O=$cert_org/CN=$sys_hostname.$sys_domain" -keyout /etc/ssl/mail/mail.key  -out /etc/ssl/mail/mail.crt
 			chmod 600 /etc/ssl/mail/mail.key
@@ -348,50 +349,59 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 	esac
 }
 upgradetask() {
-        [[ -z $1 || ! -f $1 ]] && echo "$(redb [ERR]) - \"$1\" is not a valid file" ; return 1
-        sys_hostname=$(hostname)
-        sys_domain=$(hostname -d)
-        sys_timezone=$(cat /etc/timezone)
+	if [[ -z $1 || ! -f $1 ]]; then
+		echo "$(redb [ERR]) - \"$1\" is not a valid file"
+		return 1
+	fi
+	sys_hostname=$(hostname)
+	sys_domain=$(hostname -d)
+	sys_timezone=$(cat /etc/timezone)
 	timestamp=$(date +%Y%m%d_%H%M%S)
-	old_des_key_rc=$(grep des_key "/usr/share/nginx/mail/rc/config/config.inc.php" | awk '{ print $NF }' | cut -d "'" -f2)
-        while read line
-                do
-                [[ ${line,,} =~ "postfix database" ]] && my_postfixdb=$(echo $line | awk '{ print $NF }')
-                [[ ${line,,} =~ "postfix username" ]] && my_postfixuser=$(echo $line | awk '{ print $NF }')
-                [[ ${line,,} =~ "postfix password" ]] && my_postfixpass=$(echo $line | awk '{ print $NF }')
-                [[ ${line,,} =~ "roundcube database" ]] && my_rcdb=$(echo $line | awk '{ print $NF }')
-                [[ ${line,,} =~ "roundcube username" ]] && my_rcuser=$(echo $line | awk '{ print $NF }')
-                [[ ${line,,} =~ "roundcube password" ]] && my_rcpass=$(echo $line | awk '{ print $NF }')
-        done < $1
-
+	old_des_key_rc=$(grep des_key "/usr/share/nginx/mail/rc/config/config.inc.php" 2>/dev/null | awk '{ print $NF }' | cut -d "'" -f2)
+	while read line
+	do
+		[[ ${line,,} =~ "postfix database" ]] && my_postfixdb=$(echo $line | awk '{ print $NF }')
+		[[ ${line,,} =~ "postfix username" ]] && my_postfixuser=$(echo $line | awk '{ print $NF }')
+		[[ ${line,,} =~ "postfix password" ]] && my_postfixpass=$(echo $line | awk '{ print $NF }')
+		[[ ${line,,} =~ "roundcube database" ]] && my_rcdb=$(echo $line | awk '{ print $NF }')
+		[[ ${line,,} =~ "roundcube username" ]] && my_rcuser=$(echo $line | awk '{ print $NF }')
+		[[ ${line,,} =~ "roundcube password" ]] && my_rcpass=$(echo $line | awk '{ print $NF }')
+	done < $1
+	for var in sys_hostname sys_domain sys_timezone my_postfixdb my_postfixuser my_postfixpass my_rcuser my_rcpass my_rcdb
+	do
+		if [[ -z ${!var} ]]; then
+			echo "$(redb [ERR]) - Log file does not contain all information"
+			echo
+			exit 1
+		fi
+	done
 	echo -e "The following values were detected.\nPlease review the configuration:"
 	echo "
-	$(textb "Hostname")        $sys_hostname
-	$(textb "Domain")          $sys_domain
-	$(textb "FQDN")            $sys_hostname.$sys_domain
-	$(textb "Timezone")        $sys_timezone
-	$(textb "Postfix MySQL")   ${my_postfixuser}:${my_postfixpass}/${my_postfixdb}
-	$(textb "Roundcube MySQL") ${my_rcuser}:${my_rcpass}/${my_rcdb}
+$(textb "Hostname")        $sys_hostname
+$(textb "Domain")          $sys_domain
+$(textb "FQDN")            $sys_hostname.$sys_domain
+$(textb "Timezone")        $sys_timezone
+$(textb "Postfix MySQL")   ${my_postfixuser}:${my_postfixpass}/${my_postfixdb}
+$(textb "Roundcube MySQL") ${my_rcuser}:${my_rcpass}/${my_rcdb}
 
 -----------------------------------------------------
 THIS UPGRADE WILL WILL RESET YOUR CONFIGURATION FILES
+YOUR WEBROOT AND CUSTOM SITES WILL BE DELETED
 -----------------------------------------------------
-A BACKUP WILL BE STORED IN ./before_upgrade_$timestamp
+A backup will be stored in ./before_upgrade_$timestamp
 -----------------------------------------------------
 "
-        read -p "Press ENTER to continue or CTRL-C to cancel the upgrade process"
-
-        echo -en "\nStopping services, this may take a few seconds... \t\t"
-        for var in fail2ban rsyslog nginx php5-fpm clamav-daemon clamav-freshclam spamassassin fuglu dovecot postfix
-        do
-                service $var stop > /dev/null 2>&1
-        done
-        echo -e "$(greenb "[OK]")"
-
+	read -p "Press ENTER to continue or CTRL-C to cancel the upgrade process"
+	echo -en "\nStopping services, this may take a few seconds... \t\t"
+	for var in fail2ban rsyslog nginx php5-fpm clamav-daemon clamav-freshclam spamassassin fuglu dovecot postfix
+	do
+		service $var stop > /dev/null 2>&1
+	done
+	echo -e "$(greenb "[OK]")"
 	echo -en "Creating backups in ./before_upgrade_$timestamp... \t"
-        mkdir before_upgrade_$timestamp
-        cp -R /usr/share/nginx/mail/ before_upgrade_$timestamp/mail_wwwroot
-        cp -R /etc/{fuglu,postfix,dovecot,spamassassin,fail2ban,nginx,mysql,clamav,php5} before_upgrade_$timestamp/
+		mkdir before_upgrade_$timestamp
+		cp -R /usr/share/nginx/mail/ before_upgrade_$timestamp/mail_wwwroot
+		cp -R /etc/{fuglu,postfix,dovecot,spamassassin,fail2ban,nginx,mysql,clamav,php5} before_upgrade_$timestamp/
 	echo -e "$(greenb "[OK]")"
 
 	installtask fuglu
@@ -429,5 +439,6 @@ A BACKUP WILL BE STORED IN ./before_upgrade_$timestamp
 	returnwait "Fail2ban configuration" "Restarting services"
 
 	installtask restartservices
-	returnwait "Restarting services" "Finish installation"
+	returnwait "Restarting services" "Finish upgrade"
+	exit 0
 }
