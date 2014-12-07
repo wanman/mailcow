@@ -41,6 +41,7 @@ smtpd_tls_eecdh_grade = strong
 
 # Sender, recipient, client and data restrictions
 smtpd_sender_restrictions = reject_authenticated_sender_login_mismatch,
+   reject_sender_login_mismatch,
    reject_unknown_sender_domain,
    permit_sasl_authenticated
 smtpd_recipient_restrictions = permit_sasl_authenticated,
