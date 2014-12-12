@@ -168,4 +168,4 @@ maximal_backoff_time = 1800s
 minimal_backoff_time = 300s
 
 # Maximum mail size
-message_size_limit = 2602140400
+message_size_limit = 260214400
