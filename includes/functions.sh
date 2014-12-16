@@ -421,6 +421,11 @@ A backup will be stored in ./before_upgrade_$timestamp
 		cp -R /etc/{fuglu,postfix,dovecot,spamassassin,fail2ban,nginx,mysql,clamav,php5} before_upgrade_$timestamp/
 	echo -e "$(greenb "[OK]")"
 
+	echo "Update CA certificate store..."
+	cp /etc/ssl/mail/mail.crt /usr/local/share/ca-certificates/
+	update-ca-certificates
+	returnwait "Update CA certificate store" "FuGlu setup"
+
 	installtask fuglu
 	returnwait "FuGlu setup" "Postfix configuration"
 
