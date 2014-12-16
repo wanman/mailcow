@@ -54,8 +54,6 @@ This installer is permanently **tested on Debians stable branch** but is reporte
 Please see https://www.debinux.de/fufix for further information.
 Feel free to leave a comment or question.
 
-![fufix Frontend](https://www.debinux.de/fufix_frontend.png)
-
 # Introduction
 A summary of what software is installed with which features enabled.
 
