@@ -278,6 +278,8 @@ I try to comment as much as possible inside these files to help you understand t
 You also find the SQL based maps for virtual transport here:
 * **/etc/postfix/sql/*.cf**
 
+For a quick overview of the restrictions [click here](https://github.com/andryyy/fufix/blob/master/postfix/conf/main.cf).
+
 ### Message size limit
 The parameter `message_size_limit` in `/etc/postfix/main.cf` is set to 26214400 bytes (25M). This has an effect on incoming and outgoing mail.
 
