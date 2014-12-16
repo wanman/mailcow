@@ -130,22 +130,29 @@ installtask() {
 ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 EOF
-			echo $getpublicipv4 $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
-			echo $sys_hostname.$sys_domain > /etc/mailname
-			getpublicipv6=$(wget -t2 -T1 -q6O- ip6.telize.com)
-			if is_ipv6 $getpublicipv6; then
-				 echo $getpublicipv6 $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
-			fi
-			echo $sys_hostname > /etc/hostname
-			[[ -f /lib/systemd/systemd ]] && hostnamectl set-hostname $sys_hostname || service hostname.sh start
+				echo $getpublicipv4 $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
+				echo $sys_hostname.$sys_domain > /etc/mailname
+				getpublicipv6=$(wget -t2 -T1 -q6O- ip6.telize.com)
+					if is_ipv6 $getpublicipv6; then
+						echo $getpublicipv6 $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
+					fi
 			else
-				echo "$(yellowb WARNING): Cannot set your hostname"
+				echo "Cannot set your hostname!"
+				exit 1
+			fi
+			if [[ -f /lib/systemd/systemd ]]; then
+				echo "Checking dbus, this may take a few seconds..."
+				apt-get -y update >/dev/null ; apt-get -y install dbus >/dev/null
+				hostnamectl set-hostname $sys_hostname
+			else
+				echo $sys_hostname > /etc/hostname
+				service hostname.sh start
 			fi
 			if [[ -f /usr/share/zoneinfo/$sys_timezone ]] ; then
 				echo $sys_timezone > /etc/timezone
 				dpkg-reconfigure -f noninteractive tzdata
 			else
-				echo "$(yellowb WARNING): Cannot set your timezone: timezone is unknown";
+				echo "$(yellowb WARNING): Cannot set your timezone: timezone is unknown"
 			fi
 			;;
 		installpackages)
