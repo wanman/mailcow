@@ -265,7 +265,7 @@ Default startup options for Spamassassin in `/etc/default/spamassassin`:
 
  `OPTIONS="--create-prefs --max-children 5 --helper-home-dir --username debian-spamd"`.
 
-## Max file size for virus scanning
+### Max file size for virus scanning
 The file size limit for incoming attachments is set to 25M. This is defined with `MaxFileSize` in the main configuratin file.
 
 Also there is `StreamMaxLength`. This value should match your mail transport agent’s (MTA) limit for a maximum attachment size (see section "Postfix).
