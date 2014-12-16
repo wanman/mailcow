@@ -168,6 +168,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			mkdir /etc/ssl/mail
 			openssl req -new -newkey rsa:4096 -days 1095 -nodes -x509 -subj "/C=$cert_country/ST=$cert_state/L=$cert_city/O=$cert_org/CN=$sys_hostname.$sys_domain" -keyout /etc/ssl/mail/mail.key  -out /etc/ssl/mail/mail.crt
 			chmod 600 /etc/ssl/mail/mail.key
+			cp /etc/ssl/mail/mail.crt /usr/local/share/ca-certificates/
+			update-ca-certificates
 			;;
 		mysql)
 			mysql --defaults-file=/etc/mysql/debian.cnf -e "UPDATE mysql.user SET Password=PASSWORD('$my_rootpw') WHERE USER='root'; FLUSH PRIVILEGES;"
@@ -296,6 +298,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_rcdb/$my_rcdb/g" /usr/share/nginx/mail/rc/config/config.inc.php
 			conf_rcdeskey=$(genpasswd)
 			sed -i "s/conf_rcdeskey/$conf_rcdeskey/g" /usr/share/nginx/mail/rc/config/config.inc.php
+            sed -i "s/fufix_dfhost/$sys_hostname.$sys_domain/g" /usr/share/nginx/mail/rc/config/config.inc.php
+            sed -i "s/fufix_smtpsrv/$sys_hostname.$sys_domain/g" /usr/share/nginx/mail/rc/config/config.inc.php
 			chown -R www-data: /usr/share/nginx/
 			mysql -u $my_rcuser -p$my_rcpass $my_rcdb < /usr/share/nginx/mail/rc/SQL/mysql.initial.sql
 			rm -rf roundcube/inst/$roundcube_version

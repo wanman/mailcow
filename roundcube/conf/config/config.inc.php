@@ -1,8 +1,8 @@
 <?php
 $config = array();
 $config['db_dsnw'] = 'mysql://my_rcuser:my_rcpass@localhost/my_rcdb';
-$config['default_host'] = 'tls://localhost';
-$config['smtp_server'] = 'tls://localhost';
+$config['default_host'] = 'tls://fufix_dfhost';
+$config['smtp_server'] = 'tls://fufix_smtpsrv';
 $config['smtp_port'] = 587;
 $config['smtp_user'] = '%u';
 $config['smtp_pass'] = '%p';
