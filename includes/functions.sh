@@ -72,6 +72,13 @@ is_ipv6() {
     fi
 }
 
+checksystem() {
+	if [[ $(grep MemTotal /proc/meminfo | awk '{print $2}') -lt 750000 ]]; then
+		echo "$(yellowb [WARN]) - At least 768MB of memory is highly recommended"
+		read -p "Press ENTER to skip this warning or CTRL-C to cancel the process"
+	fi
+}
+
 checkports() {
     if [[ -z $(which nc) ]]; then
 		echo "$(redb [ERR]) - Please install $(textb netcat) before running this script"
