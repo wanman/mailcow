@@ -24,6 +24,7 @@ esac
 
 source configuration
 checkconfig
+checksystem
 checkports
 
 echo "
