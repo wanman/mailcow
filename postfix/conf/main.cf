@@ -36,6 +36,9 @@ smtpd_tls_mandatory_ciphers=high
 smtpd_tls_loglevel = 1
 smtp_tls_loglevel = 1
 
+# Delay reject until RCPT TO
+smtpd_delay_reject = yes
+
 # Enable elliptic curve cryptography, "ultra" needs more cpu time
 smtpd_tls_eecdh_grade = strong
 
@@ -52,6 +55,7 @@ smtpd_recipient_restrictions = permit_sasl_authenticated,
    reject_rbl_client zen.spamhaus.org,
    reject_unauth_destination,
    reject_unknown_reverse_client_hostname
+
 smtpd_data_restrictions =
    reject_unauth_pipelining,
    permit
