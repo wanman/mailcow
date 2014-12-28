@@ -285,7 +285,7 @@ The parameter `message_size_limit` in `/etc/postfix/main.cf` is set to 26214400 
 
 ## Nginx
 A site for mail is copied to `/etc/nginx/sites-available` and enabled via symbolic link to `/etc/nginx/sites-enabled`.
-The sites root location is `/usr/share/nginx/mail/`. Any default site installed by "apt-get" is removed.
+The sites root location is `/var/www/mail/`. Any default site installed by "apt-get" is removed.
 
 A PHP socket configuration is located at `/etc/php5/fpm/pool.d/mail.conf`. 
 Some PHP parameters are set right here to override those in `/etc/php5/fpm/php.ini`.
@@ -302,7 +302,7 @@ I recommend to use `/etc/fail2ban/jail.local` to add or modify the configuration
 `jail.local` has higher priority than `jail.conf`.
 
 ## Postfixadmin
-The file "config.local.php" is copied to the target directory `/usr/share/nginx/mail/pfadmin`. Some parameters like "domain.tld" are dummies and replaced by the installer.
+The file "config.local.php" is copied to the target directory `/var/www/mail/pfadmin`. Some parameters like "domain.tld" are dummies and replaced by the installer.
 
 You can change some of these values to fit your personal needs by just editing or adding them to this file. 
 All values inside "config.local.php" override the global configuration file (`config.inc.php`) of Postfixadmin. No need to reload any service afterwards. 
@@ -405,10 +405,10 @@ Roundcube is configured by multiple configuration files.
 
 There are two files for the general configuration:
 
-`/usr/share/nginx/mail/rc/config/defaults.php.inc` and `/usr/share/nginx/mail/rc/config/config.php.inc`. 
+`/var/www/mail/rc/config/defaults.php.inc` and `/var/www/mail/rc/config/config.php.inc`. 
 The later file is the one you want to edit. Every parameter set in `config.php.inc` will override the parameter set in `defaults.php.inc`.
 
-Some plug-ins come with a seperate "config.inc.php" file. You can find them in `/usr/share/nginx/mail/rc/plugins/PLUGIN_NAME/`.
+Some plug-ins come with a seperate "config.inc.php" file. You can find them in `/var/www/mail/rc/plugins/PLUGIN_NAME/`.
 
 If no domain is specified for a login address, the webservers domain part will be appended.
 
@@ -438,7 +438,7 @@ Most important files for debugging:
 * **/var/log/fuglu/fuglu.log**
 * **/var/log/nginx/error.log**
 * **/var/log/mysql.err**
-* **/usr/share/nginx/mail/rc/logs/errors**
+* **/var/www/mail/rc/logs/errors**
 * **/var/log/php5-fpm.log**
 
 Please always see these files when troubleshooting your mail server.

@@ -282,42 +282,42 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "/worker_processes/c\worker_processes $(($(grep ^processor /proc/cpuinfo | wc -l) *2));" /etc/nginx/nginx.conf
 			;;
 		postfixadmin)
-			rm -rf /usr/share/nginx/mail 2> /dev/null
-			mkdir -p /usr/share/nginx/mail/pfadmin
-			cp nginx/conf/htdocs/index.php /usr/share/nginx/mail/
-			cp nginx/conf/htdocs/robots.txt /usr/share/nginx/mail/
-			cp nginx/conf/htdocs/autoconfig.xml /usr/share/nginx/mail/
-			sed -i "s/fufix_sub/$sys_hostname/g" /usr/share/nginx/mail/autoconfig.xml
+			rm -rf /var/www/mail 2> /dev/null
+			mkdir -p /var/www/mail/pfadmin
+			cp nginx/conf/htdocs/index.php /var/www/mail/
+			cp nginx/conf/htdocs/robots.txt /var/www/mail/
+			cp nginx/conf/htdocs/autoconfig.xml /var/www/mail/
+			sed -i "s/fufix_sub/$sys_hostname/g" /var/www/mail/autoconfig.xml
 			tar xf pfadmin/inst/$postfixadmin_revision.tar -C pfadmin/inst/
-			mv pfadmin/inst/$postfixadmin_revision/* /usr/share/nginx/mail/pfadmin/
-			cp pfadmin/conf/config.local.php /usr/share/nginx/mail/pfadmin/config.local.php
-			sed -i "s/my_postfixpass/$my_postfixpass/g" /usr/share/nginx/mail/pfadmin/config.local.php
-			sed -i "s/my_postfixuser/$my_postfixuser/g" /usr/share/nginx/mail/pfadmin/config.local.php
-			sed -i "s/my_postfixdb/$my_postfixdb/g" /usr/share/nginx/mail/pfadmin/config.local.php
-			sed -i "s/domain.tld/$sys_domain/g" /usr/share/nginx/mail/pfadmin/config.local.php
-			sed -i "s/change-this-to-your.domain.tld/$sys_domain/g" /usr/share/nginx/mail/pfadmin/config.inc.php
-			chown -R www-data: /usr/share/nginx/
+			mv pfadmin/inst/$postfixadmin_revision/* /var/www/mail/pfadmin/
+			cp pfadmin/conf/config.local.php /var/www/mail/pfadmin/config.local.php
+			sed -i "s/my_postfixpass/$my_postfixpass/g" /var/www/mail/pfadmin/config.local.php
+			sed -i "s/my_postfixuser/$my_postfixuser/g" /var/www/mail/pfadmin/config.local.php
+			sed -i "s/my_postfixdb/$my_postfixdb/g" /var/www/mail/pfadmin/config.local.php
+			sed -i "s/domain.tld/$sys_domain/g" /var/www/mail/pfadmin/config.local.php
+			sed -i "s/change-this-to-your.domain.tld/$sys_domain/g" /var/www/mail/pfadmin/config.inc.php
+			chown -R www-data: /var/www/
 			rm -rf pfadmin/inst/$postfixadmin_revision
 			;;
 		roundcube)
-			mkdir -p /usr/share/nginx/mail/rc
+			mkdir -p /var/www/mail/rc
 			tar xf roundcube/inst/$roundcube_version.tar -C roundcube/inst/
-			mv roundcube/inst/$roundcube_version/* /usr/share/nginx/mail/rc/
-			cp -R roundcube/conf/* /usr/share/nginx/mail/rc/
-			sed -i "s/my_postfixuser/$my_postfixuser/g" /usr/share/nginx/mail/rc/plugins/password/config.inc.php
-			sed -i "s/my_postfixpass/$my_postfixpass/g" /usr/share/nginx/mail/rc/plugins/password/config.inc.php
-			sed -i "s/my_postfixdb/$my_postfixdb/g" /usr/share/nginx/mail/rc/plugins/password/config.inc.php
-			sed -i "s/my_rcuser/$my_rcuser/g" /usr/share/nginx/mail/rc/config/config.inc.php
-			sed -i "s/my_rcpass/$my_rcpass/g" /usr/share/nginx/mail/rc/config/config.inc.php
-			sed -i "s/my_rcdb/$my_rcdb/g" /usr/share/nginx/mail/rc/config/config.inc.php
+			mv roundcube/inst/$roundcube_version/* /var/www/mail/rc/
+			cp -R roundcube/conf/* /var/www/mail/rc/
+			sed -i "s/my_postfixuser/$my_postfixuser/g" /var/www/mail/rc/plugins/password/config.inc.php
+			sed -i "s/my_postfixpass/$my_postfixpass/g" /var/www/mail/rc/plugins/password/config.inc.php
+			sed -i "s/my_postfixdb/$my_postfixdb/g" /var/www/mail/rc/plugins/password/config.inc.php
+			sed -i "s/my_rcuser/$my_rcuser/g" /var/www/mail/rc/config/config.inc.php
+			sed -i "s/my_rcpass/$my_rcpass/g" /var/www/mail/rc/config/config.inc.php
+			sed -i "s/my_rcdb/$my_rcdb/g" /var/www/mail/rc/config/config.inc.php
 			conf_rcdeskey=$(genpasswd)
-			sed -i "s/conf_rcdeskey/$conf_rcdeskey/g" /usr/share/nginx/mail/rc/config/config.inc.php
-            sed -i "s/fufix_dfhost/$sys_hostname.$sys_domain/g" /usr/share/nginx/mail/rc/config/config.inc.php
-            sed -i "s/fufix_smtpsrv/$sys_hostname.$sys_domain/g" /usr/share/nginx/mail/rc/config/config.inc.php
-			chown -R www-data: /usr/share/nginx/
-			mysql -u $my_rcuser -p$my_rcpass $my_rcdb < /usr/share/nginx/mail/rc/SQL/mysql.initial.sql
+			sed -i "s/conf_rcdeskey/$conf_rcdeskey/g" /var/www/mail/rc/config/config.inc.php
+            sed -i "s/fufix_dfhost/$sys_hostname.$sys_domain/g" /var/www/mail/rc/config/config.inc.php
+            sed -i "s/fufix_smtpsrv/$sys_hostname.$sys_domain/g" /var/www/mail/rc/config/config.inc.php
+			chown -R www-data: /var/www/
+			mysql -u $my_rcuser -p$my_rcpass $my_rcdb < /var/www/mail/rc/SQL/mysql.initial.sql
 			rm -rf roundcube/inst/$roundcube_version
-			rm -rf /usr/share/nginx/mail/rc/installer/
+			rm -rf /var/www/mail/rc/installer/
 			;;
 		fail2ban)
 			tar xf fail2ban/inst/$fail2ban_version.tar -C fail2ban/inst/
@@ -368,7 +368,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		setupsuperadmin)
 			wget --quiet --no-check-certificate -O /dev/null https://localhost/pfadmin/setup.php
-			php /usr/share/nginx/mail/pfadmin/scripts/postfixadmin-cli.php admin add $pfadmin_adminuser --password $pfadmin_adminpass --password2 $pfadmin_adminpass --superadmin
+			php /var/www/mail/pfadmin/scripts/postfixadmin-cli.php admin add $pfadmin_adminuser --password $pfadmin_adminpass --password2 $pfadmin_adminpass --superadmin
 			;;
 	esac
 }
@@ -381,7 +381,7 @@ upgradetask() {
 	sys_domain=$(hostname -d)
 	sys_timezone=$(cat /etc/timezone)
 	timestamp=$(date +%Y%m%d_%H%M%S)
-	old_des_key_rc=$(grep des_key "/usr/share/nginx/mail/rc/config/config.inc.php" 2>/dev/null | awk '{ print $NF }' | cut -d "'" -f2)
+	old_des_key_rc=$(grep des_key "/var/www/mail/rc/config/config.inc.php" 2>/dev/null | awk '{ print $NF }' | cut -d "'" -f2)
 	while read line
 	do
 		[[ ${line,,} =~ "postfix database" ]] && my_postfixdb=$(echo $line | awk '{ print $NF }')
@@ -424,7 +424,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 	echo -e "$(greenb "[OK]")"
 	echo -en "Creating backups in ./before_upgrade_$timestamp... \t"
 		mkdir before_upgrade_$timestamp
-		cp -R /usr/share/nginx/mail/ before_upgrade_$timestamp/mail_wwwroot
+		cp -R /var/www/mail/ before_upgrade_$timestamp/mail_wwwroot
 		cp -R /etc/{fuglu,postfix,dovecot,spamassassin,fail2ban,nginx,mysql,clamav,php5} before_upgrade_$timestamp/
 	echo -e "$(greenb "[OK]")"
 
@@ -464,8 +464,8 @@ A backup will be stored in ./before_upgrade_$timestamp
 	}
 	(export -f mysql && installtask roundcube)
 	unset -f mysql
-	sed -i "s/conf_rcdeskey/$old_des_key_rc/g" /usr/share/nginx/mail/rc/config/config.inc.php
-	/usr/share/nginx/mail/rc/bin/updatedb.sh --package=roundcube --dir=/usr/share/nginx/mail/rc/SQL
+	sed -i "s/conf_rcdeskey/$old_des_key_rc/g" /var/www/mail/rc/config/config.inc.php
+	/var/www/mail/rc/bin/updatedb.sh --package=roundcube --dir=/var/www/mail/rc/SQL
 	returnwait "Roundcube configuration" "Fail2ban configuration"
 
 	installtask fail2ban

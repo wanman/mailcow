@@ -3,7 +3,7 @@ server {
 
 	server_name _;
 
-	root /usr/share/nginx/mail;
+	root /var/www/mail;
 
 	if ($http_user_agent !~* Thunderbird) {
 		return 301 https://$host$request_uri;
@@ -26,7 +26,7 @@ server {
 	ssl_ciphers 'EDH+CAMELLIA:EDH+aRSA:EECDH+aRSA+AESGCM:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH:+CAMELLIA256:+AES256:+CAMELLIA128:+AES128:+SSLv3:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!DSS:!RC4:!SEED:!ECDSA:CAMELLIA256-SHA:AES256-SHA:CAMELLIA128-SHA:AES128-SHA';
 	add_header Strict-Transport-Security max-age=15768000;
 
-	root /usr/share/nginx/mail;
+	root /var/www/mail;
 	index index.html index.htm index.php;
 
     location ^~ /rc/logs {

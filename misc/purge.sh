@@ -54,7 +54,7 @@ rm -rf /etc/fail2ban/
 rm -rf /etc/nginx/
 rm -rf /etc/php5/
 rm -rf /etc/mysql/
-rm -rf /usr/share/nginx/
+rm -rf /var/www/
 rm -rf /usr/local/lib/python2.7/dist-packages/fuglu/
 rm -f /usr/local/bin/fuglu*
 rm -f /usr/bin/fuglu
