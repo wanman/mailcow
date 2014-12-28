@@ -5,11 +5,11 @@ server {
 
 	root /var/www/mail;
 
-	if ($http_user_agent !~* Thunderbird) {
-		return 301 https://$host$request_uri;
+	if ($request_uri ~* config-v1.1.xml$) {
+		rewrite /.well-known/autoconfig/mail/config-v1.1.xml /autoconfig.xml permanent;
 	}
 
-	rewrite /.well-known/autoconfig/mail/config-v1.1.xml /autoconfig.xml permanent;
+	return 301 https://$host$request_uri;
 }
 
 server {

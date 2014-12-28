@@ -269,27 +269,17 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i '/^ENABLED=/s/=.*/="1"/' /etc/default/spamassassin
 			;;
 		webserver)
-			if [[ $force_apache2 == "yes" ]]; then
-				cp apache2/conf/sites-available/000-0-mail.conf /etc/apache2/sites-available/
-				echo "ServerTokens Minimal
-ServerSignature Off
-TraceEnable Off" > /etc/apache2/conf-enabled/security.conf
-				echo "AddDefaultCharset UTF-8" > /etc/apache2/conf-enabled/charset.conf
-				a2enmod rewrite ssl 2> /dev/null
-				a2ensite 000-0-mail.conf 2> /dev/null
-			else
-				rm -rf /etc/php5/fpm/pool.d/* 2> /dev/null
-				rm -rf /etc/nginx/{sites-available,sites-enabled}/* 2> /dev/null
-				cp nginx/conf/sites-available/mail /etc/nginx/sites-available/mail
-				ln -s /etc/nginx/sites-available/mail /etc/nginx/sites-enabled/mail
-				cp php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
-				cp php5-fpm/conf/php-fpm.conf /etc/php5/fpm/php-fpm.conf
-				cp nginx/conf/nginx.conf /etc/nginx/nginx.conf
-				mkdir /var/lib/php5/sessions 2> /dev/null
-				chown -R www-data:www-data /var/lib/php5/sessions
-				sed -i "/date.timezone/c\php_admin_value[date.timezone] = $sys_timezone" /etc/php5/fpm/pool.d/mail.conf
-				sed -i "/worker_processes/c\worker_processes $(($(grep ^processor /proc/cpuinfo | wc -l) *2));" /etc/nginx/nginx.conf
-			fi
+			rm -rf /etc/php5/fpm/pool.d/* 2> /dev/null
+			rm -rf /etc/nginx/{sites-available,sites-enabled}/* 2> /dev/null
+			cp nginx/conf/sites-available/mail /etc/nginx/sites-available/mail
+			ln -s /etc/nginx/sites-available/mail /etc/nginx/sites-enabled/mail
+			cp php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
+			cp php5-fpm/conf/php-fpm.conf /etc/php5/fpm/php-fpm.conf
+			cp nginx/conf/nginx.conf /etc/nginx/nginx.conf
+			mkdir /var/lib/php5/sessions 2> /dev/null
+			chown -R www-data:www-data /var/lib/php5/sessions
+			sed -i "/date.timezone/c\php_admin_value[date.timezone] = $sys_timezone" /etc/php5/fpm/pool.d/mail.conf
+			sed -i "/worker_processes/c\worker_processes $(($(grep ^processor /proc/cpuinfo | wc -l) *2));" /etc/nginx/nginx.conf
 			;;
 		postfixadmin)
 			rm -rf /var/www/mail 2> /dev/null
