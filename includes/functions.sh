@@ -232,6 +232,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/postfix/sql/*
 			;;
 		dovecot)
+			[[ -z $(grep fs.inotify.max_user_instances /etc/sysctl.conf) ]] && echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.conf
+			sysctl -p > /dev/null
 			rm -rf /etc/dovecot/* 2> /dev/null
 			cp -R dovecot/conf/*.conf /etc/dovecot/
 			userdel vmail 2> /dev/null
