@@ -163,6 +163,11 @@ EOF
 			fi
 			;;
 		installpackages)
+			if [[ ! -f /etc/ssl/certs/ssl-cert-snakeoil.pem ]]; then
+				echo "$(textb [INFO]) Generating snakeoil certificate to satisfy package installation..."
+				apt-get -y update >/dev/null ; apt-get -y install ssl-cert >/dev/null
+				/usr/sbin/make-ssl-cert generate-default-snakeoil --force-overwrite
+			fi
 			echo "Installing packages unattended, please stand by, errors will be reported."
 			apt-get -y update >/dev/null
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
