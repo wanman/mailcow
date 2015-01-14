@@ -153,7 +153,8 @@ EOF
 				hostnamectl set-hostname $sys_hostname
 			else
 				echo $sys_hostname > /etc/hostname
-				service hostname.sh start
+				hostname $sys_hostname > /dev/null 2>&1
+				service hostname.sh start > /dev/null 2>&1
 			fi
 			if [[ -f /usr/share/zoneinfo/$sys_timezone ]] ; then
 				echo $sys_timezone > /etc/timezone
@@ -259,6 +260,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown -R vmail:vmail /var/vmail
 			cp dovecot/conf/doverecalcq /etc/cron.daily/; chmod 755 /etc/cron.daily/doverecalcq
 			cp dovecot/conf/spamlearn /etc/cron.daily/; chmod 755 /etc/cron.daily/spamlearn
+			cp dovecot/conf/spamassassin_heinlein /etc/cron.daily/; chmod 755 /etc/cron.daily/spamassassin_heinlein
 			;;
 		clamav)
 			service clamav-daemon stop
