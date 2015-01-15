@@ -36,3 +36,6 @@ conf_done="no"
 
 # Do not confirm to proceed
 inst_unattended="no"
+
+# Be verbose
+inst_debug="no"

@@ -124,6 +124,9 @@ checkconfig() {
 		echo
 		exit 1
 	fi
+	if [[ $inst_debug == "yes" ]]; then
+		set -x
+	fi
 }
 
 installtask() {
