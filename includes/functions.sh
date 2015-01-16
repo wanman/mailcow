@@ -378,9 +378,10 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 				echo "$(textb HINT): You may want to setup a TXT record for SPF, see spfwizard.com for further information (checked by Google DNS)" | tee -a installer.log
 			fi
 			;;
-		setupsuperadmin)
+                setupsuperadmin)
 			wget --quiet --no-check-certificate -O /dev/null https://localhost/pfadmin/setup.php
-			php /var/www/mail/pfadmin/scripts/postfixadmin-cli.php admin add $pfadmin_adminuser --password $pfadmin_adminpass --password2 $pfadmin_adminpass --superadmin
+			php /var/www/mail/pfadmin/scripts/postfixadmin-cli.php admin add $pfadmin_adminuser --password $pfadmin_adminpass --password2 $pfadmin_adminpass
+			mysql --defaults-file=/etc/mysql/debian.cnf -e "UPDATE $my_postfixdb.admin SET superadmin='1' WHERE username='$pfadmin_adminuser';"
 			;;
 	esac
 }
