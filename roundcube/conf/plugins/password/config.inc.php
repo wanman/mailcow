@@ -2,8 +2,9 @@
 $config['password_driver'] = 'sql';
 $config['password_db_dsn'] = 'mysql://my_postfixuser:my_postfixpass@localhost/my_postfixdb';
 $config['password_query'] = 'UPDATE mailbox SET password=%c WHERE username=%u';
+$config['password_crypt_hash'] = 'sha512';
 $config['password_dovecotpw'] = '/usr/bin/doveadm pw';
-$config['password_dovecotpw_method'] = 'MD5-CRYPT';
+$config['password_dovecotpw_method'] = 'SHA512-CRYPT';
 $config['password_dovecotpw_with_method'] = false;
 $config['password_confirm_current'] = true;
 $config['password_minimum_length'] = 8;
