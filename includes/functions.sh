@@ -172,6 +172,10 @@ EOF
 				apt-get -y update >/dev/null ; apt-get -y install ssl-cert >/dev/null
 				/usr/sbin/make-ssl-cert generate-default-snakeoil --force-overwrite
 			fi
+            if [[ ! -z $(grep wheezy-backports /etc/apt/sources.list) ]]; then
+				echo "$(textb [INFO]) Installing python-magic from backports..."
+				apt-get -y update >/dev/null ; apt-get -y install python-magic -t wheezy-backports >/dev/null
+			fi
 			echo "Installing packages unattended, please stand by, errors will be reported."
 			apt-get -y update >/dev/null
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
