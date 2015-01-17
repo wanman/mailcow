@@ -114,6 +114,7 @@ returnwait "Completing Postfixadmin setup" "Checking DNS settings"
 installtask checkdns
 returnwait "Checking DNS settings" "Finish installation"
 
+echo $fufix_version > /etc/fufix_version
 chmod 600 installer.log
 echo
 echo "`tput setaf 2`Finished installation`tput sgr0`"
