@@ -84,7 +84,7 @@ checkports() {
 		echo "$(redb [ERR]) - Please install $(textb netcat) before running this script"
 		exit 1
 	fi
-	for port in 25 80 143 443 465 587 993 995
+	for port in 25 80 143 443 465 587 993 995 3306
 	do
 	    if [[ $(nc -z localhost $port; echo $?) -eq 0 ]]; then
 	        echo "$(redb [ERR]) - An application is blocking the installation on Port $(textb $port)"
