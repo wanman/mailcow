@@ -31,11 +31,13 @@ cert_state="NRW"
 cert_city="DUS"
 cert_org="MAIL"
 
-# Done?
-conf_done="no"
-
 # Do not confirm to proceed
 inst_unattended="no"
 
 # Be verbose
 inst_debug="no"
+
+#########
+# Done? #
+#########
+conf_done="no"
