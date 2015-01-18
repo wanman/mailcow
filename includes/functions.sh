@@ -2,6 +2,7 @@ textb() { echo $(tput bold)${1}$(tput sgr0); }
 greenb() { echo $(tput bold)$(tput setaf 2)${1}$(tput sgr0); }
 redb() { echo $(tput bold)$(tput setaf 1)${1}$(tput sgr0); }
 yellowb() { echo $(tput bold)$(tput setaf 3)${1}$(tput sgr0); }
+pinkb() { echo $(tput bold)$(tput setaf 5)${1}$(tput sgr0); }
 
 usage() {
 	echo "fufix install script command-line parameters."
@@ -26,13 +27,12 @@ genpasswd() {
 }
 
 returnwait() {
-	echo
-    echo "$1 - $(greenb [OK])";
-    echo "Proceeding with $(textb "$2")"
-	if [[ $inst_unattended != "yes" ]]; then
-		read -p "Press ENTER to continue or CTRL-C to cancel installation"
-	fi
-	echo
+		echo "$(greenb [OK]) - Task $(textb "$1") completed"
+		echo "----------------------------------------------"
+		if [[ $inst_unattended != "yes" ]]; then
+			read -p "$(yellowb !) Press ENTER to continue with task $(textb "$2") (CTRL-C to abort) "
+		fi
+		echo "$(pinkb [RUNNING]) - Task $(textb "$2") started, please wait..."
 }
 
 is_ipv6() {
@@ -147,12 +147,12 @@ EOF
 						echo $getpublicipv6 $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
 					fi
 			else
-				echo "Cannot set your hostname!"
+				echo "$(redb [ERR]) - Cannot set your hostname!"
 				exit 1
 			fi
 			if [[ -f /lib/systemd/systemd ]]; then
-				echo "Checking dbus, this may take a few seconds..."
-				apt-get -y update >/dev/null ; apt-get -y install dbus >/dev/null
+				echo "$(textb [INFO]) - Checking for dbus, this may take a few seconds..."
+				apt-get -y update > /dev/null ; apt-get -y install dbus > /dev/null
 				hostnamectl set-hostname $sys_hostname
 			else
 				echo $sys_hostname > /etc/hostname
@@ -161,28 +161,37 @@ EOF
 			fi
 			if [[ -f /usr/share/zoneinfo/$sys_timezone ]] ; then
 				echo $sys_timezone > /etc/timezone
-				dpkg-reconfigure -f noninteractive tzdata
+				dpkg-reconfigure -f noninteractive tzdata > /dev/null 2>&1
+				if [ "$?" -ne "0" ]; then
+					echo "$(redb [ERR]) - Timezone configuration failed: dpkg returned exit code != 0"
+					exit 1
+				fi
 			else
-				echo "$(yellowb WARNING): Cannot set your timezone: timezone is unknown"
+				echo "$(redb [ERR]) - Cannot set your timezone: timezone is unknown"
+				exit 1
 			fi
 			;;
 		installpackages)
 			if [[ ! -f /etc/ssl/certs/ssl-cert-snakeoil.pem ]]; then
-				echo "$(textb [INFO]) Generating snakeoil certificate to satisfy package installation..."
+				echo "$(textb [INFO]) - Generating snakeoil certificate to satisfy package installation..."
 				apt-get -y update >/dev/null ; apt-get -y install ssl-cert >/dev/null
 				/usr/sbin/make-ssl-cert generate-default-snakeoil --force-overwrite
 			fi
             if [[ ! -z $(grep wheezy-backports /etc/apt/sources.list) ]]; then
-				echo "$(textb [INFO]) Installing python-magic from backports..."
+				echo "$(textb [INFO]) - Installing python-magic from backports..."
 				apt-get -y update >/dev/null ; apt-get -y install python-magic -t wheezy-backports >/dev/null
 			fi
-			echo "Installing packages unattended, please stand by, errors will be reported."
+			echo "$(textb [INFO]) - Installing packages unattended, please stand by, errors will be reported."
 			apt-get -y update >/dev/null
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
 python-magic libmail-spf-perl libmail-dkim-perl openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server nginx-extras mailutils \
 postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin >/dev/null
+			if [ "$?" -ne "0" ]; then
+				echo "$(redb [ERR]) - Package installation failed"
+				exit 1
+			fi
 			mkdir -p /etc/dovecot/private/
 			cp /etc/ssl/certs/ssl-cert-snakeoil.pem /etc/dovecot/dovecot.pem
 			cp /etc/ssl/private/ssl-cert-snakeoil.key /etc/dovecot/dovecot.key
@@ -270,13 +279,11 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			cp dovecot/conf/spamassassin_heinlein /etc/cron.daily/; chmod 755 /etc/cron.daily/spamassassin_heinlein
 			;;
 		clamav)
-			service clamav-daemon stop
 			service clamav-freshclam stop
-			freshclam
 			sed -i '/MaxFileSize/c\MaxFileSize 25M' /etc/clamav/clamd.conf
 			sed -i '/StreamMaxLength/c\StreamMaxLength 25M' /etc/clamav/clamd.conf
+			freshclam
 			service clamav-freshclam start
-			service clamav-daemon start
 			;;
 		spamassassin)
 			cp spamassassin/conf/local.cf /etc/spamassassin/local.cf
@@ -355,7 +362,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed "s/*.*;auth,authpriv.none/*.*;auth,mail.none,authpriv.none/" -i /etc/rsyslog.conf
 			;;
 		restartservices)
-			[[ -f /lib/systemd/systemd ]] && echo "Restarting services, this may take a few seconds..."
+			[[ -f /lib/systemd/systemd ]] && echo "$(textb [INFO]) - Restarting services, this may take a few seconds..."
 			cat /dev/null > /var/log/mail.err
 			cat /dev/null > /var/log/mail.warn
 			cat /dev/null > /var/log/mail.log
@@ -369,17 +376,17 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		checkdns)
 			if [[ -z $(dig -x $getpublicipv4 @8.8.8.8 | grep -i $sys_domain) ]]; then
-				echo "$(yellowb WARNING): Remember to setup a PTR record: $getpublicipv4 does not point to $sys_domain (checked by Google DNS)" | tee -a installer.log
+				echo "$(yellowb [WARN]) - Remember to setup a PTR record: $getpublicipv4 does not point to $sys_domain (checked by Google DNS)" | tee -a installer.log
 			fi
 			if [[ -z $(dig $sys_hostname.$sys_domain @8.8.8.8 | grep -i $getpublicipv4) ]]; then
-				echo "$(yellowb WARNING): Remember to setup an A + MX record for $sys_hostname.$sys_domain pointing to $getpublicipv4 (checked by Google DNS)" | tee -a installer.log
+				echo "$(yellowb [WARN]) - Remember to setup an A + MX record for $sys_hostname.$sys_domain pointing to $getpublicipv4 (checked by Google DNS)" | tee -a installer.log
 			else
 				if [[ -z $(dig mx $sys_domain @8.8.8.8 | grep -i $sys_hostname.$sys_domain) ]]; then
-					echo "$(yellowb WARNING): Remember to setup a MX record pointing to this server (checked by Google DNS)" | tee -a installer.log
+					echo "$(yellowb [WARN]) - Remember to setup a MX record pointing to this server (checked by Google DNS)" | tee -a installer.log
 				fi
 			fi
 			if [[ -z $(dig $sys_domain txt @8.8.8.8 | grep -i spf) ]]; then
-				echo "$(textb HINT): You may want to setup a TXT record for SPF, see spfwizard.com for further information (checked by Google DNS)" | tee -a installer.log
+				echo "$(textb [HINT]) - You may want to setup a TXT record for SPF, see spfwizard.com for further information (checked by Google DNS)" | tee -a installer.log
 			fi
 			;;
                 setupsuperadmin)
@@ -392,6 +399,10 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 upgradetask() {
 	if [[ -z $1 || ! -f $1 ]]; then
 		echo "$(redb [ERR]) - \"$1\" is not a valid file"
+		return 1
+	fi
+	if [[ ! -f /etc/fufix_version ]]; then
+		echo "$(redb [ERR]) - Upgrade not yet supported"
 		return 1
 	fi
 	sys_hostname=$(hostname)
