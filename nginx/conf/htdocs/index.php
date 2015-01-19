@@ -41,7 +41,9 @@ a:active,a:hover,a:link,a:visited{color:inherit;text-decoration:none;outline: 0;
   <li>Port 587 STARTTLS</li>
 </ul>
 </p>
-
+<?php
+if (file_exists("/usr/local/bin/radicale")) {
+?>
 <div class="line"></div>
 <h3>Cal- and CardDAV client settings</h3>
 <p><b>CalDAV access</b>
@@ -54,7 +56,7 @@ a:active,a:hover,a:link,a:visited{color:inherit;text-decoration:none;outline: 0;
 </ul>
 * the trailing slash is required.
 </p>
-
+<?php } ?>
 <div class="line"></div>
 
 <h3>Health check</h3>
