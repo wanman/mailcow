@@ -213,14 +213,29 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_postfixdb; GRANT ALL PRIVILEGES ON $my_postfixdb.* TO '$my_postfixuser'@'localhost' IDENTIFIED BY '$my_postfixpass';"
 			mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'localhost' IDENTIFIED BY '$my_rcpass';"
 			;;
+		radicale)
+			userdel radicale 2> /dev/null
+			groupadd radicale
+			useradd -g radicale -s /bin/false radicale
+			mkdir /etc/radicale 2> /dev/null
+			mkdir -p /var/lib/radicale/collections 2> /dev/null
+			touch /var/log/radicale.log 2> /dev/null
+			chown -R radicale: /var/{lib,log}/radicale*
+			tar xf radicale/inst/$radicale_version.tar -C radicale/inst/ 2> /dev/null
+			(cd radicale/inst/$radicale_version ; python setup.py -q install)
+			cp radicale/conf/{config,logging} /etc/radicale/
+			cp radicale/conf/radicale.init /etc/init.d/radicale
+			chmod +x /etc/init.d/radicale
+			update-rc.d radicale defaults
+			rm -rf radicale/inst/$radicale_version
 		fuglu)
-			mkdir /var/log/fuglu 2> /dev/null
 			userdel fuglu 2> /dev/null
 			groupadd fuglu
 			useradd -g fuglu -s /bin/false fuglu
 			usermod -a -G debian-spamd fuglu
 			usermod -a -G clamav fuglu
 			rm /tmp/fuglu_control.sock 2> /dev/null
+			mkdir /var/log/fuglu 2> /dev/null
 			chown fuglu:fuglu /var/log/fuglu
 			tar xf fuglu/inst/$fuglu_version.tar -C fuglu/inst/ 2> /dev/null
 			(cd fuglu/inst/$fuglu_version ; python setup.py -q install)
