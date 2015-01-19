@@ -73,7 +73,14 @@ installtask ssl
 returnwait "Self-signed certificate" "MySQL configuration"
 
 installtask mysql
-returnwait "MySQL configuration" "FuGlu setup"
+returnwait "MySQL configuration" "Radicale setup"
+
+if [[ $inst_with_dav == "yes" ]]; then
+installtask radicale
+returnwait "Radicale setup" "FuGlu setup"
+else
+echo "Skipping Radicale setup..."
+fi
 
 installtask fuglu
 returnwait "FuGlu setup" "Postfix configuration"
