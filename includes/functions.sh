@@ -213,29 +213,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_postfixdb; GRANT ALL PRIVILEGES ON $my_postfixdb.* TO '$my_postfixuser'@'localhost' IDENTIFIED BY '$my_postfixpass';"
 			mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'localhost' IDENTIFIED BY '$my_rcpass';"
 			;;
-		radicale)
-			userdel radicale 2> /dev/null
-			groupadd radicale
-			useradd -g radicale -s /bin/false radicale
-			mkdir /etc/radicale 2> /dev/null
-			mkdir -p /var/lib/radicale/collections 2> /dev/null
-			touch /var/log/radicale.log 2> /dev/null
-			tar xf radicale/inst/$radicale_version.tar -C radicale/inst/ 2> /dev/null
-			(cd radicale/inst/$radicale_version ; python setup.py -q install)
-			cp radicale/conf/{config,logging} /etc/radicale/
-			cp radicale/conf/radicale.init /etc/init.d/radicale
-			chmod +x /etc/init.d/radicale
-			update-rc.d radicale defaults
-			rm -rf radicale/inst/$radicale_version
-			cp radicale/conf/defaults/* /var/lib/radicale/
-            chown -R radicale: /var/{lib,log}/radicale*
-			chmod +x /var/lib/radicale/create.sh
-			cp /etc/ssl/mail/mail.key /etc/ssl/mail/mail_radicale.key
-			chown radicale:radicale /etc/ssl/mail/mail_radicale.key
-			if [[ -z $(grep radicale /etc/sudoers) ]]; then
-				echo 'www-data ALL=(radicale) NOPASSWD: /var/lib/radicale/create.sh' >> /etc/sudoers
-			fi
-			;;
 		fuglu)
 			userdel fuglu 2> /dev/null
 			groupadd fuglu
@@ -390,7 +367,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			cat /dev/null > /var/log/mail.warn
 			cat /dev/null > /var/log/mail.log
 			cat /dev/null > /var/log/mail.info
-			for var in fail2ban radicale rsyslog nginx php5-fpm clamav-daemon clamav-freshclam spamassassin fuglu mysql dovecot postfix
+			for var in fail2ban rsyslog nginx php5-fpm clamav-daemon clamav-freshclam spamassassin fuglu mysql dovecot postfix
 			do
 				service $var stop
 				sleep 1.5
@@ -467,7 +444,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 "
 	read -p "Press ENTER to continue or CTRL-C to cancel the upgrade process"
 	echo -en "\nStopping services, this may take a few seconds... \t\t"
-	for var in fail2ban radicale rsyslog nginx php5-fpm clamav-daemon clamav-freshclam spamassassin fuglu dovecot postfix
+	for var in fail2ban rsyslog nginx php5-fpm clamav-daemon clamav-freshclam spamassassin fuglu dovecot postfix
 	do
 		service $var stop > /dev/null 2>&1
 	done
@@ -475,7 +452,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 	echo -en "Creating backups in ./before_upgrade_$timestamp... \t"
 		mkdir before_upgrade_$timestamp
 		cp -R /var/www/mail/ before_upgrade_$timestamp/mail_wwwroot
-		cp -R /etc/{fuglu,postfix,radicale,dovecot,spamassassin,fail2ban,nginx,mysql,clamav,php5} before_upgrade_$timestamp/
+		cp -R /etc/{fuglu,postfix,dovecot,spamassassin,fail2ban,nginx,mysql,clamav,php5} before_upgrade_$timestamp/
 	echo -e "$(greenb "[OK]")"
 
     echo "Update CA certificate store (self-signed only)..."

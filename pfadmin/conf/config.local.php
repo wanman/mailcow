@@ -25,5 +25,4 @@ $CONF['fetchmail'] = 'NO';
 $CONF['show_footer_text'] = 'NO';
 $CONF['used_quotas'] = 'YES';
 $CONF['emailcheck_resolve_domain'] = 'NO';
-$CONF['mailbox_postcreation_script']='sudo -u radicale /var/lib/radicale/create.sh';
 ?>
