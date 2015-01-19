@@ -122,5 +122,5 @@ echo "Logged credentials and further information to file `tput bold`installer.lo
 echo
 echo "Next steps:"
 echo " * Backup installer.log to a safe place and delete it"
-echo " * Open \"https://$sys_hostname.$sys_domain\", select \"System Settings\" and login as Postfix Administrator to create a mailbox."
+echo " * Open \"https://$sys_hostname.$sys_domain\" and login to Postfixadmin as Postfix Administrator to create a domain and a mailbox."
 echo
