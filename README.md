@@ -114,6 +114,7 @@ If there is any firewall, unblock the following ports for incoming connections:
 | Dovecot ManageSieve   | TCP      | 4190 |
 | Nginx HTTPS           | TCP      | 443  |
 | Nginx HTTP (Redirect) | TCP      | 80   |
+| Radicale DAV          | TCP      | 5252 |
 
 # Installation
 **Please run all commands as root**
