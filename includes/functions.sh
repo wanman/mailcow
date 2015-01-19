@@ -391,6 +391,11 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 				sleep 1.5
 				service $var start
 			done
+			if [[ $inst_with_dav == "yes" ]]; then
+				service radicale stop
+				sleep 1.5
+				service radicale start
+			fi
 			;;
 		checkdns)
 			if [[ -z $(dig -x $getpublicipv4 @8.8.8.8 | grep -i $sys_domain) ]]; then
