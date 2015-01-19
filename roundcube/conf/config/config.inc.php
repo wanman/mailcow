@@ -17,7 +17,7 @@ $config['plugins'] = array(
 	'attachment_reminder',
 	'new_user_dialog',
 );
-$config['skin'] = 'classic';
+$config['skin'] = 'larry';
 $config['login_autocomplete'] = 2;
 $config['imap_cache'] = 'apc';
 $config['username_domain'] = '%d';
