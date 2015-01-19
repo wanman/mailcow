@@ -31,6 +31,9 @@ cert_state="NRW"
 cert_city="DUS"
 cert_org="MAIL"
 
+# Enable Radicale CalDAV/CardDAV Server
+inst_with_dav="yes"
+
 # Do not confirm to proceed
 inst_unattended="no"
 
