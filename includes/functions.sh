@@ -228,6 +228,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chmod +x /etc/init.d/radicale
 			update-rc.d radicale defaults
 			rm -rf radicale/inst/$radicale_version
+			cp /etc/ssl/mail/mail.key /etc/ssl/mail/mail_radicale.key
+			chown radicale:radicale /etc/ssl/mail/mail_radicale.key
 			;;
 		fuglu)
 			userdel fuglu 2> /dev/null

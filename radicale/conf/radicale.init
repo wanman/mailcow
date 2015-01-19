@@ -1,14 +1,14 @@
 #! /bin/sh
 ### BEGIN INIT INFO
-# Provides:		radicale
-# Required-Start:	$remote_fs
-# Required-Stop:	$remote_fs
-# Should-Start:		$syslog
-# Default-Start:	2 3 4 5
-# Default-Stop:		1
-# Short-Description:	Radicale CalDAV and CardDAV server
-# Description:		Start/Stop the Radicale CalDAV and CardDAV
-#			server, configurable via /etc/default/radicale.
+# Provides:             radicale
+# Required-Start:       $remote_fs
+# Required-Stop:        $remote_fs
+# Should-Start:         $syslog
+# Default-Start:        2 3 4 5
+# Default-Stop:         1
+# Short-Description:    Radicale CalDAV and CardDAV server
+# Description:          Start/Stop the Radicale CalDAV and CardDAV
+#                       server, configurable via /etc/default/radicale.
 ### END INIT INFO
 
 # Author: Martin Stigge <martin@stigge.org>
@@ -30,85 +30,76 @@ SCRIPTNAME=/etc/init.d/$NAME
 
 RADICALE_OPTS="-C /etc/radicale/config"
 
-check_start_daemon() {
-	if [ ! "$ENABLE_RADICALE" = "yes" ]; then
-		[ "$VERBOSE" != no ] && \
-			log_warning_msg "Not starting radicale, disabled via /etc/default/radicale"
-		return 1
-	else
-		return 0
-	fi
-}
 
 do_start()
 {
-	for dir in $RUNDIR; do
-		if [ ! -d $dir ]; then
-			mkdir -p $dir
-		fi
-		if ! dpkg-statoverride --list $dir >/dev/null 2>&1; then
-			chown $DAEMON_UID:$DAEMON_GID $dir
-			chmod g-w,o-rwx $dir
-		fi
-	done
+        for dir in $RUNDIR; do
+                if [ ! -d $dir ]; then
+                        mkdir -p $dir
+                fi
+                if ! dpkg-statoverride --list $dir >/dev/null 2>&1; then
+                        chown $DAEMON_UID:$DAEMON_GID $dir
+                        chmod g-w,o-rwx $dir
+                fi
+        done
 
-	start-stop-daemon --start --quiet --pidfile $PIDFILE --startas $DAEMON \
-		--name $NAME --test > /dev/null \
-		|| return 1
-	start-stop-daemon --start --quiet --pidfile $PIDFILE --startas $DAEMON \
-		--name $NAME --umask 0027 --chuid $DAEMON_UID:$DAEMON_GID -- \
-		--pid=$PIDFILE $RADICALE_OPTS \
-		|| return 2
+        start-stop-daemon --start --quiet --pidfile $PIDFILE --startas $DAEMON \
+                --name $NAME --test > /dev/null \
+                || return 1
+        start-stop-daemon --start --quiet --pidfile $PIDFILE --startas $DAEMON \
+                --name $NAME --umask 0027 --chuid $DAEMON_UID:$DAEMON_GID -- \
+                --pid=$PIDFILE $RADICALE_OPTS \
+                || return 2
 }
 
 do_stop()
 {
-	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
+        start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
 }
 
 case "$1" in
   start)
-	check_start_daemon || exit 0
-	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC " "$NAME"
-	do_start
-	case "$?" in
-		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
-		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
-	esac
+        [ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC " "$NAME"
+        do_start
+        case "$?" in
+                0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+                2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+        esac
   ;;
   stop)
-	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
-	do_stop
-	case "$?" in
-		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
-		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
-	esac
-	;;
+        [ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+        do_stop
+        case "$?" in
+                0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+                2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+        esac
+        ;;
   status)
-	status_of_proc "$DAEMON" "$NAME" && exit 0 || exit $?
-	;;
+        status_of_proc "$DAEMON" "$NAME" && exit 0 || exit $?
+        ;;
   restart|force-reload)
-	log_daemon_msg "Restarting $DESC" "$NAME"
-	do_stop
-	case "$?" in
-	  0|1)
-		do_start
-		case "$?" in
-			0) log_end_msg 0 ;;
-			1) log_end_msg 1 ;; # Old process is still running
-			*) log_end_msg 1 ;; # Failed to start
-		esac
-		;;
-	  *)
-		# Failed to stop
-		log_end_msg 1
-		;;
-	esac
-	;;
+        log_daemon_msg "Restarting $DESC" "$NAME"
+        do_stop
+        case "$?" in
+          0|1)
+                do_start
+                case "$?" in
+                        0) log_end_msg 0 ;;
+                        1) log_end_msg 1 ;; # Old process is still running
+                        *) log_end_msg 1 ;; # Failed to start
+                esac
+                ;;
+          *)
+                # Failed to stop
+                log_end_msg 1
+                ;;
+        esac
+        ;;
   *)
-	echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
-	exit 3
-	;;
+        echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
+        exit 3
+        ;;
 esac
 
 :
+
