@@ -48,11 +48,11 @@ if (file_exists("/usr/local/bin/radicale")) {
 <h3>Cal- and CardDAV client settings</h3>
 <p><b>CalDAV access</b>
 <ul>
-  <li>https://<?php echo $mailname; ?>:5252/user.name@domain.tld/caldav/</li>
+  <li>https://<?php echo $mailname; ?>:5252/user.name@domain.tld/Private.ics/</li>
 </ul>
 <b>CardDAV access</b> on <?php echo $mailname; ?><br />
 <ul>
-  <li>https://<?php echo $mailname; ?>:5252/user.name@domain.tld/carddav/</li>
+  <li>https://<?php echo $mailname; ?>:5252/user.name@domain.tld/AddressBook.vcf/</li>
 </ul>
 * the trailing slash is required.
 </p>
