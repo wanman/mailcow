@@ -32,7 +32,7 @@ cert_city="DUS"
 cert_org="MAIL"
 
 # Enable Radicale CalDAV/CardDAV Server
-inst_with_dav="yes"
+inst_with_dav="no"
 
 # Do not confirm to proceed
 inst_unattended="no"
