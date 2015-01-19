@@ -1,0 +1,37 @@
+[server]
+hosts = 0.0.0.0:5252
+daemon = True
+pid =
+ssl = True
+certificate = /etc/ssl/mail/mail.crt
+key = /etc/ssl/mail/mail.key
+protocol = PROTOCOL_TLSv1, PROTOCOL_TLSv1.1, PROTOCOL_TLSv1.2
+ciphers = DEFAULT:!LOW:!EXPORT:!aNULL:!eNULL:!SSLv2:!SSLv3
+dns_lookup = True
+base_prefix = /
+can_skip_base_prefix = False
+realm = Radicale - Password Required
+
+[encoding]
+request = utf-8
+stock = utf-8
+
+[auth]
+type = IMAP
+imap_hostname = localhost
+imap_port = 993
+imap_ssl = True
+
+[rights]
+type = owner_only
+custom_handler =
+
+[storage]
+type = filesystem
+filesystem_folder = /var/lib/radicale/collections
+
+[logging]
+config = /etc/radicale/logging
+debug = False
+full_environment = False
+

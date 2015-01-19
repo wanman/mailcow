@@ -23,6 +23,8 @@ service fuglu stop
 service mysql stop
 service dovecot stop
 service postfix stop
+service radicale stop
+update-rc.d -f radicale remove
 update-rc.d -f fail2ban remove
 update-rc.d -f fuglu remove
 systemctl disable fail2ban
@@ -60,11 +62,16 @@ rm -f /usr/local/bin/fuglu*
 rm -f /usr/bin/fuglu
 rm -f /usr/local/lib/python2.7/dist-packages/fuglu-0.6.2.egg-info
 rm -rf /usr/local/lib/python2.7/dist-packages/fail2ban-*
+rm -rf /usr/local/lib/python2.7/dist-packages/radicale
+rm -rf /usr/local/lib/python2.7/dist-packages/Radicale*
+rm -f /usr/local/bin/radicale
 rm -f /usr/local/bin/fail2ban*
 rm -rf /var/lib/mysql/
 rm -f /etc/init.d/fail2ban
 rm -f /etc/init.d/fuglu
 rm -rf /var/log/fuglu/
+rm -rf /var/lib/radicale
+rm -f /var/log/radicale.loh
 rm -f /var/run/fuglu.pid
 rm -rf /var/run/fail2ban/
 rm -f /var/log/fail2ban.log
