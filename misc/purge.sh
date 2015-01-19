@@ -11,7 +11,7 @@ echo '
 '
 read -p "Type \"confirm\" to continue: " confirminput
 [[ $confirminput == "confirm" ]] || exit 0
-
+echo "Please wait..."
 service fail2ban stop
 service rsyslog stop
 service nginx stop
@@ -71,7 +71,7 @@ rm -f /etc/init.d/fail2ban
 rm -f /etc/init.d/fuglu
 rm -rf /var/log/fuglu/
 rm -rf /var/lib/radicale
-rm -f /var/log/radicale.loh
+rm -f /var/log/radicale.log
 rm -f /var/run/fuglu.pid
 rm -rf /var/run/fail2ban/
 rm -f /var/log/fail2ban.log
