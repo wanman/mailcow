@@ -43,6 +43,19 @@ a:active,a:hover,a:link,a:visited{color:inherit;text-decoration:none;outline: 0;
 </p>
 
 <div class="line"></div>
+<h3>Cal- and CardDAV client settings</h3>
+<p><b>CalDAV access</b>
+<ul>
+  <li>https://<?php echo $mailname; ?>:5252/user.name@domain.tld/caldav/</li>
+</ul>
+<b>CardDAV access</b> on <?php echo $mailname; ?><br />
+<ul>
+  <li>https://<?php echo $mailname; ?>:5252/user.name@domain.tld/carddav/</li>
+</ul>
+* the trailing slash is required.
+</p>
+
+<div class="line"></div>
 
 <h3>Health check</h3>
 <a href="http://mxtoolbox.com/SuperTool.aspx?action=smtp:<?php echo `cat /etc/mailname` ?>" target="_blank">
