@@ -61,6 +61,7 @@ echo FuGlu version: $fuglu_version >> installer.log
 echo Fail2ban version: $fail2ban_version >> installer.log
 echo Postfixadmin Revision: $postfixadmin_revision >> installer.log
 echo Roundcube version: $roundcube_version >> installer.log
+echo Radicale version: $radicale_version >> installer.log
 echo --------------------------------- >> installer.log
 
 installtask environment
@@ -75,12 +76,8 @@ returnwait "Self-signed certificate" "MySQL configuration"
 installtask mysql
 returnwait "MySQL configuration" "Radicale setup"
 
-if [[ $inst_with_dav == "yes" ]]; then
 installtask radicale
 returnwait "Radicale setup" "FuGlu setup"
-else
-echo "Skipping Radicale setup..."
-fi
 
 installtask fuglu
 returnwait "FuGlu setup" "Postfix configuration"

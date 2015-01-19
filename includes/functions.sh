@@ -187,7 +187,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dnsutils python-sq
 python-magic libmail-spf-perl libmail-dkim-perl openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server nginx-extras mailutils \
-postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin >/dev/null
+postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam sudo spamassassin >/dev/null
 			if [ "$?" -ne "0" ]; then
 				echo "$(redb [ERR]) - Package installation failed"
 				exit 1
@@ -220,7 +220,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			mkdir /etc/radicale 2> /dev/null
 			mkdir -p /var/lib/radicale/collections 2> /dev/null
 			touch /var/log/radicale.log 2> /dev/null
-			chown -R radicale: /var/{lib,log}/radicale*
 			tar xf radicale/inst/$radicale_version.tar -C radicale/inst/ 2> /dev/null
 			(cd radicale/inst/$radicale_version ; python setup.py -q install)
 			cp radicale/conf/{config,logging} /etc/radicale/
@@ -228,8 +227,14 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chmod +x /etc/init.d/radicale
 			update-rc.d radicale defaults
 			rm -rf radicale/inst/$radicale_version
+			cp radicale/conf/defaults/* /var/lib/radicale/
+            chown -R radicale: /var/{lib,log}/radicale*
+			chmod +x /var/lib/radicale/create.sh
 			cp /etc/ssl/mail/mail.key /etc/ssl/mail/mail_radicale.key
 			chown radicale:radicale /etc/ssl/mail/mail_radicale.key
+			if [[ -z $(grep radicale /etc/sudoers) ]]; then
+				echo 'www-data ALL=(radicale) NOPASSWD: /var/lib/radicale/create.sh' >> /etc/sudoers
+			fi
 			;;
 		fuglu)
 			userdel fuglu 2> /dev/null
@@ -385,17 +390,12 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			cat /dev/null > /var/log/mail.warn
 			cat /dev/null > /var/log/mail.log
 			cat /dev/null > /var/log/mail.info
-			for var in fail2ban rsyslog nginx php5-fpm clamav-daemon clamav-freshclam spamassassin fuglu mysql dovecot postfix
+			for var in fail2ban radicale rsyslog nginx php5-fpm clamav-daemon clamav-freshclam spamassassin fuglu mysql dovecot postfix
 			do
 				service $var stop
 				sleep 1.5
 				service $var start
 			done
-			if [[ $inst_with_dav == "yes" ]]; then
-				service radicale stop
-				sleep 1.5
-				service radicale start
-			fi
 			;;
 		checkdns)
 			if [[ -z $(dig -x $getpublicipv4 @8.8.8.8 | grep -i $sys_domain) ]]; then
@@ -467,7 +467,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 "
 	read -p "Press ENTER to continue or CTRL-C to cancel the upgrade process"
 	echo -en "\nStopping services, this may take a few seconds... \t\t"
-	for var in fail2ban rsyslog nginx php5-fpm clamav-daemon clamav-freshclam spamassassin fuglu dovecot postfix
+	for var in fail2ban radicale rsyslog nginx php5-fpm clamav-daemon clamav-freshclam spamassassin fuglu dovecot postfix
 	do
 		service $var stop > /dev/null 2>&1
 	done
@@ -475,7 +475,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 	echo -en "Creating backups in ./before_upgrade_$timestamp... \t"
 		mkdir before_upgrade_$timestamp
 		cp -R /var/www/mail/ before_upgrade_$timestamp/mail_wwwroot
-		cp -R /etc/{fuglu,postfix,dovecot,spamassassin,fail2ban,nginx,mysql,clamav,php5} before_upgrade_$timestamp/
+		cp -R /etc/{fuglu,postfix,radicale,dovecot,spamassassin,fail2ban,nginx,mysql,clamav,php5} before_upgrade_$timestamp/
 	echo -e "$(greenb "[OK]")"
 
     echo "Update CA certificate store (self-signed only)..."
