@@ -2,6 +2,12 @@ smtp      inet  n       -       -       -       -       smtpd
   -o smtpd_proxy_filter=127.0.0.1:10025
   -o smtpd_client_connection_count_limit=10
   -o smtpd_proxy_options=speed_adjust
+127.0.0.1:10029      inet  n       -       -       -       -       smtpd
+  -o smtpd_proxy_filter=127.0.0.1:10025
+  -o smtpd_client_connection_count_limit=10
+  -o smtpd_proxy_options=speed_adjust
+  -o smtpd_tls_auth_only=no
+  -o mynetworks=
 submission inet n       -       -       -       -       smtpd
   -o smtpd_proxy_filter=127.0.0.1:10025
   -o smtpd_client_connection_count_limit=10

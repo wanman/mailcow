@@ -97,7 +97,7 @@ mydestination = mail.domain.tld, localhost.domain.tld, localhost
 relayhost =
 
 # Trusted SMTP clients with more privileges. Trusted clients can relay mail.
-mynetworks = 127.0.0.1
+mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
 
 # The maximal size of any -local- individual mailbox
 mailbox_size_limit = 0
