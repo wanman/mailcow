@@ -29,9 +29,9 @@ server {
 	root /var/www/mail;
 	index index.html index.htm index.php;
 
-    location ^~ /rc/logs {
-        deny all;
-    }
+	location ~ ^/(rc/logs|pfadmin/ADDITIONS)/ {
+		deny all;
+	}
 
 	location ~ /(\.ht) {
 		deny all;
