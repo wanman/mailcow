@@ -29,6 +29,8 @@ server {
 	root /var/www/mail;
 	index index.html index.htm index.php;
 
+	rewrite /.well-known/autoconfig/mail/config-v1.1.xml /autoconfig.xml permanent;
+
 	location ~ ^/(rc/logs|pfadmin/ADDITIONS)/ {
 		deny all;
 	}

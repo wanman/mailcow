@@ -310,20 +310,21 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		postfixadmin)
 			rm -rf /var/www/mail 2> /dev/null
-			mkdir -p /var/www/mail/pfadmin
-			cp nginx/conf/htdocs/index.php /var/www/mail/
-			cp nginx/conf/htdocs/robots.txt /var/www/mail/
-			cp nginx/conf/htdocs/autoconfig.xml /var/www/mail/
-			sed -i "s/fufix_sub/$sys_hostname/g" /var/www/mail/autoconfig.xml
-			tar xf pfadmin/inst/$postfixadmin_revision.tar -C pfadmin/inst/
+            tar xf pfadmin/inst/$postfixadmin_revision.tar -C pfadmin/inst/
+			mkdir -p /var/www/mail/pfadmin /var/run/fetchmail /etc/mail/postfixadmin 2> /dev/null
+			cp nginx/conf/htdocs/{index.php,robots.txt,autoconfig.xml} /var/www/mail/
 			mv pfadmin/inst/$postfixadmin_revision/* /var/www/mail/pfadmin/
+            cp /var/www/mail/pfadmin/ADDITIONS/fetchmail.pl /usr/local/bin/fetchmail.pl
 			cp pfadmin/conf/config.local.php /var/www/mail/pfadmin/config.local.php
-			sed -i "s/my_postfixpass/$my_postfixpass/g" /var/www/mail/pfadmin/config.local.php
-			sed -i "s/my_postfixuser/$my_postfixuser/g" /var/www/mail/pfadmin/config.local.php
-			sed -i "s/my_postfixdb/$my_postfixdb/g" /var/www/mail/pfadmin/config.local.php
-			sed -i "s/domain.tld/$sys_domain/g" /var/www/mail/pfadmin/config.local.php
+			cp pfadmin/conf/fetchmail.conf /etc/mail/postfixadmin/fetchmail.conf
+            cp pfadmin/conf/pfadminfetchmail /etc/cron.d/pfadminfetchmail
+            sed -i "s/fufix_sub/$sys_hostname/g" /var/www/mail/autoconfig.xml
+			sed -i "s/my_postfixpass/$my_postfixpass/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
+			sed -i "s/my_postfixuser/$my_postfixuser/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
+			sed -i "s/my_postfixdb/$my_postfixdb/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
+			sed -i "s/domain.tld/$sys_domain/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
 			sed -i "s/change-this-to-your.domain.tld/$sys_domain/g" /var/www/mail/pfadmin/config.inc.php
-			chown -R www-data: /var/www/
+			chmod +x /usr/local/bin/fetchmail.pl ; chown -R www-data: /var/www/ ; chown -R vmail: /var/run/fetchmail
 			rm -rf pfadmin/inst/$postfixadmin_revision
 			;;
 		roundcube)
