@@ -9,7 +9,7 @@ server {
 		return 301 https://$host$request_uri;
 	}
 
-	rewrite /.well-known/autoconfig/mail/config-v1.1.xml /autoconfig.xml permanent;
+	rewrite /.well-known/autoconfig/mail/config-v1.1.xml /autoconfig.xml last;
 }
 
 server {
@@ -29,7 +29,7 @@ server {
 	root /var/www/mail;
 	index index.html index.htm index.php;
 
-	rewrite /.well-known/autoconfig/mail/config-v1.1.xml /autoconfig.xml permanent;
+	rewrite /.well-known/autoconfig/mail/config-v1.1.xml /autoconfig.xml last;
 
 	location ~ ^/(rc/logs|pfadmin/ADDITIONS)/ {
 		deny all;
