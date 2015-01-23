@@ -1,14 +1,19 @@
+# SMTP on Port 25/tcp, advanced HELO restrictions
 smtp      inet  n       -       -       -       -       smtpd
   -o smtpd_proxy_filter=127.0.0.1:10025
   -o smtpd_client_connection_count_limit=10
   -o smtpd_proxy_options=speed_adjust
   -o smtpd_helo_restrictions=reject_non_fqdn_helo_hostname,reject_invalid_helo_hostname,reject_unknown_helo_hostname
+
+# SMTP on 127.0.0.1:10029, plain text authentication is fine here. Localhost is not in mynetworks!
 127.0.0.1:10029      inet  n       -       -       -       -       smtpd
   -o smtpd_proxy_filter=127.0.0.1:10025
   -o smtpd_client_connection_count_limit=10
   -o smtpd_proxy_options=speed_adjust
   -o smtpd_tls_auth_only=no
   -o mynetworks=
+
+# For external Users, no HELO checks to not block stupid mail clients. Authenticated clients and "mynetworks" only!
 submission inet n       -       -       -       -       smtpd
   -o smtpd_proxy_filter=127.0.0.1:10025
   -o smtpd_client_connection_count_limit=10
@@ -17,6 +22,7 @@ submission inet n       -       -       -       -       smtpd
   -o smtpd_enforce_tls=yes
   -o smtpd_tls_security_level=encrypt
   -o tls_preempt_cipherlist=yes
+
 pickup    fifo  n       -       -       60      1       pickup
 cleanup   unix  n       -       -       -       0       cleanup
 qmgr      fifo  n       -       n       300     1       qmgr
@@ -55,6 +61,8 @@ mailman   unix  -       n       n       -       -       pipe
   ${nexthop} ${user}
 dovecot   unix  -       n       n       -       -       pipe
   flags=DRhu user=vmail:vmail argv=/usr/lib/dovecot/deliver -d ${recipient}
+
+# Listener for FuGlu
 127.0.0.1:10026 inet n  -       n       -        -      smtpd
   -o smtpd_authorized_xforward_hosts=127.0.0.0/8
   -o smtpd_client_restrictions=
