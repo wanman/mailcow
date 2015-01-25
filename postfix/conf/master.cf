@@ -3,7 +3,7 @@ smtp      inet  n       -       -       -       -       smtpd
   -o smtpd_proxy_filter=127.0.0.1:10025
   -o smtpd_client_connection_count_limit=10
   -o smtpd_proxy_options=speed_adjust
-  -o smtpd_helo_restrictions=permit_sasl_authenticated,reject_non_fqdn_helo_hostname,reject_invalid_helo_hostname,reject_unknown_helo_hostname
+  -o smtpd_helo_restrictions=permit_mynetworks,permit_sasl_authenticated,reject_non_fqdn_helo_hostname,reject_invalid_helo_hostname,reject_unknown_helo_hostname
 
 # SMTP on 127.0.0.1:10029, plain text authentication is fine here. Localhost is not in mynetworks!
 127.0.0.1:10029      inet  n       -       -       -       -       smtpd
