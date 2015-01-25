@@ -68,11 +68,12 @@ A summary of what software is installed with which features enabled.
 * Autoconfiguration for Thunderbird
 * **A HTTPS Frontend**
 * Autolearn spam from mail moved to "Junk" folder
+* Installs and configures Fail2ban
 
 **Postfix**
-* Submission activated (TCP/587)
-* SMTPS disabled
-* Require TLS Authentification
+* Submission activated (TCP/587), TLS-only
+* No SMTPS on Port 465 (deprecated)
+* The restrictions used are a good compromise between blocking spam and avoiding false-positives
 * Included ZEN blocklist
 * In- and outgoing spam- and virus protection plus attachment filter via [FuGlu Mail Content Scanner](http://www.fuglu.org) (uses ClamAV and Spamassassin backend)
 * Reject infected mails, mark spam
@@ -89,6 +90,7 @@ A summary of what software is installed with which features enabled.
 **Postfixadmin**
 * Automatically creates an Administrator
 * Full quota support
+* Fetchmail support
 
 **Roundcube**
 * ManageSieve support (w/ vacation)
@@ -154,8 +156,9 @@ nano configuration
 * **my_rootpw** - MySQL root password is generated automatically by default. You can define a complex password here if you want to.
 * **pfadmin_adminuser and pfadmin_adminpass** - Postfixadmin superuser definition: **Username MUST end with a valid domain name** but **does NOT need to be yours**. "yourname@outlook.com" is fine, "yourname@domain.invalid" or "yourname@aname" is not. Password policy: minimum length 8 chars, must contain uppercase and lowercase letters and at least 2 digits. **You can use the default values**
 * **"cert-" vars** - Used for the self-signed certificate. CN will be the servers FQDN. "cert_country" must be a vaild two letter country code.
-* Set **conf_done** to **yes** or anything except "no".
+* **inst_debug** - Sets Bash mode -x
 * An unattended installation is possible, but not recommended ("inst_unattended")
+* Set **conf_done** to **yes** or anything except "no".
 
 **Empty configuration values are invalid!**
 
@@ -164,6 +167,8 @@ You are ready to start the script:
 ./install.sh
 ```
 Just be patient and confirm every step by pressing [ENTER] or [CTRL-C] to interrupt the installation.
+If you run into problems, try to locate the error with "inst_debug" enabled in your configuration.
+Please contact me when you need help or found a bug.
 
 More debugging is about to come. Though everything should work as intended.
 
@@ -259,9 +264,7 @@ The prefix "[SPAM]" is not important for the sieve filter and can be changed to 
 Default startup options for Spamassassin in `/etc/default/spamassassin`:
 - Enabled "spamd" by adding `ENABLED=1`
 - Enabled cronjob by setting `CRON=1`
-- Modified OPTIONS line to: 
-
- `OPTIONS="--create-prefs --max-children 5 --helper-home-dir --username debian-spamd"`.
+- Modified OPTIONS line to `OPTIONS="--create-prefs --max-children 5 --helper-home-dir --username debian-spamd"`.
 
 ### Max file size for virus scanning
 The file size limit for incoming attachments is set to 25M. This is defined with `MaxFileSize` in the main configuratin file.

@@ -123,4 +123,5 @@ echo
 echo "Next steps:"
 echo " * Backup installer.log to a safe place and delete it"
 echo " * Open \"https://$sys_hostname.$sys_domain\" and login to Postfixadmin as Postfix Administrator to create a domain and a mailbox."
+echo " * Please do not use Port 25 in your mail client, use Port 587 instead."
 echo
