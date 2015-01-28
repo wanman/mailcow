@@ -150,9 +150,9 @@ EOF
 				echo "$(redb [ERR]) - Cannot set your hostname!"
 				exit 1
 			fi
-			if [[ -z $(which whiptail) ]]; then
-				echo "$(textb [INFO]) - Installing whiptail as dialog frontend to satisfy dpkg..."
-				apt-get -y update > /dev/null ; apt-get -y install whiptail > /dev/null 2>&1
+			if [[ -z $(which whiptail) || ! -d /usr/share/doc/apt-utils ]]; then
+				echo "$(textb [INFO]) - Installing prerequisites to satisfy dpkg..."
+				apt-get -y update > /dev/null ; apt-get -y install whiptail apt-utils > /dev/null 2>&1
 			fi
 			if [[ -f /lib/systemd/systemd ]]; then
 				echo "$(textb [INFO]) - Checking for dbus, this may take a few seconds..."
