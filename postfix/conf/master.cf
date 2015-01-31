@@ -1,5 +1,8 @@
-# SMTP on Port 25/tcp, advanced HELO restrictions
-smtp      inet  n       -       -       -       -       smtpd
+# Postscreen on Port 25/tcp, filters zombies (spam machines) on first level with lowest costs
+smtp      inet  n       -       n       -       1       postscreen
+
+# Postscreen passes sane clients to the real SMTP daemon here
+smtpd      pass  -       -       n       -       -       smtpd
   -o smtpd_proxy_filter=127.0.0.1:10025
   -o smtpd_client_connection_count_limit=10
   -o smtpd_proxy_options=speed_adjust
@@ -22,6 +25,12 @@ submission inet n       -       -       -       -       smtpd
   -o smtpd_enforce_tls=yes
   -o smtpd_tls_security_level=encrypt
   -o tls_preempt_cipherlist=yes
+
+# Handles TLS connections for postscreen to make them readable
+tlsproxy  unix  -       -       n       -       0       tlsproxy
+
+# This implements an ad-hoc DNS white/blacklist lookup service
+dnsblog   unix  -       -       n       -       0       dnsblog
 
 pickup    fifo  n       -       -       60      1       pickup
 cleanup   unix  n       -       -       -       0       cleanup

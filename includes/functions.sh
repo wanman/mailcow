@@ -191,7 +191,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dnsutils python-sq
 python-magic libmail-spf-perl libmail-dkim-perl openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server nginx-extras mailutils \
-postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin >/dev/null
+postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin \
+fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl >/dev/null
 			if [ "$?" -ne "0" ]; then
 				echo "$(redb [ERR]) - Package installation failed"
 				exit 1
@@ -256,6 +257,10 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_postfixpass/$my_postfixpass/g" /etc/postfix/sql/*
 			sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/postfix/sql/*
 			sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/postfix/sql/*
+			# Instead of changing postscreen_cache_map do this
+			mkdir -p /var/spool/postfix/var/lib/postfix/
+			cp /var/lib/postfix/postscreen_cache.db /var/spool/postfix/var/lib/postfix/
+			chown postfix: /var/spool/postfix/var/lib/postfix/postscreen_cache.db
 			;;
 		dovecot)
 			[[ -z $(grep fs.inotify.max_user_instances /etc/sysctl.conf) ]] && echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.conf
