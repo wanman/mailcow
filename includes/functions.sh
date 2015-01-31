@@ -257,10 +257,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_postfixpass/$my_postfixpass/g" /etc/postfix/sql/*
 			sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/postfix/sql/*
 			sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/postfix/sql/*
-			# Instead of changing postscreen_cache_map do this
-			mkdir -p /var/spool/postfix/var/lib/postfix/
-			cp /var/lib/postfix/postscreen_cache.db /var/spool/postfix/var/lib/postfix/
-			chown postfix: /var/spool/postfix/var/lib/postfix/postscreen_cache.db
 			;;
 		dovecot)
 			[[ -z $(grep fs.inotify.max_user_instances /etc/sysctl.conf) ]] && echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.conf
