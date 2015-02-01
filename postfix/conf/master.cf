@@ -1,14 +1,13 @@
-# Postscreen on Port 25/tcp, filters zombies (spam machines) on first level with lowest costs
+# Postscreen on Port 25/tcp, filters zombies (spam machines) on first level with lowest costs.
 smtp      inet  n       -       n       -       1       postscreen
 
-# Postscreen passes sane clients to the real SMTP daemon here
+# Postscreen passes sane clients to the real SMTP daemon here.
 smtpd      pass  -       -       n       -       -       smtpd
   -o smtpd_proxy_filter=127.0.0.1:10025
   -o smtpd_client_connection_count_limit=10
   -o smtpd_proxy_options=speed_adjust
-  -o smtpd_helo_restrictions=permit_mynetworks,permit_sasl_authenticated,reject_non_fqdn_helo_hostname,reject_unknown_helo_hostname
 
-# SMTP on 127.0.0.1:10029, plain text authentication is fine here. Localhost is not in mynetworks!
+# SMTP on 127.0.0.1:10029, plain text authentication is fine here. No trusted networks. For roundcube.
 127.0.0.1:10029      inet  n       -       -       -       -       smtpd
   -o smtpd_proxy_filter=127.0.0.1:10025
   -o smtpd_client_connection_count_limit=10
@@ -16,7 +15,7 @@ smtpd      pass  -       -       n       -       -       smtpd
   -o smtpd_tls_auth_only=no
   -o mynetworks=
 
-# For external Users, no HELO checks to not block stupid mail clients. Authenticated clients and "mynetworks" only!
+# For mail submitting users. Authenticated clients and known networks only.
 submission inet n       -       -       -       -       smtpd
   -o smtpd_proxy_filter=127.0.0.1:10025
   -o smtpd_client_connection_count_limit=10
