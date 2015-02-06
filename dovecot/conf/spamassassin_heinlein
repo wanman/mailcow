@@ -1,5 +1,4 @@
 #!/bin/bash
-PATH=/usr/local/bin:/usr/local/sbin:/sbin:/usr/sbin:/bin:/usr/bin:/usr/bin/X11
-
-sa-update --nogpg --channel spamassassin.heinlein-support.de
-
+if [[ ! -z $(/usr/bin/sa-update --nogpg --channel spamassassin.heinlein-support.de -v | /bin/grep "no fresh updates were available") ]]; then
+exit 0
+fi
