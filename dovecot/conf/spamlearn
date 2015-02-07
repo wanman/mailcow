@@ -5,6 +5,7 @@ for domain in $(ls /var/vmail); do
 	if [[ $domain != "sieve" && -d /var/vmail/$domain ]]; then
 		for user in $(ls /var/vmail/$domain); do
 			[[ -d /var/vmail/$domain/$user/.Junk/cur ]] && sa-learn --no-sync --spam /var/vmail/$domain/$user/.Junk/cur > /dev/null
+            [[ -d /var/vmail/$domain/$user/cur ]] && sa-learn --no-sync --ham /var/vmail/$domain/$user/cur > /dev/null
 		done
 	fi
 done
