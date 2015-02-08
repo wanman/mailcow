@@ -86,10 +86,10 @@ alias_maps = hash:/etc/aliases
 alias_database = hash:/etc/aliases
 
 # The domain name that locally-posted mail appears to come from, and that locally posted mail is delivered to.
-myorigin = localhost
+myorigin = /etc/mailname
 
 # The list of domains that are delivered via the -local- mail delivery transport. No external domains like "yourdomain.tld" belong here!
-mydestination = localhost, localhost.localdomain
+mydestination = mail.domain.tld, localhost.domain.tld, localhost
 
 # We lookup MX records to send non-local mail, so this stays empty
 relayhost =
