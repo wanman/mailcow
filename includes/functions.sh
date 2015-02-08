@@ -191,7 +191,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dnsutils python-sq
 python-magic libmail-spf-perl libmail-dkim-perl openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server nginx-extras mailutils \
-postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin \
+postfix-mysql postfix-pcre spamassassin \
 fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl >/dev/null
 			if [ "$?" -ne "0" ]; then
 				echo "$(redb [ERR]) - Package installation failed"
@@ -217,29 +217,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			mysql --defaults-file=/etc/mysql/debian.cnf -e "DROP DATABASE IF EXISTS $my_postfixdb; DROP DATABASE IF EXISTS $my_rcdb;"
 			mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_postfixdb; GRANT ALL PRIVILEGES ON $my_postfixdb.* TO '$my_postfixuser'@'localhost' IDENTIFIED BY '$my_postfixpass';"
 			mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'localhost' IDENTIFIED BY '$my_rcpass';"
-			;;
-		fuglu)
-			userdel fuglu 2> /dev/null
-			groupadd fuglu
-			useradd -g fuglu -s /bin/false fuglu
-			usermod -a -G debian-spamd fuglu
-			usermod -a -G clamav fuglu
-			rm /tmp/fuglu_control.sock 2> /dev/null
-			mkdir /var/log/fuglu 2> /dev/null
-			chown fuglu:fuglu /var/log/fuglu
-			tar xf fuglu/inst/$fuglu_version.tar -C fuglu/inst/ 2> /dev/null
-			(cd fuglu/inst/$fuglu_version ; python setup.py -q install)
-			cp -R fuglu/conf/* /etc/fuglu/
-			if [[ -f /lib/systemd/systemd ]]; then
-				cp fuglu/inst/$fuglu_version/scripts/startscripts/centos_rhel/7/fuglu.service /lib/systemd/system/fuglu.service
-				ln -s /usr/local/bin/fuglu /usr/bin/fuglu
-				systemctl enable fuglu
-			else
-				cp fuglu/inst/$fuglu_version/scripts/startscripts/debian/7/fuglu /etc/init.d/fuglu
-				chmod +x /etc/init.d/fuglu
-				update-rc.d fuglu defaults
-			fi
-			rm -rf fuglu/inst/$fuglu_version
 			;;
 		postfix)
 			cp -R postfix/conf/* /etc/postfix/
@@ -283,16 +260,9 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			cp dovecot/conf/spamlearn /etc/cron.daily/; chmod 755 /etc/cron.daily/spamlearn
 			cp dovecot/conf/spamassassin_heinlein /etc/cron.daily/; chmod 755 /etc/cron.daily/spamassassin_heinlein
 			;;
-		clamav)
-			service clamav-freshclam stop
-			sed -i '/MaxFileSize/c\MaxFileSize 25M' /etc/clamav/clamd.conf
-			sed -i '/StreamMaxLength/c\StreamMaxLength 25M' /etc/clamav/clamd.conf
-			freshclam
-			service clamav-freshclam start
-			;;
 		spamassassin)
 			cp spamassassin/conf/local.cf /etc/spamassassin/local.cf
-			sed -i '/^OPTIONS=/s/=.*/="--create-prefs --max-children 5 --helper-home-dir --username debian-spamd --socketpath \/var\/run\/spamd.sock --socketowner debian-spamd --socketgroup debian-spamd"/' /etc/default/spamassassin
+			sed -i '/^OPTIONS=/s/=.*/="--create-prefs --max-children 5 --helper-home-dir"/' /etc/default/spamassassin
 			sed -i '/^CRON=/s/=.*/="1"/' /etc/default/spamassassin
 			sed -i '/^ENABLED=/s/=.*/="1"/' /etc/default/spamassassin
 			;;
@@ -373,7 +343,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			cat /dev/null > /var/log/mail.warn
 			cat /dev/null > /var/log/mail.log
 			cat /dev/null > /var/log/mail.info
-			for var in fail2ban rsyslog nginx php5-fpm clamav-daemon clamav-freshclam spamassassin fuglu mysql dovecot postfix
+			for var in fail2ban rsyslog nginx php5-fpm spamassassin mysql dovecot postfix
 			do
 				service $var stop
 				sleep 1.5
@@ -394,6 +364,9 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			if [[ -z $(dig $sys_domain txt @8.8.8.8 | grep -i spf) ]]; then
 				echo "$(textb [HINT]) - You may want to setup a TXT record for SPF, see spfwizard.com for further information (checked by Google DNS)" | tee -a installer.log
 			fi
+			if [[ ! -z $(host dbltest.com.dbl.spamhaus.org | grep NXDOMAIN) || ! -z $(cat /etc/resolv.conf | grep '^nameserver 8.8.') ]]; then
+				echo "$(redb [CRIT]) - You either use Google DNS service or another blocked DNS provider for blacklist lookups. Consider using another DNS server for better spam detection!"
+			fi
 			;;
 		setupsuperadmin)
 			echo "$(textb [INFO]) - Dont be confused if you see a PHP Notice..."
@@ -407,8 +380,8 @@ upgradetask() {
 		echo "$(redb [ERR]) - \"$1\" is not a valid file"
 		return 1
 	fi
-	if [[ ! -f /etc/fufix_version ]]; then
-		echo "$(redb [ERR]) - Upgrade not yet supported"
+	if [[ ! -f /etc/fufix_version || -z $(cat /etc/fufix_version | grep "0.6") ]]; then
+		echo "$(redb [ERR]) - Upgrade not supported"
 		return 1
 	fi
 	sys_hostname=$(hostname)
@@ -451,7 +424,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 "
 	read -p "Press ENTER to continue or CTRL-C to cancel the upgrade process"
 	echo -en "\nStopping services, this may take a few seconds... \t\t"
-	for var in fail2ban rsyslog nginx php5-fpm clamav-daemon clamav-freshclam spamassassin fuglu dovecot postfix
+	for var in fail2ban rsyslog nginx php5-fpm spamassassin dovecot postfix
 	do
 		service $var stop > /dev/null 2>&1
 	done
@@ -459,29 +432,23 @@ A backup will be stored in ./before_upgrade_$timestamp
 	echo -en "Creating backups in ./before_upgrade_$timestamp... \t"
 		mkdir before_upgrade_$timestamp
 		cp -R /var/www/mail/ before_upgrade_$timestamp/mail_wwwroot
-		cp -R /etc/{fuglu,postfix,dovecot,spamassassin,fail2ban,nginx,mysql,clamav,php5} before_upgrade_$timestamp/
+		cp -R /etc/{postfix,dovecot,spamassassin,fail2ban,nginx,mysql,php5} before_upgrade_$timestamp/
 	echo -e "$(greenb "[OK]")"
 
     echo "Update CA certificate store (self-signed only)..."
 	if [[ ! -z $(openssl x509 -issuer -in /etc/ssl/mail/mail.crt | grep $sys_hostname.$sys_domain ) ]]; then
 		cp /etc/ssl/mail/mail.crt /usr/local/share/ca-certificates/
 		update-ca-certificates
-		returnwait "Update CA certificate store" "FuGlu setup"
+		returnwait "Update CA certificate store" "Postfix configuration"
 	fi
 
-    returnwait "Update CA certificate store (skipped)" "FuGlu setup"
-
-	installtask fuglu
-	returnwait "FuGlu setup" "Postfix configuration"
+    returnwait "Update CA certificate store (skipped)" "Postfix configuration"
 
 	installtask postfix
 	returnwait "Postfix configuration" "Dovecot configuration"
 
 	installtask dovecot
-	returnwait "Dovecot configuration" "ClamAV configuration"
-
-	installtask clamav
-	returnwait "ClamAV configuration" "Spamassassin configuration"
+	returnwait "Dovecot configuration" "Spamassassin configuration"
 
 	installtask spamassassin
 	returnwait "Spamassassin configuration" "Nginx configuration"

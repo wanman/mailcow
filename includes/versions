@@ -1,6 +1,4 @@
-fuglu_version="0.6.2"
 fail2ban_version="0.9.1"
 postfixadmin_revision="1736"
-roundcube_version="1.0.4"
-fufix_version="0.7"
-
+roundcube_version="1.0.5"
+fufix_version="0.8"

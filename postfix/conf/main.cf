@@ -38,6 +38,9 @@ smtpd_delay_reject = yes
 # Enable elliptic curve cryptography, "ultra" needs more cpu time
 smtpd_tls_eecdh_grade = strong
 
+# Reject some attachments
+mime_header_checks = regexp:/etc/postfix/mime_header_checks
+
 # Sender, recipient, client and data restrictions
 smtpd_sender_restrictions = reject_authenticated_sender_login_mismatch,
    reject_sender_login_mismatch,
@@ -49,9 +52,11 @@ smtpd_sender_restrictions = reject_authenticated_sender_login_mismatch,
 smtpd_recipient_restrictions = permit_sasl_authenticated,
    permit_mynetworks,
    reject_unauth_destination,
+   check_helo_access hash:/etc/postfix/helo_access
    reject_non_fqdn_helo_hostname,
    reject_unknown_helo_hostname,
-   reject_unknown_reverse_client_hostname
+   reject_unknown_reverse_client_hostname,
+   reject_unauth_destination
 
 smtpd_data_restrictions =
    reject_unauth_pipelining,
@@ -73,7 +78,7 @@ smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
 # A custom list with secure ciphers.
 tls_high_cipherlist=EDH+CAMELLIA:EDH+aRSA:EECDH+aRSA+AESGCM:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH:+CAMELLIA256:+AES256:+CAMELLIA128:+AES128:+SSLv3:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!DSS:!RC4:!SEED:!ECDSA:CAMELLIA256-SHA:AES256-SHA:CAMELLIA128-SHA:AES128-SHA
 
-# Use the FQDN for the hostname!
+# Use the FQDN for the local hostname!
 myhostname = mail.domain.tld
 
 # Alias maps and database for -local- delivery only
@@ -81,10 +86,10 @@ alias_maps = hash:/etc/aliases
 alias_database = hash:/etc/aliases
 
 # The domain name that locally-posted mail appears to come from, and that locally posted mail is delivered to.
-myorigin = /etc/mailname
+myorigin = localhost
 
 # The list of domains that are delivered via the -local- mail delivery transport. No external domains like "yourdomain.tld" belong here!
-mydestination = mail.domain.tld, localhost.domain.tld, localhost
+mydestination = localhost, localhost.localdomain
 
 # We lookup MX records to send non-local mail, so this stays empty
 relayhost =

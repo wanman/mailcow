@@ -57,7 +57,6 @@ echo --------------------------------- >> installer.log
 echo FQDN: $sys_hostname.$sys_domain >> installer.log
 echo Timezone: $sys_timezone >> installer.log
 echo --------------------------------- >> installer.log
-echo FuGlu version: $fuglu_version >> installer.log
 echo Fail2ban version: $fail2ban_version >> installer.log
 echo Postfixadmin Revision: $postfixadmin_revision >> installer.log
 echo Roundcube version: $roundcube_version >> installer.log
@@ -73,19 +72,13 @@ installtask ssl
 returnwait "Self-signed certificate" "MySQL configuration"
 
 installtask mysql
-returnwait "MySQL configuration" "FuGlu setup"
-
-installtask fuglu
-returnwait "FuGlu setup" "Postfix configuration"
+returnwait "MySQL configuration" "Postfix configuration"
 
 installtask postfix
 returnwait "Postfix configuration" "Dovecot configuration"
 
 installtask dovecot
-returnwait "Dovecot configuration" "ClamAV configuration"
-
-installtask clamav
-returnwait "ClamAV configuration" "Spamassassin configuration"
+returnwait "Dovecot configuration" "Spamassassin configuration"
 
 installtask spamassassin
 returnwait "Spamassassin configuration" "Nginx configuration"
