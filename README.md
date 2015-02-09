@@ -241,7 +241,7 @@ The sites root location is `/var/www/mail/`. Any default site installed by "apt-
 A PHP socket configuration is located at `/etc/php5/fpm/pool.d/mail.conf`. 
 Some PHP parameters are set right here to override those in `/etc/php5/fpm/php.ini`.
 
-Nginx' default configuration file `/etc/nginx/nginx.conf` contains changes to enable chunking, a connection rate limit and more.
+Nginx' default configuration file is `/etc/nginx/nginx.conf`.
 
 ## Fail2ban
 A file `/etc/fail2ban/jail.local` is created with some pre-configured jails.
