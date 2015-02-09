@@ -304,7 +304,7 @@ doveadm search -u bob.cat@domain.com mailbox inbox subject important
 
 Want to delete Bobs messages older than 100 days?
 ```
-doveadm expunge -u bob.cat@domain.com mailbox inbox savedsince 100d
+doveadm expunge -u bob.cat@domain.com mailbox inbox savedbefore 100d
 ```
 
 From Dovecots wiki: Move jane's messages - received in September 2011 - from her INBOX into her archive.
