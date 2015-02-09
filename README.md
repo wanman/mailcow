@@ -15,6 +15,7 @@
     - [Disable for outgoing messages](#disable-for-outgoing-messages)
   - [Postfix](#postfix)
     - [Un/block certain attachment types](#unblock-certain-attachment-types)
+    - [Anonymize mail headers of outgoing mail](#anonymize-mail-headers-of-outgoing-mail)
   - [Nginx](#nginx)
   - [Fail2ban](#fail2ban)
   - [Postfixadmin](#postfixadmin)
@@ -233,6 +234,11 @@ For a quick overview of the restrictions [click here](https://github.com/andryyy
 Open `/etc/postfix/mime_header_checks` and change "(bat|com|exe|dll|vbs)" to whatever you want to reject.
 
 You can also comment out the whole line to stop blocking attachments.
+
+### Anonymize mail headers of outgoing mail
+Open `/etc/postfix/main.cf` and search for `#smtp_header_checks = pcre:/etc/postfix/smtp_header_checks.pcre`.
+
+You need to remove the leading "#" and reload Postfix: `postfix reload`
 
 ## Nginx
 A site for mail is copied to `/etc/nginx/sites-available` and enabled via symbolic link to `/etc/nginx/sites-enabled`.
