@@ -8,26 +8,22 @@
 - [Installation](#installation)
 - [Configuration and common tasks](#configuration-and-common-tasks)
   - [SSL certificate](#ssl-certificate)
-  - [FuGlu](#fuglu)
-    - [Filter mail](#filter-mail)
-    - [Filter statistics](#filter-statistics)
-  - [ClamAV and Spamassassin](#clamav-and-spamassassin)
+  - [Spamassassin](#spamassassin)
+    - [Autolearn](#autolearn)
     - [Spam rewrite](#spam-rewrite)
     - [Spamassassin daemon options](#spamassassin-daemon-options)
-    - [Max file size for virus scanning](#max-file-size-for-virus-scanning)
+    - [Disable for outgoing messages](#disable-for-outgoing-messages)
   - [Postfix](#postfix)
-    - [Message size limit](#message-size-limit)
   - [Nginx](#nginx)
   - [Fail2ban](#fail2ban)
   - [Postfixadmin](#postfixadmin)
   - [Dovecot](#dovecot)
-    - [Disallow insecure IMAP connections](#disallow-insecure-imap-connections)
     - [Trash folder quota](#trash-folder-quota)
     - [Dovecot SQL parameter](#dovecot-sql-parameter)
     - [Doveadm common tasks](#doveadm-common-tasks)
     - [Backup mail](#backup-mail)
   - [Roundcube](#roundcube)
-    - [Attachment size](#attachment-size)
+  - [Change attachment/message size](#change-attachmentmessage-size)
 - [Debugging](#debugging)
 - [Uninstall](#uninstall)
 
@@ -61,22 +57,22 @@ A summary of what software is installed with which features enabled.
 * System environment adjustments (Hostname, Timezone,...)
 * Automatically generated passwords with high complexity
 * Self-signed SSL certificate for all supported services
-* Nginx and PHP5 FPM fully optimized
+* Nginx and PHP5 fully optimized
 * MySQL database backend
 * DNS checks via Google DNS after setup
 * Syslog adjustments
 * Autoconfiguration for Thunderbird
-* **A HTTPS Frontend**
-* Autolearn spam from mail moved to "Junk" folder
 * Installs and configures Fail2ban
+* A dashboard / webpanel
 
 **Postfix**
-* Submission activated (TCP/587), TLS-only
+* Postscreen on Port 25 to block most zombies sending spam
+* Submission port activated (TCP/587), TLS-only
 * No SMTPS on Port 465 (deprecated)
 * The restrictions used are a good compromise between blocking spam and avoiding false-positives
-* Included ZEN blocklist
-* In- and outgoing spam- and virus protection plus attachment filter via [FuGlu Mail Content Scanner](http://www.fuglu.org) (uses ClamAV and Spamassassin backend)
-* Reject infected mails, mark spam
+* In- and outgoing spam protection plus attachment via mime_header_checks
+* Autolearn ham and spam
+* Heinlein Support SA rules
 * SSL based on BetterCrypto 
 
 **Dovecot**
@@ -117,6 +113,8 @@ If there is any firewall, unblock the following ports for incoming connections:
 | Nginx HTTPS           | TCP      | 443  |
 | Nginx HTTP (Redirect) | TCP      | 80   |
 
+Next it is important that you **do not use Google DNS** or another public DNS which is known to be blocked by DNS-based Blackhole List (DNSBL) providers.
+
 # Installation
 **Please run all commands as root**
 
@@ -130,7 +128,7 @@ wget -O - https://github.com/andryyy/fufix/archive/v0.x.tar.gz | tar xfz -
 cd fufix-*
 ```
 
-**Option 2: Install from git**
+**Option 2 - NOT RECOMMENDED, this may or may not work: Install from git**
 
 Install git to download fufix:
 ```
@@ -184,79 +182,19 @@ The SSL certificate is located at `/etc/ssl/mail/mail.{key,crt}`.
 You can replace it by just copying over your own files. 
 Services effected and necessary to restart are `postfix`, `dovecot` and `nginx`.
 
-## FuGlu
-Basic configuration. Set `group=nogroup` to run as nobody:nogroup (instead of group nobody). Set `defaultvirusaction` and `blockaction` to REJECT. Enabled ESMTP in `incomingport`:
-* **/etc/fuglu/fuglu.conf**
-
-Define attachments to deny/allow:
-* **/etc/fuglu/rules/default-filenames.conf**
-* **/etc/fuglu/rules/default-filetypes.conf**
-
-Mail template for the bounce to inform sender about blocked attachment:
-* **/etc/fuglu/templates/blockedfile.tmpl**
-
-### Filter mail
-You can use FuGlus Action Override plugin to create custom filters.  
-To add an action open the file `/etc/fuglu/actionrules.regex`.  
-Use the following syntax:
-```
-<headername> <regex> <argument>
-``` 
-Valid header names (a email header name, eg Received, To, From, Subject ... also supports ‘*’ as wildcard character):
-
-> - mime:headername (to get mime Headers in the message payload eg: mime:Content-Disposition)
-> - envelope_from (the envelope from address)
-> - from_domain (domain part of envelope_from)
-> - envelope_to (envelope to address)
-> - to_domain (domain part of envelope_to)
-> - a message Tag prepended by the @ symbol, eg. @incomingport
-> - body:raw (to match the the decoded message body (only applies to text/* partsl))
-> - body:stripped or just body (to match the the message body (only applies to text/* parts), with stripped tags and newlines replaced with space (similar to SpamAssassin body rules))
-> - body:full (to match the full body)
-Valid arguments:
-> - DUNNO : This plugin decides not to take any final action, continue with the next plugin (this is the most common case)
-> - ACCEPT : Whitelist this message, don’t run any remaining plugins
-> - DELETE : Silently delete this message (The sender will think it has been delivered)
-> - DEFER : Temporary Reject (4xx error), used for error conditions in after-queue mode or things like greylisting in before-queue mode
-> - REJECT : Reject this message, should only be used in before-queue mode (in after-queue mode this would produce a bounce / backscatter)
-
-Some examples with regex:
-
-```
-# Reject mails with "Hello" in the subject:
-Subject Hello REJECT
-
-# Delete mail sent from domain.org or any subdomain
-from_domain (\.)?domain.org$ DELETE
-
-# Whitelist mail sent from domain.org or any subdomain. No plug-in will be run on these mails!
-from_domain (\.)?domain.org$ ACCEPT
-
-# Reject if a X-Spam-<something> header exists
-X-Spam-* .* REJECT
-```
-
-**You do not need to restart/reload FuGlus service!**  
-The file actionrules.regex will be reloaded automatically.
-
-See more details at http://gryphius.github.io/fuglu/plugins-index.html
-
-### Filter statistics
-If you want to see a statistic of FuGlus activity, just run `fuglu_control stats`
-
-## ClamAV and Spamassassin
-ClamAV main configuration file:
-* **/etc/clamav/clamd.conf**
-
+## Spamassassin
 Spamassassin main configuration file:
 * **/etc/spamassassin/local.cf**
 
 Virus and spam filters are **enabled for both incoming and outgoing** mail.
 
+### Autolearn
 Move undetected spam to "Junk" to make Spamassassin autolearn it. This is done by a daily cronjob.
 
+Ham (non-spam) is learned the same way. Move false-positives to your inbox to autolearn them.
+
 ### Spam rewrite
-Fufix adds `rewrite_header Subject [SPAM]` and `report_safe 2` to prefix [SPAM] to junk mail and forward spam as attachment instead of original message (text/plain). 
+fufix adds `rewrite_header Subject [SPAM]` and `report_safe 2` to prefix [SPAM] to junk mail and forward spam as attachment instead of original message (text/plain). 
 
 The prefix "[SPAM]" is not important for the sieve filter and can be changed to whatever text. Spam will be moved when te Spam Flag is set the header.
 
@@ -264,12 +202,16 @@ The prefix "[SPAM]" is not important for the sieve filter and can be changed to 
 Default startup options for Spamassassin in `/etc/default/spamassassin`:
 - Enabled "spamd" by adding `ENABLED=1`
 - Enabled cronjob by setting `CRON=1`
-- Modified OPTIONS line to `OPTIONS="--create-prefs --max-children 5 --helper-home-dir --username debian-spamd"`.
+- Modified OPTIONS line to `OPTIONS="--create-prefs --max-children 5 --helper-home-dir"`.
 
-### Max file size for virus scanning
-The file size limit for incoming attachments is set to 25M. This is defined with `MaxFileSize` in the main configuratin file.
+### Disable for outgoing messages
+You can disable outgoing mail-scanning if you want to:
 
-Also there is `StreamMaxLength`. This value should match your mail transport agent’s (MTA) limit for a maximum attachment size (see section "Postfix).
+``` 
+submission inet n       -       -       -       -       smtpd
+  [...]
+  remove this line ->  -o content_filter=spamassassin
+```
 
 ## Postfix
 The files "main.cf" and "master.cf" contain a lot of changes. You should now what you do if you modify these files.
@@ -282,9 +224,6 @@ You also find the SQL based maps for virtual transport here:
 * **/etc/postfix/sql/*.cf**
 
 For a quick overview of the restrictions [click here](https://github.com/andryyy/fufix/blob/master/postfix/conf/main.cf).
-
-### Message size limit
-The parameter `message_size_limit` in `/etc/postfix/main.cf` is set to 26214400 bytes (25M). This has an effect on incoming and outgoing mail.
 
 ## Nginx
 A site for mail is copied to `/etc/nginx/sites-available` and enabled via symbolic link to `/etc/nginx/sites-enabled`.
@@ -316,26 +255,6 @@ All values inside "config.local.php" override the global configuration file (`co
 If you really need to edit Dovecots configuration, you can find the required files in `/etc/dovecot`.
 
 `/etc/dovecot/dovecot.conf` holds the default configuration. To keep it simple I chose not to split the configuration into multiple files. 
-
-### Disallow insecure IMAP connections
-
-Some people want to disable unencrypted authentication methods and require their users to either use SSL on Port 993 or STARTTLS on Port 143. To do so you need to change...
-
-```
-protocol imap {
-  mail_plugins = quota imap_quota
-}
-```
-
-...to...
-
-```
-protocol imap {
-  mail_plugins = quota imap_quota
-  ssl = required
-  disable_plaintext_auth = yes
-}
-```
 
 ### Trash folder quota
 
@@ -415,7 +334,7 @@ Some plug-ins come with a seperate "config.inc.php" file. You can find them in `
 
 If no domain is specified for a login address, the webservers domain part will be appended.
 
-### Attachment size
+## Change attachment/message size
 Default file size limit is set to 25 MB. If you want to change this, you need to see three files:
 
 1. Open `/etc/php5/fpm/pool.d/mail.conf` and set `upload_max_filesize` to your new value. Change `post_max_size` to the same value + about 1M:
