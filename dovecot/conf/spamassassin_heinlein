@@ -1,4 +1,4 @@
 #!/bin/bash
-if [[ ! -z $(/usr/bin/sa-update --nogpg --channel spamassassin.heinlein-support.de -v | /bin/grep "no fresh updates were available") ]]; then
+if [[ ! -z $(/bin/su debian-spamd -c "/usr/bin/sa-update --nogpg --channel spamassassin.heinlein-support.de -v | /bin/grep 'no fresh updates were available'") ]]; then
 exit 0
 fi
