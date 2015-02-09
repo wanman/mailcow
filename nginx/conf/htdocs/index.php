@@ -39,7 +39,7 @@ a:active,a:hover,a:link,a:visited{color:inherit;text-decoration:none;outline: 0;
 <b>SMTP</b> on <?php echo $mailname; ?><br />
 <ul>
   <li>Port 587 STARTTLS</li>
-  <li>Do <b>not</b> use Port 25 to submit mails</li>
+  <li>Do not use Port 25 to submit mails</li>
 </ul>
 </p>
 <div class="line"></div>
