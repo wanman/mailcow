@@ -96,12 +96,13 @@ A summary of what software is installed with which features enabled.
 * 25M attachment size (see "File size limitation")
 
 # Before You Begin
-**Please remove any web- and mail services** running on your server. I recommend using a clean Debian minimal installation.
+1. **Please remove any web- and mail services** running on your server. I recommend using a clean Debian minimal installation.
 Remember to purge Debians default MTA Exim4:
 ```
 apt-get purge exim4*
 ``` 
-If there is any firewall, unblock the following ports for incoming connections:
+
+2. If there is any firewall, unblock the following ports for incoming connections:
 
 | Service               | Protocol | Port |
 | -------------------   |:--------:|:-----|
@@ -113,7 +114,7 @@ If there is any firewall, unblock the following ports for incoming connections:
 | Nginx HTTPS           | TCP      | 443  |
 | Nginx HTTP (Redirect) | TCP      | 80   |
 
-Next it is important that you **do not use Google DNS** or another public DNS which is known to be blocked by DNS-based Blackhole List (DNSBL) providers.
+3. Next it is important that you **do not use Google DNS** or another public DNS which is known to be blocked by DNS-based Blackhole List (DNSBL) providers.
 
 # Installation
 **Please run all commands as root**
@@ -354,12 +355,8 @@ Restart "php5-fpm", "postfix" and "nginx" services.
 Most important files for debugging:
 
 * **/var/log/mail.log**
-* **/var/log/mail.warn**
-* **/var/log/mail.err**
 * **/var/log/syslog**
-* **/var/log/fuglu/fuglu.log**
 * **/var/log/nginx/error.log**
-* **/var/log/mysql.err**
 * **/var/www/mail/rc/logs/errors**
 * **/var/log/php5-fpm.log**
 
