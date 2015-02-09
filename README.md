@@ -73,7 +73,7 @@ A summary of what software is installed with which features enabled.
 * The restrictions used are a good compromise between blocking spam and avoiding false-positives
 * In- and outgoing spam protection plus attachment via mime_header_checks
 * Autolearn ham and spam
-* Heinlein Support SA rules
+* [Heinlein Support](https://www.heinlein-support.de/) SA rules
 * SSL based on BetterCrypto 
 
 **Dovecot**
