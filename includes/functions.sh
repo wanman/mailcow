@@ -258,14 +258,14 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sievec /var/vmail/sieve/spam-global.sieve
 			chown -R vmail:vmail /var/vmail
 			cp dovecot/conf/doverecalcq /etc/cron.daily/; chmod 755 /etc/cron.daily/doverecalcq
-			cp dovecot/conf/spamlearn /etc/cron.daily/; chmod 755 /etc/cron.daily/spamlearn
-			cp dovecot/conf/spamassassin_heinlein /etc/cron.daily/; chmod 755 /etc/cron.daily/spamassassin_heinlein
 			;;
 		spamassassin)
 			cp spamassassin/conf/local.cf /etc/spamassassin/local.cf
 			sed -i '/^OPTIONS=/s/=.*/="--create-prefs --max-children 5 --helper-home-dir"/' /etc/default/spamassassin
 			sed -i '/^CRON=/s/=.*/="1"/' /etc/default/spamassassin
 			sed -i '/^ENABLED=/s/=.*/="1"/' /etc/default/spamassassin
+			cp spamassassin/conf/spamlearn /etc/cron.daily/; chmod 755 /etc/cron.daily/spamlearn
+			cp spamassassin/conf/spamassassin_heinlein /etc/cron.daily/; chmod 755 /etc/cron.daily/spamassassin_heinlein
 			;;
 		webserver)
 			rm -rf /etc/php5/fpm/pool.d/* 2> /dev/null

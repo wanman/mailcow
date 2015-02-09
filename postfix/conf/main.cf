@@ -38,8 +38,11 @@ smtpd_delay_reject = yes
 # Enable elliptic curve cryptography, "ultra" needs more cpu time
 smtpd_tls_eecdh_grade = strong
 
-# Reject some attachments
+# Default: Reject some attachments
 mime_header_checks = regexp:/etc/postfix/mime_header_checks
+
+# Default: Anonymize outgoing mail headers (REMOVE LEADING # TO ENABLE)
+#smtp_header_checks = pcre:/etc/postfix/smtp_header_checks.pcre
 
 # Sender, recipient, client and data restrictions
 smtpd_sender_restrictions = reject_authenticated_sender_login_mismatch,
