@@ -14,6 +14,7 @@
     - [Spamassassin daemon options](#spamassassin-daemon-options)
     - [Disable for outgoing messages](#disable-for-outgoing-messages)
   - [Postfix](#postfix)
+    - [Un/block certain attachment types](#unblock-certain-attachment-types)
   - [Nginx](#nginx)
   - [Fail2ban](#fail2ban)
   - [Postfixadmin](#postfixadmin)
@@ -225,6 +226,13 @@ You also find the SQL based maps for virtual transport here:
 * **/etc/postfix/sql/*.cf**
 
 For a quick overview of the restrictions [click here](https://github.com/andryyy/fufix/blob/master/postfix/conf/main.cf).
+
+### Un/block certain attachment types
+`mime_header_checks` in the file `/etc/postfix/main.cf` allow Postfix to block certain attachment types and more.
+
+Open `/etc/postfix/mime_header_checks` and change "(bat|com|exe|dll|vbs)" to whatever you want to reject.
+
+You can also comment out the whole line to stop blocking attachments.
 
 ## Nginx
 A site for mail is copied to `/etc/nginx/sites-available` and enabled via symbolic link to `/etc/nginx/sites-enabled`.
