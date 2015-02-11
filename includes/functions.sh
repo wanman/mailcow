@@ -101,10 +101,11 @@ checkconfig() {
         echo "Is \"conf_done\" set to \"yes\"?"
         echo
         exit 1
-    elif [[ ${#cert_country} -ne 2 ]]; then
+    fi
+	if [[ ${#cert_country} -ne 2 ]]; then
         echo "$(redb [ERR]) - Country code must consist of exactly two characters (DE/US/UK etc.)"
         exit 1
-    else
+    fi
     for var in sys_hostname sys_domain sys_timezone my_postfixdb my_postfixuser my_postfixpass my_rootpw my_rcuser my_rcpass my_rcdb pfadmin_adminuser pfadmin_adminpass cert_country cert_state cert_city cert_org
     do
         if [[ -z ${!var} ]]; then
@@ -113,7 +114,6 @@ checkconfig() {
             exit 1
         fi
     done
-    fi
     pass_count=$(grep -o "[0-9]" <<< $pfadmin_adminpass | wc -l)
     pass_chars=$(echo $pfadmin_adminpass | egrep "^.{8,255}" | \
 	egrep "[ABCDEFGHIJKLMNOPQRSTUVXYZ]" | \
