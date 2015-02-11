@@ -265,7 +265,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i '/^CRON=/s/=.*/="1"/' /etc/default/spamassassin
 			sed -i '/^ENABLED=/s/=.*/="1"/' /etc/default/spamassassin
 			# Thanks to mf3hd@GitHub
-			sed '/SHELL/a RANDOM_DELAY=30' /etc/crontab
+			[[ -z $(grep RANDOM_DELAY /etc/crontab) ]] && sed -i '/SHELL/a RANDOM_DELAY=30' /etc/crontab
 			cp spamassassin/conf/spamlearn /etc/cron.daily/; chmod 755 /etc/cron.daily/spamlearn
 			cp spamassassin/conf/spamassassin_heinlein /etc/cron.daily/; chmod 755 /etc/cron.daily/spamassassin_heinlein
 			;;
