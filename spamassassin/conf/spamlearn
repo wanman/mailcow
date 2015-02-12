@@ -4,8 +4,10 @@ PATH=/usr/local/bin:/usr/local/sbin:/sbin:/usr/sbin:/bin:/usr/bin:/usr/bin/X11
 for domain in $(ls /var/vmail); do
 	if [[ $domain != "sieve" && -d /var/vmail/$domain ]]; then
 		for user in $(ls /var/vmail/$domain); do
-			[[ -d /var/vmail/$domain/$user/.Junk/cur ]] && su vmail -c "sa-learn --no-sync --spam /var/vmail/$domain/$user/.Junk/cur > /dev/null"
-            [[ -d /var/vmail/$domain/$user/cur ]] && su vmail -c "sa-learn --no-sync --ham /var/vmail/$domain/$user/cur > /dev/null"
+			[[ -d /var/vmail/$domain/$user/.Junk/cur ]] && sa-learn --dbpath /var/lib/spamassassin/.spamassassin --no-sync --spam /var/vmail/$domain/$user/.Junk/cur > /dev/null"
+            [[ -d /var/vmail/$domain/$user/cur ]] && sa-learn --dbpatch /var/lib/spamassassin/.spamassassin --no-sync --ham /var/vmail/$domain/$user/cur > /dev/null"
 		done
 	fi
 done
+chown -R debian-spamd: /var/lib/spamassassin/.spamassassin
+
