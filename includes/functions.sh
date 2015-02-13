@@ -476,5 +476,8 @@ A backup will be stored in ./before_upgrade_$timestamp
 
 	installtask restartservices
 	returnwait "Restarting services" "Finish upgrade"
+	echo Done.
+	echo
+	echo You will find your old \"installer.log\" file updated.
 	return 0
 }
