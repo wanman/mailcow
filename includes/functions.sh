@@ -383,7 +383,7 @@ upgradetask() {
 		echo "$(redb [ERR]) - \"$1\" is not a valid file"
 		return 1
 	fi
-	if [[ ! -f /etc/fufix_version || -z $(cat /etc/fufix_version | grep "0.6") ]]; then
+	if [[ ! -f /etc/fufix_version || -z $(cat /etc/fufix_version | grep "0.7") ]]; then
 		echo "$(redb [ERR]) - Upgrade not supported"
 		return 1
 	fi
@@ -443,10 +443,9 @@ A backup will be stored in ./before_upgrade_$timestamp
 		cp /etc/ssl/mail/mail.crt /usr/local/share/ca-certificates/
 		update-ca-certificates
 		returnwait "Update CA certificate store" "Postfix configuration"
+	else
+		returnwait "Update CA certificate store (skipped)" "Postfix configuration"
 	fi
-
-    returnwait "Update CA certificate store (skipped)" "Postfix configuration"
-
 	installtask postfix
 	returnwait "Postfix configuration" "Dovecot configuration"
 
@@ -477,5 +476,5 @@ A backup will be stored in ./before_upgrade_$timestamp
 
 	installtask restartservices
 	returnwait "Restarting services" "Finish upgrade"
-	exit 0
+	return 0
 }

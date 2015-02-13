@@ -14,6 +14,7 @@ case $1 in
 	"-u" | "--upgrade-from-file" )
 		shift
 		upgradetask $1
+		echo $fufix_version > /etc/fufix_version
 		exit 0
 		;;
 	"-h" | "--help" )
