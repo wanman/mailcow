@@ -15,6 +15,13 @@ case $1 in
 		shift
 		upgradetask $1
 		echo $fufix_version > /etc/fufix_version
+echo --------------------------------- >> $1
+echo UPGRADE $(echo date) >> $1
+echo --------------------------------- >> $1
+echo Fail2ban version: $fail2ban_version >> $1
+echo Postfixadmin Revision: $postfixadmin_revision >> $1
+echo Roundcube version: $roundcube_version >> $1
+echo --------------------------------- >> $1
 		exit 0
 		;;
 	"-h" | "--help" )
