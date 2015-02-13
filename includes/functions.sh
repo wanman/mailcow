@@ -73,8 +73,8 @@ is_ipv6() {
 }
 
 checksystem() {
-	if [[ $(grep MemTotal /proc/meminfo | awk '{print $2}') -lt 750000 ]]; then
-		echo "$(yellowb [WARN]) - At least 768MB of memory is highly recommended"
+	if [[ $(grep MemTotal /proc/meminfo | awk '{print $2}') -lt 500000 ]]; then
+		echo "$(yellowb [WARN]) - At least 500MB of memory is highly recommended"
 		read -p "Press ENTER to skip this warning or CTRL-C to cancel the process"
 	fi
 }
