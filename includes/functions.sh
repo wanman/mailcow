@@ -426,18 +426,18 @@ A backup will be stored in ./before_upgrade_$timestamp
 -----------------------------------------------------
 "
 	read -p "Press ENTER to continue or CTRL-C to cancel the upgrade process"
+	echo -en "Creating backups in ./before_upgrade_$timestamp... \t"
+		mkdir before_upgrade_$timestamp
+		cp -R /var/www/mail/ before_upgrade_$timestamp/mail_wwwroot
+		mysqldump --defaults-file=/etc/mysql/debian.cnf --all-databases > backup_all_databases.sql 2>/dev/null
+		cp -R /etc/{postfix,dovecot,spamassassin,fail2ban,nginx,mysql,php5} before_upgrade_$timestamp/
+    echo -e "$(greenb "[OK]")"
 	echo -en "\nStopping services, this may take a few seconds... \t\t"
 	for var in fail2ban rsyslog nginx php5-fpm spamassassin dovecot postfix
 	do
 		service $var stop > /dev/null 2>&1
 	done
 	echo -e "$(greenb "[OK]")"
-	echo -en "Creating backups in ./before_upgrade_$timestamp... \t"
-		mkdir before_upgrade_$timestamp
-		cp -R /var/www/mail/ before_upgrade_$timestamp/mail_wwwroot
-		cp -R /etc/{postfix,dovecot,spamassassin,fail2ban,nginx,mysql,php5} before_upgrade_$timestamp/
-	echo -e "$(greenb "[OK]")"
-
     echo "Update CA certificate store (self-signed only)..."
 	if [[ ! -z $(openssl x509 -issuer -in /etc/ssl/mail/mail.crt | grep $sys_hostname.$sys_domain ) ]]; then
 		cp /etc/ssl/mail/mail.crt /usr/local/share/ca-certificates/
