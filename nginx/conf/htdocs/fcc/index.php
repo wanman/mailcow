@@ -81,7 +81,7 @@ if (isset($_POST["anonymize_"])) {
 	postfix_reload();
 }
 if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
-       if (check_login($_POST["login_user"], $_POST["pass_user"], "/var/www/mail/pfadmin/config.local.php") == true) { $_SESSION['fufix_cc_loggedin'] = "yes"; }
+	if (check_login($_POST["login_user"], $_POST["pass_user"], "/var/www/mail/pfadmin/config.local.php") == true) { $_SESSION['fufix_cc_loggedin'] = "yes"; }
 }
 ?>
 <!DOCTYPE html>
@@ -107,7 +107,7 @@ input[type="submit"]{margin:5px 10px 20px 10px;}
 
 <div class="box">
 <h1>fufix control center</h1>
-<?php if ($_SESSION['fufix_cc_loggedin'] = "yes"): ?>
+<?php if ($_SESSION['fufix_cc_loggedin'] == "yes"): ?>
 
 <h2>Sender Blacklist</h2>
 <form method="post">
