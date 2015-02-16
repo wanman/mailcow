@@ -77,11 +77,27 @@ if (isset($_POST["ext"])) {
 	postfix_reload();
 }
 if (isset($_POST["anonymize_"])) {
+	if (!isset($_POST["anonymize"])) { $_POST["anonymize"] = ""; }
 	set_fufix_anonymize_headers($_POST["anonymize"]);
 	postfix_reload();
 }
 if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
 	if (check_login($_POST["login_user"], $_POST["pass_user"], "/var/www/mail/pfadmin/config.local.php") == true) { $_SESSION['fufix_cc_loggedin'] = "yes"; }
+}
+if (isset($_POST["logout"])) {
+        $_SESSION['fufix_cc_loggedin'] = "no";
+}
+if (isset($_POST["backupdl"])) {
+	shell_exec("sudo /bin/tar -cvjf /tmp/backup_vmail.tar.bz2 /var/vmail/");
+	$filename = "backup_vmail.tar.bz2";
+	$filepath = "/tmp/";
+	header("Content-Description: File Transfer");
+	header("Content-type: application/octet-stream");
+	header("Content-Disposition: attachment; filename=\"".$filename."\"");
+	header("Content-Transfer-Encoding: binary");
+	header("Content-Length: ".filesize($filepath.$filename));
+	ob_end_flush();
+	@readfile($filepath.$filename);
 }
 ?>
 <!DOCTYPE html>
@@ -140,6 +156,22 @@ Provide a "|" seperated list of extensions like ext1|ext2|ext3:</div>
 <input type="submit" value="Save">
 </form>
 
+<h2>Backup mail</h2>
+<form method="post">
+<div class="line"></div>
+<div class="left">Download a copy of your vmail directory as tar.bz2 archive.
+<br />This is a very simple function that may or may not work. Consider it unstable.</div>
+<div class="right"><input name="backupdl" type="submit" value="Download"></div>
+<div class="clearfix"></div>
+</form>
+<div class="line"></div>
+
+<form method="post">
+<br />
+<input name="logout" type="submit" value="Logout">
+<div class="clearfix"></div>
+</form>
+
 <?php else: ?>
 <h2>Login</h2>
 <form method="post">
@@ -149,10 +181,11 @@ Provide a "|" seperated list of extensions like ext1|ext2|ext3:</div>
 <div class="left">Password</div>
 <div class="right"><input name="pass_user" type="password"></div>
 <div class="clearfix"></div>
+<p>You can login with any superadmin created in <b><a href="../pfadmin">Postfixadmin</a></b>.</p>
 <input type="submit" value="Login">
 </form>
 <?php endif ?>
-
+<p><b><a href="../">&#8592; go back</a></b></p>
+</div>
 </body>
 </html>
-
