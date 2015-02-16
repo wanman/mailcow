@@ -144,8 +144,9 @@ input[type="submit"]{padding:5px;border:0px;font-family:monospace;margin:5px 10p
 <h2>Attachments</h2>
 <form method="post">
 <div class="line"></div>
-<div class="left">Block attachments by their extension.<br />
-Provide a "|" seperated list of extensions like ext1|ext2|ext3:</div>
+<div class="left">Deny attachments by their extension.<br />
+Provide a "|" seperated list of extensions: ext1|ext2|ext3 <br />
+Warning: Mails will be bounced!</div>
 <div class="right"><input type="text" name="ext" value="<?php echo get_fufix_reject_attachments("ext") ?>"></div>
 <div class="clearfix"></div>
 <p>To <b>disable</b> this feature, enter "DISABLED" as extension name.</p>
