@@ -22,6 +22,9 @@ function check_login($user, $pass, $pfconfig) {
         }
         return false;
 }
+function postfix_reload() {
+	shell_exec("sudo /usr/sbin/postfix reload");
+}
 function get_fufix_reject_attachments() {
 	$read_mime_check = file($GLOBALS["fufix_reject_attachments"])[0];
 	preg_match('#\((.*?)\)#', $read_mime_check, $match);
@@ -45,10 +48,10 @@ function set_fufix_sender_access($what) {
 			file_put_contents($GLOBALS["fufix_sender_access"], "$each     REJECT     Sender not allowed".PHP_EOL, FILE_APPEND);
 		}
 	}
-	$sender_map = $GLOBALS["fufix_sender_access"]
-	shell_exec = ("/usr/sbin/postmap $sender_map");
+	$sender_map = $GLOBALS["fufix_sender_access"];
+	shell_exec("/usr/sbin/postmap $sender_map");
 }
-function set_fufix_reject_attachments($ext, $msg, $enable) {
+function set_fufix_reject_attachments($ext) {
 	foreach (explode("|", $ext) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return 1; } }
 	file_put_contents($GLOBALS["fufix_reject_attachments"], "/name=[^>]*\.($ext)/     REJECT     Dangerous files are prohibited on this server.".PHP_EOL);
 }
@@ -67,12 +70,15 @@ function set_fufix_anonymize_headers($toggle) {
 }
 if (isset($_POST["sender"])) {
 	set_fufix_sender_access($_POST["sender"]);
+	postfix_reload();
 }
 if (isset($_POST["ext"])) {
-	set_fufix_reject_attachments($_POST["ext"], $_POST["msg"]);
+	set_fufix_reject_attachments($_POST["ext"]);
+	postfix_reload();
 }
 if (isset($_POST["anonymize_"])) {
 	set_fufix_anonymize_headers($_POST["anonymize"]);
+	postfix_reload();
 }
 if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
        if (check_login($_POST["login_user"], $_POST["pass_user"], "/var/www/mail/pfadmin/config.local.php") == true) { $_SESSION['fufix_cc_loggedin'] = "yes"; }

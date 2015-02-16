@@ -191,7 +191,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dnsutils python-sq
 python-magic libmail-spf-perl libmail-dkim-perl openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server nginx-extras mailutils \
-postfix-mysql postfix-pcre spamassassin \
+postfix-mysql postfix-pcre spamassassin sudo \
 fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl >/dev/null
 			if [ "$?" -ne "0" ]; then
 				echo "$(redb [ERR]) - Package installation failed"
@@ -237,6 +237,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			postmap /etc/postfix/helo_access
 			postmap /etc/postfix/fufix_sender_access
 			chown www-data: /etc/postfix/fufix_*
+			[[ -z "grep postfix /etc/sudoers" ]] && echo "%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload" >> /etc/sudoers
 			;;
 		dovecot)
 			[[ -z $(grep fs.inotify.max_user_instances /etc/sysctl.conf) ]] && echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.conf
