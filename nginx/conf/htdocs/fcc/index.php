@@ -6,16 +6,16 @@ $fufix_reject_attachments = "/etc/postfix/fufix_reject_attachments.regex";
 $fufix_sender_access = "/etc/postfix/fufix_sender_access";
 
 function check_login($user, $pass, $pfconfig) {
-		if(!filter_var($user, FILTER_VALIDATE_EMAIL)) {
-			return false;
-		}
-		$pass = escapeshellcmd($pass);
-		include_once($pfconfig);
-		$link = mysql_connect('localhost', $CONF['database_user'], $CONF['database_password']);
-		mysql_select_db($CONF['database_name']);
-		$result = mysql_query("select password from admin where superadmin=1 and username='$user'");
-		while ($row = mysql_fetch_array($result, MYSQL_NUM)) {
-			$row = "'".$row[0]."'";
+	if(!filter_var($user, FILTER_VALIDATE_EMAIL)) {
+		return false;
+	}
+	$pass = escapeshellcmd($pass);
+	include_once($pfconfig);
+	$link = mysql_connect('localhost', $CONF['database_user'], $CONF['database_password']);
+	mysql_select_db($CONF['database_name']);
+	$result = mysql_query("select password from admin where superadmin=1 and username='$user'");
+	while ($row = mysql_fetch_array($result, MYSQL_NUM)) {
+		$row = "'".$row[0]."'";
 		if (strpos(shell_exec("echo $pass | doveadm pw -s SHA512-CRYPT -t $row"), "verified") !== false) {
 			return true;
 		}
