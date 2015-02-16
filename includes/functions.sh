@@ -371,7 +371,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 				echo "$(textb [HINT]) - You may want to setup a TXT record for SPF, see spfwizard.com for further information (checked by Google DNS)" | tee -a installer.log
 			fi
 			if [[ ! -z $(host dbltest.com.dbl.spamhaus.org | grep NXDOMAIN) || ! -z $(cat /etc/resolv.conf | grep '^nameserver 8.8.') ]]; then
-				echo "$(redb [CRIT]) - You either use Google DNS service or another blocked DNS provider for blacklist lookups. Consider using another DNS server for better spam detection."
+				echo "$(redb [CRIT]) - You either use Google DNS service or another blocked DNS provider for blacklist lookups. Consider using another DNS server for better spam detection." | tee -a installer.log
 			fi
 			;;
 		setupsuperadmin)
