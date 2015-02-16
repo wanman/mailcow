@@ -288,7 +288,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			rm -rf /var/www/mail 2> /dev/null
             tar xf pfadmin/inst/$postfixadmin_revision.tar -C pfadmin/inst/
 			mkdir -p /var/www/mail/pfadmin /var/run/fetchmail /etc/mail/postfixadmin 2> /dev/null
-			cp nginx/conf/htdocs/{index.php,robots.txt,autoconfig.xml} /var/www/mail/
+			cp -R nginx/conf/htdocs/{fcc,index.php,robots.txt,autoconfig.xml} /var/www/mail/
 			mv pfadmin/inst/$postfixadmin_revision/* /var/www/mail/pfadmin/
             cp /var/www/mail/pfadmin/ADDITIONS/fetchmail.pl /usr/local/bin/fetchmail.pl
 			cp pfadmin/conf/config.local.php /var/www/mail/pfadmin/config.local.php
