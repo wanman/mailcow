@@ -30,7 +30,7 @@ systemctl disable fuglu
 rm /lib/systemd/system/fuglu.service
 rm /lib/systemd/system/fail2ban.service
 # dovecot purge fails at first
-apt-get -y purge php5 python-sqlalchemy python-beautifulsoup python-setuptools \
+apt-get -y purge sudo php5 python-sqlalchemy python-beautifulsoup python-setuptools \
 python-magic php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite mysql-client mysql-server nginx nginx-common nginx-extras dovecot-common dovecot-core \
@@ -52,6 +52,7 @@ rm -rf /etc/postfix/
 rm -rf /etc/fuglu/
 rm -rf /etc/fail2ban/
 rm -rf /etc/nginx/
+rm -rf /etc/sudoers*
 rm -rf /etc/php5/
 rm -rf /etc/mysql/
 rm -rf /var/www/
