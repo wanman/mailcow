@@ -228,18 +228,6 @@ You also find the SQL based maps for virtual transport here:
 
 For a quick overview of the restrictions [click here](https://github.com/andryyy/fufix/blob/master/postfix/conf/main.cf).
 
-### Un/block certain attachment types
-`mime_header_checks` in the file `/etc/postfix/main.cf` allow Postfix to block certain attachment types and more.
-
-Open `/etc/postfix/mime_header_checks` and change "(bat|com|exe|dll|vbs)" to whatever you want to reject.
-
-You can also comment out the whole line to stop blocking attachments.
-
-### Anonymize mail headers of outgoing mail
-Open `/etc/postfix/main.cf` and search for `#smtp_header_checks = pcre:/etc/postfix/smtp_header_checks.pcre`.
-
-You need to remove the leading "#" and reload Postfix: `postfix reload`
-
 ## Nginx
 A site for mail is copied to `/etc/nginx/sites-available` and enabled via symbolic link to `/etc/nginx/sites-enabled`.
 The sites root location is `/var/www/mail/`. Any default site installed by "apt-get" is removed.
@@ -335,6 +323,8 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 ```
 
 For more information about dsync (like the difference between backups and mirrors) visit http://wiki2.dovecot.org/Tools/Dsync
+
+You can also use the control center (@your.server.tld/fcc) to create and download a simple tar.bz2 copy.
 
 ## Roundcube
 
