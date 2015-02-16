@@ -1,5 +1,5 @@
 <?php
-session_start;
+session_start();
 
 $fufix_anonymize_headers = "/etc/postfix/fufix_anonymize_headers.pcre";
 $fufix_reject_attachments = "/etc/postfix/fufix_reject_attachments.regex";
@@ -52,7 +52,7 @@ function set_fufix_sender_access($what) {
 	shell_exec("/usr/sbin/postmap $sender_map");
 }
 function set_fufix_reject_attachments($ext) {
-	foreach (explode("|", $ext) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return 1; } }
+	foreach (explode("|", $ext) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return false; } }
 	file_put_contents($GLOBALS["fufix_reject_attachments"], "/name=[^>]*\.($ext)/     REJECT     Dangerous files are prohibited on this server.".PHP_EOL);
 }
 function set_fufix_anonymize_headers($toggle) {
@@ -92,9 +92,9 @@ if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
 <style type="text/css">
 a:active,a:hover,a:link,a:visited{color:inherit;text-decoration:none;outline:0;}
 body{overflow-y:scroll;background-color:#dfdfdf;font-family:"Lucida Sans Unicode","Lucida Grande",Sans-Serif;font-size:12px;color:#555}
-.box{background-color:#fff;width:600px;border-radius:5px;-moz-border-radius:5px;margin:30px auto;-moz-box-shadow:0 1px 10px 0 rgba(0,0,0,.25);-webkit-box-shadow:0 1px 10px 0 rgba(0,0,0,.25);box-shadow:0 1px 6px 0 rgba(0,0,0,.2);padding:30px 20px}
+.box{background-color:#fff;width:530px;border-radius:5px;-moz-border-radius:5px;margin:30px auto;-moz-box-shadow:0 1px 10px 0 rgba(0,0,0,.25);-webkit-box-shadow:0 1px 10px 0 rgba(0,0,0,.25);box-shadow:0 1px 6px 0 rgba(0,0,0,.2);padding:30px 20px}
 .box h1{font-size:16px;color:#555}
-.box h2{font-size:14px;color:#4480AA}
+.box h2{font-size:14px;color:#555}
 .line{width:100%;height:1px;background-color:#d7d7d7}
 .right{float:right;margin:20px 0 10px 0;width:300px}
 .left{float:left;margin:20px 0 10px 0;width:180px}
