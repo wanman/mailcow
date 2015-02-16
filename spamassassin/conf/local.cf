@@ -3,4 +3,4 @@ report_safe 2
 required_score 5.0
 use_bayes 1
 bayes_auto_learn 1
-skip_rbl_checks 1 # Is done via MTA, can lead to false positives with some freemail providers (web.de)
+skip_rbl_checks 1

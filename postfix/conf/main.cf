@@ -39,16 +39,17 @@ smtpd_delay_reject = yes
 smtpd_tls_eecdh_grade = strong
 
 # Default: Reject some attachments
-mime_header_checks = regexp:/etc/postfix/mime_header_checks
+mime_header_checks = regexp:/etc/postfix/fufix_reject_attachments.regex
 
-# Default: Anonymize outgoing mail headers (REMOVE LEADING # TO ENABLE)
-#smtp_header_checks = pcre:/etc/postfix/smtp_header_checks.pcre
+# Default: Anonymize outgoing mail headers
+smtp_header_checks = pcre:/etc/postfix/fufix_anonymize_headers.pcre
 
 # Sender, recipient, client and data restrictions
 smtpd_sender_restrictions = reject_authenticated_sender_login_mismatch,
    reject_sender_login_mismatch,
    permit_sasl_authenticated,
    permit_mynetworks,
+   check_sender_access hash:/etc/postfix/fufix_sender_access
    reject_unlisted_sender,
    reject_unknown_sender_domain
 

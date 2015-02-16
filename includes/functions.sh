@@ -235,6 +235,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/postfix/sql/*
 			sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/postfix/sql/*
 			postmap /etc/postfix/helo_access
+			postmap /etc/postfix/fufix_sender_access
+			chown www-data: /etc/postfix/fufix_*
 			;;
 		dovecot)
 			[[ -z $(grep fs.inotify.max_user_instances /etc/sysctl.conf) ]] && echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.conf
