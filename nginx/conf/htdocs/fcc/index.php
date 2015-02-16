@@ -44,7 +44,7 @@ function get_fufix_sender_access() {
 function set_fufix_sender_access($what) {
 	file_put_contents($GLOBALS["fufix_sender_access"], "");
 	foreach(preg_split("/((\r?\n)|(\r\n?))/", $what) as $each) {
-		if ($each != "" && !count_chars($each, ".") >= 1) {
+		if ($each != "" && preg_match("/^[a-zA-Z0-9-\ .@]+$/", $each)) {
 			file_put_contents($GLOBALS["fufix_sender_access"], "$each     REJECT     Sender not allowed".PHP_EOL, FILE_APPEND);
 		}
 	}
