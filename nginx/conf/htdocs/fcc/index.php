@@ -99,7 +99,7 @@ body{overflow-y:scroll;background-color:#dfdfdf;font-family:"Lucida Sans Unicode
 .right{float:right;margin:20px 0 10px 0;width:300px}
 .left{float:left;margin:20px 0 10px 0;width:180px}
 .clearfix:after{content:"";display:table;clear:both;}
-textarea,input[type="text"]{width:95%;}
+textarea,input[type="text"],input[type="password"]{width:95%;}
 input[type="submit"]{margin:5px 10px 20px 10px;}
 </style>
 </head>
@@ -147,7 +147,7 @@ Provide a "|" seperated list of extensions like ext1|ext2|ext3:</div>
 <div class="left">Postfixadmin User</div>
 <div class="right"><input name="login_user" type="text"></div>
 <div class="left">Password</div>
-<div class="right"><input name="pass_user" type="text"></div>
+<div class="right"><input name="pass_user" type="password"></div>
 <div class="clearfix"></div>
 <input type="submit" value="Login">
 </form>
