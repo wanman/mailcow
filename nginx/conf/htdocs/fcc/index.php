@@ -6,6 +6,10 @@ $fufix_reject_attachments = "/etc/postfix/fufix_reject_attachments.regex";
 $fufix_sender_access = "/etc/postfix/fufix_sender_access";
 
 function check_login($user, $pass, $pfconfig) {
+		if(!filter_var($user, FILTER_VALIDATE_EMAIL)) {
+			return false;
+		}
+		$pass = escapeshellcmd($pass);
         include_once($pfconfig);
         $link = mysql_connect('localhost', $CONF['database_user'], $CONF['database_password']);
         mysql_select_db($CONF['database_name']);
@@ -41,6 +45,8 @@ function set_fufix_sender_access($what) {
 			file_put_contents($GLOBALS["fufix_sender_access"], "$each     REJECT     Sender not allowed".PHP_EOL, FILE_APPEND);
 		}
 	}
+	$sender_map = $GLOBALS["fufix_sender_access"]
+	shell_exec = ("/usr/sbin/postmap $sender_map");
 }
 function set_fufix_reject_attachments($ext, $msg, $enable) {
 	foreach (explode("|", $ext) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return 1; } }
@@ -103,7 +109,7 @@ input[type="submit"]{margin:5px 10px 20px 10px;}
 <div class="left">Specify a list of senders or domains to blacklist access:</div>
 <div class="right"><textarea rows="6" name="sender"><?php echo get_fufix_sender_access() ?></textarea></div>
 <div class="clearfix"></div>
-<input type="submit" value="Save and reload">
+<input type="submit" value="Save">
 </form>
 
 <h2>Attachments</h2>
@@ -114,7 +120,7 @@ Provide a "|" seperated list of extensions like ext1|ext2|ext3:</div>
 <div class="right"><input type="text" name="ext" value="<?php echo get_fufix_reject_attachments("ext") ?>"></div>
 <div class="clearfix"></div>
 <p>To <b>disable</b> this feature, enter "DISABLED" as extension name.</p>
-<input type="submit" value="Save and reload">
+<input type="submit" value="Save">
 </form>
 
 <h2>Privacy</h2>
@@ -125,7 +131,7 @@ Provide a "|" seperated list of extensions like ext1|ext2|ext3:</div>
 <input type="hidden" name="anonymize_">
 <div class="clearfix"></div>
 <p>This option enables a PCRE table to remove "User-Agent", "X-Enigmail", "X-Mailer", "X-Originating-IP" and replaces "Received: from" headers with localhost/127.0.0.1.</p>
-<input type="submit" value="Save and reload">
+<input type="submit" value="Save">
 </form>
 
 <?php else: ?>
