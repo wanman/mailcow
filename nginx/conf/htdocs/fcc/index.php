@@ -109,20 +109,27 @@ if (isset($_POST["backupdl"])) {
 a:active,a:hover,a:link,a:visited{color:inherit;text-decoration:none;outline:0;}
 body{overflow-y:scroll;background-color:#dfdfdf;font-family:"Lucida Sans Unicode","Lucida Grande",Sans-Serif;font-size:12px;color:#555}
 .box{background-color:#fff;width:530px;border-radius:5px;-moz-border-radius:5px;margin:30px auto;-moz-box-shadow:0 1px 10px 0 rgba(0,0,0,.25);-webkit-box-shadow:0 1px 10px 0 rgba(0,0,0,.25);box-shadow:0 1px 6px 0 rgba(0,0,0,.2);padding:30px 20px}
-.box h1{font-size:16px;color:#555}
-.box h2{font-size:14px;color:#555}
+.box h1{font-size:18px;color:#555}
+.box h2{font-size:14px;color:#777;margin:2px;}
 .line{width:100%;height:1px;background-color:#d7d7d7}
 .right{float:right;margin:20px 0 10px 0;width:300px}
 .left{float:left;margin:20px 0 10px 0;width:180px}
 .clearfix:after{content:"";display:table;clear:both;}
 textarea,input[type="text"],input[type="password"]{width:95%;}
-input[type="submit"]{margin:5px 10px 20px 10px;}
+input[type="submit"]{padding:5px;border:0px;font-family:monospace;margin:5px 10px 20px 10px;}
 </style>
 </head>
 <body>
 
 <div class="box">
-<h1>fufix control center</h1>
+<pre>
+   m""           m""    "
+ mm#mm  m   m  mm#mm  mmm    m   m
+   #    #   #    #      #     #m#
+   #    #   #    #      #     m#m
+   #    "mm"#    #    mm#mm  m" "m
+</pre>
+<h1>control center</h1>
 <?php if ($_SESSION['fufix_cc_loggedin'] == "yes"): ?>
 
 <h2>Sender Blacklist</h2>
