@@ -71,7 +71,7 @@ A summary of what software is installed with which features enabled.
 * Submission port activated (TCP/587), TLS-only
 * No SMTPS on Port 465 (deprecated)
 * The restrictions used are a good compromise between blocking spam and avoiding false-positives
-* Incoming spam protection
+* Incoming and outgoing spam protection
 * VirusTotal Uploader for incoming mail
 * Autolearn ham and spam
 * [Heinlein Support](https://www.heinlein-support.de/) SA rules
