@@ -14,14 +14,18 @@ mkdir -p "$WORKDIR/scandir/$RAND" 2> /dev/null
 subject=$(cat /tmp/message.$$ | sed -n -e 's/^.*Subject: //p')
 
 for file in $(ls "$WORKDIR/scandir/$RAND/"); do
-        RP="$WORKDIR/scandir/$RAND/$file"
-        vt_response=$(/usr/bin/curl -X POST 'https://www.virustotal.com/vtapi/v2/file/scan' --form apikey=$APIKEY --form file=@"$RP")
-        echo $vt_response | /usr/bin/python -mjson.tool > /tmp/response.$$
-
+        upload="$WORKDIR/scandir/$RAND/$file"
+        vt_response=$(/usr/bin/curl -X POST 'https://www.virustotal.com/vtapi/v2/file/scan' --form apikey=$APIKEY --form file=@"$upload")
+        if [[ ! -z $vt_response ]]; then
+                echo $vt_response | /usr/bin/python -mjson.tool > /tmp/response.$$
+        else
+                echo "Something went wrong. Please check your API key." > /tmp/response.$$
+        fi
         for each in "${@:4}"; do
-                mail -s "Virus scan for \"$file\" in \"$subject\"" "$each" -a "From: virusservice" < /tmp/response.$$
+                if [[ $each =~ $(hostname -d) ]]; then
+                        /usr/bin/mail -s "Virus scan for \"$file\" in \"$subject\"" "$each" -a "From: vtupload" < /tmp/response.$$
+                fi
         done
-
 done
 
 cat /tmp/message.$$ | $SENDMAIL "$@"
