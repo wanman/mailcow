@@ -25,6 +25,14 @@ function check_login($user, $pass, $pfconfig) {
 function postfix_reload() {
 	shell_exec("sudo /usr/sbin/postfix reload");
 }
+function get_fufix_reject_attachments_toggle() {
+    $read_mime_check = file($GLOBALS["fufix_reject_attachments"])[0];
+	if (strpos($read_mime_check,'FILTER') !== false) {
+	    echo "checked";
+	} else {
+		echo "";
+	}
+}
 function get_fufix_reject_attachments() {
 	$read_mime_check = file($GLOBALS["fufix_reject_attachments"])[0];
 	preg_match('#\((.*?)\)#', $read_mime_check, $match);
@@ -51,9 +59,14 @@ function set_fufix_sender_access($what) {
 	$sender_map = $GLOBALS["fufix_sender_access"];
 	shell_exec("/usr/sbin/postmap $sender_map");
 }
-function set_fufix_reject_attachments($ext) {
-	foreach (explode("|", $ext) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return false; } }
-	file_put_contents($GLOBALS["fufix_reject_attachments"], "/name=[^>]*\.($ext)/     REJECT     Dangerous files are prohibited on this server.".PHP_EOL);
+function set_fufix_reject_attachments($ext, $action) {
+	if ($action == "reject") {
+		foreach (explode("|", $ext) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return false; } }
+		file_put_contents($GLOBALS["fufix_reject_attachments"], "/name=[^>]*\.($ext)/     REJECT     Dangerous files are prohibited on this server.".PHP_EOL);
+	} elseif ($action == "filter") {
+        foreach (explode("|", $ext) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return false; } }
+		file_put_contents($GLOBALS["fufix_reject_attachments"], "/name=[^>]*\.($ext)/     FILTER     vfilter:dummy".PHP_EOL);
+	}
 }
 function set_fufix_anonymize_headers($toggle) {
 	$template = '/^\s*(Received: from)[^\n]*(.*)/ REPLACE $1 [127.0.0.1] (localhost [127.0.0.1])$2
@@ -73,7 +86,11 @@ if (isset($_POST["sender"])) {
 	postfix_reload();
 }
 if (isset($_POST["ext"])) {
-	set_fufix_reject_attachments($_POST["ext"]);
+	if (isset($_POST["virustotaltoggle"]) && $_POST["virustotaltoggle"] == "on") {
+		set_fufix_reject_attachments($_POST["ext"], "filter");
+	else {
+		set_fufix_reject_attachments($_POST["ext"], "reject");
+	}
 	postfix_reload();
 }
 if (isset($_POST["anonymize_"])) {
@@ -141,6 +158,9 @@ Provide a "|" seperated list of extensions: ext1|ext2|ext3 <br />
 Warning: Mails will be bounced!</div>
 <div class="right"><input type="text" name="ext" value="<?php echo get_fufix_reject_attachments("ext") ?>">
 <p>Enter "DISABLED" as extension name to disable this feature.</p></div>
+<div class="clearfix"></div>
+<div class="left">Send <b>all files with one of the above extensions</b> to VirusTotal:</div>
+<div class="right"><input name="virustotaltoggle" type="checkbox" <?php get_fufix_reject_attachments_toggle() ?>></div>
 <div class="clearfix"></div>
 <input type="submit" value="Apply">
 </form>

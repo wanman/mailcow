@@ -255,9 +255,10 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_postfixpass/$my_postfixpass/g" /etc/dovecot/*
 			sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/dovecot/*
 			sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/dovecot/*
-			mkdir -p /var/vmail/sieve
+			mkdir -p /var/vmail/{sieve,vfilter}
 			cp dovecot/conf/spam-global.sieve /var/vmail/sieve/spam-global.sieve
 			cp dovecot/conf/default.sieve /var/vmail/sieve/default.sieve
+			cp misc/vfilter.sh /var/vmail/vfilter/
 			sievec /var/vmail/sieve/spam-global.sieve
 			chown -R vmail:vmail /var/vmail
 			cp dovecot/conf/doverecalcq /etc/cron.daily/; chmod 755 /etc/cron.daily/doverecalcq
@@ -290,6 +291,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
             tar xf pfadmin/inst/$postfixadmin_revision.tar -C pfadmin/inst/
 			mkdir -p /var/www/mail/pfadmin /var/run/fetchmail /etc/mail/postfixadmin 2> /dev/null
 			cp -R nginx/conf/htdocs/{fcc,index.php,robots.txt,autoconfig.xml} /var/www/mail/
+			touch /var/www/VT_API_KEY
 			mv pfadmin/inst/$postfixadmin_revision/* /var/www/mail/pfadmin/
             cp /var/www/mail/pfadmin/ADDITIONS/fetchmail.pl /usr/local/bin/fetchmail.pl
 			cp pfadmin/conf/config.local.php /var/www/mail/pfadmin/config.local.php
