@@ -88,7 +88,7 @@ if (isset($_POST["sender"])) {
 if (isset($_POST["ext"])) {
 	if (isset($_POST["virustotaltoggle"]) && $_POST["virustotaltoggle"] == "on") {
 		set_fufix_reject_attachments($_POST["ext"], "filter");
-	else {
+	} else {
 		set_fufix_reject_attachments($_POST["ext"], "reject");
 	}
 	postfix_reload();
