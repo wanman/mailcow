@@ -35,7 +35,7 @@ python-magic php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mime
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite mysql-client mysql-server nginx nginx-common nginx-extras dovecot-common dovecot-core \
 dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d postfix \
-postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin
+postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin curl munpack
 apt-get -y purge dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-pop3d dovecot-sieve
 apt-get -y autoremove --purge
 apt-get -y purge dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-pop3d dovecot-sieve
