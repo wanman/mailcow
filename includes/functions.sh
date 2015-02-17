@@ -237,7 +237,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			postmap /etc/postfix/helo_access
 			postmap /etc/postfix/fufix_sender_access
 			chown www-data: /etc/postfix/fufix_*
-			[[ -z "grep postfix /etc/sudoers" ]] && echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /bin/tar -cvjf /tmp/backup_vmail.tar.bz2 /var/vmail/' >> /etc/sudoers
+			[[ -z $(grep postfix /etc/sudoers) ]] && echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /bin/tar -cvjf /tmp/backup_vmail.tar.bz2 /var/vmail/' >> /etc/sudoers
 			;;
 		dovecot)
 			[[ -z $(grep fs.inotify.max_user_instances /etc/sysctl.conf) ]] && echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.conf
