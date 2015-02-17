@@ -24,7 +24,7 @@ for file in $(ls "$WORKDIR/scandir/$RAND/"); do
                 echo "Something went wrong. Please check your API key." > /tmp/response.$$
         fi
         for each in "${@:4}"; do
-                if [[ $VDOMAINS =~ $each ]]; then
+                if [[ -z $(echo $each | grep -i $VDOMAINS) ]]; then
                         /usr/bin/mail -s "Virus scan for \"$file\" in \"$subject\"" "$each" -a "From:noreply@$(hostname -d)" < /tmp/response.$$
                 fi
         done
