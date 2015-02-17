@@ -3,6 +3,8 @@ SENDMAIL="/usr/sbin/sendmail -G -i"
 WORKDIR="/var/vmail/vfilter"
 APIKEY=$(cat /var/www/VT_API_KEY)
 RAND=$(echo $RANDOM)
+PFDB=$(php -r 'include_once("/var/www/mail/pfadmin/config.local.php"); echo $CONF["database_name"];')
+VDOMAINS=$(mysql --defaults-file=/etc/mysql/debian.cnf -e "select domain from $PFDB.domain;" -BN)
 
 cat > /tmp/message.$$
 
@@ -22,8 +24,8 @@ for file in $(ls "$WORKDIR/scandir/$RAND/"); do
                 echo "Something went wrong. Please check your API key." > /tmp/response.$$
         fi
         for each in "${@:4}"; do
-                if [[ $each =~ $(hostname -d) ]]; then
-                        /usr/bin/mail -s "Virus scan for \"$file\" in \"$subject\"" "$each" -a "From: vtupload" < /tmp/response.$$
+                if [[ $VDOMAINS =~ $each ]]; then
+                        /usr/bin/mail -s "Virus scan for \"$file\" in \"$subject\"" "$each" -a "From:noreply@$(hostname -d)" < /tmp/response.$$
                 fi
         done
 done
