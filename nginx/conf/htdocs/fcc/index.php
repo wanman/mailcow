@@ -125,7 +125,7 @@ if (isset($_POST["backupdl"])) {
 <style type="text/css">
 a:active,a:hover,a:link,a:visited{color:inherit;text-decoration:none;outline:0;}
 body{overflow-y:scroll;background-color:#dfdfdf;font-family:"Lucida Sans Unicode","Lucida Grande",Sans-Serif;font-size:12px;color:#555}
-.box{background-color:#fff;width:530px;border-radius:5px;-moz-border-radius:5px;margin:30px auto;-moz-box-shadow:0 1px 10px 0 rgba(0,0,0,.25);-webkit-box-shadow:0 1px 10px 0 rgba(0,0,0,.25);box-shadow:0 1px 6px 0 rgba(0,0,0,.2);padding:$
+.box{background-color:#fff;width:530px;border-radius:5px;-moz-border-radius:5px;margin:30px auto;-moz-box-shadow:0 1px 10px 0 rgba(0,0,0,.25);-webkit-box-shadow:0 1px 10px 0 rgba(0,0,0,.25);box-shadow:0 1px 6px 0 rgba(0,0,0,.2);padding:30px 20px}
 .box h2{font-size:14px;color:#333;margin:2px;}
 .line{width:100%;height:1px;background-color:#d7d7d7}
 .right{float:right;margin:20px 0 10px 0;width:300px}
