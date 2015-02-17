@@ -237,7 +237,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			postmap /etc/postfix/helo_access
 			postmap /etc/postfix/fufix_sender_access
 			chown www-data: /etc/postfix/fufix_*
-			[[ -z "grep postfix /etc/sudoers" ]] && echo "%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /bin/tar -cvjf /tmp/backup_vmail.tar.bz2 /var/vmail/" >> /etc/sudoers
+			[[ -z "grep postfix /etc/sudoers" ]] && echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /bin/tar -cvjf /tmp/backup_vmail.tar.bz2 /var/vmail/' >> /etc/sudoers
 			;;
 		dovecot)
 			[[ -z $(grep fs.inotify.max_user_instances /etc/sysctl.conf) ]] && echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.conf
@@ -258,7 +258,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			mkdir -p /var/vmail/{sieve,vfilter}
 			cp dovecot/conf/spam-global.sieve /var/vmail/sieve/spam-global.sieve
 			cp dovecot/conf/default.sieve /var/vmail/sieve/default.sieve
-			cp misc/vfilter.sh /var/vmail/vfilter/ , chmod +x /var/vmail/vfilter/vfilter.sh
+			cp misc/vfilter.sh /var/vmail/vfilter/ ; chmod +x /var/vmail/vfilter/vfilter.sh
 			sievec /var/vmail/sieve/spam-global.sieve
 			chown -R vmail:vmail /var/vmail
 			cp dovecot/conf/doverecalcq /etc/cron.daily/; chmod 755 /etc/cron.daily/doverecalcq
