@@ -12,7 +12,6 @@
     - [Autolearn](#autolearn)
     - [Spam rewrite](#spam-rewrite)
     - [Spamassassin daemon options](#spamassassin-daemon-options)
-    - [Disable for outgoing messages](#disable-for-outgoing-messages)
   - [Postfix](#postfix)
     - [Un/block certain attachment types](#unblock-certain-attachment-types)
     - [Anonymize mail headers of outgoing mail](#anonymize-mail-headers-of-outgoing-mail)
@@ -72,7 +71,8 @@ A summary of what software is installed with which features enabled.
 * Submission port activated (TCP/587), TLS-only
 * No SMTPS on Port 465 (deprecated)
 * The restrictions used are a good compromise between blocking spam and avoiding false-positives
-* In- and outgoing spam protection plus attachment via mime_header_checks
+* Incoming spam protection
+* VirusTotal Uploader for incoming mail
 * Autolearn ham and spam
 * [Heinlein Support](https://www.heinlein-support.de/) SA rules
 * SSL based on BetterCrypto 
@@ -189,8 +189,6 @@ Services effected and necessary to restart are `postfix`, `dovecot` and `nginx`.
 Spamassassin main configuration file:
 * **/etc/spamassassin/local.cf**
 
-Virus and spam filters are **enabled for both incoming and outgoing** mail.
-
 ### Autolearn
 Move undetected spam to "Junk" to make Spamassassin autolearn it. This is done by a daily cronjob.
 
@@ -206,15 +204,6 @@ Default startup options for Spamassassin in `/etc/default/spamassassin`:
 - Enabled "spamd" by adding `ENABLED=1`
 - Enabled cronjob by setting `CRON=1`
 - Modified OPTIONS line to `OPTIONS="--create-prefs --max-children 5 --helper-home-dir"`.
-
-### Disable for outgoing messages
-You can disable outgoing mail-scanning if you want to:
-
-``` 
-submission inet n       -       -       -       -       smtpd
-  [...]
-  remove this line ->  -o content_filter=spamassassin
-```
 
 ## Postfix
 The files "main.cf" and "master.cf" contain a lot of changes. You should now what you do if you modify these files.
