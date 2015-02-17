@@ -63,6 +63,6 @@ mailman   unix  -       n       n       -       -       pipe
   ${nexthop} ${user}
 spamassassin unix -     n       n       -       -       pipe
   user=debian-spamd argv=/usr/bin/spamc -f -e /usr/sbin/sendmail -oi -f ${sender} ${recipient}
-vfilter    unix  -        n      n       -       -       pipe
+vfilter    unix  -        n      n       -       1       pipe
   flags=Rq user=vmail null_sender=
   argv=/var/vmail/vfilter/vfilter.sh -f ${sender} -- ${recipient}
