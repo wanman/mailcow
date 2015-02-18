@@ -37,7 +37,7 @@ for file in $(ls "$WORKDIR/scandir/$RAND/"); do
 done
 
 spamc_args=$(echo ${@:2})
-sudo -H -u debian-spamd | /usr/bin/spamc -f -e /usr/sbin/sendmail -oi -f ${spamc_args//"--"} < /tmp/message.$$
+sudo -H -u debian-spamd /usr/bin/spamc -f -e /usr/sbin/sendmail -oi -f ${spamc_args//"--"} < /tmp/message.$$
 
 rm -r /tmp/message*
 rm -r /tmp/response*
