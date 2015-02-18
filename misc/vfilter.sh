@@ -1,5 +1,4 @@
 #!/bin/bash
-SENDMAIL="/usr/sbin/sendmail -G -i"
 WORKDIR="/var/vmail/vfilter"
 APIKEY=$(cat /var/www/VT_API_KEY)
 RAND=$(echo $RANDOM)
@@ -30,7 +29,8 @@ for file in $(ls "$WORKDIR/scandir/$RAND/"); do
         done
 done
 
-cat /tmp/message.$$ | $SENDMAIL "$@"
+spamc_args=$(echo ${@:2})
+sudo -H -u debian-spamd | /usr/bin/spamc -f -e /usr/sbin/sendmail -oi -f ${spamc_args//"--"} < /tmp/message.$$
 
 # Cleanup
 rm -r /tmp/message*
