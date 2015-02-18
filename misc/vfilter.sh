@@ -15,13 +15,20 @@ mkdir -p "$WORKDIR/scandir/$RAND" 2> /dev/null
 subject=$(cat /tmp/message.$$ | sed -n -e 's/^.*Subject: //p')
 
 for file in $(ls "$WORKDIR/scandir/$RAND/"); do
+
         upload="$WORKDIR/scandir/$RAND/$file"
-        vt_response=$(/usr/bin/curl -X POST 'https://www.virustotal.com/vtapi/v2/file/scan' --form apikey=$APIKEY --form file=@"$upload")
-        if [[ ! -z $vt_response ]]; then
-                echo $vt_response | /usr/bin/python -mjson.tool > /tmp/response.$$
+        md5sum_upload=$(md5sum $upload | head -c 32)
+        vt_hash_report_lookup=$(/usr/bin/curl -s -X POST 'https://www.virustotal.com/vtapi/v2/file/report' --form apikey=$APIKEY --form resource=$md5sum_upload)
+
+        if [[ $vt_hash_report_lookup =~ "Scan finished" ]]; then
+                echo $vt_hash_report_lookup | /usr/bin/python -mjson.tool > /tmp/response.$$
+        elif [[ $vt_hash_report_lookup =~ "not among the finished" ]]; then
+                vt_new_scan=$(/usr/bin/curl -X POST 'https://www.virustotal.com/vtapi/v2/file/scan' --form apikey=$APIKEY --form file=@"$upload")
+                echo $vt_new_scan | /usr/bin/python -mjson.tool > /tmp/response.$$
         else
                 echo "Something went wrong. Please check your API key." > /tmp/response.$$
         fi
+
         for each in "${@:4}"; do
                 if [[ -z $(echo $each | grep -i $VDOMAINS) ]]; then
                         /usr/bin/mail -s "Virus scan for \"$file\" in \"$subject\"" "$each" -a "From:noreply@$(hostname -d)" < /tmp/response.$$
@@ -32,7 +39,6 @@ done
 spamc_args=$(echo ${@:2})
 sudo -H -u debian-spamd | /usr/bin/spamc -f -e /usr/sbin/sendmail -oi -f ${spamc_args//"--"} < /tmp/message.$$
 
-# Cleanup
 rm -r /tmp/message*
 rm -r /tmp/response*
 rm -rf $WORKDIR/scandir/*
