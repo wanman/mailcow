@@ -16,11 +16,12 @@ include_once("triggers.inc.php");
 <div class="box">
 <a href="."><img alt="fcc" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMUAAAA0CAYAAAA69vxMAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwAAADsABataJCQAAABh0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC41ZYUyZQAABOFJREFUeF7tlgFy3TAIRHv/S6dR2/0hb0AS/pLt1HTmecWCgNrJtL8+Pj6KojC4ZlE8Gdc8yuefT/lSEflFTPTOIn83V829Atfs0V4KsTmrIvKLv+/EYn2rIvJ3c9XcK3DNHnw50sizMf3i+7ux78f68mxMfzdXzb0C1+zBlyMtjmHfY73Le+CaPexHtFocw77Hepf3wDV72I9otTiGfY/1Lu+BaxbFk3HNongyrlkUT+br8O//sz2NYN2MZuF96SrYV5qF93vqwZoZzcL7R3U3nCddBfu+tD2+GQOd9Uaahfelq2BfaRbeHynPNp7VLLx/VHfDedJVsO9L20OGYDwiqu/5WdijwZp3YO8Ga2Zgj0bke2R7ND8LezSO+LvhzAZr3oG9G398WzDSCNbNaBbel66CfaVZeL+nHqyZ0Sy8f1R3w3nSVbDvS9vjm5FUQX+kWXhfugr2lWbh/ax63kiz8P5R3Q3nSVfBvi9tj29GUgX9kWbhfekq2Feahfez6nkjzcL7R3U3nCddBfu+tD2KovjCNUfwN+ssds/d3T/i7HlH0I532TW7T6beNUdkBqxk99zd/SPOnncE7XiXXb192pnYnNUerhnRGnqwbjWcJ1h3FPYVrFsN5zVYczXcT7DuLLiH6OU81M/DNSPYWLBuNZwnWHcU9hWsWw3nNVhzNdxPsO4suIdQjhrR8hGu2SPTfCW75+7uH3HFzCx2xzvsGe2js6eW5vVwzR5qOtN8Jbvn7u4fcdXcDHfbMdqHfqQjXLMonoxrFsWTcc0R2X+OVrF77u7+EWfPO4J2vMOubQdic1Z1Jsp5uGYEGwvWrYbzBOuOwr6CdavhvAZrrob7CdadieZbjWCd1QjXHDHbfDW75+7uH3H2vCNoxzvsyl2ks540wjV7tIYW5nexe+7u/hFXzMxid7zDntrBU0vzmLca4ZoRrZkH61bDeYJ1R2FfwbrVcF6DNVfD/QTrzkTzrUawzmqEa/aYbbya3XN394+4am6Gu+3IfSIV9KURrlkUT8Y178rsb/qIVX2K68h+w0y9a47IDFjJqrlRn8jfzdnzjqAd77Jrdp9MvWuOyAxYiTeX3kgjz8b0d3PVvFmd9UaahfelkdfDq6f30vaYpV3yYN0uNMvObGfS85WjerTcTjivwZodcGYj8iOyfZqfhT0aNmd1hFffzuSPr4IZ2ECw7kw0f1Y9Ws6DdavhvAZrdqA5MxrBuhnNwvvSVbDvS9sjAxtcDfcZacRs3WqumMuZWRX0R5qF96WrYN+XtkcGNrga7jPSiNm61czMbTkL81nU46gK+iPNwvvSVbDvS9vjabS/vIX5u8A9BeuKtbjmU/gpP2Q/Zc//Bde8Izt+MHb03MFP2fN/wTXfRR+RH3PWF738kZx85ulHqN4S5SPfEuXlM0+/2INrvkP0Aenb2J69OPLoR2cvjrwerGcc+b3Ynr048op9uOY7RB+Qvo3t2YsjL+MzjrwerI/iyPdinYlqbY31in245jtEH5C+je3ZiyMv4zOOvB6st3F0HsX2HDFTU6zDNd9BH5AfkZ6N7dmLIy/jM468Hqy3cXQexTor9hjli7W45rvoI/Jjjvwopm9zjC3KRTWRH6F6y0zennuxRTmbt16xD9csfOqH8xm4ZuFTvxTPwDWL4rl8/PoN6ZbaIgGBI+oAAAAASUVORK5CYII=" /></a>
 <?php if ($_SESSION['fufix_cc_loggedin'] == "yes"): ?>
-
+<p>Clicking on any "Apply" button will inevitably reload Postfix!</p>
+<p>Invalid syntax will be ignored.</p>
 <h2>Sender Blacklist</h2>
 <form method="post">
 <div class="line"></div>
-<div class="left">Specify a list of senders or domains to blacklist access:</div>
+<div class="left">Specify a list of senders or domains to blacklist access. <br />Think of it as a hashed check_sender_access table.</div>
 <div class="right"><textarea rows="6" name="sender"><?php echo get_fufix_sender_access() ?></textarea></div>
 <div class="clearfix"></div>
 <input type="submit" value="Apply">
