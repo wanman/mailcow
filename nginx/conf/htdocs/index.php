@@ -43,21 +43,21 @@ include_once("fcc/vars.inc.php");
 <table class="table">
 <thead>
   <tr>
-	<th>Service</th>
-	<th>Port</th>
-	<th>Encryption</th>
+        <th>Service</th>
+        <th>Server:Port/Prot.</th>
+        <th>Encryption</th>
   </tr>
 </thead>
 <tbody>
   <tr>
-	<td>IMAP</td>
-	<td>143</td>
-	<td>STARTTLS</td>
+        <td>IMAP</td>
+        <td><code><?php echo $mailname; ?>:143/tcp</code></td>
+        <td>STARTTLS</td>
   </tr>
   <tr>
-	<td>IMAPS</td>
-	<td>993</td>
-	<td>SSL</td>
+        <td>IMAPS</td>
+        <td><code><?php echo $mailname; ?>:993/tcp</code></td>
+        <td>SSL</td>
   </tr>
 </tbody>
 </table>
@@ -68,16 +68,16 @@ include_once("fcc/vars.inc.php");
 <table class="table">
 <thead>
   <tr>
-	<th>Service</th>
-	<th>Port</th>
-	<th>Encryption</th>
+        <th>Service</th>
+        <th>Port</th>
+        <th>Encryption</th>
   </tr>
 </thead>
 <tbody>
   <tr>
-	<td>SMTP</td>
-	<td>587</td>
-	<td>STARTTLS</td>
+        <td>SMTP</td>
+        <td><code><?php echo $mailname; ?>:587/tcp</code></td>
+        <td>STARTTLS</td>
   </tr>
 </tbody>
 </table>
