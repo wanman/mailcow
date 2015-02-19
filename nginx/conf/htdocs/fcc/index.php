@@ -124,7 +124,7 @@ This is a very simple function that may or may not work. Consider it unstable.</
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-<link href="css/signin.form.css" rel="stylesheet">
+<link href="signin.form.css" rel="stylesheet">
 </body>
 </html>
 
