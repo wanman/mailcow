@@ -106,7 +106,7 @@ include_once("fcc/vars.inc.php");
 <hr>
 <footer>
 <h4>Health check (© MXToolBox)</h4>
-<p>The Domain Health Check will execute hundreds of domain/email/network performance tests to make sure all of your systems are online and performing optimally. The report will then return results for your domain and highlight critical problem areas for your domain that need to be resolved.</p>
+<p>"The Domain Health Check will execute hundreds of domain/email/network performance tests to make sure all of your systems are online and performing optimally. The report will then return results for your domain and highlight critical problem areas for your domain that need to be resolved."</p>
 <a class="btn btn-default" href="http://mxtoolbox.com/SuperTool.aspx?action=smtp:<?php echo $mailname ?>" target="_blank">Run &raquo;</a>
 </footer>
 </div> <!-- /container -->
@@ -124,4 +124,3 @@ include_once("fcc/vars.inc.php");
 <link href="../css/signin.form.css" rel="stylesheet">
 </body>
 </html>
-
