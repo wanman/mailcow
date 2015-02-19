@@ -76,4 +76,3 @@ function set_fufix_anonymize_headers($toggle) {
         }
 }
 ?>
-

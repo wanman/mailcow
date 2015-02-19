@@ -42,4 +42,3 @@ if ($_SESSION['fufix_cc_loggedin'] == "yes") {
         }
 }
 ?>
-
