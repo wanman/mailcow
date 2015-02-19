@@ -51,6 +51,8 @@ This installer is permanently **tested on Debians stable branch** but is reporte
 Please see https://www.debinux.de/fufix for further information.
 Feel free to leave a comment or question.
 
+![fufix v0.8](https://www.debinux.de/wp-content/uploads/ffg.png "fufix v0.8")
+
 # Introduction
 A summary of what software is installed with which features enabled.
 
