@@ -6,6 +6,7 @@
 - [Introduction](#introduction)
 - [Before You Begin](#before-you-begin)
 - [Installation](#installation)
+- [Upgrade](#upgrade)
 - [Configuration and common tasks](#configuration-and-common-tasks)
   - [SSL certificate](#ssl-certificate)
   - [Spamassassin](#spamassassin)
