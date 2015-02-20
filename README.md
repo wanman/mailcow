@@ -13,8 +13,6 @@
     - [Spam rewrite](#spam-rewrite)
     - [Spamassassin daemon options](#spamassassin-daemon-options)
   - [Postfix](#postfix)
-    - [Un/block certain attachment types](#unblock-certain-attachment-types)
-    - [Anonymize mail headers of outgoing mail](#anonymize-mail-headers-of-outgoing-mail)
   - [Nginx](#nginx)
   - [Fail2ban](#fail2ban)
   - [Postfixadmin](#postfixadmin)
@@ -34,15 +32,11 @@ fufix
 =====
 
 ```
-
-
    m""           m""    "
  mm#mm  m   m  mm#mm  mmm    m   m
    #    #   #    #      #     #m#
    #    #   #    #      #     m#m
    #    "mm"#    #    mm#mm  m" "m
-
-
 ```
 
 A mail server install script with a lot of features for **Debian and Debian based distributions**. 
@@ -57,31 +51,27 @@ Feel free to leave a comment or question.
 A summary of what software is installed with which features enabled.
 
 **General setup**
-* System environment adjustments (Hostname, Timezone,...)
+* System environment adjustments (hostname, timzone, etc.)
 * Automatically generated passwords with high complexity
-* Self-signed SSL certificate for all supported services
-* Nginx and PHP5 fully optimized
+* Self-signed SSL certificate for all installed and supporting services
+* Optimized Nginx (+PHP5-FPM) installation (HTTP-to-HTTPS, BetterCrypto)
 * MySQL database backend
-* DNS checks via Google DNS after setup
-* Syslog adjustments
-* Autoconfiguration for Thunderbird
-* Installs and configures Fail2ban
-* A dashboard / webpanel
+* DNS-Checks by Google DNS (PTR, A-Record, SPF etc.)
+* Learn ham and spam, [Heinlein Support](https://www.heinlein-support.de/) SA rules included
+* Fail2ban brute force protection
+* A webpanel
 
 **Postfix**
 * Postscreen on Port 25 to block most zombies sending spam
 * Submission port activated (TCP/587), TLS-only
-* No SMTPS on Port 465 (deprecated)
 * The restrictions used are a good compromise between blocking spam and avoiding false-positives
 * Incoming and outgoing spam protection
 * VirusTotal Uploader for incoming mail
-* Autolearn ham and spam
-* [Heinlein Support](https://www.heinlein-support.de/) SA rules
 * SSL based on BetterCrypto 
 
 **Dovecot**
-* Default mailboxes to subscribe to automatically (Inbox, Sent, Drafts, Trash, Junk - SPECIAL-USE RFC 6154 tags)
-* Sieve/ManageSieve (TCP/4190)
+* Default mailboxes to subscribe to automatically (Inbox, Sent, Drafts, Trash, Junk - "SPECIAL-USE" tags)
+* Sieve/ManageSieve
 * Global sieve filter: Move mail marked as spam into "Junk"
 * (IMAP) Quotas
 * LMTP service for Postfix virtual transport
@@ -94,7 +84,7 @@ A summary of what software is installed with which features enabled.
 
 **Roundcube**
 * ManageSieve support (w/ vacation)
-* Change password
+* Users can change password
 * Attachment reminder (multiple locales)
 * Zip-download marked messages
 * 25M attachment size (see "File size limitation")
