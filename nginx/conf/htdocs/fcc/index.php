@@ -43,7 +43,7 @@ include_once("triggers.inc.php");
 		</div><!--/.nav-collapse -->
 	</div><!--/.container-fluid -->
 </nav>
-<form action="fcc/" method="post" id="logout"><input type="hidden" name="logout"></form>
+<form action="/fcc/" method="post" id="logout"><input type="hidden" name="logout"></form>
 <div class="container">
 <?php if ($_SESSION['fufix_cc_loggedin'] == "yes"): ?>
 <div class="row">
