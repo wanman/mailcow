@@ -173,10 +173,10 @@ Remember to create an alias- or a mailbox for Postmaster. ;-)
 # Upgrade
 **Please run all commands as root**
 
-Upgrade is supported since fufix v0.7.x
+Upgrade is supported since fufix v0.7.x. You need the file `installer.log` from a previous installation.
 
 To start the upgrade, run the following command:
-<pre>./install -u /path/to/installer.log</pre>
+<pre>./install.sh -u /path/to/installer.log</pre>
 
 # Configuration and common tasks
 To help you modify the configuration, I created this little overview to get you started.
