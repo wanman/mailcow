@@ -32,7 +32,7 @@ for file in $(ls "$WORKDIR/scandir/$RAND/"); do
         fi
 
         for each in "${@:4}"; do
-                if [[ -z $(echo $each | grep -i $VDOMAINS) ]]; then
+                if [[ -z $(echo $each | grep -i "$VDOMAINS") ]]; then
                         /usr/bin/mail -s "Virus scan for \"$file\" in \"$subject\"" "$each" -a "From:noreply@$(hostname -d)" < /tmp/response.$$
                 fi
         done
