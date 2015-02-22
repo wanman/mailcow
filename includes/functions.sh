@@ -132,7 +132,7 @@ checkconfig() {
 installtask() {
 	case $1 in
 		environment)
-			getpublicipv4=$(wget -q4O- ip4.telize.com)
+			getpublicipv4=$(wget -q4O- icanhazip.com)
 			if [[ $getpublicipv4 =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
 				cat > /etc/hosts<<'EOF'
 127.0.0.1 localhost
@@ -142,7 +142,7 @@ ff02::2 ip6-allrouters
 EOF
 				echo $getpublicipv4 $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
 				echo $sys_hostname.$sys_domain > /etc/mailname
-				getpublicipv6=$(wget -t2 -T1 -q6O- ip6.telize.com)
+				getpublicipv6=$(wget -t2 -T1 -q6O- icanhazip.com)
 					if is_ipv6 $getpublicipv6; then
 						echo $getpublicipv6 $sys_hostname.$sys_domain $sys_hostname >> /etc/hosts
 					fi
