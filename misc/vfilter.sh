@@ -3,7 +3,7 @@ WORKDIR="/var/vmail/vfilter"
 APIKEY=$(cat /var/www/VT_API_KEY)
 RAND=$(echo $RANDOM)
 PFDB=$(php -r 'include_once("/var/www/mail/pfadmin/config.local.php"); echo $CONF["database_name"];')
-VDOMAINS=$(mysql --defaults-file=/etc/mysql/debian.cnf -e "select domain from $PFDB.domain;" -BN)
+VDOMAINS=$(mysql -u vmail  -e "select domain from postfixdb.domain;" -BN)
 REGEX_EXT="/etc/postfix/fufix_reject_attachments.regex"
 
 cat > /tmp/message.$$
@@ -31,17 +31,16 @@ for file in $(ls "$WORKDIR/scandir/$RAND/"); do
                 echo "Something went wrong. Please check your API key." > /tmp/response.$$
         fi
 
-        for each in "${@:4}"; do
-                if [[ -z $(echo $each | grep -i "$VDOMAINS") ]]; then
+        for each in "${@:2}"; do
+                domain=$(echo $each | cut -d @ -f2)
+                if [[ ! -z $(echo $VDOMAINS | grep -i $domain) ]]; then
                         /usr/bin/mail -s "Virus scan for \"$file\" in \"$subject\"" "$each" -a "From:noreply@$(hostname -d)" < /tmp/response.$$
                 fi
         done
 done
 
-spamc_args=$(echo ${@:2})
-sudo -H -u debian-spamd /usr/bin/spamc -f -e /usr/sbin/sendmail -oi -f ${spamc_args//"--"} < /tmp/message.$$
+sudo -H -u debian-spamd /usr/bin/spamc -f -e /usr/sbin/sendmail -oi -f ${@} < /tmp/message.$$
 
 rm -r /tmp/message*
 rm -r /tmp/response*
 rm -rf $WORKDIR/scandir/*
-
