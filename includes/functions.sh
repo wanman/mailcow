@@ -217,6 +217,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			mysql --defaults-file=/etc/mysql/debian.cnf -e "DROP DATABASE IF EXISTS $my_postfixdb; DROP DATABASE IF EXISTS $my_rcdb;"
 			mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_postfixdb; GRANT ALL PRIVILEGES ON $my_postfixdb.* TO '$my_postfixuser'@'localhost' IDENTIFIED BY '$my_postfixpass';"
 			mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'localhost' IDENTIFIED BY '$my_rcpass';"
+			mysql --defaults-file=/etc/mysql/debian.cnf -e "GRANT SELECT ON $my_postfixdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
 			;;
 		postfix)
 			cp -R postfix/conf/* /etc/postfix/
@@ -381,7 +382,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			echo "$(textb [INFO]) - Dont be confused if you see a PHP Notice..."
 			wget --quiet --no-check-certificate -O /dev/null https://localhost/pfadmin/setup.php
 			php /var/www/mail/pfadmin/scripts/postfixadmin-cli.php admin add $pfadmin_adminuser --password $pfadmin_adminpass --password2 $pfadmin_adminpass --superadmin
-            mysql --defaults-file=/etc/mysql/debian.cnf -e "GRANT SELECT ON $my_postfixdb.domain TO vmail@'localhost';"
 			;;
 	esac
 }
