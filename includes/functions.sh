@@ -305,7 +305,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/domain.tld/$sys_domain/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
 			sed -i "s/change-this-to-your.domain.tld/$sys_domain/g" /var/www/mail/pfadmin/config.inc.php
 			chmod +x /usr/local/bin/fetchmail.pl ; chown -R www-data: /var/www/ ; chown -R vmail: /var/run/fetchmail
-			mysql --defaults-file=/etc/mysql/debian.cnf -e "GRANT SELECT ON $my_postfixdb.domain TO vmail@'localhost';"
 			rm -rf pfadmin/inst/$postfixadmin_revision
 			;;
 		roundcube)
@@ -382,6 +381,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			echo "$(textb [INFO]) - Dont be confused if you see a PHP Notice..."
 			wget --quiet --no-check-certificate -O /dev/null https://localhost/pfadmin/setup.php
 			php /var/www/mail/pfadmin/scripts/postfixadmin-cli.php admin add $pfadmin_adminuser --password $pfadmin_adminpass --password2 $pfadmin_adminpass --superadmin
+            mysql --defaults-file=/etc/mysql/debian.cnf -e "GRANT SELECT ON $my_postfixdb.domain TO vmail@'localhost';"
 			;;
 	esac
 }
