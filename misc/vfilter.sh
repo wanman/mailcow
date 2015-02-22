@@ -3,7 +3,7 @@ WORKDIR="/var/vmail/vfilter"
 APIKEY=$(cat /var/www/VT_API_KEY)
 RAND=$(echo $RANDOM)
 PFDB=$(php -r 'include_once("/var/www/mail/pfadmin/config.local.php"); echo $CONF["database_name"];')
-VDOMAINS=$(mysql -u vmail  -e "select domain from postfixdb.domain;" -BN)
+VDOMAINS=$(mysql -u vmail  -e "select domain from $PFDB.domain;" -BN)
 REGEX_EXT="/etc/postfix/fufix_reject_attachments.regex"
 
 cat > /tmp/message.$$
