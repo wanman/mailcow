@@ -3,5 +3,5 @@ if [[ ! -z $(/bin/su debian-spamd -c "/usr/bin/sa-update --nogpg --channel spama
 exit 0
 else
 /bin/su debian-spamd -c "/usr/bin/sa-compile --quiet"
-$(/bin/which service) spamassassin reload
+$(/bin/which service) spamassassin reload > /dev/null
 fi
