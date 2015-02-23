@@ -176,10 +176,14 @@ Remember to create an alias- or a mailbox for Postmaster. ;-)
 Upgrade is supported since fufix v0.7.x. You need the file `installer.log` from a previous installation.
 
 **! IMPORTANT for v0.7.x to v0.8:** Please install the following packages before running the upgrade:
-```sudo bzip2 curl mpack fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl```
+```
+apt-get install sudo bzip2 curl mpack fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl
+```
 
 To start the upgrade, run the following command:
-<pre>./install.sh -u /path/to/installer.log</pre>
+```
+./install.sh -u /path/to/installer.log
+```
 
 # Configuration and common tasks
 To help you modify the configuration, I created this little overview to get you started.
