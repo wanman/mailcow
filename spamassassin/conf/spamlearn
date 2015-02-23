@@ -9,4 +9,5 @@ for domain in $(ls /var/vmail); do
 		done
 	fi
 done
+sa-learn --dbpath /var/lib/spamassassin/.spamassassin --sync > /dev/null
 chown -R debian-spamd: /var/lib/spamassassin/.spamassassin
