@@ -449,10 +449,14 @@ A backup will be stored in ./before_upgrade_$timestamp
 	if [[ ! -z $(openssl x509 -issuer -in /etc/ssl/mail/mail.crt | grep $sys_hostname.$sys_domain ) ]]; then
 		cp /etc/ssl/mail/mail.crt /usr/local/share/ca-certificates/
 		update-ca-certificates
-		returnwait "Update CA certificate store" "Postfix configuration"
+		returnwait "Update CA certificate store" "Package installation"
 	else
-		returnwait "Update CA certificate store (skipped)" "Postfix configuration"
+		returnwait "Update CA certificate store (skipped)" "Package installation"
 	fi
+
+	installtask installpackages
+    returnwait "Package installation" "Postfix configuration"
+
 	installtask postfix
 	returnwait "Postfix configuration" "Dovecot configuration"
 
