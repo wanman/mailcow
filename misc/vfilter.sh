@@ -10,7 +10,7 @@ cat > /tmp/message.$$
 
 mkdir -p "$WORKDIR/scandir/$RAND" 2> /dev/null
 
-/usr/bin/munpack -fqt -C "$WORKDIR/scandir/$RAND" < /tmp/message.$$
+/usr/bin/munpack -fq -C "$WORKDIR/scandir/$RAND" < /tmp/message.$$
 /bin/rm "$WORKDIR/scandir/$RAND"/part*
 
 subject=$(cat /tmp/message.$$ | sed -n -e 's/^.*Subject: //p')
