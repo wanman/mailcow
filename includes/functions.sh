@@ -245,6 +245,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			[[ -z $(grep fs.inotify.max_user_instances /etc/sysctl.conf) ]] && echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.conf
 			sysctl -p > /dev/null
 			rm -rf /etc/dovecot/* 2> /dev/null
+			mkdir /etc/dovecot/conf.d 2> /dev/null
 			cp -R dovecot/conf/*.conf /etc/dovecot/
 			userdel vmail 2> /dev/null
 			groupadd -g 5000 vmail
