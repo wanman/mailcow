@@ -308,6 +308,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/change-this-to-your.domain.tld/$sys_domain/g" /var/www/mail/pfadmin/config.inc.php
 			chmod +x /usr/local/bin/fetchmail.pl ; chown -R www-data: /var/www/ ; chown -R vmail: /var/run/fetchmail
 			rm -rf pfadmin/inst/$postfixadmin_revision
+			[[ -z $(grep fetchmail /etc/rc.local) ]] && sed -i '/exit 0/i\test -d /var/run/fetchmail || install -m 755 -o vmail -g vmail -d /var/run/fetchmail/' /etc/rc.local
 			;;
 		roundcube)
 			mkdir -p /var/www/mail/rc
