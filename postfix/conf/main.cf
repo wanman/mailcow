@@ -53,7 +53,6 @@ smtpd_sender_restrictions = reject_authenticated_sender_login_mismatch,
 smtpd_recipient_restrictions = permit_sasl_authenticated,
    permit_mynetworks,
    reject_unauth_destination,
-   check_helo_access hash:/etc/postfix/helo_access
    reject_non_fqdn_helo_hostname,
    reject_unknown_helo_hostname,
    reject_unknown_reverse_client_hostname,

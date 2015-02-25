@@ -1,2 +1,0 @@
-# Reject HELO from domain.tld - authenticated users and users on mynetworks are still allowed to HELO with this domain
-domain.tld REJECT
