@@ -244,7 +244,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			[[ -z $(grep fs.inotify.max_user_instances /etc/sysctl.conf) ]] && echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.conf
 			sysctl -p > /dev/null
 			rm -rf /etc/dovecot/* 2> /dev/null
-			mkdir /etc/dovecot/conf.d 2> /dev/null
 			cp -R dovecot/conf/*.conf /etc/dovecot/
 			userdel vmail 2> /dev/null
 			groupadd -g 5000 vmail
@@ -257,6 +256,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_postfixpass/$my_postfixpass/g" /etc/dovecot/*
 			sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/dovecot/*
 			sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/dovecot/*
+			mkdir /etc/dovecot/conf.d 2> /dev/null
 			mkdir -p /var/vmail/{sieve,vfilter}
 			cp dovecot/conf/spam-global.sieve /var/vmail/sieve/spam-global.sieve
 			cp dovecot/conf/default.sieve /var/vmail/sieve/default.sieve
