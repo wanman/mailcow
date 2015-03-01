@@ -392,7 +392,7 @@ upgradetask() {
 		echo "$(redb [ERR]) - \"$1\" is not a valid file"
 		return 1
 	fi
-	if [[ ! -f /etc/fufix_version || -z $(cat /etc/fufix_version | grep "0.7") ]]; then
+	if [[ ! -f /etc/fufix_version || -z $(cat /etc/fufix_version | grep -E "0.7|0.8") ]]; then
 		echo "$(redb [ERR]) - Upgrade not supported"
 		return 1
 	fi
@@ -489,6 +489,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 
 	installtask restartservices
 	returnwait "Restarting services" "Finish upgrade"
+	mysql --defaults-file=/etc/mysql/debian.cnf -e "GRANT SELECT ON $my_postfixdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
 	echo Done.
 	echo
 	echo You will find your old \"installer.log\" file updated.
