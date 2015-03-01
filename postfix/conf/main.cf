@@ -43,6 +43,7 @@ smtp_header_checks = pcre:/etc/postfix/fufix_anonymize_headers.pcre
 
 # Sender, recipient, client and data restrictions
 smtpd_sender_restrictions = reject_authenticated_sender_login_mismatch,
+   permit_mynetworks,
    reject_sender_login_mismatch,
    permit_sasl_authenticated,
    permit_mynetworks,
