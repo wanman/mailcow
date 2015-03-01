@@ -235,7 +235,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_postfixpass/$my_postfixpass/g" /etc/postfix/sql/*
 			sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/postfix/sql/*
 			sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/postfix/sql/*
-			postmap /etc/postfix/helo_access
 			postmap /etc/postfix/fufix_sender_access
 			chown www-data: /etc/postfix/fufix_*
 			[[ -z $(grep postfix /etc/sudoers) ]] && echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /bin/tar -cvjf /tmp/backup_vmail.tar.bz2 /var/vmail/' >> /etc/sudoers
