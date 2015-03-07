@@ -37,8 +37,10 @@ function echo_fufix_opendkim_table() {
 	foreach($dnstxt_files as $file) {
 	echo "<div class=\"row\">
 		<div class=\"col-xs-2\">
-			DNS record for Domain <mark><strong>", explode("_", $file)[1], "</mark></strong> with selector 
-\"", explode("_", $file)[0], "\":</b>
+			<p class=\"text-justify\">
+			Domain:<br /><strong>", explode("_", $file)[1], "</strong><br />
+			Selector:<br /><strong>", explode("_", $file)[0], "</strong><br />
+			</p>
 		</div>
 		<div class=\"col-xs-9\">
 			<pre>", file_get_contents($GLOBALS["fufix_opendkim_dnstxt_folder"]."/".$file), "</pre>
