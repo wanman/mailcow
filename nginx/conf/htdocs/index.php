@@ -75,12 +75,12 @@ include_once("fcc/vars.inc.php");
 <div class="col-md-4">
         <h2>Mailbox Administration</h2>
         <p><b>Postfix Admin</b> is a web based interface used to manage mailboxes, virtual domains and aliases.</p>
-        <p><a class="btn btn-sm btn-warning" href="pfadmin/" role="button">Open &raquo;</a></p>
+        <p><a class="btn btn-m btn-warning" href="pfadmin/" role="button">Open &raquo;</a></p>
 </div>
 <div class="col-md-4">
         <h3>fufix control center</h3>
         <p><b>Only administrators</b> want to use the fufix control center. Change settings on lowest level here.</p>
-        <p><a class="btn btn-xs btn-danger" href="fcc/" role="button">Open &raquo;</a></p>
+        <p><a class="btn btn-m btn-danger" href="fcc/" role="button">Open &raquo;</a></p>
 </div>
 </div>
 <hr>

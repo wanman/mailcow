@@ -37,14 +37,15 @@ function echo_fufix_opendkim_table() {
 	foreach($dnstxt_files as $file) {
 	echo "<div class=\"row\">
 		<div class=\"col-xs-2\">
-			Key for domain <b>", explode("_", $file)[1], "</b> with selector <b>", explode("_", $file)[0], 
-":</b>
+			DNS record for Domain <mark><strong>", explode("_", $file)[1], "</mark></strong> with selector 
+\"", explode("_", $file)[0], "\":</b>
 		</div>
 		<div class=\"col-xs-9\">
 			<pre>", file_get_contents($GLOBALS["fufix_opendkim_dnstxt_folder"]."/".$file), "</pre>
 		</div>
 		<div class=\"col-xs-1\">
-			<a href=\"?del=", $file, "\" onclick=\"return confirm('Are you sure?')\"><span class=\"glyphicon glyphicon-remove-circle\"></span></a>
+			<a href=\"?del=", $file, "\" onclick=\"return confirm('Are you sure?')\"><span 
+class=\"glyphicon glyphicon-remove-circle\"></span></a>
 		</div>
 	</div>";
 	}
