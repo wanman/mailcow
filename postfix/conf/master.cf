@@ -11,7 +11,7 @@ smtpd      pass  -       -       n       -       -       smtpd
   -o smtpd_tls_auth_only=no
   -o mynetworks=
   -o content_filter=spamassassin
-
+  -o smtpd_milters=inet:127.0.0.1:10040
 
 # For mail submitting users. Authenticated clients and known networks only.
 submission inet n       -       -       -       -       smtpd

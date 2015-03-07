@@ -13,7 +13,8 @@ add)
         mv /tmp/${SELECTOR}.txt /etc/opendkim/dnstxt/${SELECTOR}_${DOMAIN}
         mv /tmp/${SELECTOR}.private /etc/opendkim/keyfiles/${SELECTOR}_${DOMAIN}.dkim
         sed -i "s/ ; ----- DKIM key $SELECTOR for $DOMAIN//g" /etc/opendkim/dnstxt/${SELECTOR}_${DOMAIN}
-        chown www-data: /etc/opendkim/dnstxt/*
+        chown www-data: /etc/opendkim/dnstxt/${SELECTOR}_${DOMAIN}
+        chown opendkim: /etc/opendkim/dnstxt/${SELECTOR}_${DOMAIN}.dkim
         echo "$ID       ${DOMAIN}:${SELECTOR}:/etc/opendkim/keyfiles/${SELECTOR}_${DOMAIN}.dkim" >> /etc/opendkim/KeyTable
         echo "*@${DOMAIN}       $ID" >> /etc/opendkim/SigningTable
         ;;
