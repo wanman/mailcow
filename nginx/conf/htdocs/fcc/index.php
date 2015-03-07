@@ -25,12 +25,12 @@ include_once("triggers.inc.php");
 <nav class="navbar navbar-default">
 	<div class="container-fluid">
 		<div class="navbar-header">
-		    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-              <span class="sr-only">Toggle navigation</span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
 			<a class="navbar-brand" href="/"><?php echo $mailname ?></a>
 		</div>
 		<div id="navbar" class="navbar-collapse collapse">
@@ -47,28 +47,26 @@ include_once("triggers.inc.php");
 <div class="container">
 <?php if ($_SESSION['fufix_cc_loggedin'] == "yes"): ?>
 <div class="row">
+
 <h2>Attachments</h2>
 <form method="post">
 <div class="form-group">
-<label for="ext">Dangerous file types</label>
-<input class="form-control" type="text" id="ext" name="ext" value="<?php echo get_fufix_reject_attachments("ext") ?>">
-<p><pre>Format: ext1|ext1|ext3
-Enter "DISABLED" to disable this feature.
-</pre></p>
-</div>
-<small>
-<div class="form-group-sm">
-<div class="checkbox">
-<label>
-<input name="virustotaltoggle" type="checkbox" <?php get_fufix_reject_attachments_toggle() ?>>
-<b>Optional:</b> Scan dangerous attachments with VirusTotal.<br />
-You will receive a mail including a link to the results.<br />
-If unchecked, those mails will be <b>rejected</b>.
-</label>
-</div>
-<label for="vtapikey">VirusTotal API Key (<a href="https://www.virustotal.com/documentation/virustotal-community/#retrieve-api-key" target="_blank">?</a>)</label>
-<input class="form-control" id="vtapikey" type="text" name="vtapikey" value="<?php echo file_get_contents($VT_API_KEY); ?>">
-<br /><button type="submit" class="btn btn-primary">Apply</button>
+	<label for="ext">Dangerous file types</label>
+	<input class="form-control" type="text" id="ext" name="ext" value="<?php echo return_fufix_reject_attachments("ext") ?>">
+	<p><pre>Format: ext1|ext1|ext3
+Enter "DISABLED" to disable this feature.</pre></p>
+	<hr>
+	<h4>VirusTotal Uploader</h4>
+	<small>
+	<div class="checkbox">
+		<label><input name="virustotaltoggle" type="checkbox" <?php echo return_fufix_reject_attachments_toggle() ?>>
+		<b>Optional:</b> Scan dangerous attachments with VirusTotal.<br />
+		You will receive a mail including a link to the results.<br />
+		If unchecked, those mails will be <b>rejected</b>.</label>
+	</div>
+	<label for="vtapikey">VirusTotal API Key (<a href="https://www.virustotal.com/documentation/virustotal-community/#retrieve-api-key" target="_blank">?</a>)</label>
+	<input class="form-control" id="vtapikey" type="text" name="vtapikey" value="<?php echo file_get_contents($VT_API_KEY); ?>">
+	<br /><button type="submit" class="btn btn-primary btn-sm">Apply</button>
 </div>
 </small>
 </form>
@@ -76,35 +74,61 @@ If unchecked, those mails will be <b>rejected</b>.
 <hr><h2>Sender Blacklist</h2>
 <form method="post">
 <div class="form-group">
-<p>Specify a list of senders or domains to blacklist access:</p>
-<textarea class="form-control" rows="6" name="sender"><?php echo get_fufix_sender_access() ?></textarea>
-<p> </p>
-<button type="submit" class="btn btn-primary">Apply</button>
+	<p>Specify a list of senders or domains to blacklist access:</p>
+	<textarea class="form-control" rows="6" name="sender"><?php echo_fufix_sender_access() ?></textarea>
+	<br /><button type="submit" class="btn btn-primary btn-sm">Apply</button>
 </div>
 </form>
 
 <hr><h2>Privacy</h2>
 <form method="post">
 <div class="form-group">
-<p>Anonymize outgoing mail.</p>
-<div class="checkbox">
-<label>
-<input type="hidden" name="anonymize_">
-<input name="anonymize" type="checkbox" <?php get_fufix_anonymize_toggle() ?>>
-<p>This option enables a PCRE table to remove "User-Agent", "X-Enigmail", "X-Mailer", "X-Originating-IP" and replaces "Received: from" headers with localhost/127.0.0.1.</p>
-</label>
-</div>
-<button type="submit" class="btn btn-primary">Apply</button>
+	<p>This option enables a PCRE table to remove "User-Agent", "X-Enigmail", "X-Mailer", "X-Originating-IP" and replaces "Received: from" headers with localhost/127.0.0.1.</p>
+	<div class="checkbox">
+	<label>
+	<input type="hidden" name="anonymize_">
+	<input name="anonymize" type="checkbox" <?php echo return_fufix_anonymize_toggle() ?>>
+	<p>Anonymize outgoing mail.</p>
+	</label>
+	</div>
+	<button type="submit" class="btn btn-primary btn-sm">Apply</button>
 </div>
 </form>
+
+<hr><h2>DKIM signing</h2>
+<?php if (return_fufix_anonymize_toggle() === false) { ?>
+<p><mark>Default behaviour is to sign with relaxed header and body canonicalization algorithm.</mark></p>
+<form method="post">
+<h4>Active keys</h4>
+<?php echo_fufix_opendkim_table() ?>
+<h4>Add new key</h4>
+<div class="form-group">
+<div class="row">
+	<div class="col-xs-4">
+		<strong>Domain</strong>
+		<input class="form-control" id="dkim_domain" name="dkim_domain" placeholder="example.org">
+	</div>
+	<div class="col-xs-4">
+		<strong>Selector</strong>
+		<input class="form-control" id="dkim_selector" name="dkim_selector" placeholder="default">
+	</div>
+	<div class="col-xs-4">
+		<br /><button type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus"></span> Add</button>
+	</div>
+</div>
+</div>
+</form>
+<?php } else { ?>
+<p><span class="label label-danger">DKIM signing is not available when "Anonymize outgoing mail" is enabled.</span></p>
+<? } ?>
 
 <hr><h2>Backup mail</h2>
 <form method="post">
 <div class="form-group">
-<p>Download a copy of your vmail directory as tar.bz2 archive.
-This is a very simple function that may or may not work. Consider it unstable.</p>
-<button type="submit" class="btn btn-info">Download</button>
-<input type="hidden" name="backupdl">
+	<p>Download a copy of your vmail directory as tar.bz2 archive.
+	This is a very simple function that may or may not work. Consider it unstable.</p>
+	<button type="submit" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download</button>
+	<input type="hidden" name="backupdl">
 </div>
 </form>
 </div>
@@ -112,11 +136,11 @@ This is a very simple function that may or may not work. Consider it unstable.</
 <?php else: ?>
 <h2>Login</h2>
 <form class="form-signin" method="post">
-<div class="form-group"
-<p><input name="login_user" type="email" id="inputEmail" class="form-control" placeholder="pfadmin@domain.tld" required autofocus></p>
-<p><input name="pass_user" type="password" id="inputPassword" class="form-control" placeholder="Password" required></p>
-<p>You can login with any superadmin created in <b><a href="../pfadmin">Postfixadmin</a></b>.</p>
-<input type="submit" class="btn btn-success" value="Login">
+<div class="form-group">
+	<p><input name="login_user" type="email" id="inputEmail" class="form-control" placeholder="pfadmin@domain.tld" required autofocus></p>
+	<p><input name="pass_user" type="password" id="inputPassword" class="form-control" placeholder="Password" required></p>
+	<p>You can login with any superadmin created in <b><a href="../pfadmin">Postfixadmin</a></b>.</p>
+	<input type="submit" class="btn btn-success" value="Login">
 </div>
 </form>
 <?php endif ?>
@@ -128,3 +152,4 @@ This is a very simple function that may or may not work. Consider it unstable.</
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+

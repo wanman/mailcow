@@ -101,7 +101,10 @@ installtask roundcube
 returnwait "Roundcube configuration" "Fail2ban configuration"
 
 installtask fail2ban
-returnwait "Fail2ban configuration" "Rsyslogd configuration"
+returnwait "Fail2ban configuration" "OpenDKIM configuration"
+
+installtask opendkim
+returnwait "OpenDKIM configuration" "Rsyslogd configuration"
 
 installtask rsyslogd
 returnwait "Rsyslogd configuration" "Restarting services"

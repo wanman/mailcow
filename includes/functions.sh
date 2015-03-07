@@ -191,7 +191,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dnsutils python-sq
 python-magic libmail-spf-perl libmail-dkim-perl openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server nginx-extras mailutils \
-postfix-mysql postfix-pcre spamassassin sudo bzip2 curl mpack \
+postfix-mysql postfix-pcre spamassassin sudo bzip2 curl mpack opendkim opendkim-tools\
 fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl >/dev/null
 			if [ "$?" -ne "0" ]; then
 				echo "$(redb [ERR]) - Package installation failed"
@@ -237,8 +237,10 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/postfix/sql/*
 			postmap /etc/postfix/fufix_sender_access
 			chown www-data: /etc/postfix/fufix_*
-			[[ -z $(grep postfix /etc/sudoers) ]] && echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /bin/tar -cvjf /tmp/backup_vmail.tar.bz2 /var/vmail/' >> /etc/sudoers
-			[[ -z $(grep spamc /etc/sudoers) ]] && echo '%vmail ALL=(ALL) NOPASSWD: /usr/bin/spamc*' >> /etc/sudoers
+			sed -i "/%www-data/d" /etc/sudoers
+			sed -i "/%vmail/d" /etc/sudoers
+			echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /bin/tar -cvjf /tmp/backup_vmail.tar.bz2 /var/vmail/, /usr/local/bin/opendkim-keycontrol' >> /etc/sudoers
+			echo '%vmail ALL=(ALL) NOPASSWD: /usr/bin/spamc*' >> /etc/sudoers
 			;;
 		dovecot)
 			[[ -z $(grep fs.inotify.max_user_instances /etc/sysctl.conf) ]] && echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.conf
@@ -264,6 +266,12 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sievec /var/vmail/sieve/spam-global.sieve
 			chown -R vmail:vmail /var/vmail
 			cp dovecot/conf/doverecalcq /etc/cron.daily/; chmod 755 /etc/cron.daily/doverecalcq
+			;;
+		opendkim)
+			echo 'SOCKET="inet:10040@localhost"' > /etc/default/opendkim
+			mkdir -p /etc/opendkim/{keyfiles,dnstxt} 2> /dev/null
+			touch /etc/opendkim/{KeyTable,SigningTable}
+			cp opendkim/conf/opendkim.conf /etc/opendkim.conf
 			;;
 		spamassassin)
 			cp spamassassin/conf/local.cf /etc/spamassassin/local.cf
@@ -354,7 +362,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			cat /dev/null > /var/log/mail.warn
 			cat /dev/null > /var/log/mail.log
 			cat /dev/null > /var/log/mail.info
-			for var in fail2ban rsyslog nginx php5-fpm spamassassin mysql dovecot postfix
+			for var in fail2ban rsyslog nginx php5-fpm spamassassin mysql dovecot postfix opendkim
 			do
 				service $var stop
 				sleep 1.5
@@ -441,7 +449,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 		cp -R /etc/{postfix,dovecot,spamassassin,fail2ban,nginx,mysql,php5} before_upgrade_$timestamp/
     echo -e "$(greenb "[OK]")"
 	echo -en "\nStopping services, this may take a few seconds... \t\t"
-	for var in fail2ban rsyslog nginx php5-fpm spamassassin dovecot postfix
+	for var in fail2ban rsyslog nginx php5-fpm spamassassin dovecot postfix opendkim
 	do
 		service $var stop > /dev/null 2>&1
 	done
@@ -481,7 +489,10 @@ A backup will be stored in ./before_upgrade_$timestamp
 	unset -f mysql
 	sed -i "s/conf_rcdeskey/$old_des_key_rc/g" /var/www/mail/rc/config/config.inc.php
 	/var/www/mail/rc/bin/updatedb.sh --package=roundcube --dir=/var/www/mail/rc/SQL
-	returnwait "Roundcube configuration" "Fail2ban configuration"
+	returnwait "Roundcube configuration" "OpenDKIM configuration"
+
+	installtask opendkim
+	returnwait "OpenDKIM configuration" "Fail2ban configuration"
 
 	installtask fail2ban
 	returnwait "Fail2ban configuration" "Restarting services"

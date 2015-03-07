@@ -228,3 +228,8 @@ postscreen_bare_newline_enable = no
 postscreen_non_smtp_command_enable = no
 postscreen_pipelining_enable = no
 postscreen_cache_map = proxy:btree:$data_directory/postscreen_cache
+
+# We need milter support for OpenDKIM
+milter_protocol = 6
+milter_default_action = accept
+
