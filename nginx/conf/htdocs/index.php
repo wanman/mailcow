@@ -74,7 +74,7 @@ include_once("fcc/vars.inc.php");
 </div>
 <div class="col-md-4">
         <h2>Mailbox Administration</h2>
-        <p><b>Postfix Admin</b> is a web based interface used to manage mailboxes, virtual domains and aliases.</p>
+        <p><b>Postfixadmin</b> is a web based interface used to manage mailboxes, virtual domains and aliases.</p>
         <p><a class="btn btn-m btn-warning" href="pfadmin/" role="button">Open &raquo;</a></p>
 </div>
 <div class="col-md-4">
