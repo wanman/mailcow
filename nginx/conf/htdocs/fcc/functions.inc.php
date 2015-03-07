@@ -44,7 +44,7 @@ function echo_fufix_opendkim_table() {
 			<pre>", file_get_contents($GLOBALS["fufix_opendkim_dnstxt_folder"]."/".$file), "</pre>
 		</div>
 		<div class=\"col-xs-1\">
-			<a href=\"?del=", $file, "\"><span class=\"glyphicon glyphicon-remove-circle\"></span></a>
+			<a href=\"?del=", $file, "\" onclick=\"return confirm('Are you sure?')\"><span class=\"glyphicon glyphicon-remove-circle\"></span></a>
 		</div>
 	</div>";
 	}
