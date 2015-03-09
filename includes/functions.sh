@@ -271,9 +271,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			echo 'SOCKET="inet:10040@localhost"' > /etc/default/opendkim
 			mkdir -p /etc/opendkim/{keyfiles,dnstxt} 2> /dev/null
 			touch /etc/opendkim/{KeyTable,SigningTable}
-			cp opendkim/conf/opendkim-keycontrol /usr/local/bin/opendkim-keycontrol
-			chmod +x /usr/local/bin/opendkim-keycontrol
-			cp opendkim/conf/opendkim.conf /etc/opendkim.conf
+			install -m 755 opendkim/conf/opendkim-keycontrol /usr/local/bin/
+			install -m 644 opendkim/conf/opendkim.conf /etc/opendkim.conf
 			;;
 		spamassassin)
 			cp spamassassin/conf/local.cf /etc/spamassassin/local.cf
