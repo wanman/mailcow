@@ -98,7 +98,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <hr><h2>DKIM signing</h2>
 <?php if (return_fufix_anonymize_toggle() === false) { ?>
 <p>Default behaviour is to sign with relaxed header and body canonicalization algorithm.</p>
-<form method="post">
+<form method="post" action="index.php">
 <h4>Active keys</h4>
 <?php echo_fufix_opendkim_table() ?>
 <h4>Add new key</h4>

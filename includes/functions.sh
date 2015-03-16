@@ -239,7 +239,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown www-data: /etc/postfix/fufix_*
 			sed -i "/%www-data/d" /etc/sudoers
 			sed -i "/%vmail/d" /etc/sudoers
-			echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /bin/tar -cvjf /tmp/backup_vmail.tar.bz2 /var/vmail/, /usr/local/bin/opendkim-keycontrol' >> /etc/sudoers
+			echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /usr/local/bin/fufix_backup_vmail, /usr/local/bin/opendkim-keycontrol' >> /etc/sudoers
 			echo '%vmail ALL=(ALL) NOPASSWD: /usr/bin/spamc*' >> /etc/sudoers
 			;;
 		dovecot)
@@ -262,10 +262,11 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			mkdir -p /var/vmail/{sieve,vfilter}
 			cp dovecot/conf/spam-global.sieve /var/vmail/sieve/spam-global.sieve
 			cp dovecot/conf/default.sieve /var/vmail/sieve/default.sieve
-			cp misc/vfilter.sh /var/vmail/vfilter/ ; chmod +x /var/vmail/vfilter/vfilter.sh
+			install -m 755 misc/vfilter.sh /var/vmail/vfilter/
+			install -m 755 misc/fufix_backup_vmail /usr/local/bin/
 			sievec /var/vmail/sieve/spam-global.sieve
 			chown -R vmail:vmail /var/vmail
-			cp dovecot/conf/doverecalcq /etc/cron.daily/; chmod 755 /etc/cron.daily/doverecalcq
+			install -m 755 dovecot/conf/doverecalcq /etc/cron.daily/
 			;;
 		opendkim)
 			echo 'SOCKET="inet:10040@localhost"' > /etc/default/opendkim

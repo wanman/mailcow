@@ -109,3 +109,4 @@ function set_fufix_anonymize_headers($toggle) {
 }
 if (isset($link)) { mysql_close($link); }
 ?>
+

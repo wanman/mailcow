@@ -1,8 +1,6 @@
 <?php
 session_start();
-include_once("fcc/vars.inc.php");
-
-
+include_once("fcc/inc/vars.inc.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">
