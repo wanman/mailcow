@@ -1,8 +1,8 @@
 <?php
 session_start();
-include_once("vars.inc.php");
-include_once("functions.inc.php");
-include_once("triggers.inc.php");
+include_once("inc/vars.inc.php");
+include_once("inc/functions.inc.php");
+include_once("inc/triggers.inc.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,7 +19,7 @@ include_once("triggers.inc.php");
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 <!-- Optional theme -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
-<link href="signin.form.css" rel="stylesheet">
+<link href="css/signin.form.css" rel="stylesheet">
 </head>
 <body>
 <nav class="navbar navbar-default">
@@ -31,7 +31,7 @@ include_once("triggers.inc.php");
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="/"><?php echo $mailname ?></a>
+			<a class="navbar-brand" href="/"><?php echo $MYHOSTNAME ?></a>
 		</div>
 		<div id="navbar" class="navbar-collapse collapse">
 			<ul class="nav navbar-nav navbar-right">
@@ -48,30 +48,37 @@ include_once("triggers.inc.php");
 <?php if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes"): ?>
 <div class="row">
 
-<h2>Attachments</h2>
+<h1><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Configuration</h1>
+
+<h3>Attachments</h3>
 <form method="post">
 <div class="form-group">
-	<label for="ext">Dangerous file types</label>
+	<p>Provide a list of dangerous file types. Please take care of the formatting.</p>
 	<input class="form-control" type="text" id="ext" name="ext" value="<?php echo return_fufix_reject_attachments("ext") ?>">
 	<p><pre>Format: ext1|ext1|ext3
 Enter "DISABLED" to disable this feature.</pre></p>
 	<hr>
-	<h4>VirusTotal Uploader</h4>
-	<small>
-	<div class="checkbox">
-		<label><input name="virustotaltoggle" type="checkbox" <?php echo return_fufix_reject_attachments_toggle() ?>>
-		<b>Optional:</b> Scan dangerous attachments with VirusTotal.<br />
-		You will receive a mail including a link to the results.<br />
-		If unchecked, those mails will be <b>rejected</b>.</label>
+	<div class="row">
+		<div class="col-xs-10">
+		<small>
+		<h4>VirusTotal Uploader</h4>
+		<div class="checkbox">
+			<label>
+			<input name="virustotaltoggle" type="checkbox"  <?php echo return_fufix_reject_attachments_toggle() ?>>
+			<b>Optional:</b> Scan dangerous attachments with VirusTotal. You will receive a mail including a link to the results. If unchecked, those mails will be <b>rejected</b>.
+			</label>
+		</div>
+		<label for="vtapikey">VirusTotal API Key (<a href="https://www.virustotal.com/documentation/virustotal-community/#retrieve-api-key" target="_blank">?</a>)</label>
+		<input class="form-control" id="vtapikey" type="text" name="vtapikey" value="<?php echo file_get_contents($VT_API_KEY); ?>">
+		</small>
+		</div>
 	</div>
-	<label for="vtapikey">VirusTotal API Key (<a href="https://www.virustotal.com/documentation/virustotal-community/#retrieve-api-key" target="_blank">?</a>)</label>
-	<input class="form-control" id="vtapikey" type="text" name="vtapikey" value="<?php echo file_get_contents($VT_API_KEY); ?>">
 	<br /><button type="submit" class="btn btn-primary btn-sm">Apply</button>
 </div>
-</small>
 </form>
 
-<hr><h2>Sender Blacklist</h2>
+<hr>
+<h3>Sender Blacklist</h3>
 <form method="post">
 <div class="form-group">
 	<p>Specify a list of senders or domains to blacklist access:</p>
@@ -80,7 +87,8 @@ Enter "DISABLED" to disable this feature.</pre></p>
 </div>
 </form>
 
-<hr><h2>Privacy</h2>
+<hr>
+<h3>Privacy</h3>
 <form method="post">
 <div class="form-group">
 	<p>This option enables a PCRE table to remove "User-Agent", "X-Enigmail", "X-Mailer", "X-Originating-IP" and replaces "Received: from" headers with localhost/127.0.0.1.</p>
@@ -95,7 +103,8 @@ Enter "DISABLED" to disable this feature.</pre></p>
 </div>
 </form>
 
-<hr><h2>DKIM signing</h2>
+<hr>
+<h3>DKIM signing</h3>
 <?php if (return_fufix_anonymize_toggle() === false) { ?>
 <p>Default behaviour is to sign with relaxed header and body canonicalization algorithm.</p>
 <form method="post" action="index.php">
@@ -103,38 +112,75 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <?php echo_fufix_opendkim_table() ?>
 <h4>Add new key</h4>
 <div class="form-group">
-<div class="row">
-	<div class="col-xs-4">
-		<strong>Domain</strong>
-		<input class="form-control" id="dkim_domain" name="dkim_domain" placeholder="example.org">
+	<div class="row">
+		<div class="col-xs-4">
+			<strong>Domain</strong>
+			<input class="form-control" id="dkim_domain" name="dkim_domain" placeholder="example.org">
+		</div>
+		<div class="col-xs-4">
+			<strong>Selector</strong>
+			<input class="form-control" id="dkim_selector" name="dkim_selector" placeholder="default">
+		</div>
+		<div class="col-xs-4">
+			<br /><button type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus"></span> Add</button>
+		</div>
 	</div>
-	<div class="col-xs-4">
-		<strong>Selector</strong>
-		<input class="form-control" id="dkim_selector" name="dkim_selector" placeholder="default">
-	</div>
-	<div class="col-xs-4">
-		<br /><button type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus"></span> Add</button>
-	</div>
-</div>
 </div>
 </form>
 <?php } else { ?>
 <p><span class="label label-danger">DKIM signing is not available when "Anonymize outgoing mail" is enabled.</span></p>
 <? } ?>
 
-<hr><h2>Backup mail</h2>
-<form method="post">
-<div class="form-group">
-	<p>Download a copy of your vmail directory as tar.bz2 archive.
-	This is a very simple function that may or may not work. Consider it unstable.</p>
-	<button type="submit" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download</button>
-	<input type="hidden" name="backupdl">
+<br />
+<h1><span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> Maintenance</h1>
+
+<hr>
+<h3>DNS records</h3>
+<p>Below you see a list of <em>recommended</em> DNS records.</p>
+<p>While some are mandatory for a mail server (A, MX), others are recommended to build a good reputation score (TXT) or used for auto-configuration of mail clients (A: "autoconfig" and SRV records).</p>
+<p>In this automatically generated DNS zone file snippet, <mark>a generic TXT/SPF record</mark> is used to only allow THIS server to send mail for your domain. Please refer to <a href="http://www.openspf.org/SPF_Record_Syntax" target="_blank">openspf.org</a>.</p>
+<p>It is <strong>highly recommended</strong> to create a DKIM TXT record with the <em>DKIM signing</em> utility tool above and install the given TXT record to your nameserver, too.</p>
+<pre>
+; ================
+; Example forward zone file
+; ================
+
+[...]
+_imaps._tcp         IN SRV     0 1 993 <?php echo $MYHOSTNAME; ?>.
+_imap._tcp          IN SRV     0 1 143 <?php echo $MYHOSTNAME; ?>.
+_submission._tcp    IN SRV     0 1 587 <?php echo $MYHOSTNAME; ?>.
+@                   IN MX 10   <?php echo $MYHOSTNAME_0, "\n"; ?>
+@                   IN TXT     "v=spf1 mx -all"
+autoconfig          IN A       <?php echo $IP, "\n"; ?>
+<?php echo str_pad($MYHOSTNAME_0, 20); ?>IN A       <?php echo $IP, "\n"; ?>
+
+; ================
+; Example reverse map zone file
+; Most ISP offer a web panel to set a PTR record in Reverse DNS
+; ================
+
+[...]
+<?php echo str_pad(exec("host $IP | awk {'print $1'}"), 30); ?>IN PTR   <?php echo $MYHOSTNAME; ?>.
+</pre>
+
+<hr>
+<div class="row">
+	<div class="col-xs-6">
+		<form method="post">
+		<h3>Backup Maildir</h3>
+		<p>Download a gzipped tarball containing a Maildir backup of each domain and all users.</p>
+		<div class="form-group">
+			<button type="submit" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download</button>
+			<input type="hidden" name="backupdl">
+		</div>
+		</form>
+	</div>
 </div>
-</form>
+
 </div>
 
 <?php else: ?>
-<h2>Login</h2>
+<h3>Login</h3>
 <form class="form-signin" method="post">
 <div class="form-group">
 	<p><input name="login_user" type="email" id="inputEmail" class="form-control" placeholder="pfadmin@domain.tld" required autofocus></p>
