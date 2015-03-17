@@ -1,4 +1,5 @@
-<?php function check_login($user, $pass, $pfconfig) {
+<?php
+function check_login($user, $pass, $pfconfig) {
 	if(!filter_var($user, FILTER_VALIDATE_EMAIL)) {
 		return false;
 	}
@@ -46,8 +47,7 @@ function echo_fufix_opendkim_table() {
 			<pre>", file_get_contents($GLOBALS["fufix_opendkim_dnstxt_folder"]."/".$file), "</pre>
 		</div>
 		<div class=\"col-xs-1\">
-			<a href=\"?del=", $file, "\" onclick=\"return confirm('Are you sure?')\"><span 
-class=\"glyphicon glyphicon-remove-circle\"></span></a>
+			<a href=\"?del=", $file, "\" onclick=\"return confirm('Are you sure?')\"><span class=\"glyphicon glyphicon-remove-circle\"></span></a>
 		</div>
 	</div>";
 	}
@@ -63,8 +63,7 @@ function set_fufix_sender_access($what) {
 	file_put_contents($GLOBALS["fufix_sender_access"], "");
 	foreach(preg_split("/((\r?\n)|(\r\n?))/", $what) as $each) {
 		if ($each != "" && preg_match("/^[a-zA-Z0-9-\ .@]+$/", $each)) {
-			file_put_contents($GLOBALS["fufix_sender_access"], "$each REJECT Sender not allowed".PHP_EOL, 
-FILE_APPEND);
+			file_put_contents($GLOBALS["fufix_sender_access"], "$each     REJECT     Sender not allowed".PHP_EOL, FILE_APPEND);
 		}
 	}
 	$sender_map = $GLOBALS["fufix_sender_access"];
@@ -85,27 +84,26 @@ function add_fufix_opendkim_entry($selector, $domain) {
 	shell_exec("sudo /usr/local/bin/opendkim-keycontrol add $selector $domain");
 }
 function set_fufix_reject_attachments($ext, $action) {
-	if ($action == "reject") {
-		foreach (explode("|", $ext) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 
-) { return false; } }
-		file_put_contents($GLOBALS["fufix_reject_attachments"], "/name=[^>]*\.($ext)/ REJECT Dangerous 
-files are prohibited on this server.".PHP_EOL);
-	} elseif ($action == "filter") {
-		foreach (explode("|", $ext) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 
-) { return false; } }
-		file_put_contents($GLOBALS["fufix_reject_attachments"], "/name=[^>]*\.($ext)/ FILTER 
-vfilter:dummy".PHP_EOL);
-	}
+        if ($action == "reject") {
+                foreach (explode("|", $ext) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return false; } }
+                file_put_contents($GLOBALS["fufix_reject_attachments"], "/name=[^>]*\.($ext)/     REJECT     Dangerous files are prohibited on this server.".PHP_EOL);
+        } elseif ($action == "filter") {
+        foreach (explode("|", $ext) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return false; } }
+                file_put_contents($GLOBALS["fufix_reject_attachments"], "/name=[^>]*\.($ext)/     FILTER     vfilter:dummy".PHP_EOL);
+        }
 }
 function set_fufix_anonymize_headers($toggle) {
-        $template = '/^\s*(Received: from)[^\n]*(.*)/ REPLACE $1 [127.0.0.1] (localhost [127.0.0.1])$2 
-/^\s*User-Agent/ IGNORE /^\s*X-Enigmail/ IGNORE /^\s*X-Mailer/ IGNORE /^\s*X-Originating-IP/ IGNORE 
-/^\s*DKIM-Signature/ IGNORE /^\s*DomainKey-Signature/ IGNORE ';
-	if ($toggle == "on") {
-		file_put_contents($GLOBALS["fufix_anonymize_headers"], $template);
-	} else {
-		file_put_contents($GLOBALS["fufix_anonymize_headers"], "");
-	}
+        $template = '/^\s*(Received: from)[^\n]*(.*)/ REPLACE $1 [127.0.0.1] (localhost [127.0.0.1])$2
+/^\s*User-Agent/        IGNORE
+/^\s*X-Enigmail/        IGNORE
+/^\s*X-Mailer/          IGNORE
+/^\s*X-Originating-IP/  IGNORE
+';
+        if ($toggle == "on") {
+                file_put_contents($GLOBALS["fufix_anonymize_headers"], $template);
+        } else {
+                file_put_contents($GLOBALS["fufix_anonymize_headers"], "");
+        }
 }
 if (isset($link)) { mysql_close($link); }
 ?>
