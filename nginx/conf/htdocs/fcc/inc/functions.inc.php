@@ -47,7 +47,8 @@ function echo_fufix_opendkim_table() {
 			<pre>", file_get_contents($GLOBALS["fufix_opendkim_dnstxt_folder"]."/".$file), "</pre>
 		</div>
 		<div class=\"col-xs-1\">
-			<a href=\"?del=", $file, "\" onclick=\"return confirm('Are you sure?')\"><span class=\"glyphicon glyphicon-remove-circle\"></span></a>
+			<a href=\"?del=", $file, "\" onclick=\"return confirm('Are you sure?')\"><span 
+class=\"glyphicon glyphicon-remove-circle\"></span></a>
 		</div>
 	</div>";
 	}
@@ -63,7 +64,8 @@ function set_fufix_sender_access($what) {
 	file_put_contents($GLOBALS["fufix_sender_access"], "");
 	foreach(preg_split("/((\r?\n)|(\r\n?))/", $what) as $each) {
 		if ($each != "" && preg_match("/^[a-zA-Z0-9-\ .@]+$/", $each)) {
-			file_put_contents($GLOBALS["fufix_sender_access"], "$each     REJECT     Sender not allowed".PHP_EOL, FILE_APPEND);
+			file_put_contents($GLOBALS["fufix_sender_access"], "$each REJECT Sender not allowed".PHP_EOL, 
+FILE_APPEND);
 		}
 	}
 	$sender_map = $GLOBALS["fufix_sender_access"];
@@ -104,6 +106,33 @@ function set_fufix_anonymize_headers($toggle) {
         } else {
                 file_put_contents($GLOBALS["fufix_anonymize_headers"], "");
         }
+}
+function force_download($filename = '', $data = '')
+{
+	if ($filename == '' OR $data == '') {
+		return FALSE;
+	}
+	$mime = 'application/octet-stream';
+	if (strpos($_SERVER['HTTP_USER_AGENT'], "MSIE") !== FALSE)
+	{
+		header('Content-Type: "'.$mime.'"');
+		header('Content-Disposition: attachment; filename="'.$filename.'"');
+		header('Expires: 0');
+		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+		header("Content-Transfer-Encoding: binary");
+		header('Pragma: public');
+		header("Content-Length: ".strlen($data));
+	}
+	else
+	{
+		header('Content-Type: "'.$mime.'"');
+		header('Content-Disposition: attachment; filename="'.$filename.'"');
+		header("Content-Transfer-Encoding: binary");
+		header('Expires: 0');
+		header('Pragma: no-cache');
+		header("Content-Length: ".strlen($data));
+	}
+	exit($data);
 }
 if (isset($link)) { mysql_close($link); }
 ?>

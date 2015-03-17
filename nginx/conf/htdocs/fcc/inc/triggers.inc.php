@@ -1,6 +1,6 @@
 <?php
 if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
-		if (check_login($_POST["login_user"], $_POST["pass_user"], "/var/www/mail/pfadmin/config.local.php") == true) { $_SESSION['fufix_cc_loggedin'] = "yes"; }
+	if (check_login($_POST["login_user"], $_POST["pass_user"], "/var/www/mail/pfadmin/config.local.php") == true) { $_SESSION['fufix_cc_loggedin'] = "yes"; }
 }
 if ($_SESSION['fufix_cc_loggedin'] == "yes") {
 	if (isset($_GET["del"])) {
@@ -18,9 +18,9 @@ if ($_SESSION['fufix_cc_loggedin'] == "yes") {
 	}
 	if (isset($_POST["ext"])) {
 		if (isset($_POST["virustotaltoggle"]) && $_POST["virustotaltoggle"] == "on") {
-				set_fufix_reject_attachments($_POST["ext"], "filter");
+			set_fufix_reject_attachments($_POST["ext"], "filter");
 		} else {
-				set_fufix_reject_attachments($_POST["ext"], "reject");
+			set_fufix_reject_attachments($_POST["ext"], "reject");
 		}
 		postfix_reload();
 	}
@@ -33,18 +33,9 @@ if ($_SESSION['fufix_cc_loggedin'] == "yes") {
 		$_SESSION['fufix_cc_loggedin'] = "no";
 	}
 	if (isset($_POST["backupdl"])) {
-		shell_exec("sudo /usr/local/bin/fufix_backup_vmail");
-		$file = '/tmp/vmail_backup.tar.gz';
-		header('Content-Description: File Transfer');
-		header('Content-Type: application/octet-stream');
-		header('Content-Disposition: attachment; filename='.basename($file));
-		header('Expires: 0');
-		header('Cache-Control: must-revalidate');
-		header('Pragma: public');
-		header('Content-Length: ' . filesize($file));
-		readfile($file);
-		exit;
+		exec("sudo /usr/local/bin/fufix_backup_vmail");
+		$filedata = file_get_contents("/tmp/vmail_backup.tar.gz");
+		force_download("backup.tar.gz", $filedata);
 	}
 }
 ?>
-
