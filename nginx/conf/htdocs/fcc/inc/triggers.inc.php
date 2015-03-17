@@ -2,7 +2,7 @@
 if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
 	if (check_login($_POST["login_user"], $_POST["pass_user"], "/var/www/mail/pfadmin/config.local.php") == true) { $_SESSION['fufix_cc_loggedin'] = "yes"; }
 }
-if ($_SESSION['fufix_cc_loggedin'] == "yes") {
+if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes") {
 	if (isset($_GET["del"])) {
 		del_fufix_opendkim_entry($_GET["del"]);
 	}
@@ -31,11 +31,6 @@ if ($_SESSION['fufix_cc_loggedin'] == "yes") {
 	}
 	if (isset($_POST["logout"])) {
 		$_SESSION['fufix_cc_loggedin'] = "no";
-	}
-	if (isset($_POST["backupdl"])) {
-		exec("sudo /usr/local/bin/fufix_backup_vmail");
-		$filedata = file_get_contents("/tmp/vmail_backup.tar.gz");
-		force_download("backup.tar.gz", $filedata);
 	}
 }
 ?>

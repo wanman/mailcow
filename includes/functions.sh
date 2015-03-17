@@ -263,7 +263,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			cp dovecot/conf/spam-global.sieve /var/vmail/sieve/spam-global.sieve
 			cp dovecot/conf/default.sieve /var/vmail/sieve/default.sieve
 			install -m 755 misc/vfilter.sh /var/vmail/vfilter/
-			install -m 755 misc/fufix_backup_vmail /usr/local/bin/
 			sievec /var/vmail/sieve/spam-global.sieve
 			chown -R vmail:vmail /var/vmail
 			install -m 755 dovecot/conf/doverecalcq /etc/cron.daily/

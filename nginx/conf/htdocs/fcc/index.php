@@ -160,20 +160,6 @@ autoconfig          IN A       <?php echo $IP, "\n"; ?>
 ; !!!!!!!!!!!!!!!!
 </pre>
 
-<hr>
-<div class="row">
-	<div class="col-xs-6">
-		<form method="post">
-		<h3>Backup Maildir</h3>
-		<p>Download a gzipped tarball containing a Maildir backup of each domain and all users.</p>
-		<div class="form-group">
-			<button type="submit" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download</button>
-			<input type="hidden" name="backupdl">
-		</div>
-		</form>
-	</div>
-</div>
-
 </div>
 
 <?php else: ?>
