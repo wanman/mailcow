@@ -154,13 +154,10 @@ _submission._tcp    IN SRV     0 1 587 <?php echo $MYHOSTNAME; ?>.
 autoconfig          IN A       <?php echo $IP, "\n"; ?>
 <?php echo str_pad($MYHOSTNAME_0, 20); ?>IN A       <?php echo $IP, "\n"; ?>
 
-; ================
-; Example reverse map zone file
-; Most ISP offer a web panel to set a PTR record in Reverse DNS
-; ================
-
-[...]
-<?php echo str_pad(exec("host $IP | awk {'print $1'}"), 30); ?>IN PTR   <?php echo $MYHOSTNAME; ?>.
+; !!!!!!!!!!!!!!!!
+; Do not forget to set a PTR record in your Reverse DNS configuration!
+; Your IPs PTR should point to <?php echo $MYHOSTNAME, "\n"; ?>
+; !!!!!!!!!!!!!!!!
 </pre>
 
 <hr>
@@ -198,4 +195,3 @@ autoconfig          IN A       <?php echo $IP, "\n"; ?>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 </body>
 </html>
-
