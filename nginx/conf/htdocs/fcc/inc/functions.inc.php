@@ -5,10 +5,9 @@ function check_login($user, $pass, $pfconfig) {
 	}
 	$pass = escapeshellcmd($pass);
 	include_once($pfconfig);
-	$link = mysql_connect('localhost', $CONF['database_user'], $CONF['database_password']);
-	mysql_select_db($CONF['database_name']);
-	$result = mysql_query("select password from admin where superadmin=1 and username='$user'");
-	while ($row = mysql_fetch_array($result, MYSQL_NUM)) {
+	$link = mysqli_connect('localhost', $CONF['database_user'], $CONF['database_password'], $CONF['database_name']);
+	$result = mysqli_query($link, "select password from admin where superadmin=1 and username='$user'");
+	while ($row = mysqli_fetch_array($result, MYSQL_NUM)) {
 		$row = "'".$row[0]."'";
 		if (strpos(shell_exec("echo $pass | doveadm pw -s SHA512-CRYPT -t $row"), "verified") !== false) {
 			return true;
@@ -107,6 +106,6 @@ function set_fufix_anonymize_headers($toggle) {
                 file_put_contents($GLOBALS["fufix_anonymize_headers"], "");
         }
 }
-if (isset($link)) { mysql_close($link); }
+if (isset($link)) { mysqli_close($link); }
 ?>
 
