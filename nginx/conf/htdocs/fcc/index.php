@@ -165,12 +165,10 @@ autoconfig          IN A       <?php echo $IP, "\n"; ?>
 <?php else: ?>
 <h3>Login</h3>
 <form class="form-signin" method="post">
-<div class="form-group">
-	<p><input name="login_user" type="email" id="inputEmail" class="form-control" placeholder="pfadmin@domain.tld" required autofocus></p>
-	<p><input name="pass_user" type="password" id="inputPassword" class="form-control" placeholder="Password" required></p>
+	<input name="login_user" type="email" id="inputEmail" class="form-control" placeholder="pfadmin@domain.tld" required autofocus>
+	<input name="pass_user" type="password" id="inputPassword" class="form-control" placeholder="Password" required>
 	<p>You can login with any superadmin created in <b><a href="../pfadmin">Postfixadmin</a></b>.</p>
 	<input type="submit" class="btn btn-success" value="Login">
-</div>
 </form>
 <?php endif ?>
 <hr>
