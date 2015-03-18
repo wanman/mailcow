@@ -176,7 +176,7 @@ maximal_backoff_time = 1800s
 minimal_backoff_time = 300s
 
 # Maximum mail size
-message_size_limit = 260214400
+message_size_limit = 26214400
 
 # This tarpits a client after 3 erroneous commands for 10s
 smtpd_soft_error_limit = 3
