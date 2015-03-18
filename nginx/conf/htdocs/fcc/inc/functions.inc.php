@@ -18,6 +18,10 @@ function check_login($user, $pass, $pfconfig) {
 function postfix_reload() {
 	shell_exec("sudo /usr/sbin/postfix reload");
 }
+function set_fufix_msg_size($MB) {
+	shell_exec("sudo /usr/local/bin/fufix_msg_size $MB");
+}
+
 function return_fufix_reject_attachments_toggle() {
 	$read_mime_check = file($GLOBALS["fufix_reject_attachments"])[0];
 	if (strpos($read_mime_check,'FILTER') !== false) { return "checked"; } else { return false; }

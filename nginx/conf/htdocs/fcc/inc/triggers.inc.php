@@ -9,6 +9,9 @@ if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "
 	if (isset($_POST["vtapikey"]) && ctype_alnum($_POST["vtapikey"])) {
 		file_put_contents($VT_API_KEY, $_POST["vtapikey"]);
 	}
+	if (isset($_POST["maxmsgsize"]) && ctype_alnum($_POST["maxmsgsize"])) {
+		set_fufix_msg_size($_POST["maxmsgsize"]);
+	}
 	if (isset($_POST["sender"])) {
 		set_fufix_sender_access($_POST["sender"]);
 		postfix_reload();
