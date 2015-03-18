@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if (( $EUID != 0 )); then
+    echo "Please run as root"
+    exit
+fi
+
 if [[ ! -z "${1##[0-9]*}" || -z $1 ]]; then
 echo "Parameter must be a value in MB."
 exit 1
@@ -14,4 +19,3 @@ echo "Reloading services..."
 postfix reload
 nginx -s reload
 service php5-fpm reload
-

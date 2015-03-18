@@ -86,3 +86,4 @@ rm -rf /var/log/mysql*
 rm -f /etc/cron.d/pfadminfetchmail
 rm -f /etc/cron.daily/spam*
 rm -rf /etc/opendkim*
+rm -f /usr/local/bin/fufix_msg_size
