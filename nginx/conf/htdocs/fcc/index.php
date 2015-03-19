@@ -149,8 +149,8 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <h3>DNS Records</h3>
 <p>Below you see a list of <em>recommended</em> DNS records.</p>
 <p>While some are mandatory for a mail server (A, MX), others are recommended to build a good reputation score (TXT/SPF) or used for auto-configuration of mail clients (A: "autoconfig" and SRV records).</p>
-<p>In this automatically generated DNS zone file snippet, <mark>a generic TXT/SPF record</mark> is used to only allow THIS server to send mail for your domain. Please refer to <a href="http://www.openspf.org/SPF_Record_Syntax" target="_blank">openspf.org</a>.</p>
-<p>It is <strong>highly recommended</strong> to create a DKIM TXT record with the <em>DKIM signing</em> utility tool above and install the given TXT record to your nameserver, too.</p>
+<p>In this automatically generated DNS zone file snippet, <strong>a generic TXT/SPF record</strong> is used to only allow THIS server to send mail for your domain. Please refer to <a href="http://www.openspf.org/SPF_Record_Syntax" target="_blank">openspf.org</a>.</p>
+<p>It is <strong>highly recommended</strong> to create a DKIM TXT record with the <em>DKIM Signing</em> utility tool above and install the given TXT record to your nameserver, too.</p>
 <pre>
 ; ================
 ; Example forward zone file
