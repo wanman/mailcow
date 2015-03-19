@@ -89,27 +89,41 @@ function add_fufix_opendkim_entry($selector, $domain) {
 	shell_exec("sudo /usr/local/bin/opendkim-keycontrol add $selector $domain");
 }
 function set_fufix_reject_attachments($ext, $action) {
-        if ($action == "reject") {
-                foreach (explode("|", $ext) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return false; } }
-                file_put_contents($GLOBALS["fufix_reject_attachments"], "/name=[^>]*\.($ext)/     REJECT     Dangerous files are prohibited on this server.".PHP_EOL);
-        } elseif ($action == "filter") {
-        foreach (explode("|", $ext) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return false; } }
-                file_put_contents($GLOBALS["fufix_reject_attachments"], "/name=[^>]*\.($ext)/     FILTER     vfilter:dummy".PHP_EOL);
-        }
+	if ($action == "reject") {
+		foreach (explode("|", $ext) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return false; } }
+		file_put_contents($GLOBALS["fufix_reject_attachments"], "/name=[^>]*\.($ext)/     REJECT     Dangerous files are prohibited on this server.".PHP_EOL);
+	} elseif ($action == "filter") {
+		foreach (explode("|", $ext) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return false; } }
+		file_put_contents($GLOBALS["fufix_reject_attachments"], "/name=[^>]*\.($ext)/     FILTER     vfilter:dummy".PHP_EOL);
+	}
 }
 function set_fufix_anonymize_headers($toggle) {
-        $template = '/^\s*(Received: from)[^\n]*(.*)/ REPLACE $1 [127.0.0.1] (localhost [127.0.0.1])$2
+	$template = '/^\s*(Received: from)[^\n]*(.*)/ REPLACE $1 [127.0.0.1] (localhost [127.0.0.1])$2
 /^\s*User-Agent/        IGNORE
 /^\s*X-Enigmail/        IGNORE
 /^\s*X-Mailer/          IGNORE
 /^\s*X-Originating-IP/  IGNORE
 ';
-        if ($toggle == "on") {
-                file_put_contents($GLOBALS["fufix_anonymize_headers"], $template);
-        } else {
-                file_put_contents($GLOBALS["fufix_anonymize_headers"], "");
-        }
+	if ($toggle == "on") {
+		file_put_contents($GLOBALS["fufix_anonymize_headers"], $template);
+	} else {
+		file_put_contents($GLOBALS["fufix_anonymize_headers"], "");
+	}
+}
+function echo_sys_info($what) {
+	switch ($what) {
+	case "ram":
+		echo round(`free | grep Mem | awk '{print $3/$2 * 100.0}'`); 
+		break;
+	case "maildisk":
+		echo preg_replace('/\D/', '', `df -h /var/vmail/ | tail -n1 | awk {'print $5'}`);
+		break;
+	case "mailq":
+		echo `mailq`;
+		break;
+	}
 }
 if (isset($link)) { mysqli_close($link); }
 ?>
+
 

@@ -104,7 +104,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 </form>
 
 <hr>
-<h3>DKIM signing</h3>
+<h3>DKIM Signing</h3>
 <?php if (return_fufix_anonymize_toggle() === false) { ?>
 <p>Default behaviour is to sign with relaxed header and body canonicalization algorithm.</p>
 <form method="post" action="index.php">
@@ -133,7 +133,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 
 <hr>
 <form class="form-inline" method="post">
-	<h3>Max message size</h3>
+	<h3>Max. Message Size</h3>
 	<p>Current message size limitation: <strong><?php echo `echo $(( $(/usr/sbin/postconf -h message_size_limit) / 1048576 ))`; ?>MB</strong></p>
 	<p>This changes values in PHP, Nginx and Postfix. Services will be reloaded.</p>
 	<div class="form-group">
@@ -146,7 +146,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <h1><span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> Maintenance</h1>
 
 <hr>
-<h3>DNS records</h3>
+<h3>DNS Records</h3>
 <p>Below you see a list of <em>recommended</em> DNS records.</p>
 <p>While some are mandatory for a mail server (A, MX), others are recommended to build a good reputation score (TXT/SPF) or used for auto-configuration of mail clients (A: "autoconfig" and SRV records).</p>
 <p>In this automatically generated DNS zone file snippet, <mark>a generic TXT/SPF record</mark> is used to only allow THIS server to send mail for your domain. Please refer to <a href="http://www.openspf.org/SPF_Record_Syntax" target="_blank">openspf.org</a>.</p>
@@ -172,7 +172,7 @@ autoconfig          IN A       <?php echo $IP, "\n"; ?>
 </pre>
 
 <hr>
-<h3>FAQ: Terminal tasks</h3>
+<h3>FAQ: Terminal Tasks</h3>
 <p><strong>Example usage of <em>doveadm</em> for common tasks regarding Dovecot.</strong></p>
 <pre style="border: 0px; background-color: #333; color: #7CFC00;">
 ; Searching for inbox messages saved in the past 3 days for user "Bob.Cat":
@@ -213,32 +213,29 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 </pre>
 
 <hr>
-<h3>System information</h3>
+<h3>System Information</h3>
 <p>This is a very simple system information function. Please be aware that a high RAM usage is what you want on a server.</p>
 <div class="row">
 	<div class="col-xs-6">
-<?php $du = preg_replace('/\D/', '', `df -h /var/vmail/ | tail -n1 | awk {'print $5'}`); ?>
-		<h4>Disk usage (/var/vmail) - <?php echo $du; ?>%</h4>
+		<h4>Disk usage (/var/vmail) - <?php echo_sys_info("maildisk"); ?>%</h4>
 		<div class="progress">
-		  <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $du; ?>"
-		  aria-valuemin="0" aria-valuemax="100" style="width:<?php echo $du; ?>%">
+		  <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="<?php echo_sys_info("maildisk"); ?>"
+		  aria-valuemin="0" aria-valuemax="100" style="width:<?php echo_sys_info("maildisk"); ?>%">
 		  </div>
 		</div>
 	</div>
 	<div class="col-xs-6">
-<?php $ru = round(`free | grep Mem | awk '{print $3/$2 * 100.0}'`); ?>
-		<h4>RAM usage - <?php echo $ru; ?>%</h4>
+		<h4>RAM usage - <?php echo_sys_info("ram"); ?>%</h4>
 		<div class="progress">
-		  <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $ru; ?>"
-		  aria-valuemin="0" aria-valuemax="100" style="width:<?php echo $ru; ?>%">
+		  <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="<?php echo_sys_info("ram"); ?>"
+		  aria-valuemin="0" aria-valuemax="100" style="width:<?php echo_sys_info("ram"); ?>%">
 		  </div>
 		</div>
 	</div>
 </div>
-
 <h4>Mail queue</h4>
 <pre>
-<?php echo `mailq`; ?>
+<?php echo_sys_info("mailq"); ?>
 </pre>
 
 </div>
