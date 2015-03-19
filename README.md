@@ -38,7 +38,7 @@ fufix
 ```
 
 A mail server install script with a lot of features for **Debian and Debian based distributions**. 
-This installer is permanently **tested on Debians stable branch** but is reported to run on newer branches, too. Debian Squeeze (old-stable) is not supported.
+This installer is permanently **tested on Debian stable (7.x) and testing (8.x)**. Debian Squeeze (old-stable) is not supported.
 
 Please see https://www.debinux.de/fufix for further information.
 Feel free to leave a comment or question.
