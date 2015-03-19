@@ -236,6 +236,11 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 	</div>
 </div>
 
+<h4>Mail queue</h4>
+<pre>
+<?php echo `mailq`; ?>
+</pre>
+
 </div>
 
 <?php else: ?>
