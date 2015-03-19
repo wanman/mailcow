@@ -20,11 +20,8 @@
   - [Dovecot](#dovecot)
     - [Trash folder quota](#trash-folder-quota)
     - [Dovecot SQL parameter](#dovecot-sql-parameter)
-    - [Doveadm common tasks](#doveadm-common-tasks)
-    - [Backup mail](#backup-mail)
   - [Roundcube](#roundcube)
   - [Change attachment/message size](#change-attachmentmessage-size)
-- [Debugging](#debugging)
 - [Uninstall](#uninstall)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
