@@ -139,7 +139,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 	<div class="form-group">
 		<input type="number" class="form-control" id="maxmsgsize" name="maxmsgsize" placeholder="in MB" min="1" max="250">
 	</div>
-	<button type="submit" class="btn btn-default">Set</button>
+	<button type="submit" class="btn btn-primary">Set</button>
 </form>
 
 <br />
