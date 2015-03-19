@@ -131,12 +131,8 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <p><span class="label label-danger">DKIM signing is not available when "Anonymize outgoing mail" is enabled.</span></p>
 <? } ?>
 
-<br />
-<h1><span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> Maintenance</h1>
-
-<div class="row">
+<hr>
 <form class="form-inline" method="post">
-	<div class="col-xs-10">
 	<h3>Max message size</h3>
 	<p>Current message size limitation: <strong><?php echo `echo $(( $(/usr/sbin/postconf -h message_size_limit) / 1048576 ))`; ?>MB</strong></p>
 	<p>This changes values in PHP, Nginx and Postfix. Services will be reloaded.</p>
@@ -144,9 +140,10 @@ Enter "DISABLED" to disable this feature.</pre></p>
 		<input type="number" class="form-control" id="maxmsgsize" name="maxmsgsize" placeholder="in MB" min="1" max="250">
 	</div>
 	<button type="submit" class="btn btn-default">Set</button>
-	</div>
 </form>
-</div>
+
+<br />
+<h1><span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> Maintenance</h1>
 
 <hr>
 <h3>DNS records</h3>
