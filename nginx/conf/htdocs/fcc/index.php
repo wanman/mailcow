@@ -174,6 +174,47 @@ autoconfig          IN A       <?php echo $IP, "\n"; ?>
 ; !!!!!!!!!!!!!!!!
 </pre>
 
+<hr>
+<h3>FAQ: Terminal tasks</h3>
+<p><strong>Example usage of <em>doveadm</em> for common tasks regarding Dovecot.</strong></p>
+<pre style="border: 0px; background-color: #333; color: #7CFC00;">
+; Searching for inbox messages saved in the past 3 days for user "Bob.Cat":
+doveadm search -u bob.cat@domain.com mailbox inbox savedsince 2d
+
+; ...or search Bobs inbox for subject "important":
+doveadm search -u bob.cat@domain.com mailbox inbox subject important
+
+; Delete Bobs messages older than 100 days?
+doveadm expunge -u bob.cat@domain.com mailbox inbox savedbefore 100d
+
+; From Wiki: Move jane's messages - received in September 2011 - from her INBOX into her archive.
+doveadm move -u jane Archive/2011/09 mailbox INBOX BEFORE 2011-10-01 SINCE 01-Sep-2011
+
+; Visit http://wiki2.dovecot.org/Tools/Doveadm
+</pre>
+
+<p><strong>Backup mail</strong></p>
+<pre style="border: 0px; background-color: #333; color: #7CFC00;">
+; If you want to create a backup of Bobs maildir to /var/mailbackup, just go ahead and create the backup destination with proper rights:
+mkdir /var/mailbackup
+chown vmail:vmail /var/mailbackup/
+
+; Afterwards you can start a full backup:
+dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
+
+; Visit http://wiki2.dovecot.org/Tools/Dsync
+</pre>
+
+<p><strong>Debugging</strong></p>
+<pre style="border: 0px; background-color: #333; color: #7CFC00;">
+; Pathes to important log files:
+/var/log/mail.log
+/var/log/syslog
+/var/log/nginx/error.log
+/var/www/mail/rc/logs/errors
+/var/log/php5-fpm.log
+</pre>
+
 </div>
 
 <?php else: ?>

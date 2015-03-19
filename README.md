@@ -281,48 +281,6 @@ A system with a very large amount of virtual users should not do this on a daily
 
 *Dovecot saves messages to `/var/vmail/DOMAINNAME/USERNAME` in maildir format.*
 
-### Doveadm common tasks
-
-For example searching for inbox messages saved in the past 3 days for user "Bob.Cat":
-```
-doveadm search -u bob.cat@domain.com mailbox inbox savedsince 2d
-```
-
-Or search Bobs inbox for subject "important":
-```
-doveadm search -u bob.cat@domain.com mailbox inbox subject important
-```
-
-Want to delete Bobs messages older than 100 days?
-```
-doveadm expunge -u bob.cat@domain.com mailbox inbox savedbefore 100d
-```
-
-From Dovecots wiki: Move jane's messages - received in September 2011 - from her INBOX into her archive.
-```
-doveadm move -u jane Archive/2011/09 mailbox INBOX BEFORE 2011-10-01 SINCE 01-Sep-2011
-```
-
-You find some more useful search queries and much more here: http://wiki2.dovecot.org/Tools/Doveadm
-
-### Backup mail
-
-If you want to create a backup of Bobs maildir to /var/mailbackup, just go ahead and create the backup destination with proper rights:
-
-```
-mkdir /var/mailbackup
-chown vmail:vmail /var/mailbackup/
-```
-
-Afterwards you can start a full backup:
-```
-dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
-```
-
-For more information about dsync (like the difference between backups and mirrors) visit http://wiki2.dovecot.org/Tools/Dsync
-
-You can also use the control center (@your.server.tld/fcc) to create and download a simple tar.bz2 copy.
-
 ## Roundcube
 
 Roundcube is configured by multiple configuration files.
@@ -337,33 +295,11 @@ Some plug-ins come with a seperate "config.inc.php" file. You can find them in `
 If no domain is specified for a login address, the webservers domain part will be appended.
 
 ## Change attachment/message size
-Default file size limit is set to 25 MB. If you want to change this, you need to see three files:
+Default file size limit is set to 25 MB. If you want to change this, either use the fufix control center or the command `fufix_msg_size` in a terminal:
 
-1. Open `/etc/php5/fpm/pool.d/mail.conf` and set `upload_max_filesize` to your new value. Change `post_max_size` to the same value + about 1M:
 ```
-php_admin_value[upload_max_filesize] = 25M
-php_admin_value[post_max_size] = 26M
-```
-
-2. Open Nginx' main configuration file `/etc/nginx/nginx.conf` and change the value of `client_max_body_size` to the value of `upload_max_filesize`.
-
-3. Make sure `message_size_limit` (defined in bytes) in  `/etc/postfix/main.cf` is set >= `upload_max_filesize` . 
-
-Restart "php5-fpm", "postfix" and "nginx" services.
-
-# Debugging
-
-Most important files for debugging:
-
-* **/var/log/mail.log**
-* **/var/log/syslog**
-* **/var/log/nginx/error.log**
-* **/var/www/mail/rc/logs/errors**
-* **/var/log/php5-fpm.log**
-
-Please always see these files when troubleshooting your mail server.
-
-Keep in mind that you may need to enable debugging options for affected services!
+fufix_msg_size VALUE_IN_MB
+``` 
 
 # Uninstall
 Run `bash misc/purge.sh` from within fufix directory to **completely purge** fufix, mailboxes, databases and any related service.
