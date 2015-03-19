@@ -34,6 +34,11 @@ server {
 
 	rewrite /.well-known/autoconfig/mail/config-v1.1.xml /autoconfig.xml last;
 
+	error_page 502 /redir.html;
+	location /redir.html {
+		return 301 /fcc;
+	}
+
 	location ~ ^/(rc/logs|pfadmin/ADDITIONS)/ {
 		deny all;
 	}

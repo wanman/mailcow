@@ -8,7 +8,7 @@ include_once("fcc/inc/vars.inc.php");
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title><?php echo $mailname ?></title>
+<title><?php echo $MYHOSTNAME ?></title>
 <!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -18,7 +18,6 @@ include_once("fcc/inc/vars.inc.php");
 <!-- Optional theme -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
 <!-- Latest compiled and minified JavaScript -->
-<link href="../css/signin.form.css" rel="stylesheet">
 
 </head>
 <body>
@@ -31,7 +30,7 @@ include_once("fcc/inc/vars.inc.php");
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-                        <a class="navbar-brand" href="/"><?php echo $mailname ?></a>
+                        <a class="navbar-brand" href="/"><?php echo $MYHOSTNAME ?></a>
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                         <ul class="nav navbar-nav navbar-right">
@@ -46,18 +45,18 @@ include_once("fcc/inc/vars.inc.php");
 <form action="fcc/" method="post" id="logout"><input type="hidden" name="logout"></form>
 <div class="jumbotron">
 <div class="container">
-<h2>Welcome @ <?php echo $mailname; ?></h2>
+<h2>Welcome @ <?php echo $MYHOSTNAME; ?></h2>
 <p>Setup a mail client to use SMTP and IMAP</p>
 <div class="row">
 <div class="col-md-6">
 <small><b>IMAP(S)</b></small>
 <ul class="ul-horizontal">
-  <li><code><?php echo $mailname; ?>:143/tcp</code></li>
-  <li><code><?php echo $mailname; ?>:993/tcp</code></li>
+  <li><code><?php echo $MYHOSTNAME; ?>:143/tcp</code></li>
+  <li><code><?php echo $MYHOSTNAME; ?>:993/tcp</code></li>
 </ul>
 <small><b>SMTP</b></small>
 <ul>
-  <li><code><?php echo $mailname; ?>:587/tcp</code></li>
+  <li><code><?php echo $MYHOSTNAME; ?>:587/tcp</code></li>
 </ul>
 </div>
 </div>
@@ -85,7 +84,7 @@ include_once("fcc/inc/vars.inc.php");
 <footer>
 <h4>Health check (© MXToolBox)</h4>
 <p>"The Domain Health Check will execute hundreds of domain/email/network performance tests to make sure all of your systems are online and performing optimally. The report will then return results for your domain and highlight critical problem areas for your domain that need to be resolved."</p>
-<a class="btn btn-default" href="http://mxtoolbox.com/SuperTool.aspx?action=smtp:<?php echo $mailname ?>" target="_blank">Run &raquo;</a>
+<a class="btn btn-default" href="http://mxtoolbox.com/SuperTool.aspx?action=smtp:<?php echo $MYHOSTNAME ?>" target="_blank">Run &raquo;</a>
 </footer>
 </div> <!-- /container -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>

@@ -135,7 +135,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <h1><span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> Maintenance</h1>
 
 <div class="row">
-<form class="form-inline">
+<form class="form-inline" method="post">
 	<div class="col-xs-10">
 	<h3>Max message size</h3>
 	<p>Current message size limitation: <strong><?php echo `echo $(( $(/usr/sbin/postconf -h message_size_limit) / 1048576 ))`; ?>MB</strong></p>
