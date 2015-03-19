@@ -212,6 +212,30 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 /var/log/php5-fpm.log
 </pre>
 
+<hr>
+<h3>System information</h3>
+<p>This is a very simple system information function. Please be aware that a high RAM usage is what you want on a server.</p>
+<div class="row">
+	<div class="col-xs-6">
+<?php $du = preg_replace('/\D/', '', `df -h /var/vmail/ | tail -n1 | awk {'print $5'}`); ?>
+		<h4>Disk usage (/var/vmail) - <?php echo $du; ?>%</h4>
+		<div class="progress">
+		  <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $du; ?>"
+		  aria-valuemin="0" aria-valuemax="100" style="width:<?php echo $du; ?>%">
+		  </div>
+		</div>
+	</div>
+	<div class="col-xs-6">
+<?php $ru = round(`free | grep Mem | awk '{print $3/$2 * 100.0}'`); ?>
+		<h4>RAM usage - <?php echo $ru; ?>%</h4>
+		<div class="progress">
+		  <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="<?php echo $ru; ?>"
+		  aria-valuemin="0" aria-valuemax="100" style="width:<?php echo $ru; ?>%">
+		  </div>
+		</div>
+	</div>
+</div>
+
 </div>
 
 <?php else: ?>
