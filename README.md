@@ -264,7 +264,7 @@ Dovecots SQL parameters can be found in either `/etc/dovecot/dovecot-dict-sql.co
 
 - `dovecot-dict-sql.conf` holds instructions for reading a users quota.
 
-- `dovecot-mysql.con` contains some basic SQL commands:
+- `dovecot-mysql.conf` contains some basic SQL commands:
 **driver** - What database  
 **connect** - How to connect to the MySQL database   **default_pass_scheme** - Password scheme. If you edit this you also need to adjust Postfixadmin!  
 **password_query** - Validate passwords.  
