@@ -85,6 +85,7 @@ include_once("fcc/inc/vars.inc.php");
 		<h4>Health check (© MXToolBox)</h4>
 		<p>"The Domain Health Check will execute hundreds of domain/email/network performance tests to make sure all of your systems are online and performing optimally. The report will then return results for your domain and highlight critical problem areas for your domain that need to be resolved."</p>
 		<a class="btn btn-default" href="http://mxtoolbox.com/SuperTool.aspx?action=smtp:<?php echo $MYHOSTNAME ?>" target="_blank">Run &raquo;</a>
+		<br />
 	</footer>
 </div> <!-- /container -->
 
