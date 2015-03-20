@@ -46,7 +46,6 @@ include_once("inc/triggers.inc.php");
 <form action="/fcc/" method="post" id="logout"><input type="hidden" name="logout"></form>
 <div class="container">
 <?php if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes"): ?>
-<div class="row">
 
 <h1><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Configuration</h1>
 
@@ -59,7 +58,7 @@ include_once("inc/triggers.inc.php");
 Enter "DISABLED" to disable this feature.</pre></p>
 	<hr>
 	<div class="row">
-		<div class="col-xs-10">
+		<div class="col-md-10">
 		<small>
 		<h4>VirusTotal Uploader</h4>
 		<div class="checkbox">
@@ -113,15 +112,15 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <h4>Add new key</h4>
 <div class="form-group">
 	<div class="row">
-		<div class="col-xs-4">
+		<div class="col-md-4">
 			<strong>Domain</strong>
 			<input class="form-control" id="dkim_domain" name="dkim_domain" placeholder="example.org">
 		</div>
-		<div class="col-xs-4">
+		<div class="col-md-4">
 			<strong>Selector</strong>
 			<input class="form-control" id="dkim_selector" name="dkim_selector" placeholder="default">
 		</div>
-		<div class="col-xs-4">
+		<div class="col-md-4">
 			<br /><button type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus"></span> Add</button>
 		</div>
 	</div>
@@ -216,7 +215,7 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 <h3>System Information</h3>
 <p>This is a very simple system information function. Please be aware that a high RAM usage is what you want on a server.</p>
 <div class="row">
-	<div class="col-xs-6">
+	<div class="col-md-6">
 		<h4>Disk usage (/var/vmail) - <?php echo_sys_info("maildisk"); ?>%</h4>
 		<div class="progress">
 		  <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="<?php echo_sys_info("maildisk"); ?>"
@@ -224,7 +223,7 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 		  </div>
 		</div>
 	</div>
-	<div class="col-xs-6">
+	<div class="col-md-6">
 		<h4>RAM usage - <?php echo_sys_info("ram"); ?>%</h4>
 		<div class="progress">
 		  <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="<?php echo_sys_info("ram"); ?>"
@@ -237,8 +236,6 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 <pre>
 <?php echo_sys_info("mailq"); ?>
 </pre>
-
-</div>
 
 <?php else: ?>
 <h3>Login</h3>
