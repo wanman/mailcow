@@ -1,8 +1,8 @@
 <?php
 session_start();
-include_once("inc/vars.inc.php");
-include_once("inc/functions.inc.php");
-include_once("inc/triggers.inc.php");
+require_once "inc/vars.inc.php";
+require_once "inc/functions.inc.php";
+require_once "inc/triggers.inc.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
