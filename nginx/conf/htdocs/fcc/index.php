@@ -38,15 +38,24 @@ require_once "inc/triggers.inc.php";
 				<li><a href="/rc">Webmail</a></li>
 				<li><a href="/pfadmin">Postfixadmin</a></li>
 				<li><a href="/fcc">fufix control center</a></li>
-				<li><a href="#" onclick="logout.submit()"><?php if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes") { echo "Logout"; } else { echo ""; } ?></a></li>
+				<li><a href="#" onclick="logout.submit()">
+<?php
+if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes") {
+    echo "Logout";
+} else {
+    echo "";
+}
+?>
+</a></li>
 			</ul>
 		</div><!--/.nav-collapse -->
 	</div><!--/.container-fluid -->
 </nav>
 <form action="/fcc/" method="post" id="logout"><input type="hidden" name="logout"></form>
 <div class="container">
-<?php if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes"): ?>
-
+<?php
+if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes") {
+?>
 <h1><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Configuration</h1>
 
 <h3>Attachments</h3>
@@ -126,9 +135,13 @@ Enter "DISABLED" to disable this feature.</pre></p>
 	</div>
 </div>
 </form>
-<?php } else { ?>
+<?php
+} else {
+?>
 <p><span class="label label-danger">DKIM signing is not available when "Anonymize outgoing mail" is enabled.</span></p>
-<? } ?>
+<?
+}
+?>
 
 <hr>
 <form class="form-inline" method="post">
@@ -237,7 +250,9 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 <?php echo_sys_info("mailq"); ?>
 </pre>
 
-<?php else: ?>
+<?php
+} else {
+?>
 <h3>Login</h3>
 <form class="form-signin" method="post">
 	<input name="login_user" type="email" id="inputEmail" class="form-control" placeholder="pfadmin@domain.tld" required autofocus>
@@ -245,7 +260,9 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 	<p>You can login with any superadmin created in <b><a href="../pfadmin">Postfixadmin</a></b>.</p>
 	<input type="submit" class="btn btn-success" value="Login">
 </form>
-<?php endif ?>
+<?php
+}
+?>
 <hr>
 <p><b><a href="../">&#8592; go back</a></b></p>
 </div> <!-- /container -->
