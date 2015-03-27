@@ -113,8 +113,8 @@ Enter "DISABLED" to disable this feature.</pre></p>
 
 <hr>
 <h3>DKIM Signing</h3>
-<?php if (return_fufix_anonymize_toggle() === false) { ?>
 <p>Default behaviour is to sign with relaxed header and body canonicalization algorithm.</p>
+<p><span class="label label-danger">Warning</span> DKIM signing should not be used when when "Anonymize outgoing mail" is enabled.</p>
 <form method="post" action="index.php">
 <h4>Active keys</h4>
 <?php echo_fufix_opendkim_table() ?>
@@ -135,13 +135,6 @@ Enter "DISABLED" to disable this feature.</pre></p>
 	</div>
 </div>
 </form>
-<?php
-} else {
-?>
-<p><span class="label label-danger">DKIM signing is not available when "Anonymize outgoing mail" is enabled.</span></p>
-<?
-}
-?>
 
 <hr>
 <form class="form-inline" method="post">
