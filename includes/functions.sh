@@ -181,12 +181,18 @@ EOF
 				apt-get -y update >/dev/null ; apt-get -y install ssl-cert >/dev/null
 				/usr/sbin/make-ssl-cert generate-default-snakeoil --force-overwrite
 			fi
-            if [[ ! -z $(grep wheezy-backports /etc/apt/sources.list) ]]; then
+			if [[ ! -z $(grep "^7\." /etc/debian_version) ]] && [[ -z $(grep wheezy-backports /etc/apt/sources.list) ]]; then
+				echo "$(textb [INFO]) - Enabling wheezy-backports..."
+				echo -e "\ndeb http://http.debian.net/debian wheezy-backports main" >> /etc/apt/sources.list
+				apt-get -y update >/dev/null
+			fi
+			if [[ ! -z $(grep wheezy-backports /etc/apt/sources.list) ]]; then
 				echo "$(textb [INFO]) - Installing python-magic from backports..."
 				apt-get -y update >/dev/null ; apt-get -y install python-magic -t wheezy-backports >/dev/null
 			fi
 			echo "$(textb [INFO]) - Installing packages unattended, please stand by, errors will be reported."
 			apt-get -y update >/dev/null
+			apt-get -y install jq -t wheezy-backports >/dev/null
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
 python-magic libmail-spf-perl libmail-dkim-perl openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
@@ -259,14 +265,17 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/dovecot/*
 			sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/dovecot/*
 			mkdir /etc/dovecot/conf.d 2> /dev/null
-			mkdir -p /var/vmail/{sieve,vfilter}
+			mkdir -p /var/vmail/sieve
 			cp dovecot/conf/spam-global.sieve /var/vmail/sieve/spam-global.sieve
 			cp dovecot/conf/default.sieve /var/vmail/sieve/default.sieve
-			install -m 755 misc/vfilter.sh /var/vmail/vfilter/
 			install -m 755 misc/fufix_msg_size /usr/local/bin/fufix_msg_size
 			sievec /var/vmail/sieve/spam-global.sieve
 			chown -R vmail:vmail /var/vmail
 			install -m 755 dovecot/conf/doverecalcq /etc/cron.daily/
+			mkdir -p /opt/vfilter
+			install -m 755 misc/vfilter/vfilter.sh /opt/vfilter/
+			install -m 644 misc/vfilter/messages /opt/vfilter/
+			chown -R vmail:vmail /opt/vfilter
 			;;
 		opendkim)
 			echo 'SOCKET="inet:10040@localhost"' > /etc/default/opendkim
@@ -304,6 +313,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			mkdir -p /var/www/mail/pfadmin /var/run/fetchmail /etc/mail/postfixadmin 2> /dev/null
 			cp -R nginx/conf/htdocs/{fcc,index.php,robots.txt,autoconfig.xml} /var/www/mail/
 			touch /var/www/VT_API_KEY
+			touch /var/www/VT_ENABLE_UPLOAD
 			mv pfadmin/inst/$postfixadmin_revision/* /var/www/mail/pfadmin/
             cp /var/www/mail/pfadmin/ADDITIONS/fetchmail.pl /usr/local/bin/fetchmail.pl
 			cp pfadmin/conf/config.local.php /var/www/mail/pfadmin/config.local.php

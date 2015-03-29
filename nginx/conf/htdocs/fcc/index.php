@@ -76,6 +76,12 @@ Enter "DISABLED" to disable this feature.</pre></p>
 			<b>Optional:</b> Scan dangerous attachments with VirusTotal. You will receive a mail including a link to the results. If unchecked, those mails will be <b>rejected</b>.
 			</label>
 		</div>
+		<div class="checkbox">
+			<label>
+			<input name="virustotalcheckonly" type="checkbox"  <?php echo return_vt_enable_upload_toggle() ?>>
+			Do <b>not</b> upload files to VirusTotal but check for a previous scan report.
+			</label>
+		</div>
 		<label for="vtapikey">VirusTotal API Key (<a href="https://www.virustotal.com/documentation/virustotal-community/#retrieve-api-key" target="_blank">?</a>)</label>
 		<input class="form-control" id="vtapikey" type="text" name="vtapikey" value="<?php echo file_get_contents($VT_API_KEY); ?>">
 		</small>

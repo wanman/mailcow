@@ -50,8 +50,7 @@ function echo_fufix_opendkim_table() {
 			<pre>", file_get_contents($GLOBALS["fufix_opendkim_dnstxt_folder"]."/".$file), "</pre>
 		</div>
 		<div class=\"col-xs-1\">
-			<a href=\"?del=", $file, "\" onclick=\"return confirm('Are you sure?')\"><span 
-class=\"glyphicon glyphicon-remove-circle\"></span></a>
+			<a href=\"?del=", $file, "\" onclick=\"return confirm('Are you sure?')\"><span class=\"glyphicon glyphicon-remove-circle\"></span></a>
 		</div>
 	</div>";
 	}
@@ -67,8 +66,7 @@ function set_fufix_sender_access($what) {
 	file_put_contents($GLOBALS["fufix_sender_access"], "");
 	foreach(preg_split("/((\r?\n)|(\r\n?))/", $what) as $each) {
 		if ($each != "" && preg_match("/^[a-zA-Z0-9-\ .@]+$/", $each)) {
-			file_put_contents($GLOBALS["fufix_sender_access"], "$each REJECT Sender not allowed".PHP_EOL, 
-FILE_APPEND);
+			file_put_contents($GLOBALS["fufix_sender_access"], "$each REJECT Sender not allowed".PHP_EOL, FILE_APPEND);
 		}
 	}
 	$sender_map = $GLOBALS["fufix_sender_access"];
@@ -87,6 +85,18 @@ function add_fufix_opendkim_entry($selector, $domain) {
 		return false;
 	}
 	shell_exec("sudo /usr/local/bin/opendkim-keycontrol add $selector $domain");
+}
+function return_vt_enable_upload_toggle() {
+	$state = file_get_contents($GLOBALS["VT_ENABLE_UPLOAD"]);
+	if (!empty($state)) { return "checked"; } else { return false; }
+}
+function set_vt_enable_upload_toggle($value) {
+    if ($value != "1") {
+       	file_put_contents($GLOBALS["VT_ENABLE_UPLOAD"], "");
+    }
+    else {
+        file_put_contents($GLOBALS["VT_ENABLE_UPLOAD"], "1");
+    }
 }
 function set_fufix_reject_attachments($ext, $action) {
 	if ($action == "reject") {
@@ -113,7 +123,7 @@ function set_fufix_anonymize_headers($toggle) {
 function echo_sys_info($what) {
 	switch ($what) {
 	case "ram":
-		echo round(`free | grep Mem | awk '{print $3/$2 * 100.0}'`); 
+		echo round(`free | grep Mem | awk '{print $3/$2 * 100.0}'`);
 		break;
 	case "maildisk":
 		echo preg_replace('/\D/', '', `df -h /var/vmail/ | tail -n1 | awk {'print $5'}`);
