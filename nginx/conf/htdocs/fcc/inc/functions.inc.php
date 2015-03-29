@@ -91,12 +91,12 @@ function return_vt_enable_upload_toggle() {
 	if (!empty($state)) { return "checked"; } else { return false; }
 }
 function set_vt_enable_upload_toggle($value) {
-    if ($value != "1") {
-       	file_put_contents($GLOBALS["VT_ENABLE_UPLOAD"], "");
-    }
-    else {
-        file_put_contents($GLOBALS["VT_ENABLE_UPLOAD"], "1");
-    }
+	if ($value != "1") {
+		file_put_contents($GLOBALS["VT_ENABLE_UPLOAD"], "");
+	}
+	else {
+		file_put_contents($GLOBALS["VT_ENABLE_UPLOAD"], "1");
+	}
 }
 function set_fufix_reject_attachments($ext, $action) {
 	if ($action == "reject") {
