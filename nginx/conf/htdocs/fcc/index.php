@@ -73,7 +73,8 @@ Enter "DISABLED" to disable this feature.</pre></p>
 		<div class="checkbox">
 			<label>
 			<input name="virustotaltoggle" type="checkbox"  <?php echo return_fufix_reject_attachments_toggle() ?>>
-			<b>Optional:</b> Scan dangerous attachments with VirusTotal. You will receive a mail including a link to the results. If unchecked, those mails will be <b>rejected</b>.
+			<b>Optional:</b> Scan dangerous attachments with VirusTotal. You will receive a mail including a link to the results. If unchecked, those mails will be <b>rejected</b>.<br />
+			<b>File size limitations:</b> 20MB/upload, 200MB/previous-result-check
 			</label>
 		</div>
 		<div class="checkbox">

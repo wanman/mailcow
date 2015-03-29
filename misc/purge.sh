@@ -83,6 +83,7 @@ rm -f /var/log/mail*gz
 rm -rf /var/log/nginx/
 rm -rf /var/log/clamav/
 rm -rf /var/log/mysql*
+rm -rf /opt/vfilter/
 rm -f /etc/cron.d/pfadminfetchmail
 rm -f /etc/cron.daily/spam*
 rm -rf /etc/opendkim*
