@@ -70,18 +70,20 @@ Enter "DISABLED" to disable this feature.</pre></p>
 		<div class="col-md-10">
 		<small>
 		<h4>VirusTotal Uploader</h4>
+		<p>Scan dangerous attachments with VirusTotal. You will receive a mail including a link to the results. If disabled, those mails will be <b>rejected</b></p>
+		<p><b>File size limitations</b> (VirusTotal Public API v2.0)
+		<ul><li>20MB/<em>upload</em></li><li>200MB/<em>previous-result-check</em></li></ul></p>
 		<div class="checkbox">
-			<label>
-			<input name="virustotaltoggle" type="checkbox"  <?php echo return_fufix_reject_attachments_toggle() ?>>
-			<b>Optional:</b> Scan dangerous attachments with VirusTotal. You will receive a mail including a link to the results. If unchecked, those mails will be <b>rejected</b>.<br />
-			<b>File size limitations:</b> 20MB/upload, 200MB/previous-result-check
-			</label>
+				<label>
+				<input name="virustotaltoggle" type="checkbox"  <?php echo return_fufix_reject_attachments_toggle() ?>>
+				Enable VirusTotal Uploader
+				</label>
 		</div>
 		<div class="checkbox">
-			<label>
-			<input name="virustotalcheckonly" type="checkbox"  <?php echo return_vt_enable_upload_toggle() ?>>
-			Do <b>not</b> upload files to VirusTotal but check for a previous scan report.
-			</label>
+				<label>
+				<input name="virustotalcheckonly" type="checkbox"  <?php echo return_vt_enable_upload_toggle() ?>>
+				Do <b>not</b> upload files to VirusTotal but check for a previous scan report.
+				</label>
 		</div>
 		<label for="vtapikey">VirusTotal API Key (<a href="https://www.virustotal.com/documentation/virustotal-community/#retrieve-api-key" target="_blank">?</a>)</label>
 		<input class="form-control" id="vtapikey" type="text" name="vtapikey" value="<?php echo file_get_contents($VT_API_KEY); ?>">

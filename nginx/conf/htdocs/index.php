@@ -37,7 +37,7 @@ require_once "fcc/inc/vars.inc.php";
 			<li><a href="/rc">Webmail</a></li>
 			<li><a href="/pfadmin">Postfixadmin</a></li>
 			<li><a href="/fcc">fufix control center</a></li>
-			<li><a href="#" onclick="logout.submit()"><?php if ($_SESSION['fufix_cc_loggedin'] == "yes") { echo "Logout"; } else { echo ""; } ?></a></li>
+			<li><a href="#" onclick="logout.submit()"><?php if (isset($_SESSION['fufix_cc_loggedin']) && ($_SESSION['fufix_cc_loggedin'] == "yes") { echo "Logout"; } else { echo ""; } ?></a></li>
 		</ul>
 	</div><!--/.nav-collapse -->
 </div><!--/.container-fluid -->
