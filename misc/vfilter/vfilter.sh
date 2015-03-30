@@ -25,7 +25,7 @@ subject=$(cat /tmp/message.$$ | sed -n -e 's/^.*Subject: //p')
 for file in $(ls "$WORKDIR/scandir/$RAND/"); do
 
         # If size exceeds 200MiB do not even check MD5 sum
-        [[ $(stat -c %s "$file") -ge 209715200 ]] && continue
+        [[ $(stat -c %s "$WORKDIR/scandir/$RAND/$file") -ge 209715200 ]] && continue
 
         # Check extension against Postfix PCRE table to prevent scanning of allowed
         # extensions with multiple attachments
@@ -53,7 +53,7 @@ for file in $(ls "$WORKDIR/scandir/$RAND/"); do
         elif [[ $vt_json_report =~ "not among the finished" ]] && [[ $VTENUP == "1" ]]; then
 
                 # Stop if file is greater than 32 MiB
-                [[ $(stat -c %s "$file") -ge 33554432 ]] && continue
+                [[ $(stat -c %s "$WORKDIR/scandir/$RAND/$file") -ge 33554432 ]] && continue
                 printf "$SCAN_PENDING" \
                 "$file" "$(/usr/bin/curl -s -X POST https://www.virustotal.com/vtapi/v2/file/scan \
                         --form apikey=$APIKEY --form file=@"$upload" | \
