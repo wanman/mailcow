@@ -187,13 +187,12 @@ EOF
 				apt-get -y update >/dev/null
 			fi
 			if [[ ! -z $(grep wheezy-backports /etc/apt/sources.list) ]]; then
-				echo "$(textb [INFO]) - Installing python-magic from backports..."
-				apt-get -y update >/dev/null ; apt-get -y install python-magic -t wheezy-backports >/dev/null
+				echo "$(textb [INFO]) - Installing jq and python-magic from wheezy-backports..."
+				apt-get -y update >/dev/null ; apt-get -y install jq python-magic -t wheezy-backports >/dev/null
 			fi
 			echo "$(textb [INFO]) - Installing packages unattended, please stand by, errors will be reported."
 			apt-get -y update >/dev/null
-			apt-get -y install jq -t wheezy-backports >/dev/null
-DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
+DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install jq dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
 python-magic libmail-spf-perl libmail-dkim-perl openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server nginx-extras mailutils \
