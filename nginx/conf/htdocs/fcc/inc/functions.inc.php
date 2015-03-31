@@ -90,6 +90,9 @@ function return_vt_enable_upload_toggle() {
 	$state = file_get_contents($GLOBALS["VT_ENABLE_UPLOAD"]);
 	if (empty($state)) { return "checked"; } else { return false; }
 }
+function return_vt_filter_log() {
+	return shell_exec("sudo -u vmail /usr/bin/tail /opt/vfilter/log/vfilter.log");
+}
 function set_vt_enable_upload_toggle($value) {
 	if ($value != "1") {
 		file_put_contents($GLOBALS["VT_ENABLE_UPLOAD"], "");

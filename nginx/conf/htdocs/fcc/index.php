@@ -90,8 +90,8 @@ Enter "DISABLED" to disable this feature.</pre></p>
 		<p><input class="form-control" id="vtapikey" type="text" name="vtapikey" value="<?php echo file_get_contents($VT_API_KEY); ?>"></p>
 		<p><b>Filter Log (tail)</b></p>
 		<p><pre>
-<?php if (!empty($vfiltertail)) {
-	echo $vfiltertail;
+<?php if (!empty(return_vt_filter_log)) {
+	echo return_vt_filter_log();
 }
 else {
 	echo "none";
