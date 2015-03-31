@@ -40,8 +40,8 @@ echo "
     $(textb "Domain")          $sys_domain
     $(textb "FQDN")            $sys_hostname.$sys_domain
     $(textb "Timezone")        $sys_timezone
-    $(textb "Postfix MySQL")   ${my_postfixuser}:${my_postfixpass}/${my_postfixdb}
-    $(textb "Roundcube MySQL") ${my_rcuser}:${my_rcpass}/${my_rcdb}
+    $(textb "Postfix MySQL")   ${my_postfixuser}:hidden/${my_postfixdb}
+    $(textb "Roundcube MySQL") ${my_rcuser}:hidden/${my_rcdb}
     $(textb "Postfixadmin")    ${pfadmin_adminuser}
 "
 
@@ -56,6 +56,7 @@ echo MySQL Roundcube database: $my_rcdb >> installer.log
 echo MySQL Roundcube username: $my_rcuser >> installer.log
 echo MySQL Roundcube password: $my_rcpass >> installer.log
 echo --------------------------------- >> installer.log
+echo Only set when MySQL was not available >> installer.log
 echo MySQL root password: $my_rootpw >> installer.log
 echo --------------------------------- >> installer.log
 echo Postfixadmin Administrator >> installer.log
