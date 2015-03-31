@@ -8,6 +8,11 @@ sys_timezone="Europe/Berlin"
 # MySQL configuration.
 # Password policy: Not empty.
 # Recommended setting: Leave "genpasswd" to generate a secure password.
+# ===============
+# AN EXISTING MYSQL INSTANCE WILL BE USED AND NOT RECONFIGURED WHEN IT IS AVAILABLE
+# AND IT IS USEABLE BY FUFIX VIA DEBIAN DEFAULTS-FILE
+# (Note: Leave "my_rootpw" setting below as it is, it will not have an effect, but needs to be set!)
+# ===============
 my_rootpw=`genpasswd`
 
 my_postfixdb="postfixdb"
