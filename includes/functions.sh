@@ -411,7 +411,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			fi
 			;;
 		setupsuperadmin)
-			echo "$(textb [INFO]) - Dont be confused if you see a PHP Notice..."
+			sed -i 's/E_ALL/E_ALL ^ E_NOTICE/g' /var/www/mail/pfadmin/scripts/postfixadmin-cli.php
 			wget --quiet --no-check-certificate -O /dev/null https://localhost/pfadmin/setup.php
 			php /var/www/mail/pfadmin/scripts/postfixadmin-cli.php admin add $pfadmin_adminuser --password $pfadmin_adminpass --password2 $pfadmin_adminpass --superadmin
 			;;
