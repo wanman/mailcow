@@ -73,7 +73,12 @@ Enter "DISABLED" to disable this feature.</pre></p>
 		<h4>VirusTotal Uploader</h4>
 		<p>Scan dangerous attachments with VirusTotal. You will receive a mail including a link to the results. If disabled, those mails will be <b>rejected</b></p>
 		<p><b>File size limitations</b> (VirusTotal Public API v2.0)
-		<ul><li>32 MB/<em>upload</em></li><li>200 MB/<em>previous-result-check</em></li></ul></p>
+		<ul>
+			<li>32M/upload</em></li>
+			<li>200M/hash</em></li>
+			<li><a href="https://www.virustotal.com/de/documentation/public-api/" target="_blank">see API doc.</a></li>
+		</ul>
+		</p>
 		<div class="checkbox">
 				<label>
 				<input name="virustotaltoggle" type="checkbox"  <?php echo return_fufix_reject_attachments_toggle() ?>>
