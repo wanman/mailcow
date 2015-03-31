@@ -259,7 +259,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 		dovecot)
 			[[ -z $(grep fs.inotify.max_user_instances /etc/sysctl.conf) ]] && echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.conf
 			sysctl -p > /dev/null
-			rm -rf /etc/dovecot/* 2> /dev/null
+			rm -rf /etc/dovecot/*
 			cp -R dovecot/conf/*.conf /etc/dovecot/
 			userdel vmail 2> /dev/null
 			groupadd -g 5000 vmail
@@ -280,9 +280,12 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sievec /var/vmail/sieve/spam-global.sieve
 			chown -R vmail:vmail /var/vmail
 			install -m 755 dovecot/conf/doverecalcq /etc/cron.daily/
-			mkdir -p /opt/vfilter
-			install -m 755 misc/vfilter/vfilter.sh /opt/vfilter/
-			install -m 644 misc/vfilter/messages /opt/vfilter/
+			;;
+		vfilter)
+			mkdir -p /opt/vfilter 2> /dev/null
+			install -m 755 vfilter/vfilter.sh /opt/vfilter/vfilter.sh
+			install -m 644 vfilter/replies /opt/vfilter/replies
+			install -m 600 vfilter/vfilter.conf /opt/vfilter/vfilter.conf
 			chown -R vmail:vmail /opt/vfilter
 			;;
 		opendkim)
@@ -490,7 +493,10 @@ A backup will be stored in ./before_upgrade_$timestamp
 	returnwait "Postfix configuration" "Dovecot configuration"
 
 	installtask dovecot
-	returnwait "Dovecot configuration" "Spamassassin configuration"
+	returnwait "Dovecot configuration" "VirusTotal filter configuration"
+
+	installtask vfilter
+	returnwait "VirusTotal filter configuration" "Spamassassin configuration"
 
 	installtask spamassassin
 	returnwait "Spamassassin configuration" "Nginx configuration"

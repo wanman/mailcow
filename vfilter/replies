@@ -1,3 +1,4 @@
 SCAN_PENDING="No previous results for file %s were found.\n\nYour file has successfully been uploaded and queued for scanning.\n\nYour results will be available within the next minutes on: %s"
 SCAN_FOUND="VirusTotal message.....: %s\nFound SHA1 hash........: %s\nPermalink to results...: %s\n\nPositives..............: %s"
 SCAN_OMITTED="The attached file %s is not yet known on VirusTotal.\n\nFeel free to upload your file manually on www.virustotal.com\n\n(Automatic file upload has not been enabled or configured)"
+
