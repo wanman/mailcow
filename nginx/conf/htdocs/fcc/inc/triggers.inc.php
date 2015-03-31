@@ -26,10 +26,10 @@ if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "
 			set_fufix_reject_attachments($_POST["ext"], "reject");
 		}
 		if (isset($_POST["virustotalcheckonly"]) && $_POST["virustotalcheckonly"] == "on") {
-			set_vt_enable_upload_toggle("1");
+			set_vt_enable_upload_toggle("0");
 		} else {
-            set_vt_enable_upload_toggle("0");
-        }
+			set_vt_enable_upload_toggle("1");
+		}
 		postfix_reload();
 	}
 	if (isset($_POST["anonymize_"])) {

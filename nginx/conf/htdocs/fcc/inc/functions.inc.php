@@ -88,7 +88,7 @@ function add_fufix_opendkim_entry($selector, $domain) {
 }
 function return_vt_enable_upload_toggle() {
 	$state = file_get_contents($GLOBALS["VT_ENABLE_UPLOAD"]);
-	if (!empty($state)) { return "checked"; } else { return false; }
+	if (empty($state)) { return "checked"; } else { return false; }
 }
 function set_vt_enable_upload_toggle($value) {
 	if ($value != "1") {
