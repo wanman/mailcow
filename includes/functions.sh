@@ -306,8 +306,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			cp spamassassin/conf/spamassassin_heinlein /etc/cron.daily/; chmod 755 /etc/cron.daily/spamassassin_heinlein
 			;;
 		webserver)
-			rm -rf /etc/php5/fpm/pool.d/* 2> /dev/null
-			rm -rf /etc/nginx/{sites-available,sites-enabled}/* 2> /dev/null
+			rm -rf /etc/nginx/sites-enabled/* 2> /dev/null
 			cp nginx/conf/sites-available/mail /etc/nginx/sites-available/mail
 			ln -s /etc/nginx/sites-available/mail /etc/nginx/sites-enabled/mail
 			cp php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
