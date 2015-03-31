@@ -84,7 +84,7 @@ checkports() {
 		echo "$(redb [ERR]) - Please install $(textb netcat) before running this script"
 		exit 1
 	fi
-	for port in 25 80 143 443 465 587 993 995 3306
+	for port in 25 80 143 443 465 587 993 995
 	do
 	    if [[ $(nc -z localhost $port; echo $?) -eq 0 ]]; then
 	        echo "$(redb [ERR]) - An application is blocking the installation on Port $(textb $port)"
@@ -92,6 +92,13 @@ checkports() {
 			blocked_port=1
 	    fi
 	done
+	if [[ $(nc -z localhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -e ""; echo $?) -ne 0 ]]; then
+		echo "$(redb [ERR]) - No useable MySQL instance found (/etc/mysql/debian.cnf missing?)"
+		exit 1
+	elif [[ $(nc -z localhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -e ""; echo $?) -eq 0 ]]; then
+		echo "$(textb [INFO]) - Useable MySQL instance found, will not re-configure MySQL"
+		mysql_useable=1
+	fi
 	[[ $blocked_port -eq 1 ]] && exit 1
 }
 
@@ -218,7 +225,9 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			update-ca-certificates
 			;;
 		mysql)
-			mysql --defaults-file=/etc/mysql/debian.cnf -e "UPDATE mysql.user SET Password=PASSWORD('$my_rootpw') WHERE USER='root'; FLUSH PRIVILEGES;"
+			if [[ $mysql_useable -ne 1 ]]; then
+				mysql --defaults-file=/etc/mysql/debian.cnf -e "UPDATE mysql.user SET Password=PASSWORD('$my_rootpw') WHERE USER='root'; FLUSH PRIVILEGES;"
+			fi
 			mysql --defaults-file=/etc/mysql/debian.cnf -e "DROP DATABASE IF EXISTS $my_postfixdb; DROP DATABASE IF EXISTS $my_rcdb;"
 			mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_postfixdb; GRANT ALL PRIVILEGES ON $my_postfixdb.* TO '$my_postfixuser'@'localhost' IDENTIFIED BY '$my_postfixpass';"
 			mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'localhost' IDENTIFIED BY '$my_rcpass';"
