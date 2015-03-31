@@ -42,7 +42,8 @@ require_once "inc/triggers.inc.php";
 <?php
 if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes") {
     echo "Logout";
-} else {
+}
+else {
     echo "";
 }
 ?>
@@ -86,7 +87,16 @@ Enter "DISABLED" to disable this feature.</pre></p>
 				</label>
 		</div>
 		<label for="vtapikey">VirusTotal API Key (<a href="https://www.virustotal.com/documentation/virustotal-community/#retrieve-api-key" target="_blank">?</a>)</label>
-		<input class="form-control" id="vtapikey" type="text" name="vtapikey" value="<?php echo file_get_contents($VT_API_KEY); ?>">
+		<p><input class="form-control" id="vtapikey" type="text" name="vtapikey" value="<?php echo file_get_contents($VT_API_KEY); ?>"></p>
+		<p><b>Filter Log (tail)</b></p>
+		<p><pre>
+<?php if (!empty($vfiltertail)) {
+	echo $vfiltertail;
+}
+else {
+	echo "none";
+}; ?>
+</pre></p>
 		</small>
 		</div>
 	</div>
@@ -220,6 +230,7 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 <pre style="border: 0px; background-color: #333; color: #7CFC00;">
 ; Pathes to important log files:
 /var/log/mail.log
+/opt/vfilter/log/vfilter.log
 /var/log/syslog
 /var/log/nginx/error.log
 /var/www/mail/rc/logs/errors

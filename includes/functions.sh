@@ -253,7 +253,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown www-data: /etc/postfix/fufix_*
 			sed -i "/%www-data/d" /etc/sudoers
 			sed -i "/%vmail/d" /etc/sudoers
-			echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /usr/local/bin/opendkim-keycontrol, /usr/local/bin/fufix_msg_size' >> /etc/sudoers
+			echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /usr/local/bin/opendkim-keycontrol, /usr/local/bin/fufix_msg_size, /usr/bin/tail /opt/vfilter/log/vfilter.log' >> /etc/sudoers
 			echo '%vmail ALL=(ALL) NOPASSWD: /usr/bin/spamc*' >> /etc/sudoers
 			;;
 		dovecot)

@@ -13,4 +13,5 @@ $MYHOSTNAME=exec("/usr/sbin/postconf -h myhostname");
 $MYHOSTNAME_0=explode(".", exec("/usr/sbin/postconf -h myhostname"))[0];
 $MYHOSTNAME_1=explode(".", exec("/usr/sbin/postconf -h myhostname"))[1];
 $MYHOSTNAME_2=explode(".", exec("/usr/sbin/postconf -h myhostname"))[2];
+$vfiltertail = shell_exec("sudo -u vmail /usr/bin/tail /opt/vfilter/log/vfilter.log");
 ?>
