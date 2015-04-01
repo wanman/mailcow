@@ -91,7 +91,13 @@ function return_vt_enable_upload_toggle() {
 	if (empty($state)) { return "checked"; } else { return false; }
 }
 function return_vt_filter_log() {
-	return shell_exec("sudo -u vmail /usr/bin/tail /opt/vfilter/log/vfilter.log");
+	$output = shell_exec("sudo -u vmail /usr/bin/tail /opt/vfilter/log/vfilter.log");
+	if ($output != NULL) {
+		return $output;
+	}
+	else {
+		return "none";
+	}
 }
 function set_vt_enable_upload_toggle($value) {
 	if ($value != "1") {

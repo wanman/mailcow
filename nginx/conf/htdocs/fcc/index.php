@@ -94,14 +94,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 		<label for="vtapikey">VirusTotal API Key (<a href="https://www.virustotal.com/documentation/virustotal-community/#retrieve-api-key" target="_blank">?</a>)</label>
 		<p><input class="form-control" id="vtapikey" type="text" name="vtapikey" value="<?php echo file_get_contents($VT_API_KEY); ?>"></p>
 		<p><b>Filter Log (tail)</b></p>
-		<p><pre>
-<?php if (!empty(return_vt_filter_log)) {
-	echo return_vt_filter_log();
-}
-else {
-	echo "none";
-}; ?>
-</pre></p>
+		<p><pre><?php echo return_vt_filter_log(); ?></pre></p>
 		</small>
 		</div>
 	</div>
@@ -202,8 +195,8 @@ autoconfig          IN A       <?php echo $IP, "\n"; ?>
 
 <hr>
 <h3>FAQ: Terminal Tasks</h3>
-<p><strong>Example usage of <em>doveadm</em> for common tasks regarding Dovecot.</strong></p>
-<pre style="border: 0px; background-color: #333; color: #7CFC00;">
+<p data-toggle="collapse" data-target="#commontasks"><strong>Example usage of <em>doveadm</em> for common tasks regarding Dovecot.</strong></p>
+<div id="commontasks" class="collapse out"><pre style="border: 0px; background-color: #333; color: #7CFC00;">
 ; Searching for inbox messages saved in the past 3 days for user "Bob.Cat":
 doveadm search -u bob.cat@domain.com mailbox inbox savedsince 2d
 
@@ -217,10 +210,10 @@ doveadm expunge -u bob.cat@domain.com mailbox inbox savedbefore 100d
 doveadm move -u jane Archive/2011/09 mailbox INBOX BEFORE 2011-10-01 SINCE 01-Sep-2011
 
 ; Visit http://wiki2.dovecot.org/Tools/Doveadm
-</pre>
+</pre></div>
 
-<p><strong>Backup mail</strong></p>
-<pre style="border: 0px; background-color: #333; color: #7CFC00;">
+<p data-toggle="collapse" data-target="#backupmail"><strong>Backup mail</strong></p>
+<div id="backupmail" class="collapse out"><pre style="border: 0px; background-color: #333; color: #7CFC00;">
 ; If you want to create a backup of Bobs maildir to /var/mailbackup, just go ahead and create the backup destination with proper rights:
 mkdir /var/mailbackup
 chown vmail:vmail /var/mailbackup/
@@ -229,10 +222,10 @@ chown vmail:vmail /var/mailbackup/
 dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 
 ; Visit http://wiki2.dovecot.org/Tools/Dsync
-</pre>
+</pre></div>
 
-<p><strong>Debugging</strong></p>
-<pre style="border: 0px; background-color: #333; color: #7CFC00;">
+<p data-toggle="collapse" data-target="#debugging"><strong>Debugging</strong></p>
+<div id="debugging" class="collapse out"><pre style="border: 0px; background-color: #333; color: #7CFC00;">
 ; Pathes to important log files:
 /var/log/mail.log
 /opt/vfilter/log/vfilter.log
@@ -240,7 +233,7 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 /var/log/nginx/error.log
 /var/www/mail/rc/logs/errors
 /var/log/php5-fpm.log
-</pre>
+</pre></div>
 
 <hr>
 <h3>System Information</h3>
