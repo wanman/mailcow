@@ -28,24 +28,26 @@ write_log "vfilter triggered"
 [ -d /opt/vfilter/tempdir ] || mkdir /opt/vfilter/tempdir
 
 # Pipe message into a file
-cat > "/opt/vfilter/tempdir/message.$$"
+cat > /opt/vfilter/tempdir/message.$$
 
 # Pipe original message to next-hop for further processing NOW
 # This is to prevent mail-loss
-# Exit with permanent error if it fails to directly inform the sender about the problem.
-if [[ $($NEXTHOP < "/opt/vfilter/tempdir/message.$$"; echo ${PIPESTATUS[@]}) -ne 0 ]]; then
+if [[ $($NEXTHOP < /opt/vfilter/tempdir/message.$$; echo ${PIPESTATUS[@]}) -ne 0 ]]; then
 	echo "$(date +%b\ %d\ %T) - CRITICAL ERROR: Cannot deliver to next-hop" >> /opt/vfilter/log/vfilter.log
 	exit 70
 fi
 write_log "Delivered to next-hop"
 
+# Get Message-ID
+messageid=$(sed '/^Message-ID: */!d; s///;q' /opt/vfilter/tempdir/message.$$)
+
 # Create a new random directory inside the tempdir
-mkdir -p "/opt/vfilter/tempdir/files.$$" 2> /dev/null
+mkdir -p /opt/vfilter/tempdir/files.$$ 2> /dev/null
 
 # Unpack attachments from piped message
-munpack -fq -C "/opt/vfilter/tempdir/files.$$" < "/opt/vfilter/tempdir/message.$$"
+munpack -fq -C /opt/vfilter/tempdir/files.$$ < /opt/vfilter/tempdir/message.$$
 
-for file in $(ls "/opt/vfilter/tempdir/files.$$/"); do
+for file in $(ls /opt/vfilter/tempdir/files.$$); do
 
 	write_log "Processing file $file"
 
@@ -75,7 +77,7 @@ for file in $(ls "/opt/vfilter/tempdir/files.$$/"); do
 			sha1=$(echo $vt_json_report | jq -r .sha1)
 			permalink=$(echo $vt_json_report | jq -r .permalink)
 			positives=$(echo $vt_json_report | jq -r .positives)
-			printf "$SCAN_FOUND" "$message" "$sha1" "$permalink" "$positives" > "/opt/vfilter/tempdir/response.$$"
+			printf "$SCAN_FOUND" "$message" "$sha1" "$permalink" "$positives" > /opt/vfilter/tempdir/response.$$
 
 		# If no previous scan was found, check if we should upload the current file to VT
 		# and receive JSON formatted response
@@ -89,18 +91,19 @@ for file in $(ls "/opt/vfilter/tempdir/files.$$/"); do
 		printf "$SCAN_PENDING" \
 		"$file" "$(curl -s -X POST https://www.virustotal.com/vtapi/v2/file/scan \
 			--form apikey=$VT_API_KEY --form file=@"$upload" | \
-			jq -r .permalink)" > "/opt/vfilter/tempdir/response.$$"
+			jq -r .permalink)" > /opt/vfilter/tempdir/response.$$
 
 		# Else omit this file
 		else
 
 			write_log "File $file was omitted"
 
-			printf "$SCAN_OMITTED" "$file" > "/opt/vfilter/tempdir/response.$$"
+			printf "$SCAN_OMITTED" "$file" > /opt/vfilter/tempdir/response.$$
 
 		fi
 
 		# Send results to all users we are the final destination for
+		# A message is sent "In-Reply-To" the original messages ID for threading
 		for each in "${@:2}"; do
 
 			domain=$(echo $each | cut -d @ -f2)
@@ -109,9 +112,10 @@ for file in $(ls "/opt/vfilter/tempdir/files.$$/"); do
 
 				write_log "Mailing report for file $file to $each"
 
-				mail -s "VirusTotal: \"$file\"" \
+				mail -s "VirusTotal Report for \"$file\"" \
 					"$each" \
-					-a "From:noreply@$(hostname -d)" < "/opt/vfilter/tempdir/response.$$"
+					-a "From: VirusTotal Filter <noreply@$(hostname -d)>" \
+					-a "In-Reply-To: $messageid" < /opt/vfilter/tempdir/response.$$
 				fi
 
 		done
@@ -120,8 +124,8 @@ done
 
 # Cleanup
 write_log "Cleaning up..."
-rm -rf "/opt/vfilter/tempdir/message.$$" \
-		"/opt/vfilter/tempdir/response.$$" \
-		"/opt/vfilter/tempdir/files.$$/" 2>/dev/null
+rm -rf /opt/vfilter/tempdir/message.$$ \
+		/opt/vfilter/tempdir/response.$$ \
+		/opt/vfilter/tempdir/files.$$/ 2>/dev/null
 
 
