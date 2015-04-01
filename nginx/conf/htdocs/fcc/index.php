@@ -138,7 +138,7 @@ else {
 <hr>
 <h3>DKIM Signing</h3>
 <p>Default behaviour is to sign with relaxed header and body canonicalization algorithm.</p>
-<p><span class="label label-danger">Warning</span> DKIM signing should not be used when when "Anonymize outgoing mail" is enabled.</p>
+<p><span class="label label-danger">Warning</span> DKIM signing will not be used when when "Anonymize outgoing mail" is enabled.</p>
 <form method="post" action="index.php">
 <h4>Active keys</h4>
 <?php echo_fufix_opendkim_table() ?>
