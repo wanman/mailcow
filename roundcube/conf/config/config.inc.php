@@ -21,4 +21,6 @@ $config['skin'] = 'larry';
 $config['login_autocomplete'] = 2;
 $config['imap_cache'] = 'apc';
 $config['username_domain'] = '%d';
+$config['default_list_mode'] = 'threads';
+$config['preview_pane'] = true;
 
