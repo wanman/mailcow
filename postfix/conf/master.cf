@@ -8,6 +8,7 @@ smtpd      pass  -       -       n       -       -       smtpd
 
 # SMTP on 127.0.0.1:10029, plain text authentication is fine here. No trusted networks. For roundcube.
 127.0.0.1:10029      inet  n       -       -       -       -       smtpd
+  -o smtpd_client_restrictions=permit_mynetworks,permit_sasl_authenticated,reject
   -o smtpd_tls_auth_only=no
   -o mynetworks=
   -o content_filter=spamassassin

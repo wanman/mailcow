@@ -51,15 +51,15 @@ for file in $(ls /opt/vfilter/tempdir/files.$$); do
 
 	write_log "Processing file $file"
 
+	# Check extension
+	[[ -z $(echo $EXTENSIONS | grep -i "${file##*.}") ]] && write_log "Extension is not listed as dangerous, file processing skipped" && continue
+
+	write_log "Extension is listed as dangerous and will be scanned"
+
 	# If size exceeds 200MiB do not even check MD5 sum
 	[[ $(stat -c %s "/opt/vfilter/tempdir/files.$$/$file") -ge 209715200 ]] && write_log "File size exceeds 200MB, file hash check skipped" && continue
 
-	write_log "File $file does not exceed 200MB"
-
-	# Check extension
-	[[ -z $(echo $EXTENSIONS | grep -i "${file##*.}") ]] && continue
-
-	write_log "Extension is listed as dangerous and will be scanned"
+	write_log "File $file does not exceed 200MB and will be hashed"
 
 	# Get MD5 sum of current file
 	upload="/opt/vfilter/tempdir/files.$$/$file"
@@ -86,7 +86,7 @@ for file in $(ls /opt/vfilter/tempdir/files.$$); do
 		# Stop if file is greater than 32 MiB
 		[[ $(stat -c %s "/opt/vfilter/tempdir/files.$$/$file") -ge 33554432 ]] && write_log "MD5 sum $md5sum_upload was not found, size exceeds 32MB, file upload skipped" && continue
 
-		write_log "MD5 sum $md5sum_upload was not found, size does not exceed 32MB, upload started"
+		write_log "MD5 sum $md5sum_upload was not found, size does not exceed 32MB, upload started..."
 
 		printf "$SCAN_PENDING" \
 		"$file" "$(curl -s -X POST https://www.virustotal.com/vtapi/v2/file/scan \
@@ -127,5 +127,4 @@ write_log "Cleaning up..."
 rm -rf /opt/vfilter/tempdir/message.$$ \
 		/opt/vfilter/tempdir/response.$$ \
 		/opt/vfilter/tempdir/files.$$/ 2>/dev/null
-
 

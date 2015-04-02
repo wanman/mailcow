@@ -57,19 +57,22 @@ A summary of what software is installed with which features enabled.
 * DNS-Checks by Google DNS (PTR, A-Record, SPF etc.)
 * Learn ham and spam, [Heinlein Support](https://www.heinlein-support.de/) SA rules included
 * Fail2ban brute force protection
-* A webpanel
+* A "fufix control center" via browser
 
 **Postfix**
-* Postscreen on Port 25 to block most zombies sending spam
-* Submission port activated (TCP/587), TLS-only
+* Postscreen activated
+* Submission port (TCP/587), TLS-only
 * The restrictions used are a good compromise between blocking spam and avoiding false-positives
 * Incoming and outgoing spam protection
 * VirusTotal Uploader for incoming mail
-* SSL based on BetterCrypto 
+* SSL based on BetterCrypto
+* OpenDKIM milter
 
 **Dovecot**
-* Default mailboxes to subscribe to automatically (Inbox, Sent, Drafts, Trash, Junk - "SPECIAL-USE" tags)
+* Default mailboxes to subscribe to automatically (Inbox, Sent, Drafts, Trash, Junk, Archive - "SPECIAL-USE" tags)
 * Sieve/ManageSieve
+* per-user ACL
+* Shared Namespace (per-user seen-flag)
 * Global sieve filter: Move mail marked as spam into "Junk"
 * (IMAP) Quotas
 * LMTP service for Postfix virtual transport
@@ -85,7 +88,6 @@ A summary of what software is installed with which features enabled.
 * Users can change password
 * Attachment reminder (multiple locales)
 * Zip-download marked messages
-* 25M attachment size (see "File size limitation")
 
 # Before You Begin
 - **Please remove any web- and mail services** running on your server. I recommend using a clean Debian minimal installation.

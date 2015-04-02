@@ -167,13 +167,15 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <br />
 <h1><span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> Maintenance</h1>
 
-<hr>
-<h3>DNS Records</h3>
+<h3>FAQ</h3>
+
+<p data-toggle="collapse" data-target="#dnsrecords"><strong>DNS Records</strong></p>
+<div id="dnsrecords" class="collapse out">
 <p>Below you see a list of <em>recommended</em> DNS records.</p>
 <p>While some are mandatory for a mail server (A, MX), others are recommended to build a good reputation score (TXT/SPF) or used for auto-configuration of mail clients (A: "autoconfig" and SRV records).</p>
 <p>In this automatically generated DNS zone file snippet, <strong>a generic TXT/SPF record</strong> is used to only allow THIS server to send mail for your domain. Please refer to <a href="http://www.openspf.org/SPF_Record_Syntax" target="_blank">openspf.org</a>.</p>
 <p>It is <strong>highly recommended</strong> to create a DKIM TXT record with the <em>DKIM Signing</em> utility tool above and install the given TXT record to your nameserver, too.</p>
-<pre>
+<pre style="border: 0px; background-color: #333; color: #7CFC00;">
 ; ================
 ; Example forward zone file
 ; ================
@@ -192,9 +194,8 @@ autoconfig          IN A       <?php echo $IP, "\n"; ?>
 ; Your IPs PTR should point to <?php echo $MYHOSTNAME, "\n"; ?>
 ; !!!!!!!!!!!!!!!!
 </pre>
+</div>
 
-<hr>
-<h3>FAQ: Terminal Tasks</h3>
 <p data-toggle="collapse" data-target="#commontasks"><strong>Example usage of <em>doveadm</em> for common tasks regarding Dovecot.</strong></p>
 <div id="commontasks" class="collapse out"><pre style="border: 0px; background-color: #333; color: #7CFC00;">
 ; Searching for inbox messages saved in the past 3 days for user "Bob.Cat":
@@ -210,6 +211,15 @@ doveadm expunge -u bob.cat@domain.com mailbox inbox savedbefore 100d
 doveadm move -u jane Archive/2011/09 mailbox INBOX BEFORE 2011-10-01 SINCE 01-Sep-2011
 
 ; Visit http://wiki2.dovecot.org/Tools/Doveadm
+</pre></div>
+
+<p data-toggle="collapse" data-target="#changevfiltermsg"><strong>VirusTotal message presets</strong></p>
+<div id="changevfiltermsg" class="collapse out"><pre style="border: 0px; background-color: #333; color: #7CFC00;">
+; The vfilter is installed into /opt/vfilter
+; You should not change any file here unless you know what you are doing
+;
+; Find and edit message presets here:
+nano /opt/vfilter/replies
 </pre></div>
 
 <p data-toggle="collapse" data-target="#backupmail"><strong>Backup mail</strong></p>
