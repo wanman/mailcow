@@ -205,7 +205,8 @@ python-magic libmail-spf-perl libmail-dkim-perl openssl php-auth-sasl php-http-r
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server nginx-extras mailutils \
 postfix-mysql postfix-pcre spamassassin spamc sudo bzip2 curl mpack opendkim opendkim-tools \
-fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl >/dev/null
+fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl bsd-mailx >/dev/null
+			update-alternatives --set mailx /usr/bin/bsd-mailx --quiet
 			if [ "$?" -ne "0" ]; then
 				echo "$(redb [ERR]) - Package installation failed"
 				exit 1
