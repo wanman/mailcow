@@ -98,6 +98,7 @@ checkports() {
 	elif [[ $(nc -z localhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -e ""; echo $?) -eq 0 ]]; then
 		echo "$(textb [INFO]) - Useable MySQL instance found, will not re-configure MySQL"
 		mysql_useable=1
+		my_rootpw="not changed"
 	fi
 	[[ $blocked_port -eq 1 ]] && exit 1
 }
