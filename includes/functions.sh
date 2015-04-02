@@ -215,7 +215,12 @@ fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtes
 			cp /etc/ssl/private/ssl-cert-snakeoil.key /etc/dovecot/dovecot.key
 			cp /etc/ssl/certs/ssl-cert-snakeoil.pem /etc/dovecot/private/dovecot.pem
 			cp /etc/ssl/private/ssl-cert-snakeoil.key /etc/dovecot/private/dovecot.key
+			if [[ ! -z $(grep wheezy-backports /etc/apt/sources.list) ]]; then
+				echo "$(textb [INFO]) - Installing Dovecot packages from wheezy-backports..."
+DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dovecot-core dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d -t wheezy-backports >/dev/null
+			else
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dovecot-core dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d >/dev/null
+			fi
 			;;
 		ssl)
 			rm /etc/ssl/mail/* 2> /dev/null

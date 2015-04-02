@@ -10,8 +10,9 @@ $config['support_url'] = '';
 $config['product_name'] = $_SERVER['HTTP_HOST'];
 $config['des_key'] = 'conf_rcdeskey';
 $config['plugins'] = array(
-    'archive',
-    'zipdownload',
+	'archive',
+	'zipdownload',
+	'acl',
 	'managesieve',
 	'password',
 	'attachment_reminder',
