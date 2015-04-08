@@ -435,15 +435,15 @@ upgradetask() {
 
 	readconf=( $(php -f misc/readconf.php) )
 
-	old_des_key_rc=${readconf[4]}
-
 	my_postfixuser=${readconf[0]}
 	my_postfixpass=${readconf[1]}
 	my_postfixdb=${readconf[2]}
 
-	my_rcdb=$(echo "${readconf[3]}" | sed -e 's|[[:blank:]]*mysql://\([^:]\+\):\([^@]\+\)@\([^/]\+\)\(/.*\)[[:blank:]]*|\4|' -e 's/^.//')
-	my_rcuser=$(echo "${readconf[3]}" | sed 's|[[:blank:]]*mysql://\([^:]\+\):\([^@]\+\)@\([^/]\+\)\(/.*\)[[:blank:]]*|\1|')
-	my_rcpass=$(echo "${readconf[3]}" | sed 's|[[:blank:]]*mysql://\([^:]\+\):\([^@]\+\)@\([^/]\+\)\(/.*\)[[:blank:]]*|\2|')
+    old_des_key_rc=${readconf[3]}
+
+	my_rcuser=${readconf[4]}
+	my_rcpass=${readconf[5]}
+    my_rcdb=${readconf[6]}
 
 	for var in sys_hostname sys_domain sys_timezone my_postfixdb my_postfixuser my_postfixpass my_rcuser my_rcpass my_rcdb
 	do
@@ -532,6 +532,6 @@ A backup will be stored in ./before_upgrade_$timestamp
 	mysql --defaults-file=/etc/mysql/debian.cnf -e "GRANT SELECT ON $my_postfixdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
 	echo Done.
 	echo
-	echo You will find your old \"installer.log\" file updated.
+	echo "\"installer.log\" file updated."
 	return 0
 }
