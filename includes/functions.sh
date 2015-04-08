@@ -439,11 +439,11 @@ upgradetask() {
 
 	my_postfixuser=${readconf[0]}
 	my_postfixpass=${readconf[1]}
-    my_postfixdb=${readconf[2]}
+	my_postfixdb=${readconf[2]}
 
-	my_rcdb=$(echo "${readconf[3]}" | sed 's|[[:blank:]]*mysql://\([^:]\+\):\([^@]\+\)@\([^/]\+\)\(/.*\)[[:blank:]]*|\1|')
-	my_rcuser=$(echo "${readconf[3]}" | sed 's|[[:blank:]]*mysql://\([^:]\+\):\([^@]\+\)@\([^/]\+\)\(/.*\)[[:blank:]]*|\2|')
-	my_rcpass=$(echo "${readconf[3]}" | sed 's|[[:blank:]]*mysql://\([^:]\+\):\([^@]\+\)@\([^/]\+\)\(/.*\)[[:blank:]]*|\3|')
+	my_rcdb=$(echo "${readconf[3]}" | sed -e 's|[[:blank:]]*mysql://\([^:]\+\):\([^@]\+\)@\([^/]\+\)\(/.*\)[[:blank:]]*|\4|' -e 's/^.//')
+	my_rcuser=$(echo "${readconf[3]}" | sed 's|[[:blank:]]*mysql://\([^:]\+\):\([^@]\+\)@\([^/]\+\)\(/.*\)[[:blank:]]*|\1|')
+	my_rcpass=$(echo "${readconf[3]}" | sed 's|[[:blank:]]*mysql://\([^:]\+\):\([^@]\+\)@\([^/]\+\)\(/.*\)[[:blank:]]*|\2|')
 
 	for var in sys_hostname sys_domain sys_timezone my_postfixdb my_postfixuser my_postfixpass my_rcuser my_rcpass my_rcdb
 	do
