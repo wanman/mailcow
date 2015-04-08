@@ -11,17 +11,17 @@ source includes/functions.sh
 echo $fufix_banner
 
 case $1 in
-	"-u" | "--upgrade-from-file" )
+	"-u" | "--upgrade" )
 		shift
-		upgradetask $1
+		upgradetask
 		echo $fufix_version > /etc/fufix_version
-echo --------------------------------- >> $1
-echo UPGRADE to $fufix_version on $(date) >> $1
-echo --------------------------------- >> $1
-echo Fail2ban version: $fail2ban_version >> $1
-echo Postfixadmin Revision: $postfixadmin_revision >> $1
-echo Roundcube version: $roundcube_version >> $1
-echo --------------------------------- >> $1
+echo --------------------------------- >> installer.log
+echo UPGRADE to $fufix_version on $(date) >> installer.log
+echo --------------------------------- >> installer.log
+echo Fail2ban version: $fail2ban_version >> installer.log
+echo Postfixadmin Revision: $postfixadmin_revision >> installer.log
+echo Roundcube version: $roundcube_version >> installer.log
+echo --------------------------------- >> installer.log
 		exit 0
 		;;
 	"-h" | "--help" )

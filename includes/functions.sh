@@ -424,11 +424,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 	esac
 }
 upgradetask() {
-	if [[ -z $1 || ! -f $1 ]]; then
-		echo "$(redb [ERR]) - \"$1\" is not a valid file"
-		return 1
-	fi
-	if [[ ! -f /etc/fufix_version || -z $(cat /etc/fufix_version | grep -E "0.7|0.8") ]]; then
+	if [[ ! -f /etc/fufix_version || -z $(cat /etc/fufix_version | grep -E "0.7|0.8|0.9") ]]; then
 		echo "$(redb [ERR]) - Upgrade not supported"
 		return 1
 	fi
@@ -436,20 +432,23 @@ upgradetask() {
 	sys_domain=$(hostname -d)
 	sys_timezone=$(cat /etc/timezone)
 	timestamp=$(date +%Y%m%d_%H%M%S)
-	old_des_key_rc=$(grep des_key "/var/www/mail/rc/config/config.inc.php" 2>/dev/null | awk '{ print $NF }' | cut -d "'" -f2)
-	while read line
-	do
-		[[ ${line,,} =~ "postfix database" ]] && my_postfixdb=$(echo $line | awk '{ print $NF }')
-		[[ ${line,,} =~ "postfix username" ]] && my_postfixuser=$(echo $line | awk '{ print $NF }')
-		[[ ${line,,} =~ "postfix password" ]] && my_postfixpass=$(echo $line | awk '{ print $NF }')
-		[[ ${line,,} =~ "roundcube database" ]] && my_rcdb=$(echo $line | awk '{ print $NF }')
-		[[ ${line,,} =~ "roundcube username" ]] && my_rcuser=$(echo $line | awk '{ print $NF }')
-		[[ ${line,,} =~ "roundcube password" ]] && my_rcpass=$(echo $line | awk '{ print $NF }')
-	done < $1
+
+	readconf=( $(php -f misc/readconf.php) )
+
+	old_des_key_rc=${readconf[4]}
+
+	my_postfixuser=${readconf[0]}
+	my_postfixpass=${readconf[1]}
+    my_postfixdb=${readconf[2]}
+
+	my_rcdb=$(echo "${readconf[3]}" | sed 's|[[:blank:]]*mysql://\([^:]\+\):\([^@]\+\)@\([^/]\+\)\(/.*\)[[:blank:]]*|\1|')
+	my_rcuser=$(echo "${readconf[3]}" | sed 's|[[:blank:]]*mysql://\([^:]\+\):\([^@]\+\)@\([^/]\+\)\(/.*\)[[:blank:]]*|\2|')
+	my_rcpass=$(echo "${readconf[3]}" | sed 's|[[:blank:]]*mysql://\([^:]\+\):\([^@]\+\)@\([^/]\+\)\(/.*\)[[:blank:]]*|\3|')
+
 	for var in sys_hostname sys_domain sys_timezone my_postfixdb my_postfixuser my_postfixpass my_rcuser my_rcpass my_rcdb
 	do
 		if [[ -z ${!var} ]]; then
-			echo "$(redb [ERR]) - Log file does not contain all information"
+			echo "$(redb [ERR]) - Could not gather required information"
 			echo
 			exit 1
 		fi
@@ -465,7 +464,6 @@ $(textb "Roundcube MySQL") ${my_rcuser}:${my_rcpass}/${my_rcdb}
 
 -----------------------------------------------------
 THIS UPGRADE WILL WILL RESET YOUR CONFIGURATION FILES
-YOUR WEBROOT AND CUSTOM SITES WILL BE DELETED
 -----------------------------------------------------
 A backup will be stored in ./before_upgrade_$timestamp
 -----------------------------------------------------
