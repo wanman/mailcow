@@ -282,7 +282,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			mkdir /etc/dovecot/conf.d 2> /dev/null
 			mkdir -p /var/vmail/sieve
 			cp dovecot/conf/spam-global.sieve /var/vmail/sieve/spam-global.sieve
-			cp dovecot/conf/default.sieve /var/vmail/sieve/default.sieve
+			touch /var/vmail/sieve/default.sieve
 			install -m 755 misc/fufix_msg_size /usr/local/bin/fufix_msg_size
 			sievec /var/vmail/sieve/spam-global.sieve
 			chown -R vmail:vmail /var/vmail
@@ -309,15 +309,17 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i '/^ENABLED=/s/=.*/="1"/' /etc/default/spamassassin
 			# Thanks to mf3hd@GitHub
 			[[ -z $(grep RANDOM_DELAY /etc/crontab) ]] && sed -i '/SHELL/a RANDOM_DELAY=30' /etc/crontab
-			cp spamassassin/conf/spamlearn /etc/cron.daily/; chmod 755 /etc/cron.daily/spamlearn
-			cp spamassassin/conf/spamassassin_heinlein /etc/cron.daily/; chmod 755 /etc/cron.daily/spamassassin_heinlein
+			install -m 755 spamassassin/conf/spamlearn /etc/cron.daily/spamlearn
+			install -m 755 spamassassin/conf/spamassassin_heinlein /etc/cron.daily/spamassassin_heinlein
 			;;
 		webserver)
-			rm -rf /etc/nginx/sites-enabled/* 2> /dev/null
+			find /etc/nginx/sites-enabled/ -type l -delete
+			mv /etc/nginx/sites-enabled/* /etc/nginx/sites-available/ 2> /dev/null
 			cp nginx/conf/sites-available/mail /etc/nginx/sites-available/mail
 			ln -s /etc/nginx/sites-available/mail /etc/nginx/sites-enabled/mail
 			cp php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
 			cp php5-fpm/conf/php-fpm.conf /etc/php5/fpm/php-fpm.conf
+			[ -a /etc/nginx/nginx.conf ] && cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf_old
 			cp nginx/conf/nginx.conf /etc/nginx/nginx.conf
 			mkdir /var/lib/php5/sessions 2> /dev/null
 			chown -R www-data:www-data /var/lib/php5/sessions
@@ -326,23 +328,23 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		postfixadmin)
 			rm -rf /var/www/mail 2> /dev/null
-            tar xf pfadmin/inst/$postfixadmin_revision.tar -C pfadmin/inst/
+			tar xf pfadmin/inst/$postfixadmin_revision.tar -C pfadmin/inst/
 			mkdir -p /var/www/mail/pfadmin /var/run/fetchmail /etc/mail/postfixadmin 2> /dev/null
 			cp -R nginx/conf/htdocs/{fcc,index.php,robots.txt,autoconfig.xml} /var/www/mail/
 			touch /var/www/VT_API_KEY
 			touch /var/www/VT_ENABLE_UPLOAD
 			mv pfadmin/inst/$postfixadmin_revision/* /var/www/mail/pfadmin/
-            cp /var/www/mail/pfadmin/ADDITIONS/fetchmail.pl /usr/local/bin/fetchmail.pl
-			cp pfadmin/conf/config.local.php /var/www/mail/pfadmin/config.local.php
-			cp pfadmin/conf/fetchmail.conf /etc/mail/postfixadmin/fetchmail.conf
-            cp pfadmin/conf/pfadminfetchmail /etc/cron.d/pfadminfetchmail
+			install -m 755 /var/www/mail/pfadmin/ADDITIONS/fetchmail.pl /usr/local/bin/fetchmail.pl
+			install -m 644 pfadmin/conf/config.local.php /var/www/mail/pfadmin/config.local.php
+			install -m 644 pfadmin/conf/fetchmail.conf /etc/mail/postfixadmin/fetchmail.conf
+			install -m 644 pfadmin/conf/pfadminfetchmail /etc/cron.d/pfadminfetchmail
             sed -i "s/fufix_sub/$sys_hostname/g" /var/www/mail/autoconfig.xml
 			sed -i "s/my_postfixpass/$my_postfixpass/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
 			sed -i "s/my_postfixuser/$my_postfixuser/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
 			sed -i "s/my_postfixdb/$my_postfixdb/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
 			sed -i "s/domain.tld/$sys_domain/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
 			sed -i "s/change-this-to-your.domain.tld/$sys_domain/g" /var/www/mail/pfadmin/config.inc.php
-			chmod +x /usr/local/bin/fetchmail.pl ; chown -R www-data: /var/www/ ; chown -R vmail: /var/run/fetchmail
+			chown -R www-data: /var/www/ ; chown -R vmail: /var/run/fetchmail
 			rm -rf pfadmin/inst/$postfixadmin_revision
 			[[ -z $(grep fetchmail /etc/rc.local) ]] && sed -i '/^exit 0/i\test -d /var/run/fetchmail || install -m 755 -o vmail -g vmail -d /var/run/fetchmail/' /etc/rc.local
 			;;
@@ -359,10 +361,12 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_rcdb/$my_rcdb/g" /var/www/mail/rc/config/config.inc.php
 			conf_rcdeskey=$(genpasswd)
 			sed -i "s/conf_rcdeskey/$conf_rcdeskey/g" /var/www/mail/rc/config/config.inc.php
-            sed -i "s/fufix_dfhost/$sys_hostname.$sys_domain/g" /var/www/mail/rc/config/config.inc.php
-            sed -i "s/fufix_smtpsrv/$sys_hostname.$sys_domain/g" /var/www/mail/rc/config/config.inc.php
+			sed -i "s/fufix_dfhost/$sys_hostname.$sys_domain/g" /var/www/mail/rc/config/config.inc.php
+			sed -i "s/fufix_smtpsrv/$sys_hostname.$sys_domain/g" /var/www/mail/rc/config/config.inc.php
 			chown -R www-data: /var/www/
-			mysql -u $my_rcuser -p$my_rcpass $my_rcdb < /var/www/mail/rc/SQL/mysql.initial.sql
+			if [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -s -N -e "use $my_rcdb; show tables;" | wc -l) -lt 5 ]]; then
+				mysql -u $my_rcuser -p$my_rcpass $my_rcdb < /var/www/mail/rc/SQL/mysql.initial.sql
+			fi
 			rm -rf roundcube/inst/$roundcube_version
 			rm -rf /var/www/mail/rc/installer/
 			;;
@@ -387,10 +391,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		restartservices)
 			[[ -f /lib/systemd/systemd ]] && echo "$(textb [INFO]) - Restarting services, this may take a few seconds..."
-			cat /dev/null > /var/log/mail.err
-			cat /dev/null > /var/log/mail.warn
-			cat /dev/null > /var/log/mail.log
-			cat /dev/null > /var/log/mail.info
 			for var in fail2ban rsyslog nginx php5-fpm spamassassin mysql dovecot postfix opendkim
 			do
 				service $var stop
@@ -511,12 +511,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 	installtask postfixadmin
 	returnwait "Postfixadmin configuration" "Roundcube configuration"
 
-	# this prevents installtask roundcube from doing any mysql stuff
-	mysql() {
-		return 0
-	}
-	(export -f mysql && installtask roundcube)
-	unset -f mysql
+	installtask roundcube)
 	sed -i "s/conf_rcdeskey/$old_des_key_rc/g" /var/www/mail/rc/config/config.inc.php
 	/var/www/mail/rc/bin/updatedb.sh --package=roundcube --dir=/var/www/mail/rc/SQL
 	returnwait "Roundcube configuration" "OpenDKIM configuration"
