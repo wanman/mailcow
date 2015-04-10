@@ -4,37 +4,37 @@ if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
 }
 if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes") {
 	if (isset($_GET["del"])) {
-		del_fufix_opendkim_entry($_GET["del"]);
+		opendkim_table("delete", $_GET["del"]);
 	}
 	if (isset($_POST["vtapikey"]) && ctype_alnum($_POST["vtapikey"])) {
-		file_put_contents($VT_API_KEY, $_POST["vtapikey"]);
+		set_fufix_config("vtapikey", $_POST["vtapikey"]);
 	}
 	if (isset($_POST["maxmsgsize"]) && ctype_alnum($_POST["maxmsgsize"])) {
-		set_fufix_msg_size($_POST["maxmsgsize"]);
+		set_fufix_config("maxmsgsize", $_POST["maxmsgsize"]);
 	}
 	if (isset($_POST["sender"])) {
-		set_fufix_sender_access($_POST["sender"]);
+		set_fufix_config("senderaccess", $_POST["sender"]);
 		postfix_reload();
 	}
 	if (isset($_POST["dkim_selector"])) {
-		add_fufix_opendkim_entry($_POST["dkim_selector"], $_POST["dkim_domain"]);
+		opendkim_table("add", $_POST["dkim_selector"] . "_" . $_POST["dkim_domain"]);
 	}
 	if (isset($_POST["ext"])) {
 		if (isset($_POST["virustotaltoggle"]) && $_POST["virustotaltoggle"] == "on") {
-			set_fufix_reject_attachments($_POST["ext"], "filter");
+			set_fufix_config("extlist", $_POST["ext"], "filter");
 		} else {
-			set_fufix_reject_attachments($_POST["ext"], "reject");
+			set_fufix_config("extlist", $_POST["ext"], "reject");
 		}
 		if (isset($_POST["virustotalcheckonly"]) && $_POST["virustotalcheckonly"] == "on") {
-			set_vt_enable_upload_toggle("0");
+			set_fufix_config("vtupload", "0");
 		} else {
-			set_vt_enable_upload_toggle("1");
+			set_fufix_config("vtupload", "1");
 		}
 		postfix_reload();
 	}
 	if (isset($_POST["anonymize_"])) {
 		if (!isset($_POST["anonymize"])) { $_POST["anonymize"] = ""; }
-		set_fufix_anonymize_headers($_POST["anonymize"]);
+		set_fufix_config("anonymize", $_POST["anonymize"]);
 		postfix_reload();
 	}
 	if (isset($_POST["logout"])) {

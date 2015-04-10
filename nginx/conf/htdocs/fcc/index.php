@@ -63,7 +63,7 @@ if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "
 <form method="post">
 <div class="form-group">
 	<p>Provide a list of dangerous file types. Please take care of the formatting.</p>
-	<input class="form-control" type="text" id="ext" name="ext" value="<?php echo return_fufix_reject_attachments("ext") ?>">
+	<input class="form-control" type="text" id="ext" name="ext" value="<?php echo return_fufix_config("extlist") ?>">
 	<p><pre>Format: ext1|ext1|ext3
 Enter "DISABLED" to disable this feature.</pre></p>
 	<hr>
@@ -81,20 +81,20 @@ Enter "DISABLED" to disable this feature.</pre></p>
 		</p>
 		<div class="checkbox">
 				<label>
-				<input name="virustotaltoggle" type="checkbox"  <?php echo return_fufix_reject_attachments_toggle() ?>>
+				<input name="virustotaltoggle" type="checkbox"  <?php echo return_fufix_config("vtenable") ?>>
 				Enable VirusTotal Uploader
 				</label>
 		</div>
 		<div class="checkbox">
 				<label>
-				<input name="virustotalcheckonly" type="checkbox"  <?php echo return_vt_enable_upload_toggle() ?>>
+				<input name="virustotalcheckonly" type="checkbox"  <?php echo return_fufix_config("vtupload") ?>>
 				Do <b>not</b> upload files to VirusTotal but check for a previous scan report.
 				</label>
 		</div>
 		<label for="vtapikey">VirusTotal API Key (<a href="https://www.virustotal.com/documentation/virustotal-community/#retrieve-api-key" target="_blank">?</a>)</label>
-		<p><input class="form-control" id="vtapikey" type="text" name="vtapikey" value="<?php echo file_get_contents($VT_API_KEY); ?>"></p>
+		<p><input class="form-control" id="vtapikey" type="text" name="vtapikey" value="<?php echo return_fufix_config("vtapikey"); ?>"></p>
 		<p><b>Filter Log (tail)</b></p>
-		<p><pre><?php echo return_vt_filter_log(); ?></pre></p>
+		<p><pre><?php echo echo_sys_info("vfilterlog"); ?></pre></p>
 		</small>
 		</div>
 	</div>
@@ -107,7 +107,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <form method="post">
 <div class="form-group">
 	<p>Specify a list of senders or domains to blacklist access:</p>
-	<textarea class="form-control" rows="6" name="sender"><?php echo_fufix_sender_access() ?></textarea>
+	<textarea class="form-control" rows="6" name="sender"><?php return_fufix_config("senderaccess") ?></textarea>
 	<br /><button type="submit" class="btn btn-primary btn-sm">Apply</button>
 </div>
 </form>
@@ -120,7 +120,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 	<div class="checkbox">
 	<label>
 	<input type="hidden" name="anonymize_">
-	<input name="anonymize" type="checkbox" <?php echo return_fufix_anonymize_toggle() ?>>
+	<input name="anonymize" type="checkbox" <?php echo return_fufix_config("anonymize") ?>>
 	<p>Anonymize outgoing mail.</p>
 	</label>
 	</div>
@@ -134,7 +134,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <p><span class="label label-danger">Warning</span> DKIM signing will not be used when when "Anonymize outgoing mail" is enabled.</p>
 <form method="post" action="index.php">
 <h4>Active keys</h4>
-<?php echo_fufix_opendkim_table() ?>
+<?php opendkim_table() ?>
 <h4>Add new key</h4>
 <div class="form-group">
 	<div class="row">
@@ -156,7 +156,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <hr>
 <form class="form-inline" method="post">
 	<h3>Max. Message Size</h3>
-	<p>Current message size limitation: <strong><?php echo `echo $(( $(/usr/sbin/postconf -h message_size_limit) / 1048576 ))`; ?>MB</strong></p>
+	<p>Current message size limitation: <strong><?php echo return_fufix_config("maxmsgsize"); ?>MB</strong></p>
 	<p>This changes values in PHP, Nginx and Postfix. Services will be reloaded.</p>
 	<div class="form-group">
 		<input type="number" class="form-control" id="maxmsgsize" name="maxmsgsize" placeholder="in MB" min="1" max="250">
