@@ -141,24 +141,24 @@ function opendkim_table($action = "show", $which = "") {
 }
 function echo_sys_info($what) {
 	switch ($what) {
-	case "ram":
-		echo round(`free | grep Mem | awk '{print $3/$2 * 100.0}'`);
-		break;
-	case "maildisk":
-		echo preg_replace('/\D/', '', `df -h /var/vmail/ | tail -n1 | awk {'print $5'}`);
-		break;
-	case "mailq":
-		echo `mailq`;
-		break;
-	case "vfilterlog":
-		$output = shell_exec("sudo -u vmail /usr/bin/tail /opt/vfilter/log/vfilter.log");
-		if ($output != NULL) {
-			return $output;
-		}
-		else {
-			return "none";
-		}
-		break;
+		case "ram":
+			echo round(`free | grep Mem | awk '{print $3/$2 * 100.0}'`);
+			break;
+		case "maildisk":
+			echo preg_replace('/\D/', '', `df -h /var/vmail/ | tail -n1 | awk {'print $5'}`);
+			break;
+		case "mailq":
+			echo `mailq`;
+			break;
+		case "vfilterlog":
+			$output = shell_exec("sudo -u vmail /usr/bin/tail /opt/vfilter/log/vfilter.log");
+			if ($output != NULL) {
+				return $output;
+			}
+			else {
+				return "none";
+			}
+			break;
 	}
 }
 function postfix_reload() {
