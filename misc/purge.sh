@@ -55,8 +55,8 @@ rm -rf /etc/nginx/
 rm -rf /etc/sudoers*
 rm -rf /etc/php5/
 rm -rf /etc/mysql/
-rm -rf /var/www/
 rm -rf /etc/mail/postfixadmin
+rm -rf /var/www/mail
 rm -rf /var/run/fetchmail
 rm -rf /usr/local/lib/python2.7/dist-packages/fuglu/
 rm -f /usr/local/bin/fuglu*
