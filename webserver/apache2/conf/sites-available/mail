@@ -1,0 +1,50 @@
+<IfModule mod_fastcgi.c>
+	Action fcgi-php-fpm /fcgi-php-fpm virtual
+	Alias /fcgi-php-fpm /fcgi-php-fpm
+	FastCgiExternalServer /fcgi-php-fpm -socket /var/run/php5-fpm-mail.sock -pass-header Authorization
+</IfModule>
+<Directory /var/www/mail>
+	AllowOverride Limit Indexes AuthConfig
+	Options -Indexes
+</Directory>
+<VirtualHost *:80>
+	ServerName "autoconfig.domain.tld"
+	DocumentRoot /var/www/mail
+	<FilesMatch ".+\.ph(p[345]?|t|tml)$">
+		SetHandler fcgi-php-fpm
+	</FilesMatch>
+	RewriteEngine On
+	RewriteRule ^/?(.*) /autoconfig.xml [L]
+</VirtualHost>
+<VirtualHost *:80>
+	ServerName "*"
+	DocumentRoot /var/www/mail
+	<FilesMatch ".+\.ph(p[345]?|t|tml)$">
+		SetHandler fcgi-php-fpm
+	</FilesMatch>
+	RewriteEngine On
+	RewriteCond %{HTTPS} !=on
+	RewriteRule ^/?(.*) https://%{HTTP_HOST}/$1 [L,R,NE]
+</VirtualHost>
+<IfModule mod_ssl.c>
+	<VirtualHost *:443>
+		ServerName "*"
+		DocumentRoot /var/www/mail
+		ErrorLog ${APACHE_LOG_DIR}/error.log
+		CustomLog ${APACHE_LOG_DIR}/access.log combined
+		SSLEngine on
+		SSLCertificateFile /etc/ssl/mail/mail.crt
+		SSLCertificateKeyFile /etc/ssl/mail/mail.key
+		ErrorDocument 500 /fcc/
+		<FilesMatch "\.(cgi|shtml|phtml|php)$">
+			SSLOptions +StdEnvVars
+		</FilesMatch>
+		<FilesMatch ".+\.ph(p[345]?|t|tml)$">
+			SetHandler fcgi-php-fpm
+		</FilesMatch>
+		BrowserMatch "MSIE [2-6]" \
+			nokeepalive ssl-unclean-shutdown \
+			downgrade-1.0 force-response-1.0
+		BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
+	</VirtualHost>
+</IfModule>

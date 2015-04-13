@@ -5,6 +5,10 @@ sys_hostname="mail"
 sys_domain="domain.com"
 sys_timezone="Europe/Berlin"
 
+# Choose a webserver platform
+# Valid values are "nginx" or "apache2"
+conf_httpd="nginx"
+
 # MySQL configuration.
 # Password policy: Not empty.
 # Recommended setting: Leave "genpasswd" to generate a secure password.

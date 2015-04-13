@@ -14,7 +14,7 @@
     - [Spam rewrite](#spam-rewrite)
     - [Spamassassin daemon options](#spamassassin-daemon-options)
   - [Postfix](#postfix)
-  - [Nginx](#nginx)
+  - [HTTPd](#httpd)
   - [Fail2ban](#fail2ban)
   - [Postfixadmin](#postfixadmin)
   - [Dovecot](#dovecot)
@@ -52,7 +52,7 @@ A summary of what software is installed with which features enabled.
 * System environment adjustments (hostname, timzone, etc.)
 * Automatically generated passwords with high complexity
 * Self-signed SSL certificate for all installed and supporting services
-* Optimized Nginx (+PHP5-FPM) installation (HTTP-to-HTTPS, BetterCrypto)
+* Nginx or Apache2 installation (+PHP5-FPM)
 * MySQL database backend
 * DNS-Checks by Google DNS (PTR, A-Record, SPF etc.)
 * Learn ham and spam, [Heinlein Support](https://www.heinlein-support.de/) SA rules included
@@ -105,8 +105,8 @@ apt-get purge exim4*
 | Dovecot IMAP          | TCP      | 143  |
 | Dovecot IMAPS         | TCP      | 993  |
 | Dovecot ManageSieve   | TCP      | 4190 |
-| Nginx HTTPS           | TCP      | 443  |
-| Nginx HTTP (Redirect) | TCP      | 80   |
+| HTTPS                 | TCP      | 443  |
+| HTTP (301+autoconfig) | TCP      | 80   |
 
 - Next it is important that you **do not use Google DNS** or another public DNS which is known to be blocked by DNS-based Blackhole List (DNSBL) providers.
 
@@ -192,7 +192,7 @@ To help you modify the configuration, I created this little overview to get you 
 ## SSL certificate
 The SSL certificate is located at `/etc/ssl/mail/mail.{key,crt}`.
 You can replace it by just copying over your own files. 
-Services effected and necessary to restart are `postfix`, `dovecot` and `nginx`.
+Services effected and necessary to restart are `postfix`, `dovecot` and `nginx` (Nginx if installed, Apache2 does not have a body size limitation configured).
 
 ## Spamassassin
 Spamassassin main configuration file:
@@ -226,14 +226,17 @@ You also find the SQL based maps for virtual transport here:
 
 For a quick overview of the restrictions [click here](https://github.com/andryyy/fufix/blob/master/postfix/conf/main.cf).
 
-## Nginx
-A site for mail is copied to `/etc/nginx/sites-available` and enabled via symbolic link to `/etc/nginx/sites-enabled`.
-The sites root location is `/var/www/mail/`. Any default site installed by "apt-get" is removed.
+## HTTPd
+A site named "000-0-mail" is copied to `/etc/{nginx,apache2}/sites-available` - depending on your configuration - and enabled via symbolic link to `[...]/sites-enabled`.
 
-A PHP socket configuration is located at `/etc/php5/fpm/pool.d/mail.conf`. 
+The sites root location is `/var/www/mail/`. 
+
+Other sites will not be touched/changed/removed by fufix (>= v0.9).
+
+A PHP socket (>> `/var/run/php5-fpm-mail.sock`) configuration is located at `/etc/php5/fpm/pool.d/mail.conf`. 
 Some PHP parameters are set right here to override those in `/etc/php5/fpm/php.ini`.
 
-Nginx' default configuration file is `/etc/nginx/nginx.conf`.
+Both Apache2 and Nginx will make use of FastCGI to call PHP5. Apache2 uses a **non-free** module *mod_fastcgi*.
 
 ## Fail2ban
 A file `/etc/fail2ban/jail.local` is created with some pre-configured jails.

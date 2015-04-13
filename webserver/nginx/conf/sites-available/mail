@@ -1,17 +1,15 @@
 server {
 	listen 80;
-
-	server_name _;
-
-	root /var/www/mail;
-
-	if ($request_uri !~* autoconfig.xml$|config-v1.1.xml$) {
-		return 301 https://$host$request_uri;
-	}
-
-	rewrite /.well-known/autoconfig/mail/config-v1.1.xml /autoconfig.xml last;
+	server_name autoconfig.*;
+	root /var/www/mail/;
+	try_files $uri /autoconfig.xml;
 }
-
+server {
+	listen 80;
+	server_name _;
+	root /var/www/mail;
+	return 301 https://$host$request_uri;
+}
 server {
 	listen 443;
 

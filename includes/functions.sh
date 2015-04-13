@@ -84,7 +84,7 @@ checkports() {
 		echo "$(redb [ERR]) - Please install $(textb netcat) before running this script"
 		exit 1
 	fi
-	for port in 25 80 143 443 465 587 993 995
+	for port in 25 143 465 587 993 995
 	do
 	    if [[ $(nc -z localhost $port; echo $?) -eq 0 ]]; then
 	        echo "$(redb [ERR]) - An application is blocking the installation on Port $(textb $port)"
@@ -92,6 +92,7 @@ checkports() {
 			blocked_port=1
 	    fi
 	done
+	[[ $blocked_port -eq 1 ]] && exit 1
 	if [[ $(nc -z localhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -e ""; echo $?) -ne 0 ]]; then
 		echo "$(redb [ERR]) - No useable MySQL instance found (/etc/mysql/debian.cnf missing?)"
 		exit 1
@@ -100,7 +101,6 @@ checkports() {
 		mysql_useable=1
 		my_rootpw="not changed"
 	fi
-	[[ $blocked_port -eq 1 ]] && exit 1
 }
 
 checkconfig() {
@@ -114,6 +114,10 @@ checkconfig() {
         echo "$(redb [ERR]) - Country code must consist of exactly two characters (DE/US/UK etc.)"
         exit 1
     fi
+	if [[ $conf_httpd != "nginx" && $conf_httpd != "apache2" ]]; then
+		echo "$(redb [ERR]) - \"conf_httpd\" is neither nginx nor apache2"
+		exit 1
+	fi
     for var in sys_hostname sys_domain sys_timezone my_postfixdb my_postfixuser my_postfixpass my_rootpw my_rcuser my_rcpass my_rcdb pfadmin_adminuser pfadmin_adminpass cert_country cert_state cert_city cert_org
     do
         if [[ -z ${!var} ]]; then
@@ -194,16 +198,31 @@ EOF
 				echo -e "\ndeb http://http.debian.net/debian wheezy-backports main" >> /etc/apt/sources.list
 				apt-get -y update >/dev/null
 			fi
+			if [[ -z $(grep "non-free" /etc/apt/sources.list) ]] && [[ $conf_httpd == "apache2" ]]; then
+				echo "$(textb [INFO]) - Enabling non-free repository for libapache2-mod-fastcgi..."
+				sed -i "s/ main/ main non-free/g" /etc/apt/sources.list
+				apt-get -y update >/dev/null
+			fi
 			if [[ ! -z $(grep wheezy-backports /etc/apt/sources.list) ]]; then
 				echo "$(textb [INFO]) - Installing jq and python-magic from wheezy-backports..."
 				apt-get -y update >/dev/null ; apt-get -y install jq python-magic -t wheezy-backports >/dev/null
+			fi
+            if [[ ! -z $(grep wheezy-backports /etc/apt/sources.list) ]] && [[ $conf_httpd == "apache2" ]]; then
+                echo "$(textb [INFO]) - Installing Apache2 and components from wheezy-backports..."
+				apt-get -y install apache2 apache2-utils libapache2-mod-fastcgi -t wheezy-backports >/dev/null
+            elif [[ $conf_httpd == "apache2" ]]; then
+				echo "$(textb [INFO]) - Installing Apache2 and components..."
+				apt-get -y install apache2 apache2-utils libapache2-mod-fastcgi >/dev/null
+			elif [[ $conf_httpd == "nginx" ]]; then
+				echo "$(textb [INFO]) - Installing Nginx..."
+				apt-get -y install nginx-extras >/dev/null
 			fi
 			echo "$(textb [INFO]) - Installing packages unattended, please stand by, errors will be reported."
 			apt-get -y update >/dev/null
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install jq dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
 python-magic libmail-spf-perl libmail-dkim-perl openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
-php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server nginx-extras mailutils \
+php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server mailutils \
 postfix-mysql postfix-pcre spamassassin spamc sudo bzip2 curl mpack opendkim opendkim-tools \
 fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl bsd-mailx >/dev/null
 			update-alternatives --set mailx /usr/bin/bsd-mailx --quiet
@@ -217,7 +236,7 @@ fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtes
 			cp /etc/ssl/certs/ssl-cert-snakeoil.pem /etc/dovecot/private/dovecot.pem
 			cp /etc/ssl/private/ssl-cert-snakeoil.key /etc/dovecot/private/dovecot.key
 			if [[ ! -z $(grep wheezy-backports /etc/apt/sources.list) ]]; then
-				echo "$(textb [INFO]) - Installing Dovecot packages from wheezy-backports..."
+				echo "$(textb [INFO]) - Installing Dovecot from wheezy-backports..."
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dovecot-core dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d -t wheezy-backports >/dev/null
 			else
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dovecot-core dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d >/dev/null
@@ -225,7 +244,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		ssl)
 			rm /etc/ssl/mail/* 2> /dev/null
-			mkdir /etc/ssl/mail
+			mkdir /etc/ssl/mail 2> /dev/null
 			openssl req -new -newkey rsa:4096 -sha256 -days 1095 -nodes -x509 -subj "/C=$cert_country/ST=$cert_state/L=$cert_city/O=$cert_org/CN=$sys_hostname.$sys_domain" -keyout /etc/ssl/mail/mail.key  -out /etc/ssl/mail/mail.crt
 			chmod 600 /etc/ssl/mail/mail.key
 			cp /etc/ssl/mail/mail.crt /usr/local/share/ca-certificates/
@@ -313,24 +332,37 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			install -m 755 spamassassin/conf/spamassassin_heinlein /etc/cron.daily/spamassassin_heinlein
 			;;
 		webserver)
-			find /etc/nginx/sites-enabled/ -type l -delete
-			mv /etc/nginx/sites-enabled/* /etc/nginx/sites-available/ 2> /dev/null
-			cp nginx/conf/sites-available/mail /etc/nginx/sites-available/mail
-			ln -s /etc/nginx/sites-available/mail /etc/nginx/sites-enabled/mail
+			if [[ $conf_httpd == "nginx" ]]; then
+				rm /etc/nginx/{sites-enabled,sites-available}/{000-0-mail,mail} 2>/dev/null
+				cp webserver/nginx/conf/sites-available/mail /etc/nginx/sites-available/000-0-mail
+				ln -s /etc/nginx/sites-available/000-0-mail /etc/nginx/sites-enabled/000-0-mail 2> /dev/null
+				sed -i "s/_;/$sys_hostname.$sys_domain;/g" /etc/nginx/sites-available/000-0-mail
+				[ -f /etc/nginx/nginx.conf ] && cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf_old
+				cp webserver/nginx/conf/nginx.conf /etc/nginx/nginx.conf
+				sed -i "/worker_processes/c\worker_processes $(($(grep ^processor /proc/cpuinfo | wc -l) *2));" /etc/nginx/nginx.conf
+			elif [[ $conf_httpd == "apache2" ]]; then
+				rm /etc/apache2/{sites-enabled,sites-available}/{000-0-mail,mail} 2>/dev/null
+				cp webserver/apache2/conf/sites-available/mail /etc/apache2/sites-available/000-0-mail
+				ln -s /etc/apache2/sites-available/000-0-mail /etc/apache2/sites-enabled/000-0-mail
+				sed -i "s/\"\*\"/\"$sys_hostname.$sys_domain\"/g" /etc/apache2/sites-available/000-0-mail
+                sed -i "s/\"autoconfig.domain.tld\"/\"autoconfig.$sys_domain\"/g" /etc/apache2/sites-available/000-0-mail
+				a2enmod actions fastcgi rewrite ssl > /dev/null 2>&1
+				[[ -z $(grep -E "(^|^#)AddDefaultCharset" /etc/apache2/conf.d/charset) ]] && echo -e "\nAddDefaultCharset UTF-8" >> /etc/apache2/conf.d/charset || sed -i "/\(^\|^#\)AddDefaultCharset/c\AddDefaultCharset UTF-8" /etc/apache2/conf.d/charset
+				[[ -z $(grep -E "(^|^#)ServerTokens" /etc/apache2/conf.d/security) ]] && echo -e "\nServerTokens Minimal" >> /etc/apache2/conf.d/security || sed -i "/\(^\|^#\)ServerTokens/c\ServerTokens Minimal" /etc/apache2/conf.d/security
+				[[ -z $(grep -E "(^|^#)ServerSignature" /etc/apache2/conf.d/security) ]] && echo -e "\nServerSignature off" >> /etc/apache2/conf.d/security || sed -i "/\(^\|^#\)ServerSignature/c\ServerSignature off" /etc/apache2/conf.d/security
+				[[ -z $(grep -E "(^|^#)TraceEnable" /etc/apache2/conf.d/security) ]] && echo -e "\nTraceEnable off" >> /etc/apache2/conf.d/security || sed -i "/\(^\|^#\)TraceEnable/c\TraceEnable off" /etc/apache2/conf.d/security
+			fi
 			cp php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
 			cp php5-fpm/conf/php-fpm.conf /etc/php5/fpm/php-fpm.conf
-			[ -a /etc/nginx/nginx.conf ] && cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf_old
-			cp nginx/conf/nginx.conf /etc/nginx/nginx.conf
 			mkdir /var/lib/php5/sessions 2> /dev/null
 			chown -R www-data:www-data /var/lib/php5/sessions
 			sed -i "/date.timezone/c\php_admin_value[date.timezone] = $sys_timezone" /etc/php5/fpm/pool.d/mail.conf
-			sed -i "/worker_processes/c\worker_processes $(($(grep ^processor /proc/cpuinfo | wc -l) *2));" /etc/nginx/nginx.conf
 			;;
 		postfixadmin)
 			rm -rf /var/www/mail 2> /dev/null
 			tar xf pfadmin/inst/$postfixadmin_revision.tar -C pfadmin/inst/
 			mkdir -p /var/www/mail/pfadmin /var/run/fetchmail /etc/mail/postfixadmin 2> /dev/null
-			cp -R nginx/conf/htdocs/{fcc,index.php,robots.txt,autoconfig.xml} /var/www/mail/
+			cp -R webserver/htdocs/{fcc,index.php,robots.txt,autoconfig.xml} /var/www/mail/
 			touch /var/www/VT_API_KEY
 			touch /var/www/VT_ENABLE_UPLOAD
 			mv pfadmin/inst/$postfixadmin_revision/* /var/www/mail/pfadmin/
@@ -391,7 +423,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		restartservices)
 			[[ -f /lib/systemd/systemd ]] && echo "$(textb [INFO]) - Restarting services, this may take a few seconds..."
-			for var in fail2ban rsyslog nginx php5-fpm spamassassin mysql dovecot postfix opendkim
+			for var in fail2ban rsyslog $conf_httpd php5-fpm spamassassin mysql dovecot postfix opendkim
 			do
 				service $var stop
 				sleep 1.5
@@ -418,7 +450,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		setupsuperadmin)
 			sed -i 's/E_ALL/E_ALL ^ E_NOTICE/g' /var/www/mail/pfadmin/scripts/postfixadmin-cli.php
-			wget --quiet --no-check-certificate -O /dev/null https://localhost/pfadmin/setup.php
+			wget --quiet --no-check-certificate -O /dev/null https://$sys_hostname.$sys_domain/pfadmin/setup.php
 			php /var/www/mail/pfadmin/scripts/postfixadmin-cli.php admin add $pfadmin_adminuser --password $pfadmin_adminpass --password2 $pfadmin_adminpass --superadmin
 			;;
 	esac
@@ -428,32 +460,35 @@ upgradetask() {
 		echo "$(redb [ERR]) - Upgrade not supported"
 		return 1
 	fi
+	if [[ ! -z $(which apache2) ]]; then
+		conf_httpd="apache2"
+	elif [[ ! -z $(which nginx) ]]; then
+		conf_httpd="nginx"
+	else
+		conf_httpd="nginx"
+	fi
 	sys_hostname=$(hostname)
 	sys_domain=$(hostname -d)
 	sys_timezone=$(cat /etc/timezone)
 	timestamp=$(date +%Y%m%d_%H%M%S)
-
 	readconf=( $(php -f misc/readconf.php) )
-
 	my_postfixuser=${readconf[0]}
 	my_postfixpass=${readconf[1]}
 	my_postfixdb=${readconf[2]}
-
-    old_des_key_rc=${readconf[3]}
-
+	old_des_key_rc=${readconf[3]}
 	my_rcuser=${readconf[4]}
 	my_rcpass=${readconf[5]}
-    my_rcdb=${readconf[6]}
+	my_rcdb=${readconf[6]}
 
-	for var in sys_hostname sys_domain sys_timezone my_postfixdb my_postfixuser my_postfixpass my_rcuser my_rcpass my_rcdb
+	for var in conf_httpd sys_hostname sys_domain sys_timezone my_postfixdb my_postfixuser my_postfixpass my_rcuser my_rcpass my_rcdb
 	do
 		if [[ -z ${!var} ]]; then
-			echo "$(redb [ERR]) - Could not gather required information"
+			echo "$(redb [ERR]) - Could not gather required information, upgrade failed..."
 			echo
 			exit 1
 		fi
 	done
-	echo -e "The following values were detected.\nPlease review the configuration:"
+	echo -e "\nThe following configuration was detected:"
 	echo "
 $(textb "Hostname")        $sys_hostname
 $(textb "Domain")          $sys_domain
@@ -461,22 +496,23 @@ $(textb "FQDN")            $sys_hostname.$sys_domain
 $(textb "Timezone")        $sys_timezone
 $(textb "Postfix MySQL")   ${my_postfixuser}:${my_postfixpass}/${my_postfixdb}
 $(textb "Roundcube MySQL") ${my_rcuser}:${my_rcpass}/${my_rcdb}
+$(textb "Web server")      ${conf_httpd^}
 
------------------------------------------------------
-THIS UPGRADE WILL WILL RESET YOUR CONFIGURATION FILES
------------------------------------------------------
+--------------------------------------------------------
+THIS UPGRADE WILL RESET SOME OF YOUR CONFIGURATION FILES
+--------------------------------------------------------
 A backup will be stored in ./before_upgrade_$timestamp
------------------------------------------------------
+--------------------------------------------------------
 "
 	read -p "Press ENTER to continue or CTRL-C to cancel the upgrade process"
 	echo -en "Creating backups in ./before_upgrade_$timestamp... \t"
 		mkdir before_upgrade_$timestamp
 		cp -R /var/www/mail/ before_upgrade_$timestamp/mail_wwwroot
 		mysqldump --defaults-file=/etc/mysql/debian.cnf --all-databases > backup_all_databases.sql 2>/dev/null
-		cp -R /etc/{postfix,dovecot,spamassassin,fail2ban,nginx,mysql,php5} before_upgrade_$timestamp/
+		cp -R /etc/{postfix,dovecot,spamassassin,fail2ban,$conf_httpd,mysql,php5} before_upgrade_$timestamp/
     echo -e "$(greenb "[OK]")"
 	echo -en "\nStopping services, this may take a few seconds... \t\t"
-	for var in fail2ban rsyslog nginx php5-fpm spamassassin dovecot postfix opendkim
+	for var in fail2ban rsyslog $conf_httpd php5-fpm spamassassin dovecot postfix opendkim
 	do
 		service $var stop > /dev/null 2>&1
 	done
@@ -503,10 +539,10 @@ A backup will be stored in ./before_upgrade_$timestamp
 	returnwait "VirusTotal filter configuration" "Spamassassin configuration"
 
 	installtask spamassassin
-	returnwait "Spamassassin configuration" "Nginx configuration"
+	returnwait "Spamassassin configuration" "Webserver configuration"
 
 	installtask webserver
-	returnwait "Nginx configuration" "Postfixadmin configuration"
+	returnwait "Webserver configuration" "Postfixadmin configuration"
 
 	installtask postfixadmin
 	returnwait "Postfixadmin configuration" "Roundcube configuration"

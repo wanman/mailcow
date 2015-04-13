@@ -12,10 +12,10 @@ fi
 
 sed -i "/upload_max_filesize/c\php_admin_value[upload_max_filesize] = ${1}M" /etc/php5/fpm/pool.d/mail.conf
 sed -i "/post_max_size/c\php_admin_value[post_max_size] = $(expr $1 + 1)M" /etc/php5/fpm/pool.d/mail.conf
-sed -i "s/client_max_body_size.*/client_max_body_size ${1}m;/g" /etc/nginx/nginx.conf
+[[ -f /etc/nginx/nginx.conf ]] && sed -i "s/client_max_body_size.*/client_max_body_size ${1}m;/g" /etc/nginx/nginx.conf
 sed -i "s/message_size_limit.*/message_size_limit = $(( $1 * 1048576 ))/g" /etc/postfix/main.cf
 
 echo "Reloading services..."
 postfix reload
-nginx -s reload
+[[ -f $(which nginx) ]] && nginx -s reload
 service php5-fpm reload

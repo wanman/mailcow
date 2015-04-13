@@ -93,7 +93,7 @@ installtask vfilter
 returnwait "VirusTotal filter configuration" "Spamassassin configuration"
 
 installtask spamassassin
-returnwait "Spamassassin configuration" "Nginx configuration"
+returnwait "Spamassassin configuration" "Webserver configuration"
 
 installtask webserver
 returnwait "Nginx configuration" "Postfixadmin configuration"
