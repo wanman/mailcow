@@ -91,8 +91,8 @@ Enter "DISABLED" to disable this feature.</pre></p>
 				Do <b>not</b> upload files to VirusTotal but check for a previous scan report.
 				</label>
 		</div>
-		<label for="vtapikey">VirusTotal API Key (<a href="https://www.virustotal.com/documentation/virustotal-community/#retrieve-api-key" target="_blank">?</a>)</label>
-		<p><input class="form-control" id="vtapikey" type="text" name="vtapikey" value="<?php echo return_fufix_config("vtapikey"); ?>"></p>
+		<label for="vtapikey">VirusTotal API Key, 64 char. alphanumeric (<a href="https://www.virustotal.com/documentation/virustotal-community/#retrieve-api-key" target="_blank">?</a>)</label>
+		<p><input class="form-control" id="vtapikey" type="text" name="vtapikey" pattern="[a-zA-Z0-9]{64}" value="<?php echo return_fufix_config("vtapikey"); ?>"></p>
 		<p><b>Filter Log (tail)</b></p>
 		<p><pre><?php echo echo_sys_info("vfilterlog"); ?></pre></p>
 		</small>

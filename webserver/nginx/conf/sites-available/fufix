@@ -27,6 +27,8 @@ server {
 	ssl_session_cache shared:SSL:5m;
 	ssl_session_timeout 30m;
 
+	client_max_body_size 25m;
+
 	root /var/www/mail;
 	index index.html index.htm index.php;
 

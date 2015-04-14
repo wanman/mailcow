@@ -333,19 +333,19 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		webserver)
 			if [[ $conf_httpd == "nginx" ]]; then
-				rm /etc/nginx/{sites-enabled,sites-available}/{000-0-mail,mail} 2>/dev/null
-				cp webserver/nginx/conf/sites-available/mail /etc/nginx/sites-available/000-0-mail
-				ln -s /etc/nginx/sites-available/000-0-mail /etc/nginx/sites-enabled/000-0-mail
-				sed -i "s/_;/$sys_hostname.$sys_domain;/g" /etc/nginx/sites-available/000-0-mail
-				[ -f /etc/nginx/nginx.conf ] && cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf_old
-				cp webserver/nginx/conf/nginx.conf /etc/nginx/nginx.conf
-				sed -i "/worker_processes/c\worker_processes $(($(grep ^processor /proc/cpuinfo | wc -l) *2));" /etc/nginx/nginx.conf
+				rm /etc/nginx/sites-enabled/000-0-fufix 2>/dev/null
+				cp webserver/nginx/conf/sites-available/fufix /etc/nginx/sites-available/
+				ln -s /etc/nginx/sites-available/fufix /etc/nginx/sites-enabled/000-0-fufix
+				[[ ! -z $(grep "client_max_body_size" /etc/nginx/nginx.conf) ]] && \
+					sed -i "/client_max_body_size/c\ \ \ \ \ \ \ \ client_max_body_size 25M;" /etc/nginx/nginx.conf || \
+					sed -i "/http {/a\ \ \ \ \ \ \ \ client_max_body_size 25M;" /etc/nginx/nginx.conf
+				sed -i "s/_;/$sys_hostname.$sys_domain;/g" /etc/nginx/sites-available/fufix
 			elif [[ $conf_httpd == "apache2" ]]; then
-				rm /etc/apache2/{sites-enabled,sites-available}/{000-0-mail.conf,mail} 2>/dev/null
-				cp webserver/apache2/conf/sites-available/mail /etc/apache2/sites-available/000-0-mail.conf
-				ln -s /etc/apache2/sites-available/000-0-mail.conf /etc/apache2/sites-enabled/000-0-mail.conf
-				sed -i "s/\"\*\"/\"$sys_hostname.$sys_domain\"/g" /etc/apache2/sites-available/000-0-mail.conf
-                sed -i "s/\"autoconfig.domain.tld\"/\"autoconfig.$sys_domain\"/g" /etc/apache2/sites-available/000-0-mail.conf
+				rm /etc/apache2/sites-enabled/000-0-fufix 2>/dev/null
+				cp webserver/apache2/conf/sites-available/fufix /etc/apache2/sites-available/
+				ln -s /etc/apache2/sites-available/fufix /etc/apache2/sites-enabled/000-0-fufix.conf
+				sed -i "s/\"\*\"/\"$sys_hostname.$sys_domain\"/g" /etc/apache2/sites-available/fufix
+                sed -i "s/\"autoconfig.domain.tld\"/\"autoconfig.$sys_domain\"/g" /etc/apache2/sites-available/fufix
 				a2enmod actions fastcgi rewrite ssl > /dev/null 2>&1
 				if [ -d /etc/apache2/conf.d/ ]; then
 					apache_charsetconf="/etc/apache2/conf.d/charset"
