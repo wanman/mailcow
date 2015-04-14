@@ -306,4 +306,9 @@ fufix_msg_size VALUE_IN_MB
 ``` 
 
 # Uninstall
-Run `bash misc/purge.sh` from within fufix directory to **completely purge** fufix, mailboxes, databases and any related service.
+Run `bash misc/purge.sh` from within fufix directory to remove fufix main components.
+
+Your web server + web root, MySQL server + databases as well as your mail directory (/var/vmail) will **not** be removed (>= v0.9).
+
+Please open and review the script before running it!
+
