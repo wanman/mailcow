@@ -89,7 +89,8 @@ function set_fufix_config($s, $v = "", $vext = "") {
 			break;
 		case "senderaccess":
 			file_put_contents($GLOBALS["fufix_sender_access"], "");
-			foreach(preg_split("/((\r?\n)|(\r\n?))/", $v) as $each) {
+			$sender_array = array_keys(array_flip(preg_split("/((\r?\n)|(\r\n?))/", $v)));
+			foreach($sender_array as $each) {
 				if ($each != "" && preg_match("/^[a-zA-Z0-9-\ .@]+$/", $each)) {
 					file_put_contents($GLOBALS["fufix_sender_access"], "$each REJECT Sender not allowed".PHP_EOL, FILE_APPEND);
 				}
