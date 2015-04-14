@@ -80,17 +80,25 @@ checksystem() {
 }
 
 checkports() {
-    if [[ -z $(which nc) ]]; then
+	if [[ -z $(which nc) ]]; then
 		echo "$(redb [ERR]) - Please install $(textb netcat) before running this script"
 		exit 1
 	fi
 	for port in 25 143 465 587 993 995
 	do
-	    if [[ $(nc -z localhost $port; echo $?) -eq 0 ]]; then
-	        echo "$(redb [ERR]) - An application is blocking the installation on Port $(textb $port)"
+		if [[ $(nc -z localhost $port; echo $?) -eq 0 ]]; then
+			echo "$(redb [ERR]) - An application is blocking the installation on Port $(textb $port)"
 			# Wait until finished to list all blocked ports.
 			blocked_port=1
-	    fi
+		fi
+	done
+	for port in 80 443
+	do
+		if [[ $(nc -z localhost $port; echo $?) -eq 0 ]]; then
+			 echo "$(redb [ERR]) - Please stop your web server before running this script"
+			# Wait until finished to list all blocked ports.
+			blocked_port=1
+		fi
 	done
 	[[ $blocked_port -eq 1 ]] && exit 1
 	if [[ $(nc -z localhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -e ""; echo $?) -ne 0 ]]; then
