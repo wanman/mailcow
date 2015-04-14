@@ -335,22 +335,29 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			if [[ $conf_httpd == "nginx" ]]; then
 				rm /etc/nginx/{sites-enabled,sites-available}/{000-0-mail,mail} 2>/dev/null
 				cp webserver/nginx/conf/sites-available/mail /etc/nginx/sites-available/000-0-mail
-				ln -s /etc/nginx/sites-available/000-0-mail /etc/nginx/sites-enabled/000-0-mail 2> /dev/null
+				ln -s /etc/nginx/sites-available/000-0-mail /etc/nginx/sites-enabled/000-0-mail
 				sed -i "s/_;/$sys_hostname.$sys_domain;/g" /etc/nginx/sites-available/000-0-mail
 				[ -f /etc/nginx/nginx.conf ] && cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf_old
 				cp webserver/nginx/conf/nginx.conf /etc/nginx/nginx.conf
 				sed -i "/worker_processes/c\worker_processes $(($(grep ^processor /proc/cpuinfo | wc -l) *2));" /etc/nginx/nginx.conf
 			elif [[ $conf_httpd == "apache2" ]]; then
-				rm /etc/apache2/{sites-enabled,sites-available}/{000-0-mail,mail} 2>/dev/null
-				cp webserver/apache2/conf/sites-available/mail /etc/apache2/sites-available/000-0-mail
-				ln -s /etc/apache2/sites-available/000-0-mail /etc/apache2/sites-enabled/000-0-mail
-				sed -i "s/\"\*\"/\"$sys_hostname.$sys_domain\"/g" /etc/apache2/sites-available/000-0-mail
-                sed -i "s/\"autoconfig.domain.tld\"/\"autoconfig.$sys_domain\"/g" /etc/apache2/sites-available/000-0-mail
+				rm /etc/apache2/{sites-enabled,sites-available}/{000-0-mail.conf,mail} 2>/dev/null
+				cp webserver/apache2/conf/sites-available/mail /etc/apache2/sites-available/000-0-mail.conf
+				ln -s /etc/apache2/sites-available/000-0-mail.conf /etc/apache2/sites-enabled/000-0-mail.conf
+				sed -i "s/\"\*\"/\"$sys_hostname.$sys_domain\"/g" /etc/apache2/sites-available/000-0-mail.conf
+                sed -i "s/\"autoconfig.domain.tld\"/\"autoconfig.$sys_domain\"/g" /etc/apache2/sites-available/000-0-mail.conf
 				a2enmod actions fastcgi rewrite ssl > /dev/null 2>&1
-				[[ -z $(grep -E "(^|^#)AddDefaultCharset" /etc/apache2/conf.d/charset) ]] && echo -e "\nAddDefaultCharset UTF-8" >> /etc/apache2/conf.d/charset || sed -i "/\(^\|^#\)AddDefaultCharset/c\AddDefaultCharset UTF-8" /etc/apache2/conf.d/charset
-				[[ -z $(grep -E "(^|^#)ServerTokens" /etc/apache2/conf.d/security) ]] && echo -e "\nServerTokens Minimal" >> /etc/apache2/conf.d/security || sed -i "/\(^\|^#\)ServerTokens/c\ServerTokens Minimal" /etc/apache2/conf.d/security
-				[[ -z $(grep -E "(^|^#)ServerSignature" /etc/apache2/conf.d/security) ]] && echo -e "\nServerSignature off" >> /etc/apache2/conf.d/security || sed -i "/\(^\|^#\)ServerSignature/c\ServerSignature off" /etc/apache2/conf.d/security
-				[[ -z $(grep -E "(^|^#)TraceEnable" /etc/apache2/conf.d/security) ]] && echo -e "\nTraceEnable off" >> /etc/apache2/conf.d/security || sed -i "/\(^\|^#\)TraceEnable/c\TraceEnable off" /etc/apache2/conf.d/security
+				if [ -d /etc/apache2/conf.d/ ]; then
+					apache_charsetconf="/etc/apache2/conf.d/charset"
+					apache_securityconf="/etc/apache2/conf.d/security"
+				elif [ -d /etc/apache2/conf-available/ ]; then
+					apache_charsetconf="/etc/apache2/conf-available/charset.conf"
+					apache_securityconf="/etc/apache2/conf-available/security.conf"
+				fi
+				[[ -z $(grep -E "^AddDefaultCharset" $apache_charsetconf) ]] && echo -e "\nAddDefaultCharset UTF-8" >> $apache_charsetconf || sed -i "/^AddDefaultCharset/c\AddDefaultCharset UTF-8" $apache_charsetconf
+				[[ -z $(grep -E "^ServerTokens" $apache_securityconf) ]] && echo -e "\nServerTokens Minimal" >> $apache_securityconf || sed -i "/^ServerTokens/c\ServerTokens Minimal" $apache_securityconf
+				[[ -z $(grep -E "^ServerSignature" $apache_securityconf) ]] && echo -e "\nServerSignature off" >> $apache_securityconf || sed -i "/^ServerSignature/c\ServerSignature off" $apache_securityconf
+				[[ -z $(grep -E "^TraceEnable" $apache_securityconf) ]] && echo -e "\nTraceEnable off" >> $apache_securityconf || sed -i "/^TraceEnable/c\TraceEnable off" $apache_securityconf
 			fi
 			cp php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
 			cp php5-fpm/conf/php-fpm.conf /etc/php5/fpm/php-fpm.conf

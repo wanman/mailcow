@@ -1,12 +1,13 @@
+<Directory />
+	Options +FollowSymLinks -Indexes
+	AllowOverride Limit Indexes AuthConfig
+	Require all granted
+</Directory>
 <IfModule mod_fastcgi.c>
 	Action fcgi-php-fpm /fcgi-php-fpm virtual
 	Alias /fcgi-php-fpm /fcgi-php-fpm
 	FastCgiExternalServer /fcgi-php-fpm -socket /var/run/php5-fpm-mail.sock -pass-header Authorization
 </IfModule>
-<Directory /var/www/mail>
-	AllowOverride Limit Indexes AuthConfig
-	Options -Indexes
-</Directory>
 <VirtualHost *:80>
 	ServerName "autoconfig.domain.tld"
 	DocumentRoot /var/www/mail
