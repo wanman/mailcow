@@ -21,10 +21,7 @@ service mysql stop
 service dovecot stop
 service postfix stop
 update-rc.d -f fail2ban remove
-update-rc.d -f fuglu remove
 systemctl disable fail2ban
-systemctl disable fuglu
-rm /lib/systemd/system/fuglu.service
 rm /lib/systemd/system/fail2ban.service
 # dovecot purge fails at first
 apt-get -y purge sudo php5 python-sqlalchemy python-beautifulsoup python-setuptools \
@@ -39,14 +36,11 @@ apt-get -y purge dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-pop3d 
 apt-get -y autoremove --purge
 killall -u vmail
 userdel vmail
-killall -u fuglu
-userdel fuglu
 rm -rf /etc/ssl/mail/
 rm -rf /etc/spamassassin/
 rm -rf /etc/clamav/
 rm -rf /etc/dovecot/
 rm -rf /etc/postfix/
-rm -rf /etc/fuglu/
 rm -rf /etc/fail2ban/
 rm -rf /etc/sudoers*
 rm -rf /etc/php5/
@@ -54,17 +48,10 @@ rm -rf /etc/mysql/
 rm -rf /etc/mail/postfixadmin
 rm -rf /var/www/mail
 rm -rf /var/run/fetchmail
-rm -rf /usr/local/lib/python2.7/dist-packages/fuglu/
-rm -f /usr/local/bin/fuglu*
-rm -f /usr/bin/fuglu
-rm -f /usr/local/lib/python2.7/dist-packages/fuglu-0.6.2.egg-info
 rm -rf /usr/local/lib/python2.7/dist-packages/fail2ban-*
 rm -f /usr/local/bin/fail2ban*
 rm -rf /var/lib/mysql/
 rm -f /etc/init.d/fail2ban
-rm -f /etc/init.d/fuglu
-rm -rf /var/log/fuglu/
-rm -f /var/run/fuglu.pid
 rm -rf /var/run/fail2ban/
 rm -f /var/log/fail2ban.log
 cat /dev/null > /var/log/mail.warn
