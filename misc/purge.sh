@@ -15,8 +15,6 @@ read -p "Type \"confirm\" to continue: " confirminput
 echo "Please wait..."
 service fail2ban stop
 service rsyslog stop
-service clamav-daemon stop
-service clamav-freshclam stop
 service spamassassin stop
 service dovecot stop
 service postfix stop
@@ -29,7 +27,7 @@ python-magic php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mime
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite dovecot-common dovecot-core \
 dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d postfix \
-postfix-mysql postfix-pcre clamav clamav-base clamav-daemon clamav-freshclam spamassassin curl mpack
+postfix-mysql postfix-pcre spamassassin curl mpack
 apt-get -y purge dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-pop3d dovecot-sieve
 apt-get -y autoremove --purge
 apt-get -y purge dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-pop3d dovecot-sieve
@@ -38,11 +36,9 @@ killall -u vmail
 userdel vmail
 rm -rf /etc/ssl/mail/
 rm -rf /etc/spamassassin/
-rm -rf /etc/clamav/
 rm -rf /etc/dovecot/
 rm -rf /etc/postfix/
 rm -rf /etc/fail2ban/
-rm -rf /etc/sudoers*
 rm -rf /etc/php5/
 rm -rf /etc/mail/postfixadmin
 rm -rf /var/www/mail
@@ -60,7 +56,6 @@ rm -rf /var/lib/fail2ban/
 rm -rf /var/lib/dovecot/
 rm -f /var/log/mail*1
 rm -f /var/log/mail*gz
-rm -rf /var/log/clamav/
 rm -rf /opt/vfilter/
 rm -f /etc/cron.d/pfadminfetchmail
 rm -f /etc/cron.daily/spam*

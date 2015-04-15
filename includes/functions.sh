@@ -92,14 +92,6 @@ checkports() {
 			blocked_port=1
 		fi
 	done
-	for port in 80 443
-	do
-		if [[ $(nc -z localhost $port; echo $?) -eq 0 ]]; then
-			 echo "$(redb [ERR]) - Please stop your web server before running this script"
-			# Wait until finished to list all blocked ports.
-			blocked_port=1
-		fi
-	done
 	[[ $blocked_port -eq 1 ]] && exit 1
 	if [[ $(nc -z localhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -e ""; echo $?) -ne 0 ]]; then
 		echo "$(redb [ERR]) - No useable MySQL instance found (/etc/mysql/debian.cnf missing?)"
@@ -170,13 +162,11 @@ EOF
 				echo "$(redb [ERR]) - Cannot set your hostname"
 				exit 1
 			fi
-			if [[ -z $(which whiptail) || ! -d /usr/share/doc/apt-utils ]]; then
-				echo "$(textb [INFO]) - Installing prerequisites to satisfy dpkg..."
-				apt-get -y update > /dev/null ; apt-get -y install whiptail apt-utils > /dev/null 2>&1
-			fi
+			echo "$(textb [INFO]) - Installing prerequisites..."
+			apt-get -y update > /dev/null ; apt-get -y install lsb-release dbus whiptail apt-utils ssl-cert > /dev/null 2>&1
+			/usr/sbin/make-ssl-cert generate-default-snakeoil --force-overwrite
+			echo "$(textb [INFO]) - Setting your hostname..."
 			if [[ -f /lib/systemd/systemd ]]; then
-				echo "$(textb [INFO]) - Checking for dbus, this may take a few seconds..."
-				apt-get -y update > /dev/null ; apt-get -y install dbus > /dev/null
 				hostnamectl set-hostname $sys_hostname
 			else
 				echo $sys_hostname > /etc/hostname
@@ -196,27 +186,27 @@ EOF
 			fi
 			;;
 		installpackages)
-			if [[ ! -f /etc/ssl/certs/ssl-cert-snakeoil.pem ]]; then
-				echo "$(textb [INFO]) - Generating snakeoil certificate to satisfy package installation..."
-				apt-get -y update >/dev/null ; apt-get -y install ssl-cert >/dev/null
-				/usr/sbin/make-ssl-cert generate-default-snakeoil --force-overwrite
-			fi
-			if [[ ! -z $(grep "^7\." /etc/debian_version) ]] && [[ -z $(grep wheezy-backports /etc/apt/sources.list) ]]; then
+			dist_codename=$(lsb_release -cs)
+			# Detect and edit repos
+			if [[ $dist_codename == "wheezy" ]] && [[ -z $(grep -E "^deb(.*)wheezy-backports(.*)" /etc/apt/sources.list) ]]; then
 				echo "$(textb [INFO]) - Enabling wheezy-backports..."
 				echo -e "\ndeb http://http.debian.net/debian wheezy-backports main" >> /etc/apt/sources.list
 				apt-get -y update >/dev/null
 			fi
-			if [[ -z $(grep "non-free" /etc/apt/sources.list) ]] && [[ $conf_httpd == "apache2" ]]; then
-				echo "$(textb [INFO]) - Enabling non-free repository for libapache2-mod-fastcgi..."
-				sed -i "s/ main/ main non-free/g" /etc/apt/sources.list
+			if [[ -z $(grep -E "^deb(.*)non-free(.*)" /etc/apt/sources.list) ]] && [[ $conf_httpd == "apache2" ]]; then
+				echo "$(textb [INFO]) - Enabling non-free repository (for libapache2-mod-fastcgi)..."
+				sed -i "s/ $dist_codename main/ $dist_codename main non-free/g" /etc/apt/sources.list
 				apt-get -y update >/dev/null
 			fi
-			if [[ ! -z $(grep wheezy-backports /etc/apt/sources.list) ]]; then
+
+			if [[ ! -z $(grep -E "^deb(.*)wheezy-backports(.*)" /etc/apt/sources.list) ]]; then
 				echo "$(textb [INFO]) - Installing jq and python-magic from wheezy-backports..."
 				apt-get -y update >/dev/null ; apt-get -y install jq python-magic -t wheezy-backports >/dev/null
 			fi
-            if [[ ! -z $(grep wheezy-backports /etc/apt/sources.list) ]] && [[ $conf_httpd == "apache2" ]]; then
-                echo "$(textb [INFO]) - Installing Apache2 and components from wheezy-backports..."
+
+			# Web server installation
+			if [[ ! -z $(grep -E "^deb(.*)wheezy-backports(.*)" /etc/apt/sources.list) ]] && [[ $conf_httpd == "apache2" ]]; then
+				echo "$(textb [INFO]) - Installing Apache2 and components from wheezy-backports..."
 				apt-get -y install apache2 apache2-utils libapache2-mod-fastcgi -t wheezy-backports >/dev/null
             elif [[ $conf_httpd == "apache2" ]]; then
 				echo "$(textb [INFO]) - Installing Apache2 and components..."
@@ -285,8 +275,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/postfix/sql/*
 			postmap /etc/postfix/fufix_sender_access
 			chown www-data: /etc/postfix/fufix_*
-			sed -i "/%www-data/d" /etc/sudoers
-			sed -i "/%vmail/d" /etc/sudoers
+			sed -i "/%www-data/d" /etc/sudoers 2> /dev/null
+			sed -i "/%vmail/d" /etc/sudoers 2> /dev/null
 			echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /usr/local/bin/opendkim-keycontrol, /usr/local/bin/fufix_msg_size, /usr/bin/tail /opt/vfilter/log/vfilter.log' >> /etc/sudoers
 			echo '%vmail ALL=(ALL) NOPASSWD: /usr/bin/spamc*' >> /etc/sudoers
 			;;
@@ -465,7 +455,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		setupsuperadmin)
 			sed -i 's/E_ALL/E_ALL ^ E_NOTICE/g' /var/www/mail/pfadmin/scripts/postfixadmin-cli.php
-			wget --quiet --no-check-certificate -O /dev/null https://$sys_hostname.$sys_domain/pfadmin/setup.php
+			(cd /var/www/mail/pfadmin ; php setup.php 2> 1&>2 /dev/null)
 			php /var/www/mail/pfadmin/scripts/postfixadmin-cli.php admin add $pfadmin_adminuser --password $pfadmin_adminpass --password2 $pfadmin_adminpass --superadmin
 			;;
 	esac

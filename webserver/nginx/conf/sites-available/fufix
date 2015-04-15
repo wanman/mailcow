@@ -1,3 +1,6 @@
+# fufix site configuration
+# ! Do not remove this header !
+
 server {
 	listen 80;
 	server_name autoconfig.*;
@@ -61,7 +64,6 @@ server {
 
 	location / {
 		try_files $uri $uri/ index.php;
-		limit_req zone=one burst=25 nodelay;
 	}
 
     location ~ \.php$ {
