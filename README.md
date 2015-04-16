@@ -113,7 +113,7 @@ apt-get purge exim4*
 # Installation
 **Please run all commands as root**
 
-**Option 1: Download a stable release**
+**Download a stable release**
 
 Download fufix to whichever directory (using ~/build here).
 Replace "v0.x" with the tag of the latest release: https://github.com/andryyy/fufix/releases/latest
@@ -123,20 +123,7 @@ wget -O - https://github.com/andryyy/fufix/archive/v0.x.tar.gz | tar xfz -
 cd fufix-*
 ```
 
-**Option 2 - NOT RECOMMENDED, this may or may not work: Install from git**
-
-Install git to download fufix:
-```
-apt-get install git
-```
-
-Clone fufix into whichever directory (using ~/build here):
-```
-mkdir ~/build
-git clone https://github.com/andryyy/fufix
-cd fufix
-```
-**Now edit "configuration" file to fit your needs!**
+**Now edit the file "configuration" to fit your needs!**
 ```
 nano configuration
 ```
@@ -144,6 +131,7 @@ nano configuration
 * **sys_hostname** - Hostname without domain
 * **sys_domain** - Domain name. "$sys_hostname.$sys_domain" equals to FQDN.
 * **sys_timezone** - The timezone must be definied in a valid format (Europe/Berlin, America/New_York etc.)
+* **conf_httpd** - Select wether to use Nginx ("nginx") or Apache2 ("apache2"). Nginx is default.
 * **my_postfixdb, my_postfixuser, my_postfixpass** - MySQL database name, username and password for use with Postfix. **You can use the default values.**
 * **my_rcdb, my_rcuser, my_rcpass** - MySQL database name, username and password for Roundcube. **You can use the default values.**
 * **my_rootpw** - MySQL root password is generated automatically by default. You can define a complex password here if you want to.
@@ -173,11 +161,6 @@ Remember to create an alias- or a mailbox for Postmaster. ;-)
 **Please run all commands as root**
 
 Upgrade is supported since fufix v0.7.x. From v0.9 on you do not need the file `installer.log` from a previous installation.
-
-**! IMPORTANT for v0.7.x to v0.8:** Please install the following packages before running the upgrade:
-```
-apt-get install sudo bzip2 curl mpack fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl
-```
 
 The fufix configuration file will not be read, so there is no need to adjust it in any way before upgrading.
 
