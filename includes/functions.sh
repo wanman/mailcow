@@ -223,11 +223,11 @@ php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl
 php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server mailutils \
 postfix-mysql postfix-pcre spamassassin spamc sudo bzip2 curl mpack opendkim opendkim-tools \
 fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl bsd-mailx >/dev/null
-			update-alternatives --set mailx /usr/bin/bsd-mailx --quiet
 			if [ "$?" -ne "0" ]; then
 				echo "$(redb [ERR]) - Package installation failed"
 				exit 1
 			fi
+			update-alternatives --set mailx /usr/bin/bsd-mailx --quiet > /dev/null 2>&1
 			mkdir -p /etc/dovecot/private/
 			cp /etc/ssl/certs/ssl-cert-snakeoil.pem /etc/dovecot/dovecot.pem
 			cp /etc/ssl/private/ssl-cert-snakeoil.key /etc/dovecot/dovecot.key
@@ -472,6 +472,8 @@ upgradetask() {
 	else
 		conf_httpd="nginx"
 	fi
+	echo "$(textb [INFO]) - Installing prerequisites..."
+	apt-get -y update > /dev/null ; apt-get -y install lsb-release > /dev/null 2>&1
 	sys_hostname=$(hostname)
 	sys_domain=$(hostname -d)
 	sys_timezone=$(cat /etc/timezone)
