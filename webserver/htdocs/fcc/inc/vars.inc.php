@@ -1,6 +1,6 @@
 <?php
 $IP=$_SERVER['SERVER_ADDR'];
-if ( false === filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ) {
+if (!filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4, FILTER_FLAG_NO_PRIV_RANGE)) {
 	$IP="YOUR.IP.V.4";
 }
 $fufix_anonymize_headers = "/etc/postfix/fufix_anonymize_headers.pcre";

@@ -268,8 +268,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown root:postfix "/etc/postfix/sql/mysql_virtual_domains_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_domains_maps.cf"
 			chown root:root "/etc/postfix/master.cf"; chmod 644 "/etc/postfix/master.cf"
 			chown root:root "/etc/postfix/main.cf"; chmod 644 "/etc/postfix/main.cf"
-			sed -i "s/mail.domain.tld/$sys_hostname.$sys_domain/g" /etc/postfix/* 2> /dev/null
-			sed -i "s/domain.tld/$sys_domain/g" /etc/postfix/* 2> /dev/null
+			sed -i "s/FUFIX_HOST.FUFIX_DOMAIN/$sys_hostname.$sys_domain/g" /etc/postfix/* 2> /dev/null
+			sed -i "s/FUFIX_DOMAIN/$sys_domain/g" /etc/postfix/* 2> /dev/null
 			sed -i "s/my_postfixpass/$my_postfixpass/g" /etc/postfix/sql/*
 			sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/postfix/sql/*
 			sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/postfix/sql/*
@@ -291,8 +291,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown root:dovecot "/etc/dovecot/dovecot-dict-sql.conf"; chmod 640 "/etc/dovecot/dovecot-dict-sql.conf"
 			chown root:vmail "/etc/dovecot/dovecot-mysql.conf"; chmod 640 "/etc/dovecot/dovecot-mysql.conf"
 			chown root:root "/etc/dovecot/dovecot.conf"; chmod 644 "/etc/dovecot/dovecot.conf"
-			sed -i "s/mail.domain.tld/$sys_hostname.$sys_domain/g" /etc/dovecot/*
-			sed -i "s/domain.tld/$sys_domain/g" /etc/dovecot/*
+			sed -i "s/FUFIX_HOST.FUFIX_DOMAIN/$sys_hostname.$sys_domain/g" /etc/dovecot/*
+			sed -i "s/FUFIX_DOMAIN/$sys_domain/g" /etc/dovecot/*
 			sed -i "s/my_postfixpass/$my_postfixpass/g" /etc/dovecot/*
 			sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/dovecot/*
 			sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/dovecot/*
@@ -440,14 +440,14 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 				echo "$(yellowb [WARN]) - Remember to setup a PTR record: $getpublicipv4 does not point to $sys_domain (checked by Google DNS)" | tee -a installer.log
 			fi
 			if [[ -z $(dig $sys_hostname.$sys_domain @8.8.8.8 | grep -i $getpublicipv4) ]]; then
-				echo "$(yellowb [WARN]) - Remember to setup an A + MX record for $sys_hostname.$sys_domain pointing to $getpublicipv4 (checked by Google DNS)" | tee -a installer.log
+				echo "$(yellowb [WARN]) - Remember to setup A + MX records! (checked by Google DNS)" | tee -a installer.log
 			else
-				if [[ -z $(dig mx $sys_domain @8.8.8.8 | grep -i $sys_hostname.$sys_domain) ]]; then
+				if [[ -z $(dig mx $sys_domain @8.8.8.8 | grep -i $sys_hostname.$sys_domain) ]] && [[ -z $(dig mx $sys_hostname.$sys_domain @8.8.8.8 | grep -i $sys_hostname.$sys_domain) ]]; then
 					echo "$(yellowb [WARN]) - Remember to setup a MX record pointing to this server (checked by Google DNS)" | tee -a installer.log
 				fi
 			fi
 			if [[ -z $(dig $sys_domain txt @8.8.8.8 | grep -i spf) ]]; then
-				echo "$(textb [HINT]) - You may want to setup a TXT record for SPF, see spfwizard.com for further information (checked by Google DNS)" | tee -a installer.log
+				echo "$(textb [HINT]) - You may want to setup a TXT record for SPF (checked by Google DNS)" | tee -a installer.log
 			fi
 			if [[ ! -z $(host dbltest.com.dbl.spamhaus.org | grep NXDOMAIN) || ! -z $(cat /etc/resolv.conf | grep '^nameserver 8.8.') ]]; then
 				echo "$(redb [CRIT]) - You either use Google DNS service or another blocked DNS provider for blacklist lookups. Consider using another DNS server for better spam detection." | tee -a installer.log

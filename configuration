@@ -1,6 +1,7 @@
 # Your servers new hostname and timezone.
-# FQDN would be mail.domain.com
+# FQDN will be "sys_hostname.sys_domain"
 # Example for valid timezone data: https://www.vmware.com/support/developer/vc-sdk/visdk400pubs/ReferenceGuide/timezone.html
+# If you plan to use "@sub.domain.tld" as mail domain, do NOT use "sub" as hostname!
 sys_hostname="mail"
 sys_domain="domain.com"
 sys_timezone="Europe/Berlin"
