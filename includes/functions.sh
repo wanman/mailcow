@@ -315,7 +315,9 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		clamav)
 			usermod -a -G clamav vmail
-			freshclam
+			if [[ -z "$(pgrep freshclam)" ]]; then
+				freshclam
+			fi
             ;;
 		opendkim)
 			echo 'SOCKET="inet:10040@localhost"' > /etc/default/opendkim
