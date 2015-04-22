@@ -162,9 +162,6 @@ EOF
 				echo "$(redb [ERR]) - Cannot set your hostname"
 				exit 1
 			fi
-			echo "$(textb [INFO]) - Installing prerequisites..."
-			apt-get -y update > /dev/null ; apt-get -y install lsb-release dbus whiptail apt-utils ssl-cert > /dev/null 2>&1
-			/usr/sbin/make-ssl-cert generate-default-snakeoil --force-overwrite
 			echo "$(textb [INFO]) - Setting your hostname..."
 			if [[ -f /lib/systemd/systemd ]]; then
 				hostnamectl set-hostname $sys_hostname
@@ -186,14 +183,17 @@ EOF
 			fi
 			;;
 		installpackages)
+			echo "$(textb [INFO]) - Installing prerequisites..."
+			apt-get -y update > /dev/null ; apt-get -y install lsb-release dbus whiptail apt-utils ssl-cert > /dev/null 2>&1
+			/usr/sbin/make-ssl-cert generate-default-snakeoil --force-overwrite
 			dist_codename=$(lsb_release -cs)
 			# Detect and edit repos
 			if [[ $dist_codename == "wheezy" ]] && [[ -z $(grep -E "^deb(.*)wheezy-backports(.*)" /etc/apt/sources.list) ]]; then
 				echo "$(textb [INFO]) - Enabling wheezy-backports..."
-				echo -e "\ndeb http://http.debian.net/debian wheezy-backports main" >> /etc/apt/sources.list
+				echo -e "\ndeb http://http.debian.net/debian wheezy-backports main contrib non-free" >> /etc/apt/sources.list
 				apt-get -y update >/dev/null
 			fi
-			if [[ -z $(grep -E "^deb(.*)non-free(.*)" /etc/apt/sources.list) ]] && [[ $conf_httpd == "apache2" ]]; then
+			if [[ -z $(grep -E "^deb(.*)non-free(.*)" /etc/apt/sources.list | grep -v -E "updates|backport") ]] && [[ $conf_httpd == "apache2" ]]; then
 				echo "$(textb [INFO]) - Enabling non-free repository (for libapache2-mod-fastcgi)..."
 				sed -i "s/ $dist_codename main/ $dist_codename main non-free/g" /etc/apt/sources.list
 				apt-get -y update >/dev/null
