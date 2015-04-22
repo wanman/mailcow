@@ -22,12 +22,16 @@ function return_fufix_config($s) {
 			preg_match('#\((.*?)\)#', $read_mime_check, $match);
 			return $match[1];
 			break;
-		case "vtenable":
+		case "vfilter":
 			$read_mime_check = file($GLOBALS["fufix_reject_attachments"])[0];
 			if (strpos($read_mime_check,'FILTER') !== false) { return "checked"; } else { return false; }
 			break;
 		case "anonymize":
 			$state = file_get_contents($GLOBALS["fufix_anonymize_headers"]);
+			if (!empty($state)) { return "checked"; } else { return false; }
+			break;
+		case "vtenable":
+			$state = file_get_contents($GLOBALS["VT_ENABLE"]);
 			if (!empty($state)) { return "checked"; } else { return false; }
 			break;
 		case "vtupload":
@@ -57,6 +61,14 @@ function set_fufix_config($s, $v = "", $vext = "") {
 			}
 			else {
 				file_put_contents($GLOBALS["VT_ENABLE_UPLOAD"], "1");
+			}
+			break;
+		case "vtenable":
+			if ($v != "1") {
+				file_put_contents($GLOBALS["VT_ENABLE"], "");
+			}
+			else {
+				file_put_contents($GLOBALS["VT_ENABLE"], "1");
 			}
 			break;
 		case "maxmsgsize":
@@ -140,19 +152,33 @@ function opendkim_table($action = "show", $which = "") {
 			break;
 	}
 }
-function echo_sys_info($what) {
+function echo_sys_info($what, $extra="") {
 	switch ($what) {
 		case "ram":
-			echo round(`free | grep Mem | awk '{print $3/$2 * 100.0}'`);
+			echo round(shell_exec('free | grep Mem | awk \'{print $3/$2 * 100.0}\''));
 			break;
 		case "maildisk":
-			echo preg_replace('/\D/', '', `df -h /var/vmail/ | tail -n1 | awk {'print $5'}`);
+			echo preg_replace('/\D/', '', shell_exec('df -h /var/vmail/ | tail -n1 | awk {\'print $5\'}'));
 			break;
 		case "mailq":
-			echo `mailq`;
+			echo shell_exec("mailq");
 			break;
+		case "positives";
+			$pos = count(glob("/opt/vfilter/clamav_positives/" . "message.*"));
+			if (empty($pos)) {
+				echo "0";
+			}
+			else {
+				echo $pos;
+			}
 		case "vfilterlog":
-			$output = shell_exec("sudo -u vmail /usr/bin/tail /opt/vfilter/log/vfilter.log");
+			if ( is_numeric($extra) && $extra <= 70) {
+				$lines = $extra;
+			}
+			else {
+				$lines = "30";
+			};
+			$output = shell_exec("sudo -u vmail /usr/bin/tail -n $lines /opt/vfilter/log/vfilter.log");
 			if ($output != NULL) {
 				return $output;
 			}

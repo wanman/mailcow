@@ -221,7 +221,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install jq dnsutils python
 python-magic libmail-spf-perl libmail-dkim-perl openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server mailutils \
-postfix-mysql postfix-pcre spamassassin spamc sudo bzip2 curl mpack opendkim opendkim-tools \
+postfix-mysql postfix-pcre spamassassin spamc sudo bzip2 curl mpack opendkim opendkim-tools unzip clamav-daemon \
 fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl bsd-mailx >/dev/null
 			if [ "$?" -ne "0" ]; then
 				echo "$(redb [ERR]) - Package installation failed"
@@ -277,7 +277,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown www-data: /etc/postfix/fufix_*
 			sed -i "/%www-data/d" /etc/sudoers 2> /dev/null
 			sed -i "/%vmail/d" /etc/sudoers 2> /dev/null
-			echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /usr/local/bin/opendkim-keycontrol, /usr/local/bin/fufix_msg_size, /usr/bin/tail /opt/vfilter/log/vfilter.log' >> /etc/sudoers
+			echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /usr/local/bin/opendkim-keycontrol, /usr/local/bin/fufix_msg_size, /usr/bin/tail * /opt/vfilter/log/vfilter.log' >> /etc/sudoers
 			echo '%vmail ALL=(ALL) NOPASSWD: /usr/bin/spamc*' >> /etc/sudoers
 			;;
 		dovecot)
@@ -312,6 +312,10 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			install -m 600 vfilter/vfilter.conf /opt/vfilter/vfilter.conf
 			chown -R vmail:vmail /opt/vfilter
 			;;
+		clamav)
+			usermod -a -G clamav vmail
+			freshclam
+            ;;
 		opendkim)
 			echo 'SOCKET="inet:10040@localhost"' > /etc/default/opendkim
 			mkdir -p /etc/opendkim/{keyfiles,dnstxt} 2> /dev/null
@@ -368,8 +372,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			tar xf pfadmin/inst/$postfixadmin_revision.tar -C pfadmin/inst/
 			mkdir -p /var/www/mail/pfadmin /var/run/fetchmail /etc/mail/postfixadmin 2> /dev/null
 			cp -R webserver/htdocs/{fcc,index.php,robots.txt,autoconfig.xml} /var/www/mail/
-			touch /var/www/VT_API_KEY
-			touch /var/www/VT_ENABLE_UPLOAD
+			touch /var/www/{VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD}
 			mv pfadmin/inst/$postfixadmin_revision/* /var/www/mail/pfadmin/
 			install -m 755 /var/www/mail/pfadmin/ADDITIONS/fetchmail.pl /usr/local/bin/fetchmail.pl
 			install -m 644 pfadmin/conf/config.local.php /var/www/mail/pfadmin/config.local.php
@@ -428,7 +431,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		restartservices)
 			[[ -f /lib/systemd/systemd ]] && echo "$(textb [INFO]) - Restarting services, this may take a few seconds..."
-			for var in fail2ban rsyslog $conf_httpd php5-fpm spamassassin mysql dovecot postfix opendkim
+			for var in fail2ban rsyslog $conf_httpd php5-fpm spamassassin mysql dovecot postfix opendkim clamav-daemon
 			do
 				service $var stop
 				sleep 1.5
@@ -519,7 +522,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 		cp -R /etc/{postfix,dovecot,spamassassin,fail2ban,$conf_httpd,mysql,php5} before_upgrade_$timestamp/
     echo -e "$(greenb "[OK]")"
 	echo -en "\nStopping services, this may take a few seconds... \t\t"
-	for var in fail2ban rsyslog $conf_httpd php5-fpm spamassassin dovecot postfix opendkim
+	for var in fail2ban rsyslog $conf_httpd php5-fpm spamassassin dovecot postfix opendkim clamav-daemon
 	do
 		service $var stop > /dev/null 2>&1
 	done
@@ -540,10 +543,13 @@ A backup will be stored in ./before_upgrade_$timestamp
 	returnwait "Postfix configuration" "Dovecot configuration"
 
 	installtask dovecot
-	returnwait "Dovecot configuration" "VirusTotal filter configuration"
+	returnwait "Dovecot configuration" "vfilter configuration"
 
 	installtask vfilter
-	returnwait "VirusTotal filter configuration" "Spamassassin configuration"
+	returnwait "vfilter configuration" "ClamAV configuration"
+
+    installtask clamav
+    returnwait "ClamAV configuration" "Spamassassin configuration"
 
 	installtask spamassassin
 	returnwait "Spamassassin configuration" "Webserver configuration"

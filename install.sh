@@ -87,10 +87,13 @@ installtask postfix
 returnwait "Postfix configuration" "Dovecot configuration"
 
 installtask dovecot
-returnwait "Dovecot configuration" "VirusTotal filter configuration"
+returnwait "Dovecot configuration" "vfilter configuration"
 
 installtask vfilter
-returnwait "VirusTotal filter configuration" "Spamassassin configuration"
+returnwait "vfilter configuration" "ClamAV configuration"
+
+installtask clamav
+returnwait "ClamAV configuration" "Spamassassin configuration"
 
 installtask spamassassin
 returnwait "Spamassassin configuration" "Webserver configuration"

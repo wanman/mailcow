@@ -20,7 +20,7 @@ if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "
 		opendkim_table("add", $_POST["dkim_selector"] . "_" . $_POST["dkim_domain"]);
 	}
 	if (isset($_POST["ext"])) {
-		if (isset($_POST["virustotaltoggle"]) && $_POST["virustotaltoggle"] == "on") {
+		if (isset($_POST["vfilter"]) && $_POST["vfilter"] == "filter") {
 			set_fufix_config("extlist", $_POST["ext"], "filter");
 		} else {
 			set_fufix_config("extlist", $_POST["ext"], "reject");
@@ -29,6 +29,11 @@ if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "
 			set_fufix_config("vtupload", "0");
 		} else {
 			set_fufix_config("vtupload", "1");
+		}
+		if (isset($_POST["virustotalenable"]) && $_POST["virustotalenable"] == "on") {
+			set_fufix_config("vtenable", "1");
+		} else {
+			set_fufix_config("vtenable", "0");
 		}
 		postfix_reload();
 	}

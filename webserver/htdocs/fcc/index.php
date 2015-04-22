@@ -66,36 +66,58 @@ if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "
 	<input class="form-control" type="text" id="ext" name="ext" value="<?php echo return_fufix_config("extlist") ?>">
 	<p><pre>Format: ext1|ext1|ext3
 Enter "DISABLED" to disable this feature.</pre></p>
+	<div class="radio">
+		<label>
+		<input type="radio" name="vfilter" id="vfilter_reject_button" value="reject" <?php if (!return_fufix_config("vfilter")) { echo "checked"; } ?>>
+		Reject attachments with a dangerous file extension
+		</label>
+	</div>
+	<div class="radio">
+		<label>
+		<input type="radio" name="vfilter" id="vfilter_scan_button" value="filter" <?php echo return_fufix_config("vfilter") ?>>
+		Scan attachments with ClamAV and/or upload to VirusTotal
+		</label>
+	</div>
 	<hr>
 	<div class="row">
-		<div class="col-md-10">
-		<small>
-		<h4>VirusTotal Uploader</h4>
-		<p>Scan dangerous attachments with VirusTotal. You will receive a mail including a link to the results. If disabled, those mails will be <b>rejected</b></p>
-		<p><b>File size limitations</b> (VirusTotal Public API v2.0)
-		<ul>
-			<li>32M/upload</em></li>
-			<li>200M/hash</em></li>
-			<li><a href="https://www.virustotal.com/de/documentation/public-api/" target="_blank">see API doc.</a></li>
-		</ul>
-		</p>
-		<div class="checkbox">
-				<label>
-				<input name="virustotaltoggle" type="checkbox"  <?php echo return_fufix_config("vtenable") ?>>
-				Enable VirusTotal Uploader
-				</label>
+		<div class="col-sm-6">
+			<small>
+			<h4>ClamAV</h4>
+			<p>ClamAV will scan dangerous file types when <em>"Scan attachments with ClamAV and/or upload to VirusTotal"</em> is enabled.</p>
+			<code><?php echo_sys_info("positives"); ?> messages</code> were blocked and saved to <code>/opt/vfilter/clamav_positives/</code></p>
+			<p>Clean directory to reset counter.</p>
+			</small>
 		</div>
-		<div class="checkbox">
-				<label>
-				<input name="virustotalcheckonly" type="checkbox"  <?php echo return_fufix_config("vtupload") ?>>
-				Do <b>not</b> upload files to VirusTotal but check for a previous scan report.
-				</label>
+		<div class="col-sm-6">
+			<small>
+			<h4>VirusTotal Uploader</h4>
+			<p>Enabling the "VirusTotal Uploader" <b>will not disable ClamAV</b>.</p>
+			<div class="checkbox">
+					<label>
+					<input name="virustotalenable" type="checkbox" <?php echo return_fufix_config("vtenable") ?>>
+					Use the "VirusTotal Uploader" feature
+					</label>
+			</div>
+			<p>Scan dangerous attachments via VirusTotal Public API.</p>
+			<p><b>File handling and limitations</b> (<a href="https://www.virustotal.com/de/documentation/public-api/" target="_blank">VirusTotal Public API v2.0</a>)
+			<ul>
+				<li>Files up to 200M will be hashed. If a previous scan result was found, it will be attached.</em></li>
+				<li>Files smaller than 32M will be uploaded if no previous scan result was found.</em></li>
+			</ul>
+			</p>
+			<div class="checkbox">
+					<label>
+					<input name="virustotalcheckonly" type="checkbox"  <?php echo return_fufix_config("vtupload") ?>>
+					Do <b>not</b> upload files to VirusTotal but check for a previous scan report. This also requires an API key!
+					</label>
+			</div>
+			<label for="vtapikey">VirusTotal API Key, 64 char. alphanumeric (<a href="https://www.virustotal.com/documentation/virustotal-community/#retrieve-api-key" target="_blank">?</a>)</label>
+			<p><input class="form-control" id="vtapikey" type="text" name="vtapikey" pattern="[a-zA-Z0-9]{64}" value="<?php echo return_fufix_config("vtapikey"); ?>"></p>
+			</small>
 		</div>
-		<label for="vtapikey">VirusTotal API Key, 64 char. alphanumeric (<a href="https://www.virustotal.com/documentation/virustotal-community/#retrieve-api-key" target="_blank">?</a>)</label>
-		<p><input class="form-control" id="vtapikey" type="text" name="vtapikey" pattern="[a-zA-Z0-9]{64}" value="<?php echo return_fufix_config("vtapikey"); ?>"></p>
-		<p><b>Filter Log (tail)</b></p>
-		<p><pre><?php echo echo_sys_info("vfilterlog"); ?></pre></p>
-		</small>
+		<div class="col-sm-12">
+		<h4>Filter Log (newest)</h4>
+		<p><pre><?php echo echo_sys_info("vfilterlog", "20"); ?></pre></p>
 		</div>
 	</div>
 	<br /><button type="submit" class="btn btn-primary btn-sm">Apply</button>

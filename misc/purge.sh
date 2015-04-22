@@ -25,7 +25,7 @@ rm /lib/systemd/system/fail2ban.service
 apt-get -y purge php5 python-sqlalchemy python-beautifulsoup python-setuptools \
 python-magic php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap subversion \
-php5-intl php5-mcrypt php5-mysql php5-sqlite dovecot-common dovecot-core \
+php5-intl php5-mcrypt php5-mysql php5-sqlite dovecot-common dovecot-core clamav-daemon clamav clamav-base clamav-freshclam \
 dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d postfix \
 postfix-mysql postfix-pcre spamassassin curl mpack
 apt-get -y purge dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-pop3d dovecot-sieve
