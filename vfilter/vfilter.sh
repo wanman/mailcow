@@ -39,7 +39,7 @@ chmod 644 /opt/vfilter/tempdir/message.$$
 clamav_scan_result=$(clamdscan --stdout --infected --no-summary /opt/vfilter/tempdir/message.$$ | cat)
 if [[ $clamav_scan_result =~ "FOUND" ]]; then
 	write_log "ClamAV: Message infected: $clamav_scan_result"
-	[[ ! -d /opt/vfilter/clamav_positives ]] && mkdir /opt/vfilter/clamav_positives
+	[[ ! -d /opt/vfilter/clamav_positives ]] && install -d /opt/vfilter/clamav_positives -m 755
 	mv /opt/vfilter/tempdir/message.$$ /opt/vfilter/clamav_positives/message.$$
 	write_log "ClamAV: Moved infected message to /opt/vfilter/clamav_positives/message.$$"
 	# Return permission denied

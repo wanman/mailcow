@@ -310,6 +310,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			install -m 755 vfilter/vfilter.sh /opt/vfilter/vfilter.sh
 			install -m 644 vfilter/replies /opt/vfilter/replies
 			install -m 600 vfilter/vfilter.conf /opt/vfilter/vfilter.conf
+			install -m 755 -d /opt/vfilter/clamav_positives
 			chown -R vmail:vmail /opt/vfilter
 			;;
 		clamav)
