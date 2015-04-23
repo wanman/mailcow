@@ -312,7 +312,9 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		clamav)
 			usermod -a -G clamav vmail
-			if [[ -z "$(pgrep freshclam)" ]]; then
+			# A second freshclam process indicates freshclam is already updating
+			# First process is freshclam in daemon mode
+			if [[ $(pgrep freshclam | wc -l) -lt 2 ]]; then
 				freshclam
 			fi
             ;;
