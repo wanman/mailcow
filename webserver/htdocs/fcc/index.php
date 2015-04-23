@@ -84,7 +84,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 			<small>
 			<h4>ClamAV</h4>
 			<p>ClamAV will scan dangerous file types when <em>"Scan attachments with ClamAV and/or upload to VirusTotal"</em> is enabled.</p>
-			<code><?php echo_sys_info("positives"); ?> messages</code> were blocked and saved to <code>/opt/vfilter/clamav_positives/</code></p>
+			<code><?php echo_sys_info("positives"); ?> messages</code> were quarantined and saved to <code>/opt/vfilter/clamav_positives/</code></p>
 			<p>Clean directory to reset counter.</p>
 			</small>
 		</div>

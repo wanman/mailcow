@@ -193,7 +193,7 @@ EOF
 			# Detect and edit repos
 			if [[ $dist_codename == "wheezy" ]] && [[ -z $(grep -E "^deb(.*)wheezy-backports(.*)" /etc/apt/sources.list) ]]; then
 				echo "$(textb [INFO]) - Enabling wheezy-backports..."
-				echo -e "\ndeb http://http.debian.net/debian wheezy-backports main contrib non-free" >> /etc/apt/sources.list
+				echo -e "\ndeb http://http.debian.net/debian wheezy-backports main" >> /etc/apt/sources.list
 				apt-get -y update >/dev/null
 			fi
 			if [[ -z $(grep -E "^deb(.*)non-free(.*)" /etc/apt/sources.list | grep -v -E "updates|backport") ]] && [[ $conf_httpd == "apache2" ]]; then
