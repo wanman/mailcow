@@ -117,6 +117,9 @@ checkconfig() {
 	if [[ $conf_httpd != "nginx" && $conf_httpd != "apache2" ]]; then
 		echo "$(redb [ERR]) - \"conf_httpd\" is neither nginx nor apache2"
 		exit 1
+	elif [[ $conf_httpd = "apache2" && -z $(apt-cache show apache2 | grep Version | grep "2.4") ]]; then
+		echo "$(redb [ERR]) - Unable to install Apache 2.4, please use Nginx or upgrade your distribution"
+        exit 1
 	fi
     for var in sys_hostname sys_domain sys_timezone my_postfixdb my_postfixuser my_postfixpass my_rootpw my_rcuser my_rcpass my_rcdb pfadmin_adminuser pfadmin_adminpass cert_country cert_state cert_city cert_org
     do
@@ -198,17 +201,11 @@ EOF
 				sed -i "s/ $dist_codename main/ $dist_codename main non-free/g" /etc/apt/sources.list
 				apt-get -y update >/dev/null
 			fi
-
 			if [[ ! -z $(grep -E "^deb(.*)wheezy-backports(.*)" /etc/apt/sources.list) ]]; then
 				echo "$(textb [INFO]) - Installing jq and python-magic from wheezy-backports..."
 				apt-get -y update >/dev/null ; apt-get -y install jq python-magic -t wheezy-backports >/dev/null
 			fi
-
-			# Web server installation
-			if [[ ! -z $(grep -E "^deb(.*)wheezy-backports(.*)" /etc/apt/sources.list) ]] && [[ $conf_httpd == "apache2" ]]; then
-				echo "$(textb [INFO]) - Installing Apache2 and components from wheezy-backports..."
-				apt-get -y install apache2 apache2-utils libapache2-mod-fastcgi -t wheezy-backports >/dev/null
-            elif [[ $conf_httpd == "apache2" ]]; then
+            if [[ $conf_httpd == "apache2" ]]; then
 				echo "$(textb [INFO]) - Installing Apache2 and components..."
 				apt-get -y install apache2 apache2-utils libapache2-mod-fastcgi >/dev/null
 			elif [[ $conf_httpd == "nginx" ]]; then
