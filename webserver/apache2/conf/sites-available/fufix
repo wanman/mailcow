@@ -1,28 +1,13 @@
-<Directory />
-	Options +FollowSymLinks -Indexes
-	AllowOverride Limit Indexes AuthConfig
-	Require all granted
-</Directory>
-<IfModule mod_fastcgi.c>
-	Action fcgi-php-fpm /fcgi-php-fpm virtual
-	Alias /fcgi-php-fpm /fcgi-php-fpm
-	FastCgiExternalServer /fcgi-php-fpm -socket /var/run/php5-fpm-mail.sock -pass-header Authorization
-</IfModule>
 <VirtualHost *:80>
 	ServerName "autoconfig.domain.tld"
 	DocumentRoot /var/www/mail
-	<FilesMatch ".+\.ph(p[345]?|t|tml)$">
-		SetHandler fcgi-php-fpm
-	</FilesMatch>
 	RewriteEngine On
 	RewriteRule ^/?(.*) /autoconfig.xml [L]
 </VirtualHost>
 <VirtualHost *:80>
 	ServerName "*"
 	DocumentRoot /var/www/mail
-	<FilesMatch ".+\.ph(p[345]?|t|tml)$">
-		SetHandler fcgi-php-fpm
-	</FilesMatch>
+	ProxyPassMatch ^/(.*\.php(/.*)?)$ unix:/var/run/php5-fpm-mail.sock|fcgi://127.0.0.1:9000/var/www/mail
 	RewriteEngine On
 	RewriteCond %{HTTPS} !=on
 	RewriteRule ^/?(.*) https://%{HTTP_HOST}/$1 [L,R,NE]
@@ -36,12 +21,10 @@
 		SSLEngine on
 		SSLCertificateFile /etc/ssl/mail/mail.crt
 		SSLCertificateKeyFile /etc/ssl/mail/mail.key
-		ErrorDocument 500 /fcc/
+		ErrorDocument 503 /fcc/
+        ProxyPassMatch ^/(.*\.php(/.*)?)$ unix:/var/run/php5-fpm-mail.sock|fcgi://127.0.0.1:9000/var/www/mail
 		<FilesMatch "\.(cgi|shtml|phtml|php)$">
 			SSLOptions +StdEnvVars
-		</FilesMatch>
-		<FilesMatch ".+\.ph(p[345]?|t|tml)$">
-			SetHandler fcgi-php-fpm
 		</FilesMatch>
 		BrowserMatch "MSIE [2-6]" \
 			nokeepalive ssl-unclean-shutdown \

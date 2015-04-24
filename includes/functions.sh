@@ -196,18 +196,13 @@ EOF
 				echo -e "\ndeb http://http.debian.net/debian wheezy-backports main" >> /etc/apt/sources.list
 				apt-get -y update >/dev/null
 			fi
-			if [[ -z $(grep -E "^deb(.*)non-free(.*)" /etc/apt/sources.list | grep -v -E "updates|backport") ]] && [[ $conf_httpd == "apache2" ]]; then
-				echo "$(textb [INFO]) - Enabling non-free repository (for libapache2-mod-fastcgi)..."
-				sed -i "s/ $dist_codename main/ $dist_codename main non-free/g" /etc/apt/sources.list
-				apt-get -y update >/dev/null
-			fi
 			if [[ ! -z $(grep -E "^deb(.*)wheezy-backports(.*)" /etc/apt/sources.list) ]]; then
 				echo "$(textb [INFO]) - Installing jq and python-magic from wheezy-backports..."
 				apt-get -y update >/dev/null ; apt-get -y install jq python-magic -t wheezy-backports >/dev/null
 			fi
             if [[ $conf_httpd == "apache2" ]]; then
 				echo "$(textb [INFO]) - Installing Apache2 and components..."
-				apt-get -y install apache2 apache2-utils libapache2-mod-fastcgi >/dev/null
+				apt-get -y install apache2 apache2-utils >/dev/null
 			elif [[ $conf_httpd == "nginx" ]]; then
 				echo "$(textb [INFO]) - Installing Nginx..."
 				apt-get -y install nginx-extras >/dev/null
@@ -350,7 +345,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 				ln -s /etc/apache2/sites-available/fufix /etc/apache2/sites-enabled/000-0-fufix.conf
 				sed -i "s/\"\*\"/\"$sys_hostname.$sys_domain\"/g" /etc/apache2/sites-available/fufix
                 sed -i "s/\"autoconfig.domain.tld\"/\"autoconfig.$sys_domain\"/g" /etc/apache2/sites-available/fufix
-				a2enmod actions fastcgi rewrite ssl > /dev/null 2>&1
+				a2enmod rewrite ssl > /dev/null 2>&1
 				if [ -d /etc/apache2/conf.d/ ]; then
 					apache_charsetconf="/etc/apache2/conf.d/charset"
 					apache_securityconf="/etc/apache2/conf.d/security"
