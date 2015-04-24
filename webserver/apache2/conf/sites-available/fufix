@@ -1,10 +1,16 @@
 <VirtualHost *:80>
+	ServerSignature off
+	TraceEnable off
+	AddDefaultCharset utf-8
 	ServerName "autoconfig.domain.tld"
 	DocumentRoot /var/www/mail
 	RewriteEngine On
 	RewriteRule ^/?(.*) /autoconfig.xml [L]
 </VirtualHost>
 <VirtualHost *:80>
+	ServerSignature off
+	TraceEnable off
+	AddDefaultCharset utf-8
 	ServerName "*"
 	DocumentRoot /var/www/mail
 	ProxyPassMatch ^/(.*\.php(/.*)?)$ unix:/var/run/php5-fpm-mail.sock|fcgi://127.0.0.1:9000/var/www/mail
@@ -14,6 +20,9 @@
 </VirtualHost>
 <IfModule mod_ssl.c>
 	<VirtualHost *:443>
+		ServerSignature off
+		TraceEnable off
+		AddDefaultCharset utf-8
 		ServerName "*"
 		DocumentRoot /var/www/mail
 		ErrorLog ${APACHE_LOG_DIR}/error.log

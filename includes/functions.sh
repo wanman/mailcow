@@ -345,18 +345,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 				ln -s /etc/apache2/sites-available/fufix /etc/apache2/sites-enabled/000-0-fufix.conf
 				sed -i "s/\"\*\"/\"$sys_hostname.$sys_domain\"/g" /etc/apache2/sites-available/fufix
                 sed -i "s/\"autoconfig.domain.tld\"/\"autoconfig.$sys_domain\"/g" /etc/apache2/sites-available/fufix
-				a2enmod rewrite ssl > /dev/null 2>&1
-				if [ -d /etc/apache2/conf.d/ ]; then
-					apache_charsetconf="/etc/apache2/conf.d/charset"
-					apache_securityconf="/etc/apache2/conf.d/security"
-				elif [ -d /etc/apache2/conf-available/ ]; then
-					apache_charsetconf="/etc/apache2/conf-available/charset.conf"
-					apache_securityconf="/etc/apache2/conf-available/security.conf"
-				fi
-				[[ -z $(grep -E "^AddDefaultCharset" $apache_charsetconf) ]] && echo -e "\nAddDefaultCharset UTF-8" >> $apache_charsetconf || sed -i "/^AddDefaultCharset/c\AddDefaultCharset UTF-8" $apache_charsetconf
-				[[ -z $(grep -E "^ServerTokens" $apache_securityconf) ]] && echo -e "\nServerTokens Minimal" >> $apache_securityconf || sed -i "/^ServerTokens/c\ServerTokens Minimal" $apache_securityconf
-				[[ -z $(grep -E "^ServerSignature" $apache_securityconf) ]] && echo -e "\nServerSignature off" >> $apache_securityconf || sed -i "/^ServerSignature/c\ServerSignature off" $apache_securityconf
-				[[ -z $(grep -E "^TraceEnable" $apache_securityconf) ]] && echo -e "\nTraceEnable off" >> $apache_securityconf || sed -i "/^TraceEnable/c\TraceEnable off" $apache_securityconf
+				a2enmod rewrite ssl proxy > /dev/null 2>&1
 			fi
 			cp php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
 			cp php5-fpm/conf/php-fpm.conf /etc/php5/fpm/php-fpm.conf
