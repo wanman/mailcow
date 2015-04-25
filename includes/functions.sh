@@ -454,11 +454,12 @@ upgradetask() {
 		echo "$(redb [ERR]) - Upgrade not supported"
 		return 1
 	fi
-	if [[ ! -z $(which apache2) ]]; then
+	if [[ ! -z $(which apache2) && -z $(apache2 -v | grep "2.4") ]]; then
 		conf_httpd="apache2"
 	elif [[ ! -z $(which nginx) ]]; then
 		conf_httpd="nginx"
 	else
+		echo "$(pinkb [NOTICE]) - Falling back to Nginx: Apache 2.4 was not available!"
 		conf_httpd="nginx"
 	fi
 	echo "$(textb [INFO]) - Installing prerequisites..."
