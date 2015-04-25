@@ -86,6 +86,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 			<p>ClamAV will scan dangerous file types when <em>"Scan attachments with ClamAV and/or upload to VirusTotal"</em> is enabled.</p>
 			<code><?php echo_sys_info("positives"); ?> message/s</code> was/were quarantined and saved to <code>/opt/vfilter/clamav_positives/</code></p>
 			<p>Clean directory to reset counter.</p>
+			<p><a href="?av_dl">Download quarantined messages</a></p>
 			</small>
 		</div>
 		<div class="col-sm-6">
@@ -195,7 +196,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <div id="dnsrecords" class="collapse out">
 <p>Below you see a list of <em>recommended</em> DNS records.</p>
 <p>While some are mandatory for a mail server (A, MX), others are recommended to build a good reputation score (TXT/SPF) or used for auto-configuration of mail clients (A: "autoconfig" and SRV records).</p>
-<p>In this automatically generated DNS zone file snippet, <strong>a generic TXT/SPF record</strong> is used to only allow THIS server to send mail for your domain. Please refer to <a href="http://www.openspf.org/SPF_Record_Syntax" target="_blank">openspf.org</a>.</p>
+<p>In this automatically generated DNS zone file snippet, a simple TXT/SPF record is used to only allow THIS server (the MX) to send mail for your domain. Every other server is disallowed ("-all"). Please refer to <a href="http://www.openspf.org/SPF_Record_Syntax" target="_blank">openspf.org</a>.</p>
 <p>It is <strong>highly recommended</strong> to create a DKIM TXT record with the <em>DKIM Signing</em> utility tool above and install the given TXT record to your nameserver, too.</p>
 <pre style="border: 0px; background-color: #333; color: #7CFC00;">
 ; ================

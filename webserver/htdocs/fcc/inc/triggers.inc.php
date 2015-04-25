@@ -6,6 +6,12 @@ if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "
 	if (isset($_GET["del"])) {
 		opendkim_table("delete", $_GET["del"]);
 	}
+	if (isset($_GET["av_dl"])) {
+		dl_clamav_positives();
+	}
+	else {
+		unlink("/tmp/clamav_positives.zip");
+	}
 	if (isset($_POST["vtapikey"]) && ctype_alnum($_POST["vtapikey"])) {
 		set_fufix_config("vtapikey", $_POST["vtapikey"]);
 	}

@@ -15,6 +15,25 @@ function check_login($user, $pass, $pfconfig) {
 	}
 	return false;
 }
+function dl_clamav_positives() {
+	$files = scandir("/opt/vfilter/clamav_positives");
+	$files = array_diff($files, array('.', '..'));
+	if (empty($files)) { return false; }
+	$zipname = "/tmp/clamav_positives.zip";
+	$zip = new ZipArchive;
+	$zip->open($zipname, ZipArchive::CREATE);
+	foreach ($files as $file) {
+		$zip->addFile("/opt/vfilter/clamav_positives/$file", "$file");
+	}
+	$zip->close();
+	header("Content-Disposition: attachment; filename=clamav_positives.zip");
+	header("Content-length: " . filesize("/tmp/clamav_positives.zip"));
+	header("Pragma: no-cache");
+	header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+	header("Expires: 0");
+	readfile("/tmp/clamav_positives.zip");
+
+}
 function return_fufix_config($s) {
 	switch ($s) {
 		case "extlist":
