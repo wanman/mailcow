@@ -23,7 +23,7 @@ function dl_clamav_positives() {
 	$zip = new ZipArchive;
 	$zip->open($zipname, ZipArchive::CREATE);
 	foreach ($files as $file) {
-		$zip->addFile("/opt/vfilter/clamav_positives/$file", "$file");
+		$zip->addFile("/opt/vfilter/clamav_positives/$file", "$file" . ".txt");
 	}
 	$zip->close();
 	header("Content-Disposition: attachment; filename=clamav_positives.zip");
