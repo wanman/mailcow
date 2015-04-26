@@ -295,3 +295,8 @@ Your web server + web root, MySQL server + databases as well as your mail direct
 
 Please open and review the script before running it!
 
+**You can perform a FULL WIPE** by appending `--all`:
+
+```bash misc/purge.sh --all```
+
+This WILL purge sensible data like your web root, databases + MySQL installation, mail directory and more... 

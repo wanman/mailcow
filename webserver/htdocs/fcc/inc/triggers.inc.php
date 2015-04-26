@@ -41,6 +41,11 @@ if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "
 		} else {
 			set_fufix_config("vtenable", "0");
 		}
+		if (isset($_POST["clamavenable"]) && $_POST["clamavenable"] == "on") {
+			set_fufix_config("cavenable", "1");
+		} else {
+			set_fufix_config("cavenable", "0");
+		}
 		postfix_reload();
 	}
 	if (isset($_POST["anonymize_"])) {

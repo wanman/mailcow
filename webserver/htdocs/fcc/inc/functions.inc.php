@@ -53,6 +53,10 @@ function return_fufix_config($s) {
 			$state = file_get_contents($GLOBALS["VT_ENABLE"]);
 			if (!empty($state)) { return "checked"; } else { return false; }
 			break;
+		case "cavenable":
+			$state = file_get_contents($GLOBALS["CAV_ENABLE"]);
+			if (!empty($state)) { return "checked"; } else { return false; }
+			break;
 		case "vtupload":
 			$state = file_get_contents($GLOBALS["VT_ENABLE_UPLOAD"]);
 			if (empty($state)) { return "checked"; } else { return false; }
@@ -88,6 +92,14 @@ function set_fufix_config($s, $v = "", $vext = "") {
 			}
 			else {
 				file_put_contents($GLOBALS["VT_ENABLE"], "1");
+			}
+			break;
+		case "cavenable":
+			if ($v != "1") {
+				file_put_contents($GLOBALS["CAV_ENABLE"], "");
+			}
+			else {
+				file_put_contents($GLOBALS["CAV_ENABLE"], "1");
 			}
 			break;
 		case "maxmsgsize":

@@ -1,15 +1,50 @@
 #!/bin/bash
+usage() {
+    echo "
+    --help | -h
+        Print this text
 
+    --all | -a
+        Completly purge fufix and ALL of its components including databases, mail dreictory etc.
+    "
+}
+
+case $1 in
+    "-a" | "--all" )
+		FULLWIPE="yes"
+        ;;
+    "-h" | "--help" )
+		usage
+		exit 0
+        ;;
+esac
+
+
+if [[ $FULLWIPE == "yes" ]]; then
+echo '
+###############
+# # WARNING # #
+###############
+# Open and review this script before running it!
+# Use with caution! You are about to perform a FULL WIPE of fufix.
+# This may remove packages and data you do not want to be removed.
+###############
+'
+else
 echo '
 ###############
 # # WARNING # #
 ###############
 # Use with caution!
-# Open and review this script before running it!
 # Web server + web root, MySQL server + databases as well as
 # your mail directory (/var/vmail) will not be removed.
+#
+# Use "--all" parameter to perform a full wipe.
+#
 ###############
 '
+fi
+
 read -p "Type \"confirm\" to continue: " confirminput
 [[ $confirminput == "confirm" ]] || exit 0
 echo "Please wait..."
@@ -22,10 +57,18 @@ update-rc.d -f fail2ban remove
 systemctl disable fail2ban
 rm /lib/systemd/system/fail2ban.service
 # dovecot purge fails at first
-apt-get -y purge php5 python-sqlalchemy python-beautifulsoup python-setuptools \
+if [[ $FULLWIPE == "yes" ]]; then
+apt-get -y purge zip jq dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
+python-magic libmail-spf-perl libmail-dkim-perl openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
+php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
+php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server mailutils \
+postfix-mysql postfix-pcre spamassassin spamc sudo bzip2 curl mpack opendkim opendkim-tools unzip clamav-daemon \
+fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl bsd-mailx
+fi
+apt-get -y purge zip php5 python-sqlalchemy python-beautifulsoup python-setuptools \
 python-magic php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap subversion \
-php5-intl php5-mcrypt php5-mysql php5-sqlite dovecot-common dovecot-core clamav-daemon clamav clamav-base clamav-freshclam \
+php5-intl php5-mcrypt php5-sqlite dovecot-common dovecot-core clamav-daemon clamav clamav-base clamav-freshclam \
 dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d postfix \
 postfix-mysql postfix-pcre spamassassin curl mpack
 apt-get -y purge dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-pop3d dovecot-sieve
@@ -34,12 +77,17 @@ apt-get -y purge dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-pop3d 
 apt-get -y autoremove --purge
 killall -u vmail
 userdel vmail
+if [[ $FULLWIPE == "yes" ]]; then
+rm -rf /var/lib/mysql
+rm -rf /opt/vfilter
+rm -rf /var/vmail
+rm -rf /var/www
+fi
 rm -rf /etc/ssl/mail/
 rm -rf /etc/spamassassin/
 rm -rf /etc/dovecot/
 rm -rf /etc/postfix/
 rm -rf /etc/fail2ban/
-rm -rf /etc/php5/
 rm -rf /etc/mail/postfixadmin
 rm -rf /var/www/mail
 rm -rf /var/run/fetchmail

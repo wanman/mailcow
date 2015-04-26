@@ -11,8 +11,8 @@ usage() {
 	--help | -h
 		Print this text
 
-	--upgrade-from-file installer.log | -u installer.log
-		Upgrade using a previous \"installer.log\" file
+	--upgrade-from-file | -u
+		Upgrade fufix to a newer version
 	"
 }
 
@@ -360,7 +360,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			tar xf pfadmin/inst/$postfixadmin_revision.tar -C pfadmin/inst/
 			mkdir -p /var/www/mail/pfadmin /var/run/fetchmail /etc/mail/postfixadmin 2> /dev/null
 			cp -R webserver/htdocs/{fcc,index.php,robots.txt,autoconfig.xml} /var/www/mail/
-			touch /var/www/{VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD}
+			touch /var/www/{VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE}
 			mv pfadmin/inst/$postfixadmin_revision/* /var/www/mail/pfadmin/
 			install -m 755 /var/www/mail/pfadmin/ADDITIONS/fetchmail.pl /usr/local/bin/fetchmail.pl
 			install -m 644 pfadmin/conf/config.local.php /var/www/mail/pfadmin/config.local.php

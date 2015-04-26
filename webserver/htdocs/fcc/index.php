@@ -83,6 +83,12 @@ Enter "DISABLED" to disable this feature.</pre></p>
 		<div class="col-sm-6">
 			<small>
 			<h4>ClamAV</h4>
+			<div class="checkbox">
+					<label>
+					<input name="clamavenable" type="checkbox" <?php echo return_fufix_config("cavenable") ?>>
+					Use ClamAV to scan mail
+					</label>
+			</div>
 			<p>ClamAV will scan dangerous file types when <em>"Scan attachments with ClamAV and/or upload to VirusTotal"</em> is enabled.</p>
 			<code><?php echo_sys_info("positives"); ?> message/s</code> was/were quarantined and saved to <code>/opt/vfilter/clamav_positives/</code></p>
 			<p>Clean directory to reset counter.</p>
@@ -92,7 +98,6 @@ Enter "DISABLED" to disable this feature.</pre></p>
 		<div class="col-sm-6">
 			<small>
 			<h4>VirusTotal Uploader</h4>
-			<p>Enabling the "VirusTotal Uploader" <b>will not disable ClamAV</b>.</p>
 			<div class="checkbox">
 					<label>
 					<input name="virustotalenable" type="checkbox" <?php echo return_fufix_config("vtenable") ?>>

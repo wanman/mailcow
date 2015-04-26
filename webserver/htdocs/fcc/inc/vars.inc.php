@@ -12,6 +12,7 @@ $fufix_sender_access = "/etc/postfix/fufix_sender_access";
 $fufix_opendkim_dnstxt_folder = "/etc/opendkim/dnstxt";
 $VT_API_KEY = "/var/www/VT_API_KEY";
 $VT_ENABLE = "/var/www/VT_ENABLE";
+$CAV_ENABLE = "/var/www/CAV_ENABLE";
 $VT_ENABLE_UPLOAD = "/var/www/VT_ENABLE_UPLOAD";
 $MYHOSTNAME=exec("/usr/sbin/postconf -h myhostname");
 $MYHOSTNAME_0=explode(".", exec("/usr/sbin/postconf -h myhostname"))[0];

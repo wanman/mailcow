@@ -33,19 +33,23 @@ fi
 # Pipe message into a file
 cat > /opt/vfilter/tempdir/message.$$
 
-write_log "ClamAV: Scanner running"
-chmod 644 /opt/vfilter/tempdir/message.$$
-# Infected files make ClamAV return exit code 1, which would stop the filter process
-clamav_scan_result=$(clamdscan --stdout --infected --no-summary /opt/vfilter/tempdir/message.$$ | cat)
-if [[ $clamav_scan_result =~ "FOUND" ]]; then
-	write_log "ClamAV: Message infected: $clamav_scan_result"
-	[[ ! -d /opt/vfilter/clamav_positives ]] && install -d /opt/vfilter/clamav_positives -m 755
-	mv /opt/vfilter/tempdir/message.$$ /opt/vfilter/clamav_positives/message.$$
-	write_log "ClamAV: Moved infected message to /opt/vfilter/clamav_positives/message.$$"
-	# Return permission denied
-	exit 77
+if [[ $ENABLE_CAV == "1" ]]; then
+	write_log "ClamAV: Scanner running"
+	chmod 644 /opt/vfilter/tempdir/message.$$
+	# Infected files make ClamAV return exit code 1, which would stop the filter process
+	clamav_scan_result=$(clamdscan --stdout --infected --no-summary /opt/vfilter/tempdir/message.$$ | cat)
+	if [[ $clamav_scan_result =~ "FOUND" ]]; then
+		write_log "ClamAV: Message infected: $clamav_scan_result"
+		[[ ! -d /opt/vfilter/clamav_positives ]] && install -d /opt/vfilter/clamav_positives -m 755
+		mv /opt/vfilter/tempdir/message.$$ /opt/vfilter/clamav_positives/message.$$
+		write_log "ClamAV: Moved infected message to /opt/vfilter/clamav_positives/message.$$"
+		# Return permission denied
+		exit 77
+	fi
+	write_log "ClamAV: Clean message"
+else
+	write_log "ClamAV skipped"
 fi
-write_log "ClamAV: Clean message"
 
 # Pipe original message to next-hop for further processing NOW
 if [[ $($NEXTHOP < /opt/vfilter/tempdir/message.$$; echo ${PIPESTATUS[@]}) -ne 0 ]]; then
@@ -61,14 +65,15 @@ messageid=$(sed '/^Message-ID: */!d; s///;q' /opt/vfilter/tempdir/message.$$)
 # Create a new random directory inside the tempdir
 mkdir -p /opt/vfilter/tempdir/files.$$ 2> /dev/null
 
-# Unpack attachments from piped message
-munpack -fq -C /opt/vfilter/tempdir/files.$$ < /opt/vfilter/tempdir/message.$$
-write_log "VirusTotal: Scanner running"
-for file in $(ls /opt/vfilter/tempdir/files.$$); do
-	# Check extension
-	[[ -z $(echo $EXTENSIONS | grep -i "${file##*.}") ]] && write_log "Extension ${file##*.} is not listed as dangerous, file processing skipped" && continue
-	write_log "VirusTotal: Processing file $file"
-	if [[ $ENABLE_VT == "1" ]]; then
+if [[ $ENABLE_VT == "1" ]]; then
+
+	# Unpack attachments from piped message
+	munpack -fq -C /opt/vfilter/tempdir/files.$$ < /opt/vfilter/tempdir/message.$$
+	write_log "VirusTotal: Scanner running"
+	for file in $(ls /opt/vfilter/tempdir/files.$$); do
+		# Check extension
+		[[ -z $(echo $EXTENSIONS | grep -i "${file##*.}") ]] && write_log "Extension ${file##*.} is not listed as dangerous, file processing skipped" && continue
+		write_log "VirusTotal: Processing file $file"
 		# If size exceeds 200MiB do not even check MD5 sum
 		[[ $(stat -c %s "/opt/vfilter/tempdir/files.$$/$file") -ge 209715200 ]] && write_log "VirusTotal: File size exceeds 200MB, file hash check skipped" && continue
 		write_log "VirusTotal: File $file does not exceed 200MB and will be hashed"
@@ -120,14 +125,14 @@ for file in $(ls /opt/vfilter/tempdir/files.$$); do
 					-a "In-Reply-To: $messageid" < /opt/vfilter/tempdir/response.$$
 				fi
 		done
-	fi
-done
-write_log "VirusTotal: Scanner finished"
+	done
+	write_log "VirusTotal: Scanner finished"
+else
+	write_log "VirusTotal skipped"
+fi
 
 # Cleanup
 write_log "Cleaning up..."
 rm -rf /opt/vfilter/tempdir/message.$$ \
 		/opt/vfilter/tempdir/response.$$ \
 		/opt/vfilter/tempdir/files.$$/ 2>/dev/null
-
-
