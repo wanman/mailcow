@@ -60,7 +60,7 @@ rm /lib/systemd/system/fail2ban.service
 # dovecot purge fails at first
 if [[ $FULLWIPE == "yes" ]]; then
 apt-get -y purge zip jq dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
-python-magic libmail-spf-perl libmail-dkim-perl openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
+python-magic libmail-spf-perl libmail-dkim-perl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server mailutils \
 postfix-mysql postfix-pcre spamassassin spamc sudo bzip2 curl mpack opendkim opendkim-tools unzip clamav-daemon \

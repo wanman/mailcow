@@ -516,7 +516,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 		mkdir before_upgrade_$timestamp
 		cp -R /var/www/mail/ before_upgrade_$timestamp/mail_wwwroot
 		mysqldump --defaults-file=/etc/mysql/debian.cnf --all-databases > backup_all_databases.sql 2>/dev/null
-		cp -R /etc/{postfix,dovecot,spamassassin,fail2ban,$conf_httpd,mysql,php5} before_upgrade_$timestamp/
+		cp -R /etc/{postfix,dovecot,spamassassin,fail2ban,$conf_httpd,mysql,php5,clamav} before_upgrade_$timestamp/
     echo -e "$(greenb "[OK]")"
 	echo -en "\nStopping services, this may take a few seconds... \t\t"
 	for var in fail2ban rsyslog $conf_httpd php5-fpm spamassassin dovecot postfix opendkim clamav-daemon
