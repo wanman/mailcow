@@ -31,6 +31,7 @@
 		SSLCertificateFile /etc/ssl/mail/mail.crt
 		SSLCertificateKeyFile /etc/ssl/mail/mail.key
 		ErrorDocument 503 /fcc/
+        ErrorDocument 500 /fcc/
         ProxyPassMatch ^/(.*\.php(/.*)?)$ unix:/var/run/php5-fpm-mail.sock|fcgi://127.0.0.1:9000/var/www/mail
 		<FilesMatch "\.(cgi|shtml|phtml|php)$">
 			SSLOptions +StdEnvVars
