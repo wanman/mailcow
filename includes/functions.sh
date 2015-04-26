@@ -193,8 +193,8 @@ EOF
 			# Detect and edit repos
 			if [[ $dist_codename == "wheezy" ]] && [[ -z $(grep -E "^deb(.*)wheezy-backports(.*)" /etc/apt/sources.list) ]]; then
 				echo "$(textb [INFO]) - Enabling wheezy-backports..."
-				gpg --keyserver pgpkeys.mit.edu --recv-key  8B48AD6246925553 > /dev/null 2>&1
-				gpg -a --export 8B48AD6246925553 | apt-key add - > /dev/null 2>&1
+				apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7638D0442B90D010 > /dev/null 2>&1
+				apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8B48AD6246925553 > /dev/null 2>&1
 				echo -e "\ndeb http://http.debian.net/debian wheezy-backports main" >> /etc/apt/sources.list
 				apt-get -y update >/dev/null
 			fi
