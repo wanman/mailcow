@@ -308,12 +308,14 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown -R vmail:vmail /opt/vfilter
 			;;
 		clamav)
-			usermod -a -G clamav vmail
-			# A second freshclam process indicates freshclam is already updating
-			# First process is freshclam in daemon mode
-			if [[ $(pgrep freshclam | wc -l) -lt 2 ]]; then
-				freshclam
-			fi
+			usermod -a -G clamav vmail 2> /dev/null
+			service clamav-freshclam stop > /dev/null 2>&1
+			killall freshclam 2> /dev/null
+			rm -f /var/lib/clamav/* 2> /dev/null
+			sed -i '/DatabaseMirror/d' /etc/clamav/freshclam.conf
+			echo "DatabaseMirror db.uk.clamav.net
+DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
+			freshclam
             ;;
 		opendkim)
 			echo 'SOCKET="inet:10040@localhost"' > /etc/default/opendkim
