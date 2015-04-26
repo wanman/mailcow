@@ -1,6 +1,7 @@
 #!/bin/bash
 usage() {
-    echo "
+    echo "Usage:
+
     --help | -h
         Print this text
 
