@@ -12,7 +12,6 @@ echo $fufix_banner
 
 case $1 in
 	"-u" | "--upgrade" )
-		shift
 		upgradetask
 		echo $fufix_version > /etc/fufix_version
 echo --------------------------------- >> installer.log
