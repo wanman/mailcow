@@ -135,7 +135,7 @@ checkconfig() {
 	egrep "[abcdefghijklmnopqrstuvxyz"] | \
 	egrep "[0-9]")
     if [[ $pass_count -lt 2 || -z $pass_chars ]]; then
-		echo "$(redb [ERR]) - Postfixadmin password does not meet password policy requirements."
+		echo "$(redb [ERR]) - Postfixadmin password does not meet password policy requirements (8 char., 2 num., UPPER- + lowercase)"
 		echo
 		exit 1
 	fi
@@ -193,12 +193,14 @@ EOF
 			# Detect and edit repos
 			if [[ $dist_codename == "wheezy" ]] && [[ -z $(grep -E "^deb(.*)wheezy-backports(.*)" /etc/apt/sources.list) ]]; then
 				echo "$(textb [INFO]) - Enabling wheezy-backports..."
+				gpg --keyserver pgpkeys.mit.edu --recv-key  8B48AD6246925553 > /dev/null 2>&1
+				gpg -a --export 8B48AD6246925553 | apt-key add - > /dev/null 2>&1
 				echo -e "\ndeb http://http.debian.net/debian wheezy-backports main" >> /etc/apt/sources.list
 				apt-get -y update >/dev/null
 			fi
 			if [[ ! -z $(grep -E "^deb(.*)wheezy-backports(.*)" /etc/apt/sources.list) ]]; then
 				echo "$(textb [INFO]) - Installing jq and python-magic from wheezy-backports..."
-				apt-get -y update >/dev/null ; apt-get -y install jq python-magic -t wheezy-backports >/dev/null
+				apt-get -y update >/dev/null ; apt-get -y --force-yes install jq python-magic -t wheezy-backports >/dev/null
 			fi
             if [[ $conf_httpd == "apache2" ]]; then
 				echo "$(textb [INFO]) - Installing Apache2 and components..."
