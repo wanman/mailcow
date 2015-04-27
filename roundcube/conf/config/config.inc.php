@@ -24,4 +24,17 @@ $config['imap_cache'] = 'apc';
 $config['username_domain'] = '%d';
 $config['default_list_mode'] = 'threads';
 $config['preview_pane'] = true;
-
+$config['imap_conn_options'] = array(
+    'ssl' => array(
+      'allow_self_signed' => true,
+       'verify_peer'      => false,
+       'verify_peer_name' => false,
+    ),
+);
+$config['smtp_conn_options'] = array(
+   'ssl'         => array(
+       'allow_self_signed' => true,
+        'verify_peer'      => false,
+        'verify_peer_name' => false,
+   ),
+);
