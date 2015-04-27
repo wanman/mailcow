@@ -45,6 +45,8 @@ if [[ $ENABLE_CAV == "1" ]]; then
 		write_log "ClamAV: Moved infected message to /opt/vfilter/clamav_positives/message.$$"
 		# Return permission denied
 		exit 77
+	elif [[ $clamav_scan_result =~ "ERROR" ]]; then
+		write_log "ClamAV: An error occured while scanning the file, please check your ClamAV log, processing anyway..."
 	fi
 	write_log "ClamAV: Clean message"
 else
