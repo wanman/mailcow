@@ -204,6 +204,11 @@ EOF
 			fi
             if [[ $conf_httpd == "apache2" ]]; then
 				echo "$(textb [INFO]) - Installing Apache2 and components..."
+				if [[ $(lsb_release -is) == "Ubuntu" ]]; then
+					echo "$(textb [INFO]) - Enabling ppa:ondrej/apache2..."
+					add-apt-repository -y ppa:ondrej/apache2 > /dev/null 2>&1
+					apt-get -y update >/dev/null
+				fi
 				apt-get -y install apache2 apache2-utils >/dev/null
 			elif [[ $conf_httpd == "nginx" ]]; then
 				echo "$(textb [INFO]) - Installing Nginx..."
@@ -361,7 +366,7 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			if [[ $conf_httpd == "nginx" ]]; then
 				rm /etc/nginx/sites-enabled/000-0-fufix 2>/dev/null
 				cp webserver/nginx/conf/sites-available/fufix /etc/nginx/sites-available/
-				ln -s /etc/nginx/sites-available/fufix /etc/nginx/sites-enabled/000-0-fufix
+				ln -s /etc/nginx/sites-available/fufix /etc/nginx/sites-enabled/000-0-fufix 2>/dev/null
 				[[ ! -z $(grep "client_max_body_size" /etc/nginx/nginx.conf) ]] && \
 					sed -i "/client_max_body_size/c\ \ \ \ \ \ \ \ client_max_body_size 25M;" /etc/nginx/nginx.conf || \
 					sed -i "/http {/a\ \ \ \ \ \ \ \ client_max_body_size 25M;" /etc/nginx/nginx.conf
@@ -489,7 +494,7 @@ upgradetask() {
 		echo "$(redb [ERR]) - Upgrade not supported"
 		return 1
 	fi
-	if [[ ! -z $(which apache2) && -z $(apache2 -v | grep "2.4") ]]; then
+	if [[ ! -z $(which apache2) && ! -z $(apache2 -v | grep "2.4") ]]; then
 		conf_httpd="apache2"
 	elif [[ ! -z $(which nginx) ]]; then
 		conf_httpd="nginx"
