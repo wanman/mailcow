@@ -34,8 +34,7 @@ checkconfig
 checksystem
 checkports
 
-echo "
-    $(textb "Hostname")        $sys_hostname
+echo "    $(textb "Hostname")        $sys_hostname
     $(textb "Domain")          $sys_domain
     $(textb "FQDN")            $sys_hostname.$sys_domain
     $(textb "Timezone")        $sys_timezone
