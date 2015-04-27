@@ -488,7 +488,7 @@ upgradetask() {
 		echo "$(pinkb [NOTICE]) - Falling back to Nginx: Apache 2.4 was not available!"
 		conf_httpd="nginx"
 	fi
-	echo "$(textb [INFO]) - Installing prerequisites..."
+	echo "$(textb [INFO]) - Installing upgrade prerequisites and collecting system information..."
 	apt-get -y update > /dev/null ; apt-get -y install lsb-release > /dev/null 2>&1
 	sys_hostname=$(hostname)
 	sys_domain=$(hostname -d)
