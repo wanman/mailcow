@@ -311,7 +311,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown -R vmail:vmail /opt/vfilter
 			;;
 		clamav)
-			usermod -a -G clamav vmail 2> /dev/null
+			usermod -a -G vmail clamav 2> /dev/null
 			service clamav-freshclam stop > /dev/null 2>&1
 			killall freshclam 2> /dev/null
 			rm -f /var/lib/clamav/* 2> /dev/null
