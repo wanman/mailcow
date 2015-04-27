@@ -283,6 +283,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			rm -rf /etc/dovecot/*
 			cp -R dovecot/conf/*.conf /etc/dovecot/
 			userdel vmail 2> /dev/null
+			groupdel vmail 2> /dev/null
 			groupadd -g 5000 vmail
 			useradd -g vmail -u 5000 vmail -d /var/vmail
 			chown root:dovecot "/etc/dovecot/dovecot-dict-sql.conf"; chmod 640 "/etc/dovecot/dovecot-dict-sql.conf"
