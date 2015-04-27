@@ -325,6 +325,11 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 				echo "DatabaseMirror db.uk.clamav.net
 DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			fi
+			if [[ -f /etc/apparmor.d/usr.sbin.clamd || -f /etc/apparmor.d/local/usr.sbin.clamd ]]; then
+				rm /etc/apparmor.d/usr.sbin.clamd > /dev/null 2>&1
+				rm /etc/apparmor.d/local/usr.sbin.clamd > /dev/null 2>&1
+				service apparmor restart > /dev/null 2>&1
+			fi
 			freshclam
             ;;
 		opendkim)
