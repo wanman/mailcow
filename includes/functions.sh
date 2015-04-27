@@ -210,6 +210,9 @@ EOF
 				apt-get -y install nginx-extras >/dev/null
 			fi
 			echo "$(textb [INFO]) - Installing packages unattended, please stand by, errors will be reported."
+			if [[ $(lsb_release -is) == "Ubuntu" ]]; then
+				echo "$(yellowb [WARN]) - You are using Ubuntu. The installation will not fail, though you may see a lot of output until the installation is finished."
+			fi
 			apt-get -y update >/dev/null
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install zip jq dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
 python-magic libmail-spf-perl libmail-dkim-perl openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
