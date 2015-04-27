@@ -363,7 +363,7 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 				ln -s /etc/apache2/sites-available/fufix /etc/apache2/sites-enabled/000-0-fufix.conf
 				sed -i "s/\"\*\"/\"$sys_hostname.$sys_domain\"/g" /etc/apache2/sites-available/fufix
                 sed -i "s/\"autoconfig.domain.tld\"/\"autoconfig.$sys_domain\"/g" /etc/apache2/sites-available/fufix
-				a2enmod rewrite ssl proxy > /dev/null 2>&1
+				a2enmod rewrite ssl proxy proxy_fcgi > /dev/null 2>&1
 			fi
 			cp php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
 			cp php5-fpm/conf/php-fpm.conf /etc/php5/fpm/php-fpm.conf
