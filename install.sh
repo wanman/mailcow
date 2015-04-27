@@ -103,16 +103,16 @@ installtask postfixadmin
 returnwait "Postfixadmin configuration" "Roundcube configuration"
 
 installtask roundcube
-returnwait "Roundcube configuration" "Fail2ban configuration"
+returnwait "Roundcube configuration" "Rsyslogd configuration"
+
+installtask rsyslogd
+returnwait "Rsyslogd configuration" "Fail2ban configuration"
 
 installtask fail2ban
 returnwait "Fail2ban configuration" "OpenDKIM configuration"
 
 installtask opendkim
-returnwait "OpenDKIM configuration" "Rsyslogd configuration"
-
-installtask rsyslogd
-returnwait "Rsyslogd configuration" "Restarting services"
+returnwait "OpenDKIM configuration" "Restarting services"
 
 installtask restartservices
 returnwait "Restarting services" "Completing Postfixadmin setup"

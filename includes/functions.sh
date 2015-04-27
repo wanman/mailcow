@@ -422,6 +422,15 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			rm -rf roundcube/inst/$roundcube_version
 			rm -rf /var/www/mail/rc/installer/
 			;;
+        rsyslogd)
+            if [[ -d /etc/rsyslog.d ]]; then
+				cp rsyslog/conf/10-fufix /etc/rsyslog.d/
+				service rsyslog restart > /dev/null 2>&1
+				postlog -p warn dummy > /dev/null 2>&1
+				postlog -p info dummy > /dev/null 2>&1
+				postlog -p err dummy > /dev/null 2>&1
+			fi
+			;;
 		fail2ban)
 			tar xf fail2ban/inst/$fail2ban_version.tar -C fail2ban/inst/
 			rm -rf /etc/fail2ban/ 2> /dev/null
@@ -435,11 +444,11 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 				chmod +x /etc/init.d/fail2ban
 				update-rc.d fail2ban defaults
 			fi
+			if [[ ! -f /var/log/mail.warn ]]; then
+				touch /var/log/mail.warn
+			fi
 			cp fail2ban/conf/jail.local /etc/fail2ban/jail.local
 			rm -rf fail2ban/inst/$fail2ban_version
-			;;
-		rsyslogd)
-			sed "s/*.*;auth,authpriv.none/*.*;auth,mail.none,authpriv.none/" -i /etc/rsyslog.conf
 			;;
 		restartservices)
 			[[ -f /lib/systemd/systemd ]] && echo "$(textb [INFO]) - Restarting services, this may take a few seconds..."
@@ -579,7 +588,10 @@ A backup will be stored in ./before_upgrade_$timestamp
 	returnwait "Roundcube configuration" "OpenDKIM configuration"
 
 	installtask opendkim
-	returnwait "OpenDKIM configuration" "Fail2ban configuration"
+	returnwait "OpenDKIM configuration" "Rsyslogd configuration"
+
+	installtask rsyslogd
+	returnwait "Rsyslogd configuration" "Fail2ban configuration"
 
 	installtask fail2ban
 	returnwait "Fail2ban configuration" "Restarting services"
