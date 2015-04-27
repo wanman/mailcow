@@ -397,8 +397,7 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			sed -i "s/my_rcdb/$my_rcdb/g" /var/www/mail/rc/config/config.inc.php
 			conf_rcdeskey=$(genpasswd)
 			sed -i "s/conf_rcdeskey/$conf_rcdeskey/g" /var/www/mail/rc/config/config.inc.php
-			sed -i "s/fufix_dfhost/$sys_hostname.$sys_domain/g" /var/www/mail/rc/config/config.inc.php
-			sed -i "s/fufix_smtpsrv/$sys_hostname.$sys_domain/g" /var/www/mail/rc/config/config.inc.php
+            sed -i "s/FUFIX_HOST.FUFIX_DOMAIN/$sys_hostname.$sys_domain/g" /var/www/mail/rc/config/config.inc.php
 			chown -R www-data: /var/www/
 			if [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -s -N -e "use $my_rcdb; show tables;" | wc -l) -lt 5 ]]; then
 				mysql -u $my_rcuser -p$my_rcpass $my_rcdb < /var/www/mail/rc/SQL/mysql.initial.sql
