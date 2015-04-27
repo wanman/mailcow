@@ -195,13 +195,14 @@ function echo_sys_info($what, $extra="") {
 			echo shell_exec("mailq");
 			break;
 		case "positives";
-			$pos = count(glob("/opt/vfilter/clamav_positives/" . "message.*"));
+			$pos = glob('/opt/vfilter/clamav_positives/message*', GLOB_BRACE);
 			if (empty($pos)) {
 				echo "0";
 			}
 			else {
-				echo $pos;
+				echo count($pos);
 			}
+			break;
 		case "vfilterlog":
 			if ( is_numeric($extra) && $extra <= 70) {
 				$lines = $extra;
@@ -211,10 +212,10 @@ function echo_sys_info($what, $extra="") {
 			};
 			$output = shell_exec("sudo -u vmail /usr/bin/tail -n $lines /opt/vfilter/log/vfilter.log");
 			if ($output != NULL) {
-				return $output;
+				echo $output;
 			}
 			else {
-				return "none";
+				echo "none";
 			}
 			break;
 	}

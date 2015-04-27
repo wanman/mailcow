@@ -122,7 +122,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 		</div>
 		<div class="col-sm-12">
 		<h4>Filter Log (newest)</h4>
-		<p><pre><?php echo echo_sys_info("vfilterlog", "20"); ?></pre></p>
+		<p><pre><?php echo_sys_info("vfilterlog", "20"); ?></pre></p>
 		</div>
 	</div>
 	<br /><button type="submit" class="btn btn-primary btn-sm">Apply</button>
