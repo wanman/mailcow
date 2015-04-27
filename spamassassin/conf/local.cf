@@ -4,3 +4,6 @@ required_score 5.0
 use_bayes 1
 bayes_auto_learn 1
 skip_rbl_checks 1
+pyzor_options --homedir /etc/mail/spamassassin/.pyzor
+use_razor2 1
+razor_config /etc/razor/razor-agent.conf
