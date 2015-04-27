@@ -214,7 +214,7 @@ EOF
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install zip jq dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
 python-magic libmail-spf-perl libmail-dkim-perl openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
-php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server mailutils \
+php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server mailutils pyzor razor \
 postfix-mysql postfix-pcre spamassassin spamc sudo bzip2 curl mpack opendkim opendkim-tools unzip clamav-daemon \
 fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl bsd-mailx >/dev/null
 			if [ "$?" -ne "0" ]; then
@@ -339,6 +339,14 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			[[ -z $(grep RANDOM_DELAY /etc/crontab) ]] && sed -i '/SHELL/a RANDOM_DELAY=30' /etc/crontab
 			install -m 755 spamassassin/conf/spamlearn /etc/cron.daily/spamlearn
 			install -m 755 spamassassin/conf/spamassassin_heinlein /etc/cron.daily/spamassassin_heinlein
+			# Thanks to mf3hd@GitHub, again!
+			chmod g+s /etc/spamassassin
+			chown -R debian-spamd: /etc/spamassassin
+			razor-admin -create -home /etc/razor -conf=/etc/razor/razor-agent.conf
+			razor-admin -discover -home /etc/razor
+			razor-admin -register -home /etc/razor
+			su debian-spamd -c "pyzor --homedir /etc/mail/spamassassin/.pyzor discover 2> /dev/null"
+			su debian-spamd -c "sa-update 2> /dev/null"
 			;;
 		webserver)
 			if [[ $conf_httpd == "nginx" ]]; then
