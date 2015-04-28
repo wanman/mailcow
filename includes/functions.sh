@@ -187,11 +187,14 @@ EOF
 			;;
 		installpackages)
 			echo "$(textb [INFO]) - Installing prerequisites..."
-			apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7638D0442B90D010 > /dev/null 2>&1
-			apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8B48AD6246925553 > /dev/null 2>&1
+			dist_codename=$(lsb_release -cs)
+			dist_id=$(lsb_release -is)
+			if [[ $dist_id == "Debian" ]]; then
+				apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7638D0442B90D010 > /dev/null 2>&1
+				apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8B48AD6246925553 > /dev/null 2>&1
+			fi
 			apt-get -y update > /dev/null ; apt-get -y install lsb-release dbus whiptail apt-utils ssl-cert > /dev/null 2>&1
 			/usr/sbin/make-ssl-cert generate-default-snakeoil --force-overwrite
-			dist_codename=$(lsb_release -cs)
 			# Detect and edit repos
 			if [[ $dist_codename == "wheezy" ]] && [[ -z $(grep -E "^deb(.*)wheezy-backports(.*)" /etc/apt/sources.list) ]]; then
 				echo "$(textb [INFO]) - Enabling wheezy-backports..."
@@ -204,7 +207,7 @@ EOF
 			fi
             if [[ $conf_httpd == "apache2" ]]; then
 				echo "$(textb [INFO]) - Installing Apache2 and components..."
-				if [[ $(lsb_release -is) == "Ubuntu" ]]; then
+				if [[ $dist_codename == "trusty" ]]; then
 					echo "$(textb [INFO]) - Enabling ppa:ondrej/apache2..."
 					add-apt-repository -y ppa:ondrej/apache2 > /dev/null 2>&1
 					apt-get -y update >/dev/null
@@ -216,7 +219,7 @@ EOF
 			fi
 			echo "$(textb [INFO]) - Installing packages unattended, please stand by, errors will be reported."
 			if [[ $(lsb_release -is) == "Ubuntu" ]]; then
-				echo "$(yellowb [WARN]) - You are using Ubuntu. The installation will not fail, though you may see a lot of output until the installation is finished."
+				echo "$(yellowb [WARN]) - You are running Ubuntu. The installation will not fail, though you may see a lot of output until the installation is finished."
 			fi
 			apt-get -y update >/dev/null
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install zip jq dnsutils python-sqlalchemy python-beautifulsoup python-setuptools \
