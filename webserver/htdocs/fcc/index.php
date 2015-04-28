@@ -2,7 +2,6 @@
 session_start();
 require_once "inc/vars.inc.php";
 require_once "inc/functions.inc.php";
-require_once "inc/triggers.inc.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -56,6 +55,7 @@ else {
 <div class="container">
 <?php
 if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes") {
+require_once "inc/triggers.inc.php";
 ?>
 <h1><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Configuration</h1>
 
@@ -89,9 +89,9 @@ Enter "DISABLED" to disable this feature.</pre></p>
 					Use ClamAV to scan mail
 					</label>
 			</div>
-			<code><?php echo_sys_info("positives"); ?> message/s</code> was/were quarantined and saved to <code>/opt/vfilter/clamav_positives/</code></p>
-			<p>Clean directory to reset counter.</p>
-			<p><a href="?av_dl">Download quarantined messages</a></p>
+			<a href="?av_dl"<span class="badge"><?php echo_sys_info("positives"); ?> quarantined items</span></a></p>
+			<p>Clean directory <code>/opt/vfilter/clamav_positives/</code> to reset counter.</p>
+			<p>Senders of infected messages are informed about failed delivery.</p>
 			</small>
 		</div>
 		<div class="col-sm-6">
