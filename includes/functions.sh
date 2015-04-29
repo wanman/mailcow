@@ -11,7 +11,7 @@ usage() {
 	--help | -h
 		Print this text
 
-	--upgrade-from-file | -u
+	--upgrade | -u
 		Upgrade fufix to a newer version
 	"
 }

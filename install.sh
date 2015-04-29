@@ -29,10 +29,10 @@ echo --------------------------------- >> installer.log
         ;;
 esac
 
-source configuration
-checkconfig
 checksystem
 checkports
+source configuration
+checkconfig
 
 echo "    $(textb "Hostname")        $sys_hostname
     $(textb "Domain")          $sys_domain
