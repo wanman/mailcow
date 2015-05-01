@@ -54,8 +54,8 @@ else {
 <form action="/fcc/" method="post" id="logout"><input type="hidden" name="logout"></form>
 <div class="container">
 <?php
-if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes") {
 require_once "inc/triggers.inc.php";
+if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes") {
 ?>
 <h1><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Configuration</h1>
 
