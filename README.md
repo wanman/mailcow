@@ -43,7 +43,7 @@ This installer is permanently **tested on Debian stable (7.x) and testing (8.x)*
 Please see https://www.debinux.de/fufix for further information.
 Feel free to leave a comment or question.
 
-![fufix v0.8](https://www.debinux.de/wp-content/uploads/ffg.png "fufix v0.8")
+![fufix v0.10](https://www.debinux.de/wp-content/uploads/2014/10/fufix010.png "fufix v0.10")
 
 # Introduction
 A summary of what software is installed with which features enabled.
