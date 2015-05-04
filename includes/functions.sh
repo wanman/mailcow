@@ -208,8 +208,9 @@ EOF
             if [[ $conf_httpd == "apache2" ]]; then
 				echo "$(textb [INFO]) - Installing Apache2 and components..."
 				if [[ $dist_codename == "trusty" ]]; then
-					echo "$(textb [INFO]) - Enabling ppa:ondrej/apache2..."
-					add-apt-repository -y ppa:ondrej/apache2 > /dev/null 2>&1
+					echo "$(textb [INFO]) - Adding ondrej/apache2 repository..."
+					echo "deb http://ppa.launchpad.net/ondrej/apache2/ubuntu trusty main" > /etc/apt/sources.list.d/ondrej.list
+					apt-key adv --keyserver keyserver.ubuntu.com --recv E5267A6C > /dev/null 2>&1
 					apt-get -y update >/dev/null
 				fi
 				apt-get -y install apache2 apache2-utils >/dev/null
