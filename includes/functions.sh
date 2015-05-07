@@ -167,6 +167,7 @@ EOF
 			fi
 			echo "$(textb [INFO]) - Setting your hostname..."
 			if [[ -f /lib/systemd/systemd ]]; then
+				apt-get update -y > /dev/null 2>&1 && apt-get install dbus > /dev/null 2>&1
 				hostnamectl set-hostname $sys_hostname
 			else
 				echo $sys_hostname > /etc/hostname
@@ -193,7 +194,7 @@ EOF
 				apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7638D0442B90D010 > /dev/null 2>&1
 				apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8B48AD6246925553 > /dev/null 2>&1
 			fi
-			apt-get -y update > /dev/null ; apt-get -y install lsb-release dbus whiptail apt-utils ssl-cert > /dev/null 2>&1
+			apt-get -y update > /dev/null ; apt-get -y install lsb-release whiptail apt-utils ssl-cert > /dev/null 2>&1
 			/usr/sbin/make-ssl-cert generate-default-snakeoil --force-overwrite
 			# Detect and edit repos
 			if [[ $dist_codename == "wheezy" ]] && [[ -z $(grep -E "^deb(.*)wheezy-backports(.*)" /etc/apt/sources.list) ]]; then
