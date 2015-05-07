@@ -188,13 +188,13 @@ EOF
 			;;
 		installpackages)
 			echo "$(textb [INFO]) - Installing prerequisites..."
-			dist_codename=$(lsb_release -cs)
-			dist_id=$(lsb_release -is)
-			if [[ $dist_id == "Debian" ]]; then
-				apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7638D0442B90D010 > /dev/null 2>&1
-				apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8B48AD6246925553 > /dev/null 2>&1
-			fi
 			apt-get -y update > /dev/null ; apt-get -y install lsb-release whiptail apt-utils ssl-cert > /dev/null 2>&1
+            dist_codename=$(lsb_release -cs)
+            dist_id=$(lsb_release -is)
+            if [[ $dist_id == "Debian" ]]; then
+                apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7638D0442B90D010 > /dev/null 2>&1
+                apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8B48AD6246925553 > /dev/null 2>&1
+            fi
 			/usr/sbin/make-ssl-cert generate-default-snakeoil --force-overwrite
 			# Detect and edit repos
 			if [[ $dist_codename == "wheezy" ]] && [[ -z $(grep -E "^deb(.*)wheezy-backports(.*)" /etc/apt/sources.list) ]]; then
