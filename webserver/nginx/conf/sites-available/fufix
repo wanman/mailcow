@@ -1,22 +1,21 @@
 # fufix site configuration
 # ! Do not remove this header !
-
 server {
 	listen 80;
-	server_name autoconfig.*;
-	root /var/www/mail/;
-	try_files $uri /autoconfig.xml;
-}
-server {
-	listen 80;
-	server_name _;
+	server_name *;
 	root /var/www/mail;
 	return 301 https://$host$request_uri;
 }
 server {
+	listen 80;
+	server_name autoconfig.*
+	root /var/www/mail/;
+	try_files $uri /autoconfig.xml;
+}
+server {
 	listen 443;
 
-	server_name _;
+	server_name FUFIX_HOST.FUFIX_DOMAIN;
 
 	ssl on;
 	ssl_certificate         /etc/ssl/mail/mail.crt;

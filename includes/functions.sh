@@ -378,13 +378,13 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 				[[ ! -z $(grep "client_max_body_size" /etc/nginx/nginx.conf) ]] && \
 					sed -i "/client_max_body_size/c\ \ \ \ \ \ \ \ client_max_body_size 25M;" /etc/nginx/nginx.conf || \
 					sed -i "/http {/a\ \ \ \ \ \ \ \ client_max_body_size 25M;" /etc/nginx/nginx.conf
-				sed -i "s/_;/$sys_hostname.$sys_domain;/g" /etc/nginx/sites-available/fufix
+				sed -i "s/FUFIX_HOST.FUFIX_DOMAIN;/$sys_hostname.$sys_domain;/g" /etc/nginx/sites-available/fufix
 			elif [[ $conf_httpd == "apache2" ]]; then
 				rm /etc/apache2/sites-enabled/000-0-fufix 2>/dev/null
 				cp webserver/apache2/conf/sites-available/fufix /etc/apache2/sites-available/
 				ln -s /etc/apache2/sites-available/fufix /etc/apache2/sites-enabled/000-0-fufix.conf
-				sed -i "s/\"\*\"/\"$sys_hostname.$sys_domain\"/g" /etc/apache2/sites-available/fufix
-                sed -i "s/\"autoconfig.domain.tld\"/\"autoconfig.$sys_domain\"/g" /etc/apache2/sites-available/fufix
+				sed -i "s/\"\FUFIX_HOST.FUFIX_DOMAIN\"/\"$sys_hostname.$sys_domain\"/g" /etc/apache2/sites-available/fufix
+                sed -i "s/\"autoconfig.FUFIX_DOMAIN\"/\"autoconfig.$sys_domain\"/g" /etc/apache2/sites-available/fufix
 				a2enmod rewrite ssl proxy proxy_fcgi > /dev/null 2>&1
 			fi
 			cp php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
@@ -462,6 +462,8 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			fi
 			cp fail2ban/conf/jail.local /etc/fail2ban/jail.local
 			rm -rf fail2ban/inst/$fail2ban_version
+			[[ -z $(grep fail2ban /etc/rc.local) ]] && sed -i '/^exit 0/i\test -d /var/run/fail2ban || install -m 755 -d /var/run/fail2ban/' /etc/rc.local
+			mkdir /var/run/fail2ban/
 			;;
 		restartservices)
 			[[ -f /lib/systemd/systemd ]] && echo "$(textb [INFO]) - Restarting services, this may take a few seconds..."
