@@ -379,6 +379,7 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 					sed -i "/client_max_body_size/c\ \ \ \ \ \ \ \ client_max_body_size 25M;" /etc/nginx/nginx.conf || \
 					sed -i "/http {/a\ \ \ \ \ \ \ \ client_max_body_size 25M;" /etc/nginx/nginx.conf
 				sed -i "s/FUFIX_HOST.FUFIX_DOMAIN;/$sys_hostname.$sys_domain;/g" /etc/nginx/sites-available/fufix
+				sed -i "s/FUFIX_DOMAIN;/$sys_domain;/g" /etc/nginx/sites-available/fufix
 			elif [[ $conf_httpd == "apache2" ]]; then
 				rm /etc/apache2/sites-enabled/000-0-fufix 2>/dev/null
 				cp webserver/apache2/conf/sites-available/fufix /etc/apache2/sites-available/

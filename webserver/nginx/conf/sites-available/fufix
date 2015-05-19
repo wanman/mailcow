@@ -2,13 +2,13 @@
 # ! Do not remove this header !
 server {
 	listen 80;
-	server_name *;
+	server_name FUFIX_HOST.FUFIX_DOMAIN;
 	root /var/www/mail;
 	return 301 https://$host$request_uri;
 }
 server {
 	listen 80;
-	server_name autoconfig.*
+	server_name autoconfig.FUFIX_DOMAIN;
 	root /var/www/mail/;
 	try_files $uri /autoconfig.xml;
 }
