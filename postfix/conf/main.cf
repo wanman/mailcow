@@ -21,6 +21,9 @@ smtpd_tls_key_file = /etc/ssl/mail/mail.key
 smtpd_tls_security_level=may
 smtpd_tls_auth_only=yes
 
+# DH parameters, actually 2048 bit long
+smtpd_tls_dh1024_param_file = /etc/ssl/mail/dhparams.pem
+
 # TLS session cache for SMTPd
 smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
 
@@ -214,10 +217,6 @@ postscreen_dnsbl_sites =
   hostkarma.junkemailfilter.com=127.0.0.4*1
   hostkarma.junkemailfilter.com=127.0.1.2*1
   wl.mailspike.net=127.0.0.[18;19;20]*-2
-  list.dnswl.org=127.0.[0..255].0*-2
-  list.dnswl.org=127.0.[0..255].1*-3
-  list.dnswl.org=127.0.[0..255].2*-4
-  list.dnswl.org=127.0.[0..255].3*-5
   hostkarma.junkemailfilter.com=127.0.0.1*-2
 postscreen_greet_banner = $smtpd_banner
 postscreen_greet_action = enforce

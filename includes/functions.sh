@@ -251,6 +251,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		ssl)
 			rm /etc/ssl/mail/* 2> /dev/null
+			echo "$(textb [INFO]) - Generating 2048 bit DH parameters, this may take a while, please wait..."
+			openssl dhparam -out /etc/ssl/mail/dhparams.pem 2048 2> /dev/null
 			mkdir /etc/ssl/mail 2> /dev/null
 			openssl req -new -newkey rsa:4096 -sha256 -days 1095 -nodes -x509 -subj "/C=$cert_country/ST=$cert_state/L=$cert_city/O=$cert_org/CN=$sys_hostname.$sys_domain" -keyout /etc/ssl/mail/mail.key  -out /etc/ssl/mail/mail.crt
 			chmod 600 /etc/ssl/mail/mail.key
@@ -565,15 +567,17 @@ A backup will be stored in ./before_upgrade_$timestamp
 		service $var stop > /dev/null 2>&1
 	done
 	echo -e "$(greenb "[OK]")"
-    echo "Update CA certificate store (self-signed only)..."
 	if [[ ! -z $(openssl x509 -issuer -in /etc/ssl/mail/mail.crt | grep $sys_hostname.$sys_domain ) ]]; then
+		echo "$(textb [INFO]) - Update CA certificate store (self-signed only)..."
 		cp /etc/ssl/mail/mail.crt /usr/local/share/ca-certificates/
 		update-ca-certificates
-		returnwait "Update CA certificate store" "Package installation"
-	else
-		returnwait "Update CA certificate store (skipped)" "Package installation"
+	fi
+	if [[ ! -f /etc/ssl/mail/dhparams.pem ]]; then
+		echo "$(textb [INFO]) - Generating 2048 bit DH parameters, this may take a while, please wait..."
+		openssl dhparam -out /etc/ssl/mail/dhparams.pem 2048 2> /dev/null
 	fi
 
+	echo "Starting task \"Package installation\"..."
 	installtask installpackages
     returnwait "Package installation" "Postfix configuration"
 
