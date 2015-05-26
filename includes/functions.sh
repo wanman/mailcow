@@ -464,7 +464,7 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			cp fail2ban/conf/jail.local /etc/fail2ban/jail.local
 			rm -rf fail2ban/inst/$fail2ban_version
 			[[ -z $(grep fail2ban /etc/rc.local) ]] && sed -i '/^exit 0/i\test -d /var/run/fail2ban || install -m 755 -d /var/run/fail2ban/' /etc/rc.local
-			mkdir /var/run/fail2ban/
+			mkdir /var/run/fail2ban/ 2> /dev/null
 			;;
 		restartservices)
 			[[ -f /lib/systemd/systemd ]] && echo "$(textb [INFO]) - Restarting services, this may take a few seconds..."

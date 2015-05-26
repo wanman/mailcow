@@ -14,11 +14,10 @@ require_once "inc/functions.inc.php";
 <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
-<!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-<!-- Optional theme -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
-<link href="css/signin.form.css" rel="stylesheet">
+<alink href="../css/roboto.min.css" rel="stylesheet">
+<link href="../css/material.min.css" rel="stylesheet">
+<link href="../css/ripples.min.css" rel="stylesheet">
 </head>
 <body>
 <nav class="navbar navbar-default">
@@ -51,15 +50,19 @@ else {
 		</div><!--/.nav-collapse -->
 	</div><!--/.container-fluid -->
 </nav>
+
 <form action="/fcc/" method="post" id="logout"><input type="hidden" name="logout"></form>
 <div class="container">
+
 <?php
 require_once "inc/triggers.inc.php";
 if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes") {
 ?>
 <h1><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Configuration</h1>
 
-<h3>Attachments</h3>
+<div class="panel panel-default">
+<div class="panel-heading">Attachments</div>
+<div class="panel-body">
 <form method="post">
 <div class="form-group">
 	<p>Provide a list of dangerous file types. Please take care of the formatting.</p>
@@ -89,7 +92,10 @@ Enter "DISABLED" to disable this feature.</pre></p>
 					Use ClamAV to scan mail
 					</label>
 			</div>
-			<a href="?av_dl"<span class="badge"><?php echo_sys_info("positives"); ?> quarantined items</span></a></p>
+			<p>
+			<ul class="nav nav-pills">
+				<li><a href="?av_dl">Download quarantined items<span class="badge"><?php echo_sys_info("positives"); ?></span></a></li>
+			</ul></p>
 			<p>Clean directory <code>/opt/vfilter/clamav_positives/</code> to reset counter.</p>
 			<p>Senders of infected messages are informed about failed delivery.</p>
 			</small>
@@ -128,9 +134,12 @@ Enter "DISABLED" to disable this feature.</pre></p>
 	<br /><button type="submit" class="btn btn-primary btn-sm">Apply</button>
 </div>
 </form>
+</div>
+</div>
 
-<hr>
-<h3>Sender Blacklist</h3>
+<div class="panel panel-default">
+<div class="panel-heading">Sender Blacklist</div>
+<div class="panel-body">
 <form method="post">
 <div class="form-group">
 	<p>Specify a list of senders or domains to blacklist access:</p>
@@ -138,9 +147,12 @@ Enter "DISABLED" to disable this feature.</pre></p>
 	<br /><button type="submit" class="btn btn-primary btn-sm">Apply</button>
 </div>
 </form>
+</div>
+</div>
 
-<hr>
-<h3>Privacy</h3>
+<div class="panel panel-default">
+<div class="panel-heading">Privacy</div>
+<div class="panel-body">
 <form method="post">
 <div class="form-group">
 	<p>This option enables a PCRE table to remove "User-Agent", "X-Enigmail", "X-Mailer", "X-Originating-IP" and replaces "Received: from" headers with localhost/127.0.0.1.</p>
@@ -148,17 +160,20 @@ Enter "DISABLED" to disable this feature.</pre></p>
 	<label>
 	<input type="hidden" name="anonymize_">
 	<input name="anonymize" type="checkbox" <?php echo return_fufix_config("anonymize") ?>>
-	<p>Anonymize outgoing mail.</p>
+		Anonymize outgoing mail
 	</label>
 	</div>
 	<button type="submit" class="btn btn-primary btn-sm">Apply</button>
 </div>
 </form>
+</div>
+</div>
 
-<hr>
-<h3>DKIM Signing</h3>
+<div class="panel panel-default">
+<div class="panel-heading">DKIM Signing</div>
+<div class="panel-body">
 <p>Default behaviour is to sign with relaxed header and body canonicalization algorithm.</p>
-<p><span class="label label-danger">Warning</span> DKIM signing will not be used when when "Anonymize outgoing mail" is enabled.</p>
+<p><strong>DKIM signing will not be used when when "Anonymize outgoing mail" is enabled.</strong></p>
 <form method="post" action="index.php">
 <h4>Active keys</h4>
 <?php opendkim_table() ?>
@@ -179,22 +194,30 @@ Enter "DISABLED" to disable this feature.</pre></p>
 	</div>
 </div>
 </form>
+</div>
+</div>
 
-<hr>
-<form class="form-inline" method="post">
-	<h3>Max. Message Size</h3>
+<div class="panel panel-default">
+<div class="panel-heading">Message Size</div>
+<div class="panel-body">
+	<form class="form-inline" method="post">
 	<p>Current message size limitation: <strong><?php echo return_fufix_config("maxmsgsize"); ?>MB</strong></p>
 	<p>This changes values in PHP, Nginx and Postfix. Services will be reloaded.</p>
 	<div class="form-group">
 		<input type="number" class="form-control" id="maxmsgsize" name="maxmsgsize" placeholder="in MB" min="1" max="250">
 	</div>
-	<button type="submit" class="btn btn-primary">Set</button>
-</form>
+	<button type="submit" class="btn btn-primary btn-sm">Set</button>
+	</form>
+
+</div>
+</div>
 
 <br />
 <h1><span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> Maintenance</h1>
 
-<h3>FAQ</h3>
+<div class="panel panel-default">
+<div class="panel-heading">FAQ</div>
+<div class="panel-body">
 
 <p data-toggle="collapse" style="cursor:help;" data-target="#dnsrecords"><strong>DNS Records</strong></p>
 <div id="dnsrecords" class="collapse out">
@@ -202,7 +225,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <p>While some are mandatory for a mail server (A, MX), others are recommended to build a good reputation score (TXT/SPF) or used for auto-configuration of mail clients (A: "autoconfig" and SRV records).</p>
 <p>In this automatically generated DNS zone file snippet, a simple TXT/SPF record is used to only allow THIS server (the MX) to send mail for your domain. Every other server is disallowed ("-all"). Please refer to <a href="http://www.openspf.org/SPF_Record_Syntax" target="_blank">openspf.org</a>.</p>
 <p>It is <strong>highly recommended</strong> to create a DKIM TXT record with the <em>DKIM Signing</em> utility tool above and install the given TXT record to your nameserver, too.</p>
-<pre style="border: 0px; background-color: #333; color: #7CFC00;">
+<pre>
 ; ================
 ; Example forward zone file
 ; ================
@@ -224,7 +247,8 @@ autoconfig          IN A       <?php echo $IP, "\n"; ?>
 </div>
 
 <p data-toggle="collapse" style="cursor:help;" data-target="#commontasks"><strong>Example usage of <em>doveadm</em> for common tasks regarding Dovecot.</strong></p>
-<div id="commontasks" class="collapse out"><pre style="border: 0px; background-color: #333; color: #7CFC00;">
+<div id="commontasks" class="collapse out">
+<pre>
 ; Searching for inbox messages saved in the past 3 days for user "Bob.Cat":
 doveadm search -u bob.cat@domain.com mailbox inbox savedsince 2d
 
@@ -241,7 +265,8 @@ doveadm move -u jane Archive/2011/09 mailbox INBOX BEFORE 2011-10-01 SINCE 01-Se
 </pre></div>
 
 <p data-toggle="collapse" style="cursor:help;" data-target="#changevfiltermsg"><strong>VirusTotal message presets</strong></p>
-<div id="changevfiltermsg" class="collapse out"><pre style="border: 0px; background-color: #333; color: #7CFC00;">
+<div id="changevfiltermsg" class="collapse out">
+<pre>
 ; The vfilter is installed into /opt/vfilter
 ; You should not change any file here unless you know what you are doing
 ;
@@ -250,7 +275,8 @@ nano /opt/vfilter/replies
 </pre></div>
 
 <p data-toggle="collapse" style="cursor:help;" data-target="#backupmail"><strong>Backup mail</strong></p>
-<div id="backupmail" class="collapse out"><pre style="border: 0px; background-color: #333; color: #7CFC00;">
+<div id="backupmail" class="collapse out">
+<pre>
 ; If you want to create a backup of Bobs maildir to /var/mailbackup, just go ahead and create the backup destination with proper rights:
 mkdir /var/mailbackup
 chown vmail:vmail /var/mailbackup/
@@ -262,7 +288,8 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 </pre></div>
 
 <p data-toggle="collapse" style="cursor:help;" data-target="#debugging"><strong>Debugging</strong></p>
-<div id="debugging" class="collapse out"><pre style="border: 0px; background-color: #333; color: #7CFC00;">
+<div id="debugging" class="collapse out">
+<pre>
 ; Pathes to important log files:
 /var/log/mail.log
 /opt/vfilter/log/vfilter.log
@@ -272,8 +299,12 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 /var/log/php5-fpm.log
 </pre></div>
 
-<hr>
-<h3>System Information</h3>
+</div>
+</div>
+
+<div class="panel panel-default">
+<div class="panel-heading">System Information</div>
+<div class="panel-body">
 <p>This is a very simple system information function. Please be aware that a high RAM usage is what you want on a server.</p>
 <div class="row">
 	<div class="col-md-6">
@@ -297,25 +328,39 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 <pre>
 <?php echo_sys_info("mailq"); ?>
 </pre>
+</div>
+</div>
 
 <?php
 } else {
 ?>
-<h3>Login</h3>
+<div class="panel panel-default">
+<div class="panel-heading">Login</div>
+<div class="panel-body">
 <form class="form-signin" method="post">
 	<input name="login_user" type="email" id="inputEmail" class="form-control" placeholder="pfadmin@domain.tld" required autofocus>
 	<input name="pass_user" type="password" id="inputPassword" class="form-control" placeholder="Password" required>
 	<p>You can login with any superadmin created in <b><a href="../pfadmin">Postfixadmin</a></b>.</p>
 	<input type="submit" class="btn btn-success" value="Login">
 </form>
+</div>
+</div>
+
 <?php
 }
 ?>
-<hr>
 <p><b><a href="../">&#8592; go back</a></b></p>
 </div> <!-- /container -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-<!-- Latest compiled and minified JavaScript -->
+
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+<script src="../js/ripples.min.js"></script>
+<script src="../js/material.min.js"></script>
+<script>
+$(document).ready(function() {
+	$.material.init();
+});
+</script>
+
 </body>
 </html>
