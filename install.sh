@@ -97,7 +97,7 @@ installtask spamassassin
 returnwait "Spamassassin configuration" "Webserver configuration"
 
 installtask webserver
-returnwait "Nginx configuration" "Postfixadmin configuration"
+returnwait "Webserver configuration" "Postfixadmin configuration"
 
 installtask postfixadmin
 returnwait "Postfixadmin configuration" "Roundcube configuration"
