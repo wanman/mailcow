@@ -39,7 +39,7 @@ server {
 
 	error_page 502 /redir.html;
 	location /redir.html {
-		return 301 /fcc;
+		return 301 /admin.php;
 	}
 
 	location ~ ^/(rc/logs|pfadmin/ADDITIONS)/ {
