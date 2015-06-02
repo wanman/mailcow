@@ -2,21 +2,21 @@
 	ServerSignature off
 	TraceEnable off
 	AddDefaultCharset utf-8
-	ServerName "autoconfig.FUFIX_DOMAIN"
-	DocumentRoot /var/www/mail
-	RewriteEngine On
-	RewriteRule ^/?(.*) /autoconfig.xml [L]
-</VirtualHost>
-<VirtualHost *:80>
-	ServerSignature off
-	TraceEnable off
-	AddDefaultCharset utf-8
 	ServerName "FUFIX_HOST.FUFIX_DOMAIN"
 	DocumentRoot /var/www/mail
 	ProxyPassMatch ^/(.*\.php(/.*)?)$ unix:/var/run/php5-fpm-mail.sock|fcgi://127.0.0.1:9000/var/www/mail
 	RewriteEngine On
 	RewriteCond %{HTTPS} !=on
 	RewriteRule ^/?(.*) https://%{HTTP_HOST}/$1 [L,R,NE]
+</VirtualHost>
+<VirtualHost *:80>
+	ServerSignature off
+	TraceEnable off
+	AddDefaultCharset utf-8
+	ServerName "autoconfig.FUFIX_DOMAIN"
+	DocumentRoot /var/www/mail
+	RewriteEngine On
+	RewriteRule ^/?(.*) /autoconfig.xml [L]
 </VirtualHost>
 <IfModule mod_ssl.c>
 	<VirtualHost *:443>

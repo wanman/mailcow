@@ -8,14 +8,9 @@ $CONF['database_name'] = 'my_postfixdb';
 $CONF['encrypt'] = 'dovecot:SHA512-CRYPT';
 $CONF['dovecotpw'] = "/usr/bin/doveadm pw";
 $CONF['admin_email'] = 'noreply@domain.tld';
-$CONF['default_aliases'] = array (
-    'abuse' => 'abuse@domain.tld',
-    'hostmaster' => 'hostmaster@domain.tld',
-    'postmaster' => 'postmaster@domain.tld',
-    'webmaster' => 'webmaster@domain.tld'
-);
-$CONF['aliases'] = '10240';
-$CONF['mailboxes'] = '10240';
+$CONF['default_aliases'] = ''
+$CONF['aliases'] = '200';
+$CONF['mailboxes'] = '200';
 $CONF['maxquota'] = '10240';
 $CONF['domain_quota_default'] = '20480';
 $CONF['quota_multiplier'] = '1048576';

@@ -1,4 +1,9 @@
 <?php
+$database_host = "localhost";
+$database_user = "postfix";
+$database_pass = "Z5eY9w4L8h1vUrhluhUveoyE";
+$database_name = "postfixdb";
+// if NAT or IPv6
 $IP=$_SERVER['SERVER_ADDR'];
 if (!filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
 	$IP="YOUR.IP.V.4";

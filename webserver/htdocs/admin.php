@@ -1,64 +1,130 @@
 <?php
-session_start();
-require_once "inc/vars.inc.php";
-require_once "inc/functions.inc.php";
+require_once("inc/header.inc.php");
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>fufix control center</title>
-<!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-<alink href="../css/roboto.min.css" rel="stylesheet">
-<link href="../css/material.min.css" rel="stylesheet">
-<link href="../css/ripples.min.css" rel="stylesheet">
-</head>
-<body>
-<nav class="navbar navbar-default">
-	<div class="container-fluid">
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
-			<a class="navbar-brand" href="/"><?php echo $MYHOSTNAME ?></a>
-		</div>
-		<div id="navbar" class="navbar-collapse collapse">
-			<ul class="nav navbar-nav navbar-right">
-				<li><a href="/rc">Webmail</a></li>
-				<li><a href="/pfadmin">Postfixadmin</a></li>
-				<li><a href="/fcc">fufix control center</a></li>
-				<li><a href="#" onclick="logout.submit()">
-<?php
-if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes") {
-    echo "Logout";
-}
-else {
-    echo "";
-}
-?>
-</a></li>
-			</ul>
-		</div><!--/.nav-collapse -->
-	</div><!--/.container-fluid -->
-</nav>
-
-<form action="/fcc/" method="post" id="logout"><input type="hidden" name="logout"></form>
 <div class="container">
-
 <?php
-require_once "inc/triggers.inc.php";
-if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes") {
+if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes" && $_SESSION['fufix_cc_role'] == "admin") {
 ?>
-<h1><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Configuration</h1>
+<h4><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Access</h4>
+
+<div class="panel panel-default">
+<div class="panel-heading">Administrators</div>
+<div class="panel-body">
+<form method="post">
+<?php
+$result = mysqli_fetch_assoc(mysqli_query($link, "SELECT username from admin where superadmin='1' and active='1'"));
+?>
+	<input type="hidden" name="admin_user_now" value="<?php echo $result['username']; ?>">
+	<div class="form-group">
+		<label class="control-label col-sm-2" for="quota">Administrator:</label>
+		<div class="col-sm-10">          
+		<input type="text" class="form-control" name="admin_user" id="quota" value="<?php echo $result['username']; ?>">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="control-label col-sm-2" for="password">Password:</label>
+		<div class="col-sm-10">
+		<input type="password" class="form-control" name="admin_pass" id="password" placeholder="Leave blank for no change">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="control-label col-sm-2" for="password2">Password (repeat):</label>
+		<div class="col-sm-10">
+		<input type="password" class="form-control" name="admin_pass2" id="password2">
+		</div>
+	</div>
+	<div class="form-group">        
+		<div class="col-sm-offset-2 col-sm-10">
+			<button type="submit" class="btn btn-default btn-raised btn-sm">Save changes</button>
+		</div>
+	</div>
+</form>
+</div>
+</div>
+
+<div class="panel panel-default">
+<div class="panel-heading">Domain administrators</div>
+<div class="panel-body">
+<form method="post">
+<div class="table-responsive">
+<table class="table table-striped" id="domainadminstable">
+	<thead>
+	<tr>
+		<th>Username</th>
+		<th>Assigned domains</th>
+		<th>Active</th>
+		<th>Action</th>
+	</tr>
+	</thead>
+	<tbody>
+<?php
+$result = mysqli_query($link, "SELECT username, LOWER(GROUP_CONCAT(DISTINCT domain SEPARATOR ', ')) AS domain, active FROM domain_admins WHERE username NOT IN (SELECT username FROM admin WHERE superadmin='1') GROUP BY username");
+while ($row = mysqli_fetch_array($result)) {
+echo "<tr><td>", $row['username'],
+"</td><td>", $row['domain'],
+"</td><td>", $row['active'],
+"</td><td><a href=\"do.php?deletedomainadmin=", $row['username'], "\">delete</a> | 
+<a href=\"do.php?editdomainadmin=", $row['username'], "\">edit</a>",
+"</td></tr>";
+}
+?>
+	</tbody>
+</table>
+</div>
+</form>
+<small>
+<h4>Add domain administrator</h4>
+<form class="form-horizontal" role="form" method="post">
+<input type="hidden" name="mailboxaction" value="adddomainadmin">
+	<div class="form-group">
+		<label class="control-label col-sm-2" for="username">Username (<code>A-Z</code>, <code>@</code>, <code>-</code>, <code>.</code>).</label>
+		<div class="col-sm-10">
+			<input type="text" class="form-control" name="username" id="username" required>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="control-label col-sm-2" for="name">Assign domains <small>(hold <code>CTRL</code> to select multiple domains)</small>:</label>
+		<div class="col-sm-10">
+			<select style="width:50%" name="domain[]" size="5" multiple>
+<?php
+$resultselect = mysqli_query($link, "SELECT domain FROM domain");
+while ($row = mysqli_fetch_array($resultselect)) {
+echo "<option>", $row['domain'], "</option>";
+}
+?>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="control-label col-sm-2" for="password">Password:</label>
+		<div class="col-sm-10">
+		<input type="password" class="form-control" name="password" id="password" placeholder="">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="control-label col-sm-2" for="password2">Password (repeat):</label>
+		<div class="col-sm-10">
+		<input type="password" class="form-control" name="password2" id="password2" placeholder="">
+		</div>
+	</div>
+	<div class="form-group">        
+		<div class="col-sm-offset-2 col-sm-10">
+			<div class="checkbox">
+			<label><input type="checkbox" name="active" checked> Active</label>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">        
+		<div class="col-sm-offset-2 col-sm-10">
+			<button type="submit" class="btn btn-default btn-raised btn-sm">Add domain admin</button>
+		</div>
+	</div>
+</form>
+</small>
+</div>
+</div>
+
+<h4><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Configuration</h4>
 
 <div class="panel panel-default">
 <div class="panel-heading">Attachments</div>
@@ -122,8 +188,8 @@ Enter "DISABLED" to disable this feature.</pre></p>
 					Do <b>not</b> upload files to VirusTotal but check for a previous scan report. This also requires an API key!
 					</label>
 			</div>
-			<label for="vtapikey">VirusTotal API Key, 64 char. alphanumeric (<a href="https://www.virustotal.com/documentation/virustotal-community/#retrieve-api-key" target="_blank">?</a>)</label>
-			<p><input class="form-control" id="vtapikey" type="text" name="vtapikey" pattern="[a-zA-Z0-9]{64}" value="<?php echo return_fufix_config("vtapikey"); ?>"></p>
+			<label for="vtapikey">VirusTotal API Key (<a href="https://www.virustotal.com/documentation/virustotal-community/#retrieve-api-key" target="_blank">?</a>)</label>
+			<p><input class="form-control" id="vtapikey" type="text" name="vtapikey" placeholder="64 characters, alphanumeric" pattern="[a-zA-Z0-9]{64}" value="<?php echo return_fufix_config("vtapikey"); ?>"></p>
 			</small>
 		</div>
 		<div class="col-sm-12">
@@ -131,7 +197,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 		<p><pre><?php echo_sys_info("vfilterlog", "20"); ?></pre></p>
 		</div>
 	</div>
-	<br /><button type="submit" class="btn btn-primary btn-sm">Apply</button>
+	<br /><button type="submit" class="btn btn-default btn-raised btn-sm">Apply</button>
 </div>
 </form>
 </div>
@@ -144,7 +210,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <div class="form-group">
 	<p>Specify a list of senders or domains to blacklist access:</p>
 	<textarea class="form-control" rows="6" name="sender"><?php return_fufix_config("senderaccess") ?></textarea>
-	<br /><button type="submit" class="btn btn-primary btn-sm">Apply</button>
+	<br /><button type="submit" class="btn btn-default btn-raised btn-sm">Apply</button>
 </div>
 </form>
 </div>
@@ -163,7 +229,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 		Anonymize outgoing mail
 	</label>
 	</div>
-	<button type="submit" class="btn btn-primary btn-sm">Apply</button>
+	<button type="submit" class="btn btn-default btn-raised btn-sm">Apply</button>
 </div>
 </form>
 </div>
@@ -174,7 +240,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <div class="panel-body">
 <p>Default behaviour is to sign with relaxed header and body canonicalization algorithm.</p>
 <p><strong>DKIM signing will not be used when when "Anonymize outgoing mail" is enabled.</strong></p>
-<form method="post" action="index.php">
+<form method="post">
 <h4>Active keys</h4>
 <?php opendkim_table() ?>
 <h4>Add new key</h4>
@@ -189,7 +255,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 			<input class="form-control" id="dkim_selector" name="dkim_selector" placeholder="default">
 		</div>
 		<div class="col-md-4">
-			<br /><button type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus"></span> Add</button>
+			<br /><button type="submit" class="btn btn-default btn-raised btn-sm"><span class="glyphicon glyphicon-plus"></span> Add</button>
 		</div>
 	</div>
 </div>
@@ -206,14 +272,14 @@ Enter "DISABLED" to disable this feature.</pre></p>
 	<div class="form-group">
 		<input type="number" class="form-control" id="maxmsgsize" name="maxmsgsize" placeholder="in MB" min="1" max="250">
 	</div>
-	<button type="submit" class="btn btn-primary btn-sm">Set</button>
+	<button type="submit" class="btn btn-default btn-raised btn-sm">Set</button>
 	</form>
 
 </div>
 </div>
 
 <br />
-<h1><span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> Maintenance</h1>
+<h2><span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> Maintenance</h2>
 
 <div class="panel panel-default">
 <div class="panel-heading">FAQ</div>
@@ -310,7 +376,7 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 	<div class="col-md-6">
 		<h4>Disk usage (/var/vmail) - <?php echo_sys_info("maildisk"); ?>%</h4>
 		<div class="progress">
-		  <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="<?php echo_sys_info("maildisk"); ?>"
+		  <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?php echo_sys_info("maildisk"); ?>"
 		  aria-valuemin="0" aria-valuemax="100" style="width:<?php echo_sys_info("maildisk"); ?>%">
 		  </div>
 		</div>
@@ -318,7 +384,7 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 	<div class="col-md-6">
 		<h4>RAM usage - <?php echo_sys_info("ram"); ?>%</h4>
 		<div class="progress">
-		  <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="<?php echo_sys_info("ram"); ?>"
+		  <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?php echo_sys_info("ram"); ?>"
 		  aria-valuemin="0" aria-valuemax="100" style="width:<?php echo_sys_info("ram"); ?>%">
 		  </div>
 		</div>
@@ -332,16 +398,20 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 </div>
 
 <?php
+} 
+elseif (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes" && $_SESSION['fufix_cc_role'] == "domainadmin") {
+header('Location: mailbox.php');
+die("Permission denied");
 } else {
 ?>
 <div class="panel panel-default">
 <div class="panel-heading">Login</div>
 <div class="panel-body">
 <form class="form-signin" method="post">
-	<input name="login_user" type="email" id="inputEmail" class="form-control" placeholder="pfadmin@domain.tld" required autofocus>
-	<input name="pass_user" type="password" id="inputPassword" class="form-control" placeholder="Password" required>
-	<p>You can login with any superadmin created in <b><a href="../pfadmin">Postfixadmin</a></b>.</p>
+	<input name="login_user" type="name" id="login_user" class="form-control" placeholder="Username" required autofocus>
+	<input name="pass_user" type="password" id="pass_user" class="form-control" placeholder="Password" required>
 	<input type="submit" class="btn btn-success" value="Login">
+	<p><small><strong>Hint:</strong> Use "fufix_resetadmin" to reset the password.</small></p>
 </form>
 </div>
 </div>
@@ -351,16 +421,14 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 ?>
 <p><b><a href="../">&#8592; go back</a></b></p>
 </div> <!-- /container -->
-
-<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-<script src="../js/ripples.min.js"></script>
-<script src="../js/material.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="js/ripples.min.js"></script>
+<script src="js/material.min.js"></script>
 <script>
 $(document).ready(function() {
 	$.material.init();
 });
 </script>
-
 </body>
 </html>
