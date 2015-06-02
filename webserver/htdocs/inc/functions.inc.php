@@ -1,6 +1,6 @@
 <?php
 function check_login($link, $user, $pass) {
-	if(!ctype_alnum($user)) {
+	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $user))) {
 		return false;
 	}
 	$pass = escapeshellcmd($pass);

@@ -400,7 +400,7 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			rm -rf /var/www/mail 2> /dev/null
 			tar xf pfadmin/inst/$postfixadmin_revision.tar -C pfadmin/inst/
 			mkdir -p /var/www/mail/pfadmin /var/run/fetchmail /etc/mail/postfixadmin 2> /dev/null
-			cp -R webserver/htdocs/{fcc,index.php,robots.txt,autoconfig.xml} /var/www/mail/
+			cp -R webserver/htdocs/* /var/www/mail/
 			touch /var/www/{VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE}
 			mv pfadmin/inst/$postfixadmin_revision/* /var/www/mail/pfadmin/
 			install -m 755 /var/www/mail/pfadmin/ADDITIONS/fetchmail.pl /usr/local/bin/fetchmail.pl
@@ -412,6 +412,9 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			sed -i "s/my_postfixuser/$my_postfixuser/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
 			sed -i "s/my_postfixdb/$my_postfixdb/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
 			sed -i "s/domain.tld/$sys_domain/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
+			sed -i "s/my_postfixpass/$my_postfixpass/g" /var/www/mail/inc/vars.inc.php
+			sed -i "s/my_postfixuser/$my_postfixuser/g" /var/www/mail/inc/vars.inc.php
+			sed -i "s/my_postfixdb/$my_postfixdb/g" /var/www/mail/inc/vars.inc.php
 			sed -i "s/change-this-to-your.domain.tld/$sys_domain/g" /var/www/mail/pfadmin/config.inc.php
 			chown -R www-data: /var/www/ ; chown -R vmail: /var/run/fetchmail
 			rm -rf pfadmin/inst/$postfixadmin_revision

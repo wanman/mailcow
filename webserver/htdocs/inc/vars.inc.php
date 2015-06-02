@@ -1,8 +1,8 @@
 <?php
 $database_host = "localhost";
-$database_user = "postfix";
-$database_pass = "Z5eY9w4L8h1vUrhluhUveoyE";
-$database_name = "postfixdb";
+$database_user = "my_postfixuser";
+$database_pass = "my_postfixpass";
+$database_name = "my_postfixdb";
 // if NAT or IPv6
 $IP=$_SERVER['SERVER_ADDR'];
 if (!filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
