@@ -1,8 +1,10 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+fufix is now known as mailcow!
 
-- [fufix](#fufix)
+![mailcow](https://www.debinux.de/256.png)
+
+- [mailcow](#mailcow)
 - [Introduction](#introduction)
 - [Before You Begin](#before-you-begin)
 - [Installation](#installation)
@@ -26,22 +28,18 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-fufix
+mailcow
 =====
 
-```
-   m""           m""    "
- mm#mm  m   m  mm#mm  mmm    m   m
-   #    #   #    #      #     #m#
-   #    #   #    #      #     m#m
-   #    "mm"#    #    mm#mm  m" "m
-```
+mailcow is a mail server suite based on Dovecot, Postfix and other open source software, that provides a modern Web UI for administration.
+In future versions mailcow will provide Cal- and CardDAV support.
 
-A mail server install script with a lot of features for **Debian and Debian based distributions**. 
-This installer is permanently **tested on Debian stable (8.x) and old-stable (7.x)**.
+For **Debian and Debian based distributions**. 
+
+This script is permanently **tested on Debian stable (8.x) and old-stable (7.x)**.
 Debian Squeeze is not supported.
 
-Please see https://www.debinux.de/fufix for further information.
+Please see https://www.debinux.de/mailcow for further information.
 Feel free to leave a comment or question.
 
 ![fufix v0.10](https://www.debinux.de/wp-content/uploads/2014/10/fufix010.png "fufix v0.10")
@@ -58,7 +56,7 @@ A summary of what software is installed with which features enabled.
 * DNS-Checks by Google DNS (PTR, A-Record, SPF etc.)
 * Learn ham and spam, [Heinlein Support](https://www.heinlein-support.de/) SA rules included
 * Fail2ban brute force protection
-* A "fufix control center" via browser
+* A "mailcow control center" via browser
 
 **Postfix**
 * Postscreen activated
@@ -116,12 +114,12 @@ apt-get purge exim4*
 
 **Download a stable release**
 
-Download fufix to whichever directory (using ~/build here).
-Replace "v0.x" with the tag of the latest release: https://github.com/andryyy/fufix/releases/latest
+Download mailcow to whichever directory (using ~/build here).
+Replace "v0.x" with the tag of the latest release: https://github.com/andryyy/mailcow/releases/latest
 ```
 mkdir ~/build ; cd ~/build
-wget -O - https://github.com/andryyy/fufix/archive/v0.x.tar.gz | tar xfz -
-cd fufix-*
+wget -O - https://github.com/andryyy/mailcow/archive/v0.x.tar.gz | tar xfz -
+cd mailcow-*
 ```
 
 **Now edit the file "configuration" to fit your needs!**
@@ -161,9 +159,9 @@ Remember to create an alias- or a mailbox for Postmaster. ;-)
 # Upgrade
 **Please run all commands as root**
 
-Upgrade is supported since fufix v0.7.x. From v0.9 on you do not need the file `installer.log` from a previous installation.
+Upgrade is supported since mailcow v0.7.x. From v0.9 on you do not need the file `installer.log` from a previous installation.
 
-The fufix configuration file will not be read, so there is no need to adjust it in any way before upgrading.
+The mailcow configuration file will not be read, so there is no need to adjust it in any way before upgrading.
 
 To start the upgrade, run the following command:
 ```
@@ -188,7 +186,7 @@ Move undetected spam to "Junk" to make Spamassassin autolearn it. This is done b
 Ham (non-spam) is learned the same way. Move false-positives to your inbox to autolearn them.
 
 ### Spam rewrite
-fufix adds `rewrite_header Subject [SPAM]` and `report_safe 2` to prefix [SPAM] to junk mail and forward spam as attachment instead of original message (text/plain). 
+mailcow adds `rewrite_header Subject [SPAM]` and `report_safe 2` to prefix [SPAM] to junk mail and forward spam as attachment instead of original message (text/plain). 
 
 The prefix "[SPAM]" is not important for the sieve filter and can be changed to whatever text. Spam will be moved when te Spam Flag is set the header.
 
@@ -208,14 +206,14 @@ I try to comment as much as possible inside these files to help you understand t
 You also find the SQL based maps for virtual transport here:
 * **/etc/postfix/sql/*.cf**
 
-For a quick overview of the restrictions [click here](https://github.com/andryyy/fufix/blob/master/postfix/conf/main.cf).
+For a quick overview of the restrictions [click here](https://github.com/andryyy/mailcow/blob/master/postfix/conf/main.cf).
 
 ## HTTPd
 A site named "000-0-mail" is copied to `/etc/{nginx,apache2}/sites-available` - depending on your configuration - and enabled via symbolic link to `[...]/sites-enabled`.
 
 The sites root location is `/var/www/mail/`. 
 
-Other sites will not be touched/changed/removed by fufix (>= v0.9).
+Other sites will not be touched/changed/removed by mailcow (>= v0.9).
 
 A PHP socket (>> `/var/run/php5-fpm-mail.sock`) configuration is located at `/etc/php5/fpm/pool.d/mail.conf`. 
 Some PHP parameters are set right here to override those in `/etc/php5/fpm/php.ini`.
@@ -283,14 +281,14 @@ Some plug-ins come with a seperate "config.inc.php" file. You can find them in `
 If no domain is specified for a login address, the webservers domain part will be appended.
 
 ## Change attachment/message size
-Default file size limit is set to 25 MB. If you want to change this, either use the fufix control center or the command `fufix_msg_size` in a terminal:
+Default file size limit is set to 25 MB. If you want to change this, either use the mailcow control center or the command `mailcow_msg_size` in a terminal:
 
 ```
-fufix_msg_size VALUE_IN_MB
+mailcow_msg_size VALUE_IN_MB
 ``` 
 
 # Uninstall
-Run `bash misc/purge.sh` from within fufix directory to remove fufix main components.
+Run `bash misc/purge.sh` from within mailcow directory to remove mailcow main components.
 
 Your web server + web root, MySQL server + databases as well as your mail directory (/var/vmail) will **not** be removed (>= v0.9).
 
