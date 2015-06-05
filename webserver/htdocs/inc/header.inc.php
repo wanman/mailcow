@@ -4,6 +4,10 @@ if (isset($_SESSION['fufix_cc_loggedin']) && !empty($_SESSION['fufix_cc_loggedin
 	$logged_in_as = $_SESSION['fufix_cc_username'];
 	$logged_in_role = $_SESSION['fufix_cc_role'];
 }
+else {
+	$logged_in_role = "";
+	$logged_in_as = "";
+}
 require_once "inc/vars.inc.php";
 $link = mysqli_connect($database_host, $database_user, $database_pass, $database_name);
 require_once "inc/functions.inc.php";
