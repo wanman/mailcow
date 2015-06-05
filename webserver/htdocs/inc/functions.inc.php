@@ -496,9 +496,11 @@ function mailbox_edit_domain($link, $postarray) {
 	if (isset($_POST['active']) && $_POST['active'] == "on") { $active = "1"; } else { $active = "0"; }
 	if (isset($_POST['backupmx']) && $_POST['backupmx'] == "on") { $backupmx = "1"; } else { $backupmx = "0"; }
 	$mystring = "UPDATE domain SET modified=now(), backupmx='$backupmx', active='$active', quota='$quota', maxquota='$maxquota', mailboxes='$mailboxes', aliases='$aliases', description='$description' WHERE domain='$domain'";
-	if (mysqli_query($link, $mystring)) {
-		header('Location: do.php?return=success');
+	if (!mysqli_query($link, $mystring)) {
+		header("Location: do.php?event=".base64_encode("MySQL query failed"));
+		die("MySQL query failed");
 	}
+	header('Location: do.php?return=success');
 }
 function mailbox_edit_domainadmin($link, $postarray) {
 	if (empty($_POST['domain'])) {
