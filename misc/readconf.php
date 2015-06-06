@@ -1,11 +1,11 @@
 <?php
 error_reporting(E_ERROR);
 require_once "/var/www/mail/rc/config/config.inc.php";
-require_once "/var/www/mail/pfadmin/config.local.php";
+require_once "/var/www/mail/inc/vars.inc.php";
 
-echo $CONF['database_user'], PHP_EOL;
-echo $CONF['database_password'], PHP_EOL;
-echo $CONF['database_name'], PHP_EOL;
+echo $database_user, PHP_EOL;
+echo $database_pass, PHP_EOL;
+echo $database_name, PHP_EOL;
 
 echo $config["des_key"], PHP_EOL;
 echo parse_url($config["db_dsnw"])[user], PHP_EOL;

@@ -20,4 +20,3 @@ do
 done
 EOF
 chmod +x /etc/cron.$RUNTIME/mailcow_backup
-
