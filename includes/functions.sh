@@ -289,7 +289,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown www-data: /etc/postfix/fufix_*
 			sed -i "/%www-data/d" /etc/sudoers 2> /dev/null
 			sed -i "/%vmail/d" /etc/sudoers 2> /dev/null
-			echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /usr/local/bin/opendkim-keycontrol, /usr/local/bin/fufix_msg_size, /usr/bin/tail * /opt/vfilter/log/vfilter.log' >> /etc/sudoers
+			echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /usr/local/bin/opendkim-keycontrol, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_inst_cron, /usr/bin/tail * /opt/vfilter/log/vfilter.log' >> /etc/sudoers
 			echo '%vmail ALL=(ALL) NOPASSWD: /usr/bin/spamc*' >> /etc/sudoers
 			;;
 		dovecot)
@@ -313,7 +313,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			mkdir -p /var/vmail/sieve
 			cp dovecot/conf/spam-global.sieve /var/vmail/sieve/spam-global.sieve
 			touch /var/vmail/sieve/default.sieve
-			install -m 755 misc/fufix_msg_size /usr/local/bin/fufix_msg_size
+			install -m 755 misc/mc_msg_size /usr/local/sbin/mc_msg_size
 			sievec /var/vmail/sieve/spam-global.sieve
 			chown -R vmail:vmail /var/vmail
 			install -m 755 dovecot/conf/doverecalcq /etc/cron.daily/
@@ -401,7 +401,8 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			tar xf pfadmin/inst/$postfixadmin_revision.tar -C pfadmin/inst/
 			mkdir -p /var/www/mail/pfadmin /var/run/fetchmail /etc/mail/postfixadmin 2> /dev/null
 			cp -R webserver/htdocs/* /var/www/mail/
-			touch /var/www/{VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE}
+			touch /var/www/{VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE,MAIL_BACKUP}
+			install -m 755 misc/mc_inst_cron /usr/local/sbin/mc_inst_cron
 			mv pfadmin/inst/$postfixadmin_revision/* /var/www/mail/pfadmin/
 			install -m 755 /var/www/mail/pfadmin/ADDITIONS/fetchmail.pl /usr/local/bin/fetchmail.pl
 			install -m 644 pfadmin/conf/config.local.php /var/www/mail/pfadmin/config.local.php

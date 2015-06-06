@@ -60,6 +60,18 @@ function dl_clamav_positives() {
 }
 function return_fufix_config($s) {
 	switch ($s) {
+		case "backup_location":
+			preg_match("/LOCATION=(.*)/", file_get_contents($GLOBALS['mc_mailbox_backup']) , $result);
+			return $result[1];
+			break;
+		case "backup_runtime":
+			preg_match("/RUNTIME=(.*)/", file_get_contents($GLOBALS['mc_mailbox_backup']) , $result);
+			return $result[1];
+			break;
+		case "backup_active":
+			preg_match("/BACKUP=(.*)/", file_get_contents("/var/www/MAILBOX_BACKUP") , $result);
+			return $result[1];
+			break;
 		case "extlist":
 			$read_mime_check = file($GLOBALS["fufix_reject_attachments"])[0];
 			preg_match('#\((.*?)\)#', $read_mime_check, $match);
@@ -102,43 +114,86 @@ function return_fufix_config($s) {
 }
 function set_fufix_config($s, $v = "", $vext = "") {
 	switch ($s) {
+		case "backup":
+			$file="/var/www/MAILBOX_BACKUP";
+			if (($v['use_backup'] != "on" && $v['use_backup'] != "off") || 
+				($v['runtime'] != "hourly" && $v['runtime'] != "daily" && $v['runtime'] != "monthly")) {
+				header("Location: do.php?event=".base64_encode("Invalid form data"));
+				die("Invalid form data");
+			}
+			if (!ctype_alnum(str_replace("/", "", $v['location']))) {
+				header("Location: do.php?event=".base64_encode("Invalid form data"));
+				die("Invalid form data");
+			}
+			file_put_contents($file, "BACKUP=".$v['use_backup'].PHP_EOL, LOCK_EX);
+			file_put_contents($file, "MBOX=(".PHP_EOL, FILE_APPEND | LOCK_EX);
+			foreach ($v['mailboxes'] as $mbox) {
+				if (!filter_var($mbox, FILTER_VALIDATE_EMAIL)) {
+					header("Location: do.php?event=".base64_encode("Mail address format invalid"));
+					die("Mail address format invalid"); 
+				}
+				file_put_contents($file, $mbox.PHP_EOL, FILE_APPEND | LOCK_EX);
+			}
+			file_put_contents($file, ")".PHP_EOL.'RUNTIME='.$v['runtime'].PHP_EOL, FILE_APPEND | LOCK_EX);
+			file_put_contents($file, "LOCATION=".$v['location'].PHP_EOL, FILE_APPEND | LOCK_EX);
+			exec("sudo /usr/local/sbin/mc_inst_cron", $out, $return);
+			if ($return != "0") {
+				header("Location: do.php?event=".base64_encode("Error setting up cronjob"));
+				die("Error setting up cronjob");
+			}
+			header('Location: do.php?return=success');
+			break;
 		case "vtupload":
 			if ($v != "1") {
 				file_put_contents($GLOBALS["VT_ENABLE_UPLOAD"], "");
+				header('Location: do.php?return=success');
 			}
 			else {
 				file_put_contents($GLOBALS["VT_ENABLE_UPLOAD"], "1");
+				header('Location: do.php?return=success');
 			}
 			break;
 		case "vtenable":
 			if ($v != "1") {
 				file_put_contents($GLOBALS["VT_ENABLE"], "");
+				header('Location: do.php?return=success');
 			}
 			else {
 				file_put_contents($GLOBALS["VT_ENABLE"], "1");
+				header('Location: do.php?return=success');
 			}
 			break;
 		case "cavenable":
 			if ($v != "1") {
 				file_put_contents($GLOBALS["CAV_ENABLE"], "");
+				header('Location: do.php?return=success');
 			}
 			else {
 				file_put_contents($GLOBALS["CAV_ENABLE"], "1");
+				header('Location: do.php?return=success');
 			}
 			break;
 		case "maxmsgsize":
-			shell_exec("sudo /usr/local/bin/fufix_msg_size $v");
+			exec("sudo /usr/local/sbin/mc_msg_size $v", $out, $return);
+			if ($return != "0") {
+				header("Location: do.php?event=".base64_encode("Error setting max. message size"));
+				die("Error setting max. message size");
+			}
+			header('Location: do.php?return=success');
 			break;
 		case "vtapikey":
 			file_put_contents($GLOBALS["VT_API_KEY"], $v);
+			header('Location: do.php?return=success');
 			break;
 		case "extlist":
 			if ($vext == "reject") {
 				foreach (explode("|", $v) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return false; } }
 				file_put_contents($GLOBALS["fufix_reject_attachments"], "/name=[^>]*\.($v)/     REJECT     Dangerous files are prohibited on this server.".PHP_EOL);
+				header('Location: do.php?return=success');
 			} elseif ($vext == "filter") {
 				foreach (explode("|", $v) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return false; } }
 				file_put_contents($GLOBALS["fufix_reject_attachments"], "/name=[^>]*\.($v)/     FILTER     vfilter:dummy".PHP_EOL);
+				header('Location: do.php?return=success');
 			}
 			break;
 		case "anonymize":
@@ -150,8 +205,10 @@ function set_fufix_config($s, $v = "", $vext = "") {
 		';
 			if ($v == "on") {
 				file_put_contents($GLOBALS["fufix_anonymize_headers"], $template);
+				header('Location: do.php?return=success');
 			} else {
 				file_put_contents($GLOBALS["fufix_anonymize_headers"], "");
+				header('Location: do.php?return=success');
 			}
 			break;
 		case "senderaccess":
@@ -164,6 +221,7 @@ function set_fufix_config($s, $v = "", $vext = "") {
 			}
 			$sender_map = $GLOBALS["fufix_sender_access"];
 			shell_exec("/usr/sbin/postmap $sender_map");
+			header('Location: do.php?return=success');
 			break;
 	}
 }
@@ -191,19 +249,31 @@ function opendkim_table($action = "show", $which = "") {
 			break;
 		case "delete":
 			if(!ctype_alnum(str_replace(array("_", "-", "."), "", $which))) {
-				return false;
+				header("Location: do.php?event=".base64_encode("Invalid format"));
+				die("Invalid format");
 			}
 			$selector = explode("_", $which)[0];
 			$domain = explode("_", $which)[1];
-			shell_exec("sudo /usr/local/bin/opendkim-keycontrol del $selector $domain");
+			exec("sudo /usr/local/bin/opendkim-keycontrol del $selector $domain", $hash, $return);
+			if ($return != "0") {
+				header("Location: do.php?event=".base64_encode("Cannot delete domain record. Does it exist?"));
+				die("Cannot delete domain record. Does it exist?");
+			}
+			header('Location: do.php?return=success');
 			break;
 		case "add":
 			$selector = explode("_", $which)[0];
 			$domain = explode("_", $which)[1];
 			if(!ctype_alnum($selector) || !ctype_alnum(str_replace(array("-", "."), "", $domain))) {
-				return false;
+				header("Location: do.php?event=".base64_encode("Invalid format"));
+				die("Invalid format");
 			}
-			shell_exec("sudo /usr/local/bin/opendkim-keycontrol add $selector $domain");
+			exec("sudo /usr/local/bin/opendkim-keycontrol add $selector $domain", $hash, $return);
+			if ($return != "0") {
+				header("Location: do.php?event=".base64_encode("Cannot add this domain. Does it already exist?"));
+				die("Cannot add this domain. Does it already exist?");
+			}
+			header('Location: do.php?return=success');
 			break;
 	}
 }
@@ -257,7 +327,7 @@ function mailbox_add_domain($link, $postarray) {
 	$aliases = mysqli_real_escape_string($link, $postarray['aliases']);
 	$mailboxes = mysqli_real_escape_string($link, $postarray['mailboxes']);
 	$maxquota = mysqli_real_escape_string($link, $postarray['maxquota']);
-	$quota = mysqli_real_escape_string($link, $postarray['quota']);
+	$quota = mysqli_real_escape_string($link, $postarray['quota']); 
 	if ($maxquota > $quota) {
 		header("Location: do.php?event=".base64_encode("Max. size per mailbox can not be greater than domain quota"));
 		die("Max. size per mailbox can not be greater than domain quota");
@@ -269,9 +339,9 @@ function mailbox_add_domain($link, $postarray) {
 		die("Domain name invalid");
 	}
 	foreach (array($quota, $maxquota, $mailboxes, $aliases) as $data) {
-		if (!is_numeric($data)) {
+		if (!is_numeric($data)) { 
 			header("Location: do.php?event=".base64_encode("'$data' is not numeric"));
-			die("'$data' is not numeric");
+			die("'$data' is not numeric"); 
 		}
 	}
 	$mystring = "INSERT INTO domain (domain, description, aliases, mailboxes, maxquota, quota, transport, backupmx, created, modified, active)
@@ -295,16 +365,16 @@ function mailbox_add_alias($link, $postarray) {
 	if (isset($_POST['active']) && $_POST['active'] == "on") { $active = "1"; } else { $active = "0"; }
 	if (!filter_var($address, FILTER_VALIDATE_EMAIL) || !filter_var($goto, FILTER_VALIDATE_EMAIL)) {
 		header("Location: do.php?event=".base64_encode("Mail address format invalid"));
-		die("Mail address format invalid");
+		die("Mail address format invalid"); 
 	}
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain'"))) {
+	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain'"))) { 
 		header("Location: do.php?event=".base64_encode("Domain $domain not found"));
 		die("Domain $domain not found");
 	}
 	$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('$address', '$goto', '$domain', now(), now(), '$active')";
 	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+		header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+		die("MySQL is read-only");
 	}
 	header('Location: do.php?return=success');
 }
@@ -326,7 +396,7 @@ function mailbox_add_alias_domain($link, $postarray) {
 		header("Location: do.php?event=".base64_encode("Target domain name invalid"));
 		die("Target domain name invalid");
 	}
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain where domain='$target_domain'"))) {
+	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain where domain='$target_domain'"))) { 
 		header("Location: do.php?event=".base64_encode("Target domain $target_domain not found"));
 		die("Target domain $target_domain not found");
 	}
@@ -336,8 +406,8 @@ function mailbox_add_alias_domain($link, $postarray) {
 	}
 	$mystring = "INSERT INTO alias_domain (alias_domain, target_domain, created, modified, active) VALUE ('$alias_domain', '$target_domain', now(), now(), '$active')";
 	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+		header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+		die("MySQL is read-only");
 	}
 	header('Location: do.php?return=success');
 }
@@ -364,7 +434,7 @@ function mailbox_add_mailbox($link, $postarray) {
 
 	global $logged_in_role;
 	global $logged_in_as;
-
+	
 	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) { 
 		header("Location: do.php?event=".base64_encode("Permission denied"));
 		die("Permission denied");
@@ -377,12 +447,12 @@ function mailbox_add_mailbox($link, $postarray) {
 		header("Location: do.php?event=".base64_encode("Mailbox alias must be alphanumeric"));
 		die("Mailbox alias must be alphanumeric");
 	}
-	if (!is_numeric($quota_m)) {
+	if (!is_numeric($quota_m)) { 
 		header("Location: do.php?event=".base64_encode("Quota is not numeric"));
-		die("Quota is not numeric");
+		die("Quota is not numeric"); 
 	}
 	if (!empty($password) && !empty($password2)) {
-		if ($password != $password2) {
+		if ($password != $password2) { 
 			header("Location: do.php?event=".base64_encode("Password mismatch"));
 			die("Password mismatch");
 		}
@@ -408,11 +478,11 @@ function mailbox_add_mailbox($link, $postarray) {
 	}
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		header("Location: do.php?event=".base64_encode("Mail address is invalid"));
-		die("Mail address is invalid");
+		die("Mail address is invalid"); 
 	}
 	if ($quota_m > $maxquota_m) {
 		header("Location: do.php?event=".base64_encode("Quota over max. quota limit ($maxquota_m M)"));
-		die("Quota over max. quota limit ($maxquota_m M)");
+		die("Quota over max. quota limit ($maxquota_m M)"); 
 	}
 	if (($quota_m_in_use+$quota_m) > $domain_quota_m) {
 		$quota_left_m = ($domain_quota_m - $quota_m_in_use);
@@ -423,20 +493,20 @@ function mailbox_add_mailbox($link, $postarray) {
 	$mystring = "INSERT INTO mailbox (username, password, name, maildir, quota, local_part, domain, created, modified, active)
 		VALUES ('$username', '$password', '$name', '$maildir', '$quota_b', '$local_part', '$domain', now(), now(), '$active')";
 	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+		header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+		die("MySQL is read-only");
 	}
 	$mystring = "INSERT INTO quota2 (username, bytes, messages)
 		VALUES ('$username', '', '')";
 	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+		header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+		die("MySQL is read-only");
 	}
 	$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active)
 		VALUES ('$username', '$username', '$domain', now(), now(), '$active')";
 	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+		header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+		die("MySQL is read-only");
 	}
 	header('Location: do.php?return=success');
 }
@@ -497,8 +567,8 @@ function mailbox_edit_domain($link, $postarray) {
 	if (isset($_POST['backupmx']) && $_POST['backupmx'] == "on") { $backupmx = "1"; } else { $backupmx = "0"; }
 	$mystring = "UPDATE domain SET modified=now(), backupmx='$backupmx', active='$active', quota='$quota', maxquota='$maxquota', mailboxes='$mailboxes', aliases='$aliases', description='$description' WHERE domain='$domain'";
 	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+		header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+		die("MySQL is read-only"); 
 	}
 	header('Location: do.php?return=success');
 }
@@ -511,7 +581,7 @@ function mailbox_edit_domainadmin($link, $postarray) {
 		header("Location: do.php?event=".base64_encode("Permission denied"));
 		die("Permission denied");
 	}
-	array_walk($_POST['domain'], function(&$string) use ($link) {
+	array_walk($_POST['domain'], function(&$string) use ($link) { 
 		$string = mysqli_real_escape_string($link, $string);
 	});
 	$username = mysqli_real_escape_string($link, $_POST['username']);
@@ -522,20 +592,20 @@ function mailbox_edit_domainadmin($link, $postarray) {
 	if (isset($_POST['active']) && $_POST['active'] == "on") { $active = "1"; } else { $active = "0"; }
 	$mystring = "DELETE FROM domain_admins WHERE username='$username'";
 	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+		header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+		die("MySQL is read-only"); 
 	}
 	foreach ($_POST['domain'] as $domain) {
 		$mystring = "INSERT INTO domain_admins (username, domain, created, active) VALUES ('$username', '$domain', now(), '$active')";
 		if (!mysqli_query($link, $mystring)) {
-			header("Location: do.php?event=".base64_encode("MySQL query failed"));
-			die("MySQL query failed");
+			header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+			die("MySQL is read-only");
 		}
 	}
 	$mystring = "UPDATE admin SET modified=now(), active='$active' where username='$username'";
 	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+		header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+		die("MySQL is read-only");
 	}
 	header('Location: do.php?return=success');
 }
@@ -546,9 +616,9 @@ function mailbox_edit_mailbox($link, $postarray) {
 	$name = mysqli_real_escape_string($link, $_POST['name']);
 	$password = mysqli_real_escape_string($link, $_POST['password']);
 	$password2 = mysqli_real_escape_string($link, $_POST['password2']);
-	if (!is_numeric($quota_m)) {
+	if (!is_numeric($quota_m)) { 
 		header("Location: do.php?event=".base64_encode("Quota not numeric"));
-		die("Quota not numeric");
+		die("Quota not numeric"); 
 	}
 	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $username))) {
 		header("Location: do.php?event=".base64_encode("Invalid username"));
@@ -568,7 +638,7 @@ function mailbox_edit_mailbox($link, $postarray) {
 	}
 	if ($quota_m > $maxquota_m) {
 		header("Location: do.php?event=".base64_encode("Quota over max. quota limit ($maxquota_m M)"));
-		die("Quota over max. quota limit ($maxquota_m M)");
+		die("Quota over max. quota limit ($maxquota_m M)"); 
 	}
 	if (($quota_m_in_use-$quota_m_now+$quota_m) > $domain_quota_m) {
 		$quota_left_m = ($domain_quota_m - $quota_m_in_use + $quota_m_now);
@@ -586,12 +656,12 @@ function mailbox_edit_mailbox($link, $postarray) {
 		$password = $hash[0];
 		if ($return != "0") {
 			header("Location: do.php?event=".base64_encode("Error creating password hash"));
-			die("Error creating password hash");
+			die("Error creating password hash");	
 		}
 		$mystring = "UPDATE mailbox SET modified=now(), active='$active', password='$password', name='$name', quota='$quota_b' WHERE username='$username'";
 		if (!mysqli_query($link, $mystring)) {
-			header("Location: do.php?event=".base64_encode("MySQL query failed"));
-			die("MySQL query failed");
+			header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+			die("MySQL is read-only");
 		}
 		else {
 			header('Location: do.php?return=success');
@@ -599,8 +669,8 @@ function mailbox_edit_mailbox($link, $postarray) {
 	}
 	$mystring = "UPDATE mailbox SET modified=now(), active='$active', name='$name', quota='$quota_b' WHERE username='$username'";
 	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+		header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+		die("MySQL is read-only");
 	}
 	else {
 		header('Location: do.php?return=success');
@@ -618,20 +688,20 @@ function mailbox_delete_domain($link, $postarray) {
 	}
 	$mystring = "DELETE FROM quota2 WHERE username IN (SELECT username FROM mailbox WHERE domain='$domain')";
 	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+		header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+		die("MySQL is read-only");
 	}
 	foreach (array("domain", "alias", "mailbox", "domain_admins") as $deletefrom) {
 		$mystring = "DELETE FROM $deletefrom WHERE domain='$domain'";
 		if (!mysqli_query($link, $mystring)) {
-			header("Location: do.php?event=".base64_encode("MySQL query failed"));
-			die("MySQL query failed");
+			header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+			die("MySQL is read-only");
 		}
 	}
 	$mystring = "DELETE FROM alias_domain WHERE target_domain='$domain'";
 	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+		header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+		die("MySQL is read-only");
 	}
 	header('Location: do.php?return=success');
 }
@@ -649,8 +719,8 @@ function mailbox_delete_alias($link, $postarray) {
 	}
 	$mystring = "DELETE FROM alias WHERE address='$address' AND address NOT IN (SELECT username FROM mailbox)";
 	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+		header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+		die("MySQL is read-only");
 	}
 	header('Location: do.php?return=success');
 }
@@ -668,8 +738,8 @@ function mailbox_delete_alias_domain($link, $postarray) {
 	}
 	$mystring = "DELETE FROM alias_domain WHERE alias_domain='$alias_domain'";
 	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+		header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+		die("MySQL is read-only");
 	}
 	header('Location: do.php?return=success');
 }
@@ -687,15 +757,15 @@ function mailbox_delete_mailbox($link, $postarray) {
 	}
 	$mystring = "DELETE FROM alias WHERE goto='$username'";
 	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+		header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+		die("MySQL is read-only");
 	}
 	$arraydeletefrom = array("quota2", "mailbox");
 	foreach ($arraydeletefrom as $deletefrom) {
 		$mystring = "DELETE FROM $deletefrom WHERE username='$username'";
 		if (!mysqli_query($link, $mystring)) {
-			header("Location: do.php?event=".base64_encode("MySQL query failed"));
-			die("MySQL query failed");
+			header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+			die("MySQL is read-only");
 		}
 	}
 	header('Location: do.php?return=success');
@@ -727,25 +797,25 @@ function set_admin_account($link, $postarray) {
 		$password = $hash[0];
 		if ($return != "0") {
 			header("Location: do.php?event=".base64_encode("Error creating password hash"));
-			die("Error creating password hash");
+			die("Error creating password hash");	
 		}
 		$mystring = "UPDATE admin SET modified=now(), password='$password', username='$name' WHERE username='$name_now'";
 		if (!mysqli_query($link, $mystring)) {
-			header("Location: do.php?event=".base64_encode("MySQL query failed"));
-			die("MySQL query failed");
+			header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+			die("MySQL is read-only");
 		}
 	}
 	else {
 		$mystring = "UPDATE admin SET modified=now(), username='$name' WHERE username='$name_now'";
 		if (!mysqli_query($link, $mystring)) {
-			header("Location: do.php?event=".base64_encode("MySQL query failed"));
-			die("MySQL query failed");
+			header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+			die("MySQL is read-only");
 		}
 	}
 	$mystring = "UPDATE domain_admins SET username='$name', domain='ALL' WHERE username='$name_now'";
 	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+		header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+		die("MySQL is read-only");
 	}
 	header('Location: do.php?return=success');
 }
@@ -761,7 +831,7 @@ function add_domain_admin($link, $postarray) {
 	$username = mysqli_real_escape_string($link, $_POST['username']);
 	$password = mysqli_real_escape_string($link, $_POST['password']);
 	$password2 = mysqli_real_escape_string($link, $_POST['password2']);
-	array_walk($_POST['domain'], function(&$string) use ($link) {
+	array_walk($_POST['domain'], function(&$string) use ($link) { 
 		$string = mysqli_real_escape_string($link, $string);
 	});
 	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $username)) || empty ($username)) {
@@ -782,30 +852,30 @@ function add_domain_admin($link, $postarray) {
 		$password = $hash[0];
 		if ($return != "0") {
 			header("Location: do.php?event=".base64_encode("Error creating password hash"));
-			die("Error creating password hash");
+			die("Error creating password hash");	
 		}
 		if (isset($_POST['active']) && $_POST['active'] == "on") { $active = "1"; } else { $active = "0"; }
 		$mystring = "DELETE FROM domain_admins WHERE username='$username'";
 		if (!mysqli_query($link, $mystring)) {
-			header("Location: do.php?event=".base64_encode("MySQL query failed"));
-			die("MySQL query failed");
+			header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+			die("MySQL is read-only"); 
 		}
 		$mystring = "DELETE FROM admin WHERE username='$username'";
 		if (!mysqli_query($link, $mystring)) {
-			header("Location: do.php?event=".base64_encode("MySQL query failed"));
-			die("MySQL query failed");
+			header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+			die("MySQL is read-only"); 
 		}
 		foreach ($_POST['domain'] as $domain) {
 			$mystring = "INSERT INTO domain_admins (username, domain, created, active) VALUES ('$username', '$domain', now(), '$active')";
 			if (!mysqli_query($link, $mystring)) {
-				header("Location: do.php?event=".base64_encode("MySQL query failed"));
-				die("MySQL query failed");
+				header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+				die("MySQL is read-only");
 			}
 		}
 		$mystring = "INSERT INTO admin (username, password, superadmin, created, modified, active) VALUES ('$username', '$password', '0', now(), now(), '$active')";
 		if (!mysqli_query($link, $mystring)) {
-			header("Location: do.php?event=".base64_encode("MySQL query failed"));
-			die("MySQL query failed");
+			header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+			die("MySQL is read-only");
 		}
 	}
 	else {
@@ -826,14 +896,15 @@ function delete_domain_admin($link, $postarray) {
 	}
 	$mystring = "DELETE FROM domain_admins WHERE username='$username'";
 	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+		header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+		die("MySQL is read-only");
 	}
 	$mystring = "DELETE FROM admin WHERE username='$username'";
 	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+		header("Location: do.php?event=".base64_encode("MySQL is read-only"));
+		die("MySQL is read-only");
 	}
 	header('Location: do.php?return=success');
 }
 ?>
+

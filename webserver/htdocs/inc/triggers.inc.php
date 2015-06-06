@@ -18,6 +18,9 @@ if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "
 	if (isset($_POST["admin_user"])) {
 		set_admin_account($link, $_POST);
 	}
+	if (isset($_POST["use_backup"])) {
+		set_fufix_config("backup", $_POST);
+	}
 	if (isset($_GET["del"])) {
 		opendkim_table("delete", $_GET["del"]);
 	}
@@ -123,3 +126,4 @@ if (isset($_POST["logout"])) {
 	session_destroy();
 }
 ?>
+
