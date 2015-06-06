@@ -77,14 +77,14 @@ echo "<tr><td>", $row['username'],
 <form class="form-horizontal" role="form" method="post">
 <input type="hidden" name="mailboxaction" value="adddomainadmin">
 	<div class="form-group">
-		<label class="control-label col-sm-2" for="username">Username (<code>A-Z</code>, <code>@</code>, <code>-</code>, <code>.</code>).</label>
-		<div class="col-sm-10">
+		<label class="control-label col-sm-4" for="username">Username (<code>A-Z</code>, <code>@</code>, <code>-</code>, <code>.</code>).</label>
+		<div class="col-sm-8">
 			<input type="text" class="form-control" name="username" id="username" required>
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="control-label col-sm-2" for="name">Assign domains <small>(hold <code>CTRL</code> to select multiple domains)</small>:</label>
-		<div class="col-sm-10">
+		<label class="control-label col-sm-4" for="name">Assign domains <small>(hold <code>CTRL</code> to select multiple values)</small>:</label>
+		<div class="col-sm-8">
 			<select style="width:50%" name="domain[]" size="5" multiple>
 <?php
 $resultselect = mysqli_query($link, "SELECT domain FROM domain");
@@ -96,26 +96,26 @@ echo "<option>", $row['domain'], "</option>";
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="control-label col-sm-2" for="password">Password:</label>
-		<div class="col-sm-10">
+		<label class="control-label col-sm-4" for="password">Password:</label>
+		<div class="col-sm-8">
 		<input type="password" class="form-control" name="password" id="password" placeholder="">
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="control-label col-sm-2" for="password2">Password (repeat):</label>
-		<div class="col-sm-10">
+		<label class="control-label col-sm-4" for="password2">Password (repeat):</label>
+		<div class="col-sm-8">
 		<input type="password" class="form-control" name="password2" id="password2" placeholder="">
 		</div>
 	</div>
 	<div class="form-group">        
-		<div class="col-sm-offset-2 col-sm-10">
+		<div class="col-sm-offset-4 col-sm-8">
 			<div class="checkbox">
 			<label><input type="checkbox" name="active" checked> Active</label>
 			</div>
 		</div>
 	</div>
 	<div class="form-group">        
-		<div class="col-sm-offset-2 col-sm-10">
+		<div class="col-sm-offset-0 col-sm-8">
 			<button type="submit" class="btn btn-default btn-raised btn-sm">Add domain admin</button>
 		</div>
 	</div>
@@ -125,6 +125,64 @@ echo "<option>", $row['domain'], "</option>";
 </div>
 
 <h4><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Configuration</h4>
+
+<div class="panel panel-default">
+<div class="panel-heading">Backup</div>
+<div class="panel-body">
+<form method="post">
+	<div class="form-group">
+		<label class="control-label col-sm-4" for="location">Location <small>(will be created if missing)</small></label>
+		<div class="col-sm-8">
+		<input type="text" class="form-control" name="location" id="location" value="<?php echo return_fufix_config("backup_location"); ?>">
+		</div>
+	</div>
+	<div class="clearfix"></div>
+	<div class="form-group">
+		<label class="control-label col-sm-4" for="runtime">Runtime</label>
+		<div class="col-sm-8">
+			<select style="width:50%" name="runtime" size="3">
+				<option <?php if (return_fufix_config("backup_runtime") == "hourly") { echo "selected"; } ?>>hourly</option>
+				<option <?php if (return_fufix_config("backup_runtime") == "daily") { echo "selected"; } ?>>daily</option>
+				<option <?php if (return_fufix_config("backup_runtime") == "monthly") { echo "selected"; } ?>>monthly</option>
+			</select>
+		</div>
+	</div>
+	<div class="clearfix"></div>
+	<div class="form-group">
+		<label class="control-label col-sm-4" for="mailboxes[]">Select mailboxes <small>(hold <code>CTRL</code> to select multiple values)</small>:</label>
+		<div class="col-sm-8">
+			<select style="width:50%" name="mailboxes[]" size="5" multiple>
+<?php
+$resultselect = mysqli_query($link, "SELECT username FROM mailbox");
+while ($row = mysqli_fetch_array($resultselect)) {
+	if (strpos(file_get_contents($mc_mailbox_backup), $row['username'])) {
+		echo "<option selected>", $row['username'], "</option>";
+	}
+	else {
+		echo "<option>", $row['username'], "</option>";
+	}
+}
+?>
+			</select>
+		</div>
+	</div>
+	<div class="clearfix"></div>
+	<div class="form-group">        
+		<div class="col-sm-offset-4 col-sm-8">
+			<div class="checkbox">
+			<label><input type="checkbox" name="use_backup" <?php if (return_fufix_config("backup_active") == "on") { echo "checked"; } ?>> Use backup function</label>
+			</div>
+		</div>
+	</div>
+	<div class="clearfix"></div>
+	<div class="form-group">        
+		<div class="col-sm-8">
+			<button type="submit" class="btn btn-default btn-raised btn-sm">Save changes</button>
+		</div>
+	</div>
+</form>
+</div>
+</div>
 
 <div class="panel panel-default">
 <div class="panel-heading">Attachments</div>
