@@ -254,7 +254,7 @@ function opendkim_table($action = "show", $which = "") {
 			}
 			$selector = explode("_", $which)[0];
 			$domain = explode("_", $which)[1];
-			exec("sudo /usr/local/bin/opendkim-keycontrol del $selector $domain", $hash, $return);
+			exec("sudo /usr/local/bin/mc-dkim-ctrl del $selector $domain", $hash, $return);
 			if ($return != "0") {
 				header("Location: do.php?event=".base64_encode("Cannot delete domain record. Does it exist?"));
 				die("Cannot delete domain record. Does it exist?");
@@ -268,7 +268,7 @@ function opendkim_table($action = "show", $which = "") {
 				header("Location: do.php?event=".base64_encode("Invalid format"));
 				die("Invalid format");
 			}
-			exec("sudo /usr/local/bin/opendkim-keycontrol add $selector $domain", $hash, $return);
+			exec("sudo /usr/local/bin/mc-dkim-ctrl add $selector $domain", $hash, $return);
 			if ($return != "0") {
 				header("Location: do.php?event=".base64_encode("Cannot add this domain. Does it already exist?"));
 				die("Cannot add this domain. Does it already exist?");

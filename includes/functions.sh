@@ -401,7 +401,7 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			tar xf pfadmin/inst/$postfixadmin_revision.tar -C pfadmin/inst/
 			mkdir -p /var/www/mail/pfadmin /var/run/fetchmail /etc/mail/postfixadmin 2> /dev/null
 			cp -R webserver/htdocs/* /var/www/mail/
-			touch /var/www/{VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE,MAIL_BACKUP}
+			touch /var/www/{VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE,MAILBOX_BACKUP}
 			install -m 755 misc/mc_inst_cron /usr/local/sbin/mc_inst_cron
 			mv pfadmin/inst/$postfixadmin_revision/* /var/www/mail/pfadmin/
 			install -m 755 /var/www/mail/pfadmin/ADDITIONS/fetchmail.pl /usr/local/bin/fetchmail.pl
