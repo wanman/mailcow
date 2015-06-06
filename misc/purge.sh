@@ -6,7 +6,7 @@ usage() {
         Print this text
 
     --all | -a
-        Completly purge fufix and ALL of its components including databases, mail dreictory etc.
+        Completly purge mailcow and ALL of its components including databases, mail dreictory etc.
     "
 }
 
@@ -27,7 +27,7 @@ echo '
 # # WARNING # #
 ###############
 # Open and review this script before running it!
-# Use with caution! You are about to perform a FULL WIPE of fufix.
+# Use with caution! You are about to perform a FULL WIPE of mailcow.
 # This may remove packages and data you do not want to be removed.
 ###############
 '
@@ -109,4 +109,4 @@ rm -rf /opt/vfilter/
 rm -f /etc/cron.d/pfadminfetchmail
 rm -f /etc/cron.daily/spam*
 rm -rf /etc/opendkim*
-rm -f /usr/local/bin/fufix_msg_size
+rm -f /usr/local/bin/mc_msg_size

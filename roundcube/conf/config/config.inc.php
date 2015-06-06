@@ -1,8 +1,8 @@
 <?php
 $config = array();
 $config['db_dsnw'] = 'mysql://my_rcuser:my_rcpass@localhost/my_rcdb';
-$config['default_host'] = 'tls://FUFIX_HOST.FUFIX_DOMAIN';
-$config['smtp_server'] = 'tls://FUFIX_HOST.FUFIX_DOMAIN';
+$config['default_host'] = 'tls://MAILCOW_HOST.MAILCOW_DOMAIN';
+$config['smtp_server'] = 'tls://MAILCOW_HOST.MAILCOW_DOMAIN';
 $config['smtp_port'] = 587;
 $config['smtp_user'] = '%u';
 $config['smtp_pass'] = '%p';

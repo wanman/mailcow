@@ -11,7 +11,7 @@ require_once("inc/header.inc.php");
 				<div class="panel-body">
 <?php
 require_once "inc/triggers.inc.php";
-if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes") {
+if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes") {
 	if (isset($_GET['return']) && $_GET['return'] == "success") {
 		echo '<div class="alert alert-success" role="alert"><strong>Success:</strong> Edit was successfull.</div>';
 	}

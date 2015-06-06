@@ -5,14 +5,14 @@ yellowb() { echo $(tput bold)$(tput setaf 3)${1}$(tput sgr0); }
 pinkb() { echo $(tput bold)$(tput setaf 5)${1}$(tput sgr0); }
 
 usage() {
-	echo "fufix install script command-line parameters."
-	echo $(textb "Do not append any parameters to run fufix in default mode.")
+	echo "mailcow install script command-line parameters."
+	echo $(textb "Do not append any parameters to run mailcow in default mode.")
 	echo "
 	--help | -h
 		Print this text
 
 	--upgrade | -u
-		Upgrade fufix to a newer version
+		Upgrade mailcow to a newer version
 	"
 }
 
@@ -280,16 +280,16 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown root:postfix "/etc/postfix/sql/mysql_virtual_domains_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_domains_maps.cf"
 			chown root:root "/etc/postfix/master.cf"; chmod 644 "/etc/postfix/master.cf"
 			chown root:root "/etc/postfix/main.cf"; chmod 644 "/etc/postfix/main.cf"
-			sed -i "s/FUFIX_HOST.FUFIX_DOMAIN/$sys_hostname.$sys_domain/g" /etc/postfix/* 2> /dev/null
-			sed -i "s/FUFIX_DOMAIN/$sys_domain/g" /etc/postfix/* 2> /dev/null
+			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/$sys_hostname.$sys_domain/g" /etc/postfix/* 2> /dev/null
+			sed -i "s/MAILCOW_DOMAIN/$sys_domain/g" /etc/postfix/* 2> /dev/null
 			sed -i "s/my_postfixpass/$my_postfixpass/g" /etc/postfix/sql/*
 			sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/postfix/sql/*
 			sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/postfix/sql/*
-			postmap /etc/postfix/fufix_sender_access
-			chown www-data: /etc/postfix/fufix_*
+			postmap /etc/postfix/mailcow_sender_access
+			chown www-data: /etc/postfix/mailcow_*
 			sed -i "/%www-data/d" /etc/sudoers 2> /dev/null
 			sed -i "/%vmail/d" /etc/sudoers 2> /dev/null
-			echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /usr/local/bin/opendkim-keycontrol, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_inst_cron, /usr/bin/tail * /opt/vfilter/log/vfilter.log' >> /etc/sudoers
+			echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /usr/local/bin/mc-dkim-ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_inst_cron, /usr/bin/tail * /opt/vfilter/log/vfilter.log' >> /etc/sudoers
 			echo '%vmail ALL=(ALL) NOPASSWD: /usr/bin/spamc*' >> /etc/sudoers
 			;;
 		dovecot)
@@ -304,8 +304,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown root:dovecot "/etc/dovecot/dovecot-dict-sql.conf"; chmod 640 "/etc/dovecot/dovecot-dict-sql.conf"
 			chown root:vmail "/etc/dovecot/dovecot-mysql.conf"; chmod 640 "/etc/dovecot/dovecot-mysql.conf"
 			chown root:root "/etc/dovecot/dovecot.conf"; chmod 644 "/etc/dovecot/dovecot.conf"
-			sed -i "s/FUFIX_HOST.FUFIX_DOMAIN/$sys_hostname.$sys_domain/g" /etc/dovecot/*
-			sed -i "s/FUFIX_DOMAIN/$sys_domain/g" /etc/dovecot/*
+			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/$sys_hostname.$sys_domain/g" /etc/dovecot/*
+			sed -i "s/MAILCOW_DOMAIN/$sys_domain/g" /etc/dovecot/*
 			sed -i "s/my_postfixpass/$my_postfixpass/g" /etc/dovecot/*
 			sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/dovecot/*
 			sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/dovecot/*
@@ -351,7 +351,7 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			echo 'SOCKET="inet:10040@localhost"' > /etc/default/opendkim
 			mkdir -p /etc/opendkim/{keyfiles,dnstxt} 2> /dev/null
 			touch /etc/opendkim/{KeyTable,SigningTable}
-			install -m 755 opendkim/conf/opendkim-keycontrol /usr/local/bin/
+			install -m 755 opendkim/conf/mc-dkim-ctrl /usr/local/bin/
 			install -m 644 opendkim/conf/opendkim.conf /etc/opendkim.conf
 			;;
 		spamassassin)
@@ -374,20 +374,20 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			;;
 		webserver)
 			if [[ $conf_httpd == "nginx" ]]; then
-				rm /etc/nginx/sites-enabled/000-0-fufix 2>/dev/null
-				cp webserver/nginx/conf/sites-available/fufix /etc/nginx/sites-available/
-				ln -s /etc/nginx/sites-available/fufix /etc/nginx/sites-enabled/000-0-fufix 2>/dev/null
+				rm /etc/nginx/sites-enabled/{000-0-mailcow,000-0-fufix} 2>/dev/null
+				cp webserver/nginx/conf/sites-available/mailcow /etc/nginx/sites-available/
+				ln -s /etc/nginx/sites-available/mailcow /etc/nginx/sites-enabled/000-0-mailcow 2>/dev/null
 				[[ ! -z $(grep "client_max_body_size" /etc/nginx/nginx.conf) ]] && \
 					sed -i "/client_max_body_size/c\ \ \ \ \ \ \ \ client_max_body_size 25M;" /etc/nginx/nginx.conf || \
 					sed -i "/http {/a\ \ \ \ \ \ \ \ client_max_body_size 25M;" /etc/nginx/nginx.conf
-				sed -i "s/FUFIX_HOST.FUFIX_DOMAIN;/$sys_hostname.$sys_domain;/g" /etc/nginx/sites-available/fufix
-				sed -i "s/FUFIX_DOMAIN;/$sys_domain;/g" /etc/nginx/sites-available/fufix
+				sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN;/$sys_hostname.$sys_domain;/g" /etc/nginx/sites-available/mailcow
+				sed -i "s/MAILCOW_DOMAIN;/$sys_domain;/g" /etc/nginx/sites-available/mailcow
 			elif [[ $conf_httpd == "apache2" ]]; then
-				rm /etc/apache2/sites-enabled/000-0-fufix 2>/dev/null
-				cp webserver/apache2/conf/sites-available/fufix /etc/apache2/sites-available/
-				ln -s /etc/apache2/sites-available/fufix /etc/apache2/sites-enabled/000-0-fufix.conf
-				sed -i "s/\"\FUFIX_HOST.FUFIX_DOMAIN\"/\"$sys_hostname.$sys_domain\"/g" /etc/apache2/sites-available/fufix
-                sed -i "s/\"autoconfig.FUFIX_DOMAIN\"/\"autoconfig.$sys_domain\"/g" /etc/apache2/sites-available/fufix
+				rm /etc/apache2/sites-enabled/{000-0-mailcow,000-0-fufix} 2>/dev/null
+				cp webserver/apache2/conf/sites-available/mailcow /etc/apache2/sites-available/
+				ln -s /etc/apache2/sites-available/mailcow /etc/apache2/sites-enabled/000-0-mailcow.conf
+				sed -i "s/\"\MAILCOW_HOST.MAILCOW_DOMAIN\"/\"$sys_hostname.$sys_domain\"/g" /etc/apache2/sites-available/mailcow
+                sed -i "s/\"autoconfig.MAILCOW_DOMAIN\"/\"autoconfig.$sys_domain\"/g" /etc/apache2/sites-available/mailcow
 				a2enmod rewrite ssl proxy proxy_fcgi > /dev/null 2>&1
 			fi
 			cp php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
@@ -408,7 +408,7 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			install -m 644 pfadmin/conf/config.local.php /var/www/mail/pfadmin/config.local.php
 			install -m 644 pfadmin/conf/fetchmail.conf /etc/mail/postfixadmin/fetchmail.conf
 			install -m 644 pfadmin/conf/pfadminfetchmail /etc/cron.d/pfadminfetchmail
-            sed -i "s/fufix_sub/$sys_hostname/g" /var/www/mail/autoconfig.xml
+            sed -i "s/mailcow_sub/$sys_hostname/g" /var/www/mail/autoconfig.xml
 			sed -i "s/my_postfixpass/$my_postfixpass/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
 			sed -i "s/my_postfixuser/$my_postfixuser/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
 			sed -i "s/my_postfixdb/$my_postfixdb/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
@@ -434,7 +434,7 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			sed -i "s/my_rcdb/$my_rcdb/g" /var/www/mail/rc/config/config.inc.php
 			conf_rcdeskey=$(genpasswd)
 			sed -i "s/conf_rcdeskey/$conf_rcdeskey/g" /var/www/mail/rc/config/config.inc.php
-            sed -i "s/FUFIX_HOST.FUFIX_DOMAIN/$sys_hostname.$sys_domain/g" /var/www/mail/rc/config/config.inc.php
+            sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/$sys_hostname.$sys_domain/g" /var/www/mail/rc/config/config.inc.php
 			chown -R www-data: /var/www/
 			if [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -s -N -e "use $my_rcdb; show tables;" | wc -l) -lt 5 ]]; then
 				mysql -u $my_rcuser -p$my_rcpass $my_rcdb < /var/www/mail/rc/SQL/mysql.initial.sql
@@ -444,7 +444,8 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			;;
         rsyslogd)
             if [[ -d /etc/rsyslog.d ]]; then
-				cp rsyslog/conf/10-fufix /etc/rsyslog.d/
+				rm /etc/rsyslog.d/10-fufix > /dev/null 2>&1
+				cp rsyslog/conf/10-mailcow /etc/rsyslog.d/
 				service rsyslog restart > /dev/null 2>&1
 				postlog -p warn dummy > /dev/null 2>&1
 				postlog -p info dummy > /dev/null 2>&1
@@ -507,7 +508,7 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 	esac
 }
 upgradetask() {
-	if [[ ! -f /etc/fufix_version || -z $(cat /etc/fufix_version | grep -E "0.7|0.8|0.9|0.10") ]]; then
+	if [[ -z $(cat /etc/{fufix_version,mailcow_version} 2> /dev/null | grep -E "0.7|0.8|0.9|0.10") ]]; then
 		echo "$(redb [ERR]) - Upgrade not supported"
 		return 1
 	fi

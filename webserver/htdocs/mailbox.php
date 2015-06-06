@@ -1,6 +1,6 @@
 <?php
 require_once("inc/header.inc.php");
-if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes") {
+if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes") {
 ?>
 <div class="container">
 	<div class="row">

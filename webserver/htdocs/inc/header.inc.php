@@ -1,8 +1,8 @@
 <?php
 session_start();
-if (isset($_SESSION['fufix_cc_loggedin']) && !empty($_SESSION['fufix_cc_loggedin'])) {
-	$logged_in_as = $_SESSION['fufix_cc_username'];
-	$logged_in_role = $_SESSION['fufix_cc_role'];
+if (isset($_SESSION['mailcow_cc_loggedin']) && !empty($_SESSION['mailcow_cc_loggedin'])) {
+	$logged_in_as = $_SESSION['mailcow_cc_username'];
+	$logged_in_role = $_SESSION['mailcow_cc_role'];
 }
 else {
 	$logged_in_role = "";
@@ -73,7 +73,7 @@ display: none;
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Control center<span class="caret"></span></a>
 					<ul class="dropdown-menu" role="menu">
-						<?php if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes") {
+						<?php if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes") {
 							if ($logged_in_role == "admin") { ?>
 						<li><a href="/admin.php">Administration</a></li>
 							<?php } if ($logged_in_role == "admin" || $logged_in_role == "domainadmin") { ?>
@@ -85,7 +85,7 @@ display: none;
 				</li>
 				<li class="divider"></li>
 				<li>
-					<a href="#" onclick="logout.submit()"><?php	if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes") { echo "Hello, <strong>$logged_in_as</strong> (logout)"; } ?></a>
+					<a href="#" onclick="logout.submit()"><?php	if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes") { echo "Hello, <strong>$logged_in_as</strong> (logout)"; } ?></a>
 				</li>
 			</ul>
 		</div><!--/.nav-collapse -->

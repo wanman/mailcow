@@ -3,7 +3,7 @@ smtp      inet  n       -       n       -       1       postscreen
 
 # Postscreen passes sane clients to the real SMTP daemon here.
 smtpd      pass  -       -       n       -       -       smtpd
-  -o cleanup_service_name=cleanup_fufix
+  -o cleanup_service_name=cleanup_mailcow
   -o content_filter=spamassassin
 
 # For mail submitting users. Authenticated clients and known networks only.
@@ -22,8 +22,8 @@ tlsproxy  unix  -       -       n       -       0       tlsproxy
 dnsblog   unix  -       -       n       -       0       dnsblog
 pickup    fifo  n       -       -       60      1       pickup
 cleanup   unix  n       -       -       -       0       cleanup
-cleanup_fufix   unix  n       -       -       -       0       cleanup
-  -o mime_header_checks=regexp:/etc/postfix/fufix_reject_attachments.regex
+cleanup_mailcow   unix  n       -       -       -       0       cleanup
+  -o mime_header_checks=regexp:/etc/postfix/mailcow_reject_attachments.regex
 qmgr      fifo  n       -       n       300     1       qmgr
 tlsmgr    unix  -       -       -       1000?   1       tlsmgr
 rewrite   unix  -       -       -       -       -       trivial-rewrite

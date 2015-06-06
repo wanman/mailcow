@@ -1,25 +1,25 @@
 <?php
 if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
 	if (check_login($link, $_POST["login_user"], $_POST["pass_user"]) == "admin") {
-		$_SESSION['fufix_cc_loggedin'] = "yes";
-		$_SESSION['fufix_cc_username'] = $_POST["login_user"];
-		$_SESSION['fufix_cc_role'] = "admin";
+		$_SESSION['mailcow_cc_loggedin'] = "yes";
+		$_SESSION['mailcow_cc_username'] = $_POST["login_user"];
+		$_SESSION['mailcow_cc_role'] = "admin";
 		header("Location: admin.php");
 	}
 	elseif (check_login($link, $_POST["login_user"], $_POST["pass_user"]) == "domainadmin") {
-		$_SESSION['fufix_cc_loggedin'] = "yes";
-		$_SESSION['fufix_cc_username'] = $_POST["login_user"];
-		$_SESSION['fufix_cc_role'] = "domainadmin";
+		$_SESSION['mailcow_cc_loggedin'] = "yes";
+		$_SESSION['mailcow_cc_username'] = $_POST["login_user"];
+		$_SESSION['mailcow_cc_role'] = "domainadmin";
 		header("Location: mailbox.php");
 
 	}
 }
-if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes" && $_SESSION['fufix_cc_role'] == "admin") {
+if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "admin") {
 	if (isset($_POST["admin_user"])) {
 		set_admin_account($link, $_POST);
 	}
 	if (isset($_POST["use_backup"])) {
-		set_fufix_config("backup", $_POST);
+		set_mailcow_config("backup", $_POST);
 	}
 	if (isset($_GET["del"])) {
 		opendkim_table("delete", $_GET["del"]);
@@ -31,13 +31,13 @@ if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "
 		unlink("/tmp/clamav_positives.zip");
 	}
 	if (isset($_POST["vtapikey"]) && ctype_alnum($_POST["vtapikey"])) {
-		set_fufix_config("vtapikey", $_POST["vtapikey"]);
+		set_mailcow_config("vtapikey", $_POST["vtapikey"]);
 	}
 	if (isset($_POST["maxmsgsize"]) && ctype_alnum($_POST["maxmsgsize"])) {
-		set_fufix_config("maxmsgsize", $_POST["maxmsgsize"]);
+		set_mailcow_config("maxmsgsize", $_POST["maxmsgsize"]);
 	}
 	if (isset($_POST["sender"])) {
-		set_fufix_config("senderaccess", $_POST["sender"]);
+		set_mailcow_config("senderaccess", $_POST["sender"]);
 		postfix_reload();
 	}
 	if (isset($_POST["dkim_selector"])) {
@@ -45,30 +45,30 @@ if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "
 	}
 	if (isset($_POST["ext"])) {
 		if (isset($_POST["vfilter"]) && $_POST["vfilter"] == "filter") {
-			set_fufix_config("extlist", $_POST["ext"], "filter");
+			set_mailcow_config("extlist", $_POST["ext"], "filter");
 		} else {
-			set_fufix_config("extlist", $_POST["ext"], "reject");
+			set_mailcow_config("extlist", $_POST["ext"], "reject");
 		}
 		if (isset($_POST["virustotalcheckonly"]) && $_POST["virustotalcheckonly"] == "on") {
-			set_fufix_config("vtupload", "0");
+			set_mailcow_config("vtupload", "0");
 		} else {
-			set_fufix_config("vtupload", "1");
+			set_mailcow_config("vtupload", "1");
 		}
 		if (isset($_POST["virustotalenable"]) && $_POST["virustotalenable"] == "on") {
-			set_fufix_config("vtenable", "1");
+			set_mailcow_config("vtenable", "1");
 		} else {
-			set_fufix_config("vtenable", "0");
+			set_mailcow_config("vtenable", "0");
 		}
 		if (isset($_POST["clamavenable"]) && $_POST["clamavenable"] == "on") {
-			set_fufix_config("cavenable", "1");
+			set_mailcow_config("cavenable", "1");
 		} else {
-			set_fufix_config("cavenable", "0");
+			set_mailcow_config("cavenable", "0");
 		}
 		postfix_reload();
 	}
 	if (isset($_POST["anonymize_"])) {
 		if (!isset($_POST["anonymize"])) { $_POST["anonymize"] = ""; }
-		set_fufix_config("anonymize", $_POST["anonymize"]);
+		set_mailcow_config("anonymize", $_POST["anonymize"]);
 		postfix_reload();
 	}
 	if (isset($_POST["mailboxaction"])) {
@@ -82,7 +82,7 @@ if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "
 		}
 	}
 }
-if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes" && ($_SESSION['fufix_cc_role'] == "domainadmin" || $_SESSION['fufix_cc_role'] == "admin")) {
+if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && ($_SESSION['mailcow_cc_role'] == "domainadmin" || $_SESSION['mailcow_cc_role'] == "admin")) {
 	if (isset($_POST["mailboxaction"])) {
 		switch ($_POST["mailboxaction"]) {
 			case "adddomain":
@@ -122,7 +122,7 @@ if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "
 	}
 }
 if (isset($_POST["logout"])) {
-	$_SESSION['fufix_cc_loggedin'] = "no";
+	$_SESSION['mailcow_cc_loggedin'] = "no";
 	session_destroy();
 }
 ?>

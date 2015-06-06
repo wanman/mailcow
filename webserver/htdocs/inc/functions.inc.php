@@ -58,7 +58,7 @@ function dl_clamav_positives() {
 	readfile("/tmp/clamav_positives.zip");
 
 }
-function return_fufix_config($s) {
+function return_mailcow_config($s) {
 	switch ($s) {
 		case "backup_location":
 			preg_match("/LOCATION=(.*)/", file_get_contents($GLOBALS['mc_mailbox_backup']) , $result);
@@ -73,16 +73,16 @@ function return_fufix_config($s) {
 			return $result[1];
 			break;
 		case "extlist":
-			$read_mime_check = file($GLOBALS["fufix_reject_attachments"])[0];
+			$read_mime_check = file($GLOBALS["mailcow_reject_attachments"])[0];
 			preg_match('#\((.*?)\)#', $read_mime_check, $match);
 			return $match[1];
 			break;
 		case "vfilter":
-			$read_mime_check = file($GLOBALS["fufix_reject_attachments"])[0];
+			$read_mime_check = file($GLOBALS["mailcow_reject_attachments"])[0];
 			if (strpos($read_mime_check,'FILTER') !== false) { return "checked"; } else { return false; }
 			break;
 		case "anonymize":
-			$state = file_get_contents($GLOBALS["fufix_anonymize_headers"]);
+			$state = file_get_contents($GLOBALS["mailcow_anonymize_headers"]);
 			if (!empty($state)) { return "checked"; } else { return false; }
 			break;
 		case "vtenable":
@@ -101,7 +101,7 @@ function return_fufix_config($s) {
 			return file_get_contents($GLOBALS["VT_API_KEY"]);
 			break;
 		case "senderaccess":
-			$state = file($GLOBALS["fufix_sender_access"]);
+			$state = file($GLOBALS["mailcow_sender_access"]);
 			foreach ($state as $each) {
 				$each_expl = explode(" ", $each);
 				echo $each_expl[0], "\n";
@@ -112,7 +112,7 @@ function return_fufix_config($s) {
 			break;
 	}
 }
-function set_fufix_config($s, $v = "", $vext = "") {
+function set_mailcow_config($s, $v = "", $vext = "") {
 	switch ($s) {
 		case "backup":
 			$file="/var/www/MAILBOX_BACKUP";
@@ -188,11 +188,11 @@ function set_fufix_config($s, $v = "", $vext = "") {
 		case "extlist":
 			if ($vext == "reject") {
 				foreach (explode("|", $v) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return false; } }
-				file_put_contents($GLOBALS["fufix_reject_attachments"], "/name=[^>]*\.($v)/     REJECT     Dangerous files are prohibited on this server.".PHP_EOL);
+				file_put_contents($GLOBALS["mailcow_reject_attachments"], "/name=[^>]*\.($v)/     REJECT     Dangerous files are prohibited on this server.".PHP_EOL);
 				header('Location: do.php?return=success');
 			} elseif ($vext == "filter") {
 				foreach (explode("|", $v) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return false; } }
-				file_put_contents($GLOBALS["fufix_reject_attachments"], "/name=[^>]*\.($v)/     FILTER     vfilter:dummy".PHP_EOL);
+				file_put_contents($GLOBALS["mailcow_reject_attachments"], "/name=[^>]*\.($v)/     FILTER     vfilter:dummy".PHP_EOL);
 				header('Location: do.php?return=success');
 			}
 			break;
@@ -204,22 +204,22 @@ function set_fufix_config($s, $v = "", $vext = "") {
 /^\s*X-Originating-IP/  IGNORE
 		';
 			if ($v == "on") {
-				file_put_contents($GLOBALS["fufix_anonymize_headers"], $template);
+				file_put_contents($GLOBALS["mailcow_anonymize_headers"], $template);
 				header('Location: do.php?return=success');
 			} else {
-				file_put_contents($GLOBALS["fufix_anonymize_headers"], "");
+				file_put_contents($GLOBALS["mailcow_anonymize_headers"], "");
 				header('Location: do.php?return=success');
 			}
 			break;
 		case "senderaccess":
-			file_put_contents($GLOBALS["fufix_sender_access"], "");
+			file_put_contents($GLOBALS["mailcow_sender_access"], "");
 			$sender_array = array_keys(array_flip(preg_split("/((\r?\n)|(\r\n?))/", $v)));
 			foreach($sender_array as $each) {
 				if ($each != "" && preg_match("/^[a-zA-Z0-9-\ .@]+$/", $each)) {
-					file_put_contents($GLOBALS["fufix_sender_access"], "$each REJECT Sender not allowed".PHP_EOL, FILE_APPEND);
+					file_put_contents($GLOBALS["mailcow_sender_access"], "$each REJECT Sender not allowed".PHP_EOL, FILE_APPEND);
 				}
 			}
-			$sender_map = $GLOBALS["fufix_sender_access"];
+			$sender_map = $GLOBALS["mailcow_sender_access"];
 			shell_exec("/usr/sbin/postmap $sender_map");
 			header('Location: do.php?return=success');
 			break;
@@ -228,7 +228,7 @@ function set_fufix_config($s, $v = "", $vext = "") {
 function opendkim_table($action = "show", $which = "") {
 	switch ($action) {
 		case "show":
-			$dnstxt_folder = scandir($GLOBALS["fufix_opendkim_dnstxt_folder"]);
+			$dnstxt_folder = scandir($GLOBALS["mailcow_opendkim_dnstxt_folder"]);
 			$dnstxt_files = array_diff($dnstxt_folder, array('.', '..'));
 			foreach($dnstxt_files as $file) {
 			echo "<div class=\"row\">
@@ -239,7 +239,7 @@ function opendkim_table($action = "show", $which = "") {
 					</p>
 				</div>
 				<div class=\"col-xs-9\">
-					<pre>", file_get_contents($GLOBALS["fufix_opendkim_dnstxt_folder"]."/".$file), "</pre>
+					<pre>", file_get_contents($GLOBALS["mailcow_opendkim_dnstxt_folder"]."/".$file), "</pre>
 				</div>
 				<div class=\"col-xs-1\">
 					<a href=\"?del=", $file, "\" onclick=\"return confirm('Are you sure?')\"><span class=\"glyphicon glyphicon-remove-circle\"></span></a>
@@ -318,7 +318,7 @@ function postfix_reload() {
 	shell_exec("sudo /usr/sbin/postfix reload");
 }
 function mailbox_add_domain($link, $postarray) {
-	if ($_SESSION['fufix_cc_role'] != "admin") {
+	if ($_SESSION['mailcow_cc_role'] != "admin") {
 		header("Location: do.php?event=".base64_encode("Permission denied"));
 		die("Permission denied");
 	}
@@ -577,7 +577,7 @@ function mailbox_edit_domainadmin($link, $postarray) {
 		header("Location: do.php?event=".base64_encode("Please assign a domain"));
 		die("Please assign a domain");
 	}
-	if ($_SESSION['fufix_cc_role'] != "admin") {
+	if ($_SESSION['mailcow_cc_role'] != "admin") {
 		header("Location: do.php?event=".base64_encode("Permission denied"));
 		die("Permission denied");
 	}
@@ -678,7 +678,7 @@ function mailbox_edit_mailbox($link, $postarray) {
 }
 function mailbox_delete_domain($link, $postarray) {
 	$domain = mysqli_real_escape_string($link, $_POST['domain']);
-	if ($_SESSION['fufix_cc_role'] != "admin") {
+	if ($_SESSION['mailcow_cc_role'] != "admin") {
 		header("Location: do.php?event=".base64_encode("Permission denied"));
 		die("Permission denied");
 	}
@@ -775,7 +775,7 @@ function set_admin_account($link, $postarray) {
 	$name_now = mysqli_real_escape_string($link, $_POST['admin_user_now']);
 	$password = mysqli_real_escape_string($link, $_POST['admin_pass']);
 	$password2 = mysqli_real_escape_string($link, $_POST['admin_pass2']);
-	if ($_SESSION['fufix_cc_role'] != "admin") {
+	if ($_SESSION['mailcow_cc_role'] != "admin") {
 		header("Location: do.php?event=".base64_encode("Permission denied"));
 		die("Permission denied");
 	}
@@ -820,7 +820,7 @@ function set_admin_account($link, $postarray) {
 	header('Location: do.php?return=success');
 }
 function add_domain_admin($link, $postarray) {
-	if ($_SESSION['fufix_cc_role'] != "admin") {
+	if ($_SESSION['mailcow_cc_role'] != "admin") {
 		header("Location: do.php?event=".base64_encode("Permission denied"));
 		die("Permission denied");
 	}
@@ -885,7 +885,7 @@ function add_domain_admin($link, $postarray) {
 	header('Location: do.php?return=success');
 }
 function delete_domain_admin($link, $postarray) {
-	if ($_SESSION['fufix_cc_role'] != "admin") {
+	if ($_SESSION['mailcow_cc_role'] != "admin") {
 		header("Location: do.php?event=".base64_encode("Permission denied"));
 		die("Permission denied");
 	}

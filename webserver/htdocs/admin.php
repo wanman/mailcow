@@ -3,7 +3,7 @@ require_once("inc/header.inc.php");
 ?>
 <div class="container">
 <?php
-if (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes" && $_SESSION['fufix_cc_role'] == "admin") {
+if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "admin") {
 ?>
 <h4><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Access</h4>
 
@@ -133,7 +133,7 @@ echo "<option>", $row['domain'], "</option>";
 	<div class="form-group">
 		<label class="control-label col-sm-4" for="location">Location <small>(will be created if missing)</small></label>
 		<div class="col-sm-8">
-		<input type="text" class="form-control" name="location" id="location" value="<?php echo return_fufix_config("backup_location"); ?>">
+		<input type="text" class="form-control" name="location" id="location" value="<?php echo return_mailcow_config("backup_location"); ?>">
 		</div>
 	</div>
 	<div class="clearfix"></div>
@@ -141,9 +141,9 @@ echo "<option>", $row['domain'], "</option>";
 		<label class="control-label col-sm-4" for="runtime">Runtime</label>
 		<div class="col-sm-8">
 			<select style="width:50%" name="runtime" size="3">
-				<option <?php if (return_fufix_config("backup_runtime") == "hourly") { echo "selected"; } ?>>hourly</option>
-				<option <?php if (return_fufix_config("backup_runtime") == "daily") { echo "selected"; } ?>>daily</option>
-				<option <?php if (return_fufix_config("backup_runtime") == "monthly") { echo "selected"; } ?>>monthly</option>
+				<option <?php if (return_mailcow_config("backup_runtime") == "hourly") { echo "selected"; } ?>>hourly</option>
+				<option <?php if (return_mailcow_config("backup_runtime") == "daily") { echo "selected"; } ?>>daily</option>
+				<option <?php if (return_mailcow_config("backup_runtime") == "monthly") { echo "selected"; } ?>>monthly</option>
 			</select>
 		</div>
 	</div>
@@ -170,7 +170,7 @@ while ($row = mysqli_fetch_array($resultselect)) {
 	<div class="form-group">        
 		<div class="col-sm-offset-4 col-sm-8">
 			<div class="checkbox">
-			<label><input type="checkbox" name="use_backup" <?php if (return_fufix_config("backup_active") == "on") { echo "checked"; } ?>> Use backup function</label>
+			<label><input type="checkbox" name="use_backup" <?php if (return_mailcow_config("backup_active") == "on") { echo "checked"; } ?>> Use backup function</label>
 			</div>
 		</div>
 	</div>
@@ -190,18 +190,18 @@ while ($row = mysqli_fetch_array($resultselect)) {
 <form method="post">
 <div class="form-group">
 	<p>Provide a list of dangerous file types. Please take care of the formatting.</p>
-	<input class="form-control" type="text" id="ext" name="ext" value="<?php echo return_fufix_config("extlist") ?>">
+	<input class="form-control" type="text" id="ext" name="ext" value="<?php echo return_mailcow_config("extlist") ?>">
 	<p><pre>Format: ext1|ext1|ext3
 Enter "DISABLED" to disable this feature.</pre></p>
 	<div class="radio">
 		<label>
-		<input type="radio" name="vfilter" id="vfilter_reject_button" value="reject" <?php if (!return_fufix_config("vfilter")) { echo "checked"; } ?>>
+		<input type="radio" name="vfilter" id="vfilter_reject_button" value="reject" <?php if (!return_mailcow_config("vfilter")) { echo "checked"; } ?>>
 		Reject attachments with a dangerous file extension
 		</label>
 	</div>
 	<div class="radio">
 		<label>
-		<input type="radio" name="vfilter" id="vfilter_scan_button" value="filter" <?php echo return_fufix_config("vfilter") ?>>
+		<input type="radio" name="vfilter" id="vfilter_scan_button" value="filter" <?php echo return_mailcow_config("vfilter") ?>>
 		Scan attachments with ClamAV and/or upload to VirusTotal
 		</label>
 	</div>
@@ -212,7 +212,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 			<h4>ClamAV</h4>
 			<div class="checkbox">
 					<label>
-					<input name="clamavenable" type="checkbox" <?php echo return_fufix_config("cavenable") ?>>
+					<input name="clamavenable" type="checkbox" <?php echo return_mailcow_config("cavenable") ?>>
 					Use ClamAV to scan mail
 					</label>
 			</div>
@@ -229,7 +229,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 			<h4>VirusTotal Uploader</h4>
 			<div class="checkbox">
 					<label>
-					<input name="virustotalenable" type="checkbox" <?php echo return_fufix_config("vtenable") ?>>
+					<input name="virustotalenable" type="checkbox" <?php echo return_mailcow_config("vtenable") ?>>
 					Use the "VirusTotal Uploader" feature
 					</label>
 			</div>
@@ -242,12 +242,12 @@ Enter "DISABLED" to disable this feature.</pre></p>
 			</p>
 			<div class="checkbox">
 					<label>
-					<input name="virustotalcheckonly" type="checkbox"  <?php echo return_fufix_config("vtupload") ?>>
+					<input name="virustotalcheckonly" type="checkbox"  <?php echo return_mailcow_config("vtupload") ?>>
 					Do <b>not</b> upload files to VirusTotal but check for a previous scan report. This also requires an API key!
 					</label>
 			</div>
 			<label for="vtapikey">VirusTotal API Key (<a href="https://www.virustotal.com/documentation/virustotal-community/#retrieve-api-key" target="_blank">?</a>)</label>
-			<p><input class="form-control" id="vtapikey" type="text" name="vtapikey" placeholder="64 characters, alphanumeric" pattern="[a-zA-Z0-9]{64}" value="<?php echo return_fufix_config("vtapikey"); ?>"></p>
+			<p><input class="form-control" id="vtapikey" type="text" name="vtapikey" placeholder="64 characters, alphanumeric" pattern="[a-zA-Z0-9]{64}" value="<?php echo return_mailcow_config("vtapikey"); ?>"></p>
 			</small>
 		</div>
 		<div class="col-sm-12">
@@ -267,7 +267,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <form method="post">
 <div class="form-group">
 	<p>Specify a list of senders or domains to blacklist access:</p>
-	<textarea class="form-control" rows="6" name="sender"><?php return_fufix_config("senderaccess") ?></textarea>
+	<textarea class="form-control" rows="6" name="sender"><?php return_mailcow_config("senderaccess") ?></textarea>
 	<br /><button type="submit" class="btn btn-default btn-raised btn-sm">Apply</button>
 </div>
 </form>
@@ -283,7 +283,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 	<div class="checkbox">
 	<label>
 	<input type="hidden" name="anonymize_">
-	<input name="anonymize" type="checkbox" <?php echo return_fufix_config("anonymize") ?>>
+	<input name="anonymize" type="checkbox" <?php echo return_mailcow_config("anonymize") ?>>
 		Anonymize outgoing mail
 	</label>
 	</div>
@@ -325,7 +325,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <div class="panel-heading">Message Size</div>
 <div class="panel-body">
 	<form class="form-inline" method="post">
-	<p>Current message size limitation: <strong><?php echo return_fufix_config("maxmsgsize"); ?>MB</strong></p>
+	<p>Current message size limitation: <strong><?php echo return_mailcow_config("maxmsgsize"); ?>MB</strong></p>
 	<p>This changes values in PHP, Nginx and Postfix. Services will be reloaded.</p>
 	<div class="form-group">
 		<input type="number" class="form-control" id="maxmsgsize" name="maxmsgsize" placeholder="in MB" min="1" max="250">
@@ -457,7 +457,7 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 
 <?php
 } 
-elseif (isset($_SESSION['fufix_cc_loggedin']) && $_SESSION['fufix_cc_loggedin'] == "yes" && $_SESSION['fufix_cc_role'] == "domainadmin") {
+elseif (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "domainadmin") {
 header('Location: mailbox.php');
 die("Permission denied");
 } else {
@@ -469,7 +469,7 @@ die("Permission denied");
 	<input name="login_user" type="name" id="login_user" class="form-control" placeholder="Username" required autofocus>
 	<input name="pass_user" type="password" id="pass_user" class="form-control" placeholder="Password" required>
 	<input type="submit" class="btn btn-success" value="Login">
-	<p><small><strong>Hint:</strong> Use "fufix_resetadmin" to reset the password.</small></p>
+	<p><small><strong>Hint:</strong> Use "mailcow_resetadmin" to reset the password.</small></p>
 </form>
 </div>
 </div>

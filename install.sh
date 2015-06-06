@@ -8,14 +8,12 @@ cat includes/banner
 source includes/versions
 source includes/functions.sh
 
-echo $fufix_banner
-
 case $1 in
 	"-u" | "--upgrade" )
 		upgradetask
-		echo $fufix_version > /etc/fufix_version
+		echo $mailcow_version > /etc/mailcow_version
 echo --------------------------------- >> installer.log
-echo UPGRADE to $fufix_version on $(date) >> installer.log
+echo UPGRADE to $mailcow_version on $(date) >> installer.log
 echo --------------------------------- >> installer.log
 echo Fail2ban version: $fail2ban_version >> installer.log
 echo Postfixadmin Revision: $postfixadmin_revision >> installer.log
@@ -123,7 +121,7 @@ returnwait "Completing Postfixadmin setup" "Checking DNS settings"
 installtask checkdns
 returnwait "Checking DNS settings" "Finish installation"
 
-echo $fufix_version > /etc/fufix_version
+echo $mailcow_version > /etc/mailcow_version
 chmod 600 installer.log
 echo
 echo "`tput setaf 2`Finished installation`tput sgr0`"
