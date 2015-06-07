@@ -121,7 +121,7 @@ checkconfig() {
 		echo "$(redb [ERR]) - Unable to install Apache 2.4, please use Nginx or upgrade your distribution"
         exit 1
 	fi
-    for var in sys_hostname sys_domain sys_timezone my_postfixdb my_postfixuser my_postfixpass my_rootpw my_rcuser my_rcpass my_rcdb pfadmin_adminuser pfadmin_adminpass cert_country cert_state cert_city cert_org
+    for var in sys_hostname sys_domain sys_timezone my_mailcowdb my_mailcowuser my_mailcowpass my_rootpw my_rcuser my_rcpass my_rcdb mailcow_admin_user mailcow_admin_pass cert_country cert_state cert_city cert_org
     do
         if [[ -z ${!var} ]]; then
             echo "$(redb [ERR]) - Parameter $var must not be empty."
@@ -129,13 +129,13 @@ checkconfig() {
             exit 1
         fi
     done
-    pass_count=$(grep -o "[0-9]" <<< $pfadmin_adminpass | wc -l)
-    pass_chars=$(echo $pfadmin_adminpass | egrep "^.{8,255}" | \
+    pass_count=$(grep -o "[0-9]" <<< $mailcow_admin_pass | wc -l)
+    pass_chars=$(echo $mailcow_admin_pass | egrep "^.{8,255}" | \
 	egrep "[ABCDEFGHIJKLMNOPQRSTUVXYZ]" | \
 	egrep "[abcdefghijklmnopqrstuvxyz"] | \
 	egrep "[0-9]")
     if [[ $pass_count -lt 2 || -z $pass_chars ]]; then
-		echo "$(redb [ERR]) - Postfixadmin password does not meet password policy requirements (8 char., 2 num., UPPER- + lowercase)"
+		echo "$(redb [ERR]) - mailcow administrator password does not meet password policy requirements (8 char., 2 num., UPPER- + lowercase)"
 		echo
 		exit 1
 	fi
@@ -263,10 +263,10 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			if [[ $mysql_useable -ne 1 ]]; then
 				mysql --defaults-file=/etc/mysql/debian.cnf -e "UPDATE mysql.user SET Password=PASSWORD('$my_rootpw') WHERE USER='root'; FLUSH PRIVILEGES;"
 			fi
-			mysql --defaults-file=/etc/mysql/debian.cnf -e "DROP DATABASE IF EXISTS $my_postfixdb; DROP DATABASE IF EXISTS $my_rcdb;"
-			mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_postfixdb; GRANT ALL PRIVILEGES ON $my_postfixdb.* TO '$my_postfixuser'@'localhost' IDENTIFIED BY '$my_postfixpass';"
+			mysql --defaults-file=/etc/mysql/debian.cnf -e "DROP DATABASE IF EXISTS $my_mailcowdb; DROP DATABASE IF EXISTS $my_rcdb;"
+			mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_mailcowdb; GRANT ALL PRIVILEGES ON $my_mailcowdb.* TO '$my_mailcowuser'@'localhost' IDENTIFIED BY '$my_mailcowpass';"
 			mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'localhost' IDENTIFIED BY '$my_rcpass';"
-			mysql --defaults-file=/etc/mysql/debian.cnf -e "GRANT SELECT ON $my_postfixdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
+			mysql --defaults-file=/etc/mysql/debian.cnf -e "GRANT SELECT ON $my_mailcowdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
 			;;
 		postfix)
 			cp -R postfix/conf/* /etc/postfix/
@@ -282,9 +282,9 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown root:root "/etc/postfix/main.cf"; chmod 644 "/etc/postfix/main.cf"
 			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/$sys_hostname.$sys_domain/g" /etc/postfix/* 2> /dev/null
 			sed -i "s/MAILCOW_DOMAIN/$sys_domain/g" /etc/postfix/* 2> /dev/null
-			sed -i "s/my_postfixpass/$my_postfixpass/g" /etc/postfix/sql/*
-			sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/postfix/sql/*
-			sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/postfix/sql/*
+			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /etc/postfix/sql/*
+			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /etc/postfix/sql/*
+			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /etc/postfix/sql/*
 			postmap /etc/postfix/mailcow_sender_access
 			chown www-data: /etc/postfix/mailcow_*
 			sed -i "/%www-data/d" /etc/sudoers 2> /dev/null
@@ -306,9 +306,9 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown root:root "/etc/dovecot/dovecot.conf"; chmod 644 "/etc/dovecot/dovecot.conf"
 			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/$sys_hostname.$sys_domain/g" /etc/dovecot/*
 			sed -i "s/MAILCOW_DOMAIN/$sys_domain/g" /etc/dovecot/*
-			sed -i "s/my_postfixpass/$my_postfixpass/g" /etc/dovecot/*
-			sed -i "s/my_postfixuser/$my_postfixuser/g" /etc/dovecot/*
-			sed -i "s/my_postfixdb/$my_postfixdb/g" /etc/dovecot/*
+			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /etc/dovecot/*
+			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /etc/dovecot/*
+			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /etc/dovecot/*
 			mkdir /etc/dovecot/conf.d 2> /dev/null
 			mkdir -p /var/vmail/sieve
 			cp dovecot/conf/spam-global.sieve /var/vmail/sieve/spam-global.sieve
@@ -373,6 +373,7 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			su debian-spamd -c "sa-update 2> /dev/null"
 			;;
 		webserver)
+			rm -rf /var/www/{mail,dav} 2> /dev/null
 			if [[ $conf_httpd == "nginx" ]]; then
 				rm /etc/nginx/sites-enabled/{000-0-mailcow,000-0-fufix} 2>/dev/null
 				cp webserver/nginx/conf/sites-available/mailcow /etc/nginx/sites-available/
@@ -395,40 +396,37 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			mkdir /var/lib/php5/sessions 2> /dev/null
 			chown -R www-data:www-data /var/lib/php5/sessions
 			sed -i "/date.timezone/c\php_admin_value[date.timezone] = $sys_timezone" /etc/php5/fpm/pool.d/mail.conf
-			;;
-		postfixadmin)
-			rm -rf /var/www/mail 2> /dev/null
-			tar xf pfadmin/inst/$postfixadmin_revision.tar -C pfadmin/inst/
-			mkdir -p /var/www/mail/pfadmin /var/run/fetchmail /etc/mail/postfixadmin 2> /dev/null
-			cp -R webserver/htdocs/* /var/www/mail/
-			touch /var/www/{VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE,MAILBOX_BACKUP}
 			install -m 755 misc/mc_inst_cron /usr/local/sbin/mc_inst_cron
-			mv pfadmin/inst/$postfixadmin_revision/* /var/www/mail/pfadmin/
-			install -m 755 /var/www/mail/pfadmin/ADDITIONS/fetchmail.pl /usr/local/bin/fetchmail.pl
-			install -m 644 pfadmin/conf/config.local.php /var/www/mail/pfadmin/config.local.php
-			install -m 644 pfadmin/conf/fetchmail.conf /etc/mail/postfixadmin/fetchmail.conf
-			install -m 644 pfadmin/conf/pfadminfetchmail /etc/cron.d/pfadminfetchmail
+			cp -R webserver/htdocs/{mail,dav} /var/www/
+			tar xf /var/www/dav/vendor.tar -C /var/www/dav/ ; rm /var/www/dav/vendor.tar
+			sed -i "/date_default_timezone_set/c\date_default_timezone_set('$sys_timezone');" /var/www/dav/server.php
+			touch /var/www/{VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE,MAILBOX_BACKUP}
             sed -i "s/mailcow_sub/$sys_hostname/g" /var/www/mail/autoconfig.xml
-			sed -i "s/my_postfixpass/$my_postfixpass/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
-			sed -i "s/my_postfixuser/$my_postfixuser/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
-			sed -i "s/my_postfixdb/$my_postfixdb/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
-			sed -i "s/domain.tld/$sys_domain/g" /var/www/mail/pfadmin/config.local.php /etc/mail/postfixadmin/fetchmail.conf
-			sed -i "s/my_postfixpass/$my_postfixpass/g" /var/www/mail/inc/vars.inc.php
-			sed -i "s/my_postfixuser/$my_postfixuser/g" /var/www/mail/inc/vars.inc.php
-			sed -i "s/my_postfixdb/$my_postfixdb/g" /var/www/mail/inc/vars.inc.php
-			sed -i "s/change-this-to-your.domain.tld/$sys_domain/g" /var/www/mail/pfadmin/config.inc.php
-			chown -R www-data: /var/www/ ; chown -R vmail: /var/run/fetchmail
-			rm -rf pfadmin/inst/$postfixadmin_revision
-			[[ -z $(grep fetchmail /etc/rc.local) ]] && sed -i '/^exit 0/i\test -d /var/run/fetchmail || install -m 755 -o vmail -g vmail -d /var/run/fetchmail/' /etc/rc.local
+			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
+			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
+			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
+			chown -R www-data: /var/www/ /var/lib/php5/sessions
+			mysql -u $my_mailcowuser -p$my_mailcowpass $my_mailcowdb < webserver/htdocs/init.sql
+			if [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -s -N -e "use $my_mailcowdb; select * from admin;" | wc -l) -lt 1 ]]; then
+				my_mailcowadmin_pass_hashed=$(doveadm pw -s SHA512-CRYPT -p $mailcow_admin_pass)
+				mysql -u $my_mailcowuser -p$my_mailcowpass $my_mailcowdb -e "INSERT INTO admin VALUES ('admin','$my_mailcowadmin_pass_hashed',1,now(),now(),1);"
+			else
+				echo "$(textb [INFO]) - At least one administrator exists, will not create another mailcow administrator"
+			fi
+			# Cleaning up old files
+			sed -i '/test -d /var/run/fetchmail/d' /etc/rc.local > /dev/null 2>&1
+			rm /etc/cron.d/pfadminfetchmail > /dev/null 2>&1
+			rm /etc/mail/postfixadmin/fetchmail.conf > /dev/null 2>&1
+			rm /usr/local/bin/fetchmail.pl > /dev/null 2>&1
 			;;
 		roundcube)
 			mkdir -p /var/www/mail/rc
 			tar xf roundcube/inst/$roundcube_version.tar -C roundcube/inst/
 			mv roundcube/inst/$roundcube_version/* /var/www/mail/rc/
 			cp -R roundcube/conf/* /var/www/mail/rc/
-			sed -i "s/my_postfixuser/$my_postfixuser/g" /var/www/mail/rc/plugins/password/config.inc.php
-			sed -i "s/my_postfixpass/$my_postfixpass/g" /var/www/mail/rc/plugins/password/config.inc.php
-			sed -i "s/my_postfixdb/$my_postfixdb/g" /var/www/mail/rc/plugins/password/config.inc.php
+			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/rc/plugins/password/config.inc.php
+			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/rc/plugins/password/config.inc.php
+			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/rc/plugins/password/config.inc.php
 			sed -i "s/my_rcuser/$my_rcuser/g" /var/www/mail/rc/config/config.inc.php
 			sed -i "s/my_rcpass/$my_rcpass/g" /var/www/mail/rc/config/config.inc.php
 			sed -i "s/my_rcdb/$my_rcdb/g" /var/www/mail/rc/config/config.inc.php
@@ -500,11 +498,6 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 				echo "$(redb [CRIT]) - You either use Google DNS service or another blocked DNS provider for blacklist lookups. Consider using another DNS server for better spam detection." | tee -a installer.log
 			fi
 			;;
-		setupsuperadmin)
-			sed -i 's/E_ALL/E_ALL ^ E_NOTICE/g' /var/www/mail/pfadmin/scripts/postfixadmin-cli.php
-			(cd /var/www/mail/pfadmin ; php setup.php 2> 1&>2 /dev/null)
-			php /var/www/mail/pfadmin/scripts/postfixadmin-cli.php admin add $pfadmin_adminuser --password $pfadmin_adminpass --password2 $pfadmin_adminpass --superadmin
-			;;
 	esac
 }
 upgradetask() {
@@ -527,15 +520,15 @@ upgradetask() {
 	sys_timezone=$(cat /etc/timezone)
 	timestamp=$(date +%Y%m%d_%H%M%S)
 	readconf=( $(php -f misc/readconf.php) )
-	my_postfixuser=${readconf[0]}
-	my_postfixpass=${readconf[1]}
-	my_postfixdb=${readconf[2]}
+	my_mailcowuser=${readconf[0]}
+	my_mailcowpass=${readconf[1]}
+	my_mailcowdb=${readconf[2]}
 	old_des_key_rc=${readconf[3]}
 	my_rcuser=${readconf[4]}
 	my_rcpass=${readconf[5]}
 	my_rcdb=${readconf[6]}
 
-	for var in conf_httpd sys_hostname sys_domain sys_timezone my_postfixdb my_postfixuser my_postfixpass my_rcuser my_rcpass my_rcdb
+	for var in conf_httpd sys_hostname sys_domain sys_timezone my_mailcowdb my_mailcowuser my_mailcowpass my_rcuser my_rcpass my_rcdb
 	do
 		if [[ -z ${!var} ]]; then
 			echo "$(redb [ERR]) - Could not gather required information, upgrade failed..."
@@ -549,7 +542,7 @@ $(textb "Hostname")        $sys_hostname
 $(textb "Domain")          $sys_domain
 $(textb "FQDN")            $sys_hostname.$sys_domain
 $(textb "Timezone")        $sys_timezone
-$(textb "Postfix MySQL")   ${my_postfixuser}:${my_postfixpass}/${my_postfixdb}
+$(textb "mailcow MySQL")   ${my_mailcowuser}:${my_mailcowpass}/${my_mailcowdb}
 $(textb "Roundcube MySQL") ${my_rcuser}:${my_rcpass}/${my_rcdb}
 $(textb "Web server")      ${conf_httpd^}
 
@@ -602,10 +595,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 	returnwait "Spamassassin configuration" "Webserver configuration"
 
 	installtask webserver
-	returnwait "Webserver configuration" "Postfixadmin configuration"
-
-	installtask postfixadmin
-	returnwait "Postfixadmin configuration" "Roundcube configuration"
+	returnwait "Webserver configuration" "Roundcube configuration"
 
 	installtask roundcube
 	sed -i "s/conf_rcdeskey/$old_des_key_rc/g" /var/www/mail/rc/config/config.inc.php
@@ -623,7 +613,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 
 	installtask restartservices
 	returnwait "Restarting services" "Finish upgrade"
-	mysql --defaults-file=/etc/mysql/debian.cnf -e "GRANT SELECT ON $my_postfixdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
+	mysql --defaults-file=/etc/mysql/debian.cnf -e "GRANT SELECT ON $my_mailcowdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
 	echo Done.
 	echo
 	echo "\"installer.log\" file updated."

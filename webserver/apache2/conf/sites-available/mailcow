@@ -41,4 +41,24 @@
 			downgrade-1.0 force-response-1.0
 		BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
 	</VirtualHost>
+	<VirtualHost *:443>
+		ServerSignature off
+		TraceEnable off
+		AddDefaultCharset utf-8
+		ServerName "dav.MAILCOW_DOMAIN"
+		DocumentRoot /var/www/dav
+		ErrorLog ${APACHE_LOG_DIR}/error.log
+		CustomLog ${APACHE_LOG_DIR}/access.log combined
+		SSLEngine on
+		SSLCertificateFile /etc/ssl/mail/mail.crt
+		SSLCertificateKeyFile /etc/ssl/mail/mail.key
+        ProxyPassMatch ^/(.*\.php(/.*)?)$ unix:/var/run/php5-fpm.sock|fcgi://127.0.0.1:9000/var/www/mail
+		<FilesMatch "\.(cgi|shtml|phtml|php)$">
+			SSLOptions +StdEnvVars
+		</FilesMatch>
+		BrowserMatch "MSIE [2-6]" \
+			nokeepalive ssl-unclean-shutdown \
+			downgrade-1.0 force-response-1.0
+		BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
+	</VirtualHost>
 </IfModule>

@@ -53,7 +53,14 @@ display: none;
 <?php
 }
 ?>
-
+<style>
+.navbar.navbar, .navbar-default.navbar {
+  background-color: #914063;
+}
+a, a:hover, a:focus {
+  color: #333;
+}
+</style>
 </head>
 <body>
 <nav class="navbar navbar-default">

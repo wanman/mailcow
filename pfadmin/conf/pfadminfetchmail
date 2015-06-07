@@ -1,2 +1,0 @@
-*/10 * * * * vmail /usr/bin/perl /usr/local/bin/fetchmail.pl
-

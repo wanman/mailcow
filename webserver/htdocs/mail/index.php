@@ -4,18 +4,23 @@ require_once("inc/header.inc.php");
 <div class="jumbotron">
 	<div class="container">
 		<h2>Welcome @ <?php echo $MYHOSTNAME; ?></h2>
-		<p>Setup a mail client to use SMTP and IMAP</p>
+		<p style="font-weight:300;font-size:24px;margin-right:151px;line-height:30px;margin-top:-2px"><i>Get cownnected...</i></h4>
 		<div class="row">
 			<div class="col-md-6">
-				<small><b>IMAP(S)</b></small>
+				<small><b>IMAP (STARTTLS) or IMAPS</b></small>
 				<ul class="ul-horizontal">
 					<li><code><?php echo $MYHOSTNAME; ?>:143/tcp</code></li>
 					<li><code><?php echo $MYHOSTNAME; ?>:993/tcp</code></li>
 				</ul>
-				<small><b>SMTP</b></small>
+				<small><b>SMTP (STARTTLS)</b></small>
 				<ul>
 					<li><code><?php echo $MYHOSTNAME; ?>:587/tcp</code></li>
 				</ul>
+				<small><b>Cal- and CardDAV</b></small>
+				<ul>
+					<li><code>https://dav.<?php echo $MYHOSTNAME_1.'.'.$MYHOSTNAME_2; ?>/principals/you@<?php echo $MYHOSTNAME_1.'.'.$MYHOSTNAME_2; ?>/</code></li>
+				</ul>
+				<small>Please use your full email address as login name.</small>
 			</div>
 		</div>
 	</div>

@@ -16,7 +16,6 @@ echo --------------------------------- >> installer.log
 echo UPGRADE to $mailcow_version on $(date) >> installer.log
 echo --------------------------------- >> installer.log
 echo Fail2ban version: $fail2ban_version >> installer.log
-echo Postfixadmin Revision: $postfixadmin_revision >> installer.log
 echo Roundcube version: $roundcube_version >> installer.log
 echo --------------------------------- >> installer.log
 		exit 0
@@ -32,21 +31,21 @@ checkports
 source configuration
 checkconfig
 
-echo "    $(textb "Hostname")        $sys_hostname
-    $(textb "Domain")          $sys_domain
-    $(textb "FQDN")            $sys_hostname.$sys_domain
-    $(textb "Timezone")        $sys_timezone
-    $(textb "Postfix MySQL")   ${my_postfixuser}:hidden/${my_postfixdb}
-    $(textb "Roundcube MySQL") ${my_rcuser}:hidden/${my_rcdb}
-    $(textb "Postfixadmin")    ${pfadmin_adminuser}
+echo "    $(textb "Hostname")      $sys_hostname
+    $(textb "Domain")              $sys_domain
+    $(textb "FQDN")                $sys_hostname.$sys_domain
+    $(textb "Timezone")            $sys_timezone
+    $(textb "mailcow MySQL")       ${my_mailcowuser}:hidden/${my_mailcowdb}
+    $(textb "Roundcube MySQL")     ${my_rcuser}:hidden/${my_rcdb}
+    $(textb "mailcow admin user")  ${mailcow_admin_user}
 "
 
 returnwait "Reading configuration" "System environment"
 
 echo --------------------------------- > installer.log
-echo MySQL Postfix database: $my_postfixdb >> installer.log
-echo MySQL Postfix username: $my_postfixuser >> installer.log
-echo MySQL Postfix password: $my_postfixpass >> installer.log
+echo MySQL mailcow database: $my_mailcowdb >> installer.log
+echo MySQL mailcow username: $my_mailcowuser >> installer.log
+echo MySQL mailcow password: $my_mailcowpass >> installer.log
 echo --------------------------------- >> installer.log
 echo MySQL Roundcube database: $my_rcdb >> installer.log
 echo MySQL Roundcube username: $my_rcuser >> installer.log
@@ -55,15 +54,14 @@ echo --------------------------------- >> installer.log
 echo Only set when MySQL was not available >> installer.log
 echo MySQL root password: $my_rootpw >> installer.log
 echo --------------------------------- >> installer.log
-echo Postfixadmin Administrator >> installer.log
-echo Username: $pfadmin_adminuser >> installer.log
-echo Password: $pfadmin_adminpass >> installer.log
+echo mailcow administrator >> installer.log
+echo Username: $mailcow_admin_user >> installer.log
+echo Password: $mailcow_admin_pass >> installer.log
 echo --------------------------------- >> installer.log
 echo FQDN: $sys_hostname.$sys_domain >> installer.log
 echo Timezone: $sys_timezone >> installer.log
 echo --------------------------------- >> installer.log
 echo Fail2ban version: $fail2ban_version >> installer.log
-echo Postfixadmin Revision: $postfixadmin_revision >> installer.log
 echo Roundcube version: $roundcube_version >> installer.log
 echo --------------------------------- >> installer.log
 
@@ -95,10 +93,7 @@ installtask spamassassin
 returnwait "Spamassassin configuration" "Webserver configuration"
 
 installtask webserver
-returnwait "Webserver configuration" "Postfixadmin configuration"
-
-installtask postfixadmin
-returnwait "Postfixadmin configuration" "Roundcube configuration"
+returnwait "Webserver configuration" "Roundcube configuration"
 
 installtask roundcube
 returnwait "Roundcube configuration" "Rsyslogd configuration"
@@ -113,10 +108,7 @@ installtask opendkim
 returnwait "OpenDKIM configuration" "Restarting services"
 
 installtask restartservices
-returnwait "Restarting services" "Completing Postfixadmin setup"
-
-installtask setupsuperadmin
-returnwait "Completing Postfixadmin setup" "Checking DNS settings"
+returnwait "Restarting services" "Checking DNS settings"
 
 installtask checkdns
 returnwait "Checking DNS settings" "Finish installation"
@@ -128,7 +120,8 @@ echo "`tput setaf 2`Finished installation`tput sgr0`"
 echo "Logged credentials and further information to file `tput bold`installer.log`tput sgr0`."
 echo
 echo "Next steps:"
-echo " * Backup installer.log to a safe place and delete it"
-echo " * Open \"https://$sys_hostname.$sys_domain\" and login to Postfixadmin as Postfix Administrator to create a domain and a mailbox."
-echo " * Please do not use Port 25 in your mail client, use Port 587 instead."
+echo " * Backup installer.log to a safe place and delete it here"
+echo " * Open \"https://$sys_hostname.$sys_domain\" and login to mailcow control center as $mailcow_admin_user to create a domain and a mailbox."
+echo " * Please do not use port 25 in your mail client, use port 587 instead."
+echo " * Setup SPF records!"
 echo

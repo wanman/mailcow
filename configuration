@@ -1,15 +1,31 @@
+# ==================================
 # Your servers new hostname and timezone.
 # FQDN will be "sys_hostname.sys_domain"
 # Example for valid timezone data: https://www.vmware.com/support/developer/vc-sdk/visdk400pubs/ReferenceGuide/timezone.html
 # If you plan to use "@sub.domain.tld" as mail domain, do NOT use "sub" as hostname!
+# ==================================
+
 sys_hostname="mail"
 sys_domain="domain.com"
 sys_timezone="Europe/Berlin"
 
+# ==================================
+# mailcow administrator
+# Password policy: At least 8 characters long, including 2 numbers, an uppercase letter, and a lowercase letter.
+# Recommended settings: Leave "genpasswd" to generate a secure password.
+# ==================================
+
+mailcow_admin_user="admin@$sys_domain"
+mailcow_admin_pass=`genpasswd`
+
+# ==================================
 # Choose a webserver platform
 # Valid values are "nginx" or "apache2"
+# ==================================
+
 conf_httpd="nginx"
 
+# ==================================
 # MySQL configuration.
 # Password policy: Not empty.
 # Recommended setting: Leave "genpasswd" to generate a secure password.
@@ -17,29 +33,31 @@ conf_httpd="nginx"
 # AN EXISTING MYSQL INSTANCE WILL BE USED AND NOT RECONFIGURED WHEN IT IS AVAILABLE
 # AND IT IS USEABLE BY MAILCOW VIA DEBIAN DEFAULTS-FILE
 # (Note: Leave "my_rootpw" setting below as it is, it will not have an effect, but needs to be set!)
-# ===============
+# ==================================
+
 my_rootpw=`genpasswd`
 
-my_postfixdb="postfixdb"
-my_postfixuser="postfix"
-my_postfixpass=`genpasswd`
+my_mailcowdb="mailcow"
+my_mailcowuser="mailcow"
+my_mailcowpass=`genpasswd`
 
 my_rcdb="roundcubedb"
 my_rcuser="roundcube"
 my_rcpass=`genpasswd`
 
-# Postfixadmin - Admin Login
-# Password policy: At least 8 characters long, including 2 numbers, an uppercase letter, and a lowercase letter.
-# Recommended settings: Leave "genpasswd" to generate a secure password.
-pfadmin_adminuser="pfadmin@$sys_domain"
-pfadmin_adminpass=`genpasswd`
-
+# ==================================
 # Self-signed certificate
 # "cert_country" needs to be a valid 2 letter country code. See https://www.digicert.com/ssl-certificate-country-codes.htm
+# ==================================
+
 cert_country="DE"
 cert_state="NRW"
 cert_city="DUS"
 cert_org="MAIL"
+
+# ==================================
+# Misc configuration option
+# ==================================
 
 # Do not confirm to proceed
 inst_unattended="no"

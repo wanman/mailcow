@@ -456,9 +456,9 @@ function mailbox_add_mailbox($link, $postarray) {
 			header("Location: do.php?event=".base64_encode("Password mismatch"));
 			die("Password mismatch");
 		}
-		$password = escapeshellcmd($password);
-		exec("/usr/bin/doveadm pw -s SHA512-CRYPT -p $password", $hash, $return);
-		$password = $hash[0];
+		$prep_password = escapeshellcmd($password);
+		exec("/usr/bin/doveadm pw -s SHA512-CRYPT -p $prep_password", $hash, $return);
+		$password_sha512c = $hash[0];
 		if ($return != "0") {
 			header("Location: do.php?event=".base64_encode("Error creating password hash"));
 			die("Error creating password hash");
@@ -490,23 +490,30 @@ function mailbox_add_mailbox($link, $postarray) {
 		die("Quota exceeds quota left ($quota_left_m M)");
 	}
 	if (isset($_POST['active']) && $_POST['active'] == "on") { $active = "1"; } else { $active = "0"; }
-	$mystring = "INSERT INTO mailbox (username, password, name, maildir, quota, local_part, domain, created, modified, active)
-		VALUES ('$username', '$password', '$name', '$maildir', '$quota_b', '$local_part', '$domain', now(), now(), '$active')";
-	if (!mysqli_query($link, $mystring)) {
+	$create_user = "INSERT INTO mailbox (username, password, name, maildir, quota, local_part, domain, created, modified, active) 
+			VALUES ('$username', '$password_sha512c', '$name', '$maildir', '$quota_b', '$local_part', '$domain', now(), now(), '$active')";
+	$create_user .= "INSERT INTO quota2 (username, bytes, messages)
+			VALUES ('$username', '', '')";
+	$create_user .= "INSERT INTO alias (address, goto, domain, created, modified, active)
+			VALUES ('$username', '$username', '$domain', now(), now(), '$active')";
+	$create_user .= "INSERT INTO users (username, digesta1)
+			VALUES('$username', MD5(CONCAT('$username', ':SabreDAV:', '$password')));";
+	$create_user .= "INSERT INTO principals (uri,email,displayname) 
+			VALUES ('principals/$username', '$username','$name');";
+	$create_user .= "INSERT INTO principals (uri,email,displayname) 
+			VALUES ('principals/$username/calendar-proxy-read', null, null);";
+	$create_user .= "INSERT INTO principals (uri,email,displayname)
+			VALUES ('principals/$username/calendar-proxy-write', null, null);";
+	$create_user .= "INSERT INTO addressbooks (principaluri, displayname, uri, description, synctoken) 
+			VALUES ('principals/$username','Default address book','default','','1');";
+	$create_user .= "INSERT INTO calendars (principaluri, displayname, uri, description, components, transparent) 
+			VALUES ('principals/$username','Default calendar','default','','VEVENT,VTODO', '0');";	
+	if (!mysqli_multi_query($link, $create_user)) {
 		header("Location: do.php?event=".base64_encode("MySQL query failed"));
 		die("MySQL query failed");
 	}
-	$mystring = "INSERT INTO quota2 (username, bytes, messages)
-		VALUES ('$username', '', '')";
-	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
-	}
-	$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active)
-		VALUES ('$username', '$username', '$domain', now(), now(), '$active')";
-	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+	while ($link->next_result()) {
+		if (!$link->more_results()) break;
 	}
 	header('Location: do.php?return=success');
 }
