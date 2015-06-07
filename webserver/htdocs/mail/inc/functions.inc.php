@@ -491,15 +491,15 @@ function mailbox_add_mailbox($link, $postarray) {
 	}
 	if (isset($_POST['active']) && $_POST['active'] == "on") { $active = "1"; } else { $active = "0"; }
 	$create_user = "INSERT INTO mailbox (username, password, name, maildir, quota, local_part, domain, created, modified, active) 
-			VALUES ('$username', '$password_sha512c', '$name', '$maildir', '$quota_b', '$local_part', '$domain', now(), now(), '$active')";
+			VALUES ('$username', '$password_sha512c', '$name', '$maildir', '$quota_b', '$local_part', '$domain', now(), now(), '$active');";
 	$create_user .= "INSERT INTO quota2 (username, bytes, messages)
-			VALUES ('$username', '', '')";
+			VALUES ('$username', '', '');";
 	$create_user .= "INSERT INTO alias (address, goto, domain, created, modified, active)
-			VALUES ('$username', '$username', '$domain', now(), now(), '$active')";
+			VALUES ('$username', '$username', '$domain', now(), now(), '$active');";
 	$create_user .= "INSERT INTO users (username, digesta1)
 			VALUES('$username', MD5(CONCAT('$username', ':SabreDAV:', '$password')));";
 	$create_user .= "INSERT INTO principals (uri,email,displayname) 
-			VALUES ('principals/$username', '$username','$name');";
+			VALUES ('principals/$username', '$username', '$name');";
 	$create_user .= "INSERT INTO principals (uri,email,displayname) 
 			VALUES ('principals/$username/calendar-proxy-read', null, null);";
 	$create_user .= "INSERT INTO principals (uri,email,displayname)
@@ -762,18 +762,21 @@ function mailbox_delete_mailbox($link, $postarray) {
 		header("Location: do.php?event=".base64_encode("Mail address invalid"));
 		die("Mail address invalid"); 
 	}
-	$mystring = "DELETE FROM alias WHERE goto='$username'";
-	if (!mysqli_query($link, $mystring)) {
+	$delete_user = "DELETE FROM alias WHERE goto='$username';";
+	$delete_user .= "DELETE FROM quota2 WHERE username='$username';";
+	$delete_user .= "DELETE FROM mailbox WHERE username='$username';";
+	$delete_user .= "DELETE FROM users WHERE username='$username';";
+	$delete_user .= "DELETE FROM principals WHERE uri='principals/$username';";
+	$delete_user .= "DELETE FROM principals WHERE uri='principals/$username/calendar-proxy-read';";
+	$delete_user .= "DELETE FROM principals WHERE uri='principals/$username/calendar-proxy-write';";
+	$delete_user .= "DELETE FROM addressbooks WHERE principaluri='principals/$username';";
+	$delete_user .= "DELETE FROM calendars WHERE principaluri='principals/$username';";
+	if (!mysqli_multi_query($link, $delete_user)) {
 		header("Location: do.php?event=".base64_encode("MySQL query failed"));
 		die("MySQL query failed");
 	}
-	$arraydeletefrom = array("quota2", "mailbox");
-	foreach ($arraydeletefrom as $deletefrom) {
-		$mystring = "DELETE FROM $deletefrom WHERE username='$username'";
-		if (!mysqli_query($link, $mystring)) {
-			header("Location: do.php?event=".base64_encode("MySQL query failed"));
-			die("MySQL query failed");
-		}
+	while ($link->next_result()) {
+		if (!$link->more_results()) break;
 	}
 	header('Location: do.php?return=success');
 }
@@ -901,15 +904,14 @@ function delete_domain_admin($link, $postarray) {
 		header("Location: do.php?event=".base64_encode("Invalid username"));
 		die("Invalid username");
 	}
-	$mystring = "DELETE FROM domain_admins WHERE username='$username'";
-	if (!mysqli_query($link, $mystring)) {
+	$delete_domain = "DELETE FROM domain_admins WHERE username='$username';";
+	$delete_domain .= "DELETE FROM admin WHERE username='$username';";
+	if (!mysqli_multi_query($link, $delete_domain)) {
 		header("Location: do.php?event=".base64_encode("MySQL query failed"));
 		die("MySQL query failed");
 	}
-	$mystring = "DELETE FROM admin WHERE username='$username'";
-	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+	while ($link->next_result()) {
+		if (!$link->more_results()) break;
 	}
 	header('Location: do.php?return=success');
 }
