@@ -408,8 +408,9 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			chown -R www-data: /var/www/ /var/lib/php5/sessions
 			mysql -u $my_mailcowuser -p$my_mailcowpass $my_mailcowdb < webserver/htdocs/init.sql
 			if [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -s -N -e "use $my_mailcowdb; select * from admin;" | wc -l) -lt 1 ]]; then
-				my_mailcowadmin_pass_hashed=$(doveadm pw -s SHA512-CRYPT -p $mailcow_admin_pass)
-				mysql -u $my_mailcowuser -p$my_mailcowpass $my_mailcowdb -e "INSERT INTO admin VALUES ('admin','$my_mailcowadmin_pass_hashed',1,now(),now(),1);"
+				mailcow_admin_pass_hashed=$(doveadm pw -s SHA512-CRYPT -p $mailcow_admin_pass)
+				mysql -u $my_mailcowuser -p$my_mailcowpass $my_mailcowdb -e "INSERT INTO admin VALUES ('$mailcow_admin_user','$mailcow_admin_pass_hashed',1,now(),now(),1);"
+				mysql -u $my_mailcowuser -p$my_mailcowpass $my_mailcowdb -e "INSERT INTO domain_admins (username, domain, created, active) VALUES ('$mailcow_admin_user', 'ALL', now(), '1');"
 			else
 				echo "$(textb [INFO]) - At least one administrator exists, will not create another mailcow administrator"
 			fi
