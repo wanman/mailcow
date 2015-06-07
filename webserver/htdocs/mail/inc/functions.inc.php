@@ -658,21 +658,23 @@ function mailbox_edit_mailbox($link, $postarray) {
 			header("Location: do.php?event=".base64_encode("Password mismatch"));
 			die("Password mismatch");
 		}
-		$password = escapeshellcmd($password);
-		exec("/usr/bin/doveadm pw -s SHA512-CRYPT -p $password", $hash, $return);
-		$password = $hash[0];
+		$prep_password = escapeshellcmd($password);
+		exec("/usr/bin/doveadm pw -s SHA512-CRYPT -p $prep_password", $hash, $return);
+		$password_sha512c = $hash[0];
 		if ($return != "0") {
 			header("Location: do.php?event=".base64_encode("Error creating password hash"));
 			die("Error creating password hash");	
 		}
-		$mystring = "UPDATE mailbox SET modified=now(), active='$active', password='$password', name='$name', quota='$quota_b' WHERE username='$username'";
-		if (!mysqli_query($link, $mystring)) {
+		$update_user = "UPDATE mailbox SET modified=now(), active='$active', password='$password_sha512c', name='$name', quota='$quota_b' WHERE username='$username';";
+		$update_user .= "UPDATE users SET digesta1=MD5(CONCAT('$username', ':SabreDAV:', '$password')) WHERE username='$username';";
+		if (!mysqli_multi_query($link, $update_user)) {
 			header("Location: do.php?event=".base64_encode("MySQL query failed"));
 			die("MySQL query failed");
 		}
-		else {
-			header('Location: do.php?return=success');
+		while ($link->next_result()) {
+			if (!$link->more_results()) break;
 		}
+		header('Location: do.php?return=success');
 	}
 	$mystring = "UPDATE mailbox SET modified=now(), active='$active', name='$name', quota='$quota_b' WHERE username='$username'";
 	if (!mysqli_query($link, $mystring)) {
