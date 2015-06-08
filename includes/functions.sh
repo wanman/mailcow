@@ -391,8 +391,8 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
                 sed -i "s/\"autoconfig.MAILCOW_DOMAIN\"/\"autoconfig.$sys_domain\"/g" /etc/apache2/sites-available/mailcow
 				a2enmod rewrite ssl proxy proxy_fcgi > /dev/null 2>&1
 			fi
-			cp php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
-			cp php5-fpm/conf/php-fpm.conf /etc/php5/fpm/php-fpm.conf
+			cp webserver/php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
+			cp webserver/php5-fpm/conf/php-fpm.conf /etc/php5/fpm/php-fpm.conf
 			mkdir /var/lib/php5/sessions 2> /dev/null
 			chown -R www-data:www-data /var/lib/php5/sessions
 			sed -i "/date.timezone/c\php_admin_value[date.timezone] = $sys_timezone" /etc/php5/fpm/pool.d/mail.conf
