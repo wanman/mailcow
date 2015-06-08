@@ -28,7 +28,7 @@ esac
 
 checksystem
 checkports
-source configuration
+source mailcow.config
 checkconfig
 
 echo "    $(textb "Hostname")      $sys_hostname

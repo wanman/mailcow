@@ -124,7 +124,7 @@ cd mailcow-*
 
 **Now edit the file "configuration" to fit your needs!**
 ```
-nano configuration
+nano mailcow.config
 ```
 
 * **sys_hostname** - Hostname without domain
