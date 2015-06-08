@@ -400,17 +400,21 @@ doveadm move -u jane Archive/2011/09 mailbox INBOX BEFORE 2011-10-01 SINCE 01-Se
 nano /opt/vfilter/replies
 </pre></div>
 
-<p data-toggle="collapse" style="cursor:help;" data-target="#backupmail"><strong>Backup mail</strong></p>
-<div id="backupmail" class="collapse out">
+<p data-toggle="collapse" style="cursor:help;" data-target="#backupdav"><strong>Export Cal- and CardDAV data</strong></p>
+<div id="backupdav" class="collapse out">
 <pre>
-; If you want to create a backup of Bobs maildir to /var/mailbackup, just go ahead and create the backup destination with proper rights:
-mkdir /var/mailbackup
-chown vmail:vmail /var/mailbackup/
+; mailcow comes with plugins helping to export Cal- and CardDAV data to .vcf and .ics files.
+; Each user can export data he has access to.
+; You can generate these exports by finding a url to your calendar, and adding ?export at the end of the url. This will automatically trigger a download:
+https://<?php echo $MYHOSTNAME, "\n"; ?>/calendars/you@domain.tld/default?export
 
-; Afterwards you can start a full backup:
-dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
+; The same procedure for address books:
+https://<?php echo $MYHOSTNAME, "\n"; ?>/addressbooks/you@domain.tld/default?export
 
-; Visit http://wiki2.dovecot.org/Tools/Dsync
+; Please use a Cal-/CardDAV client of your choice to find out the ID of self-created calendars and address books.
+; Administrators can use MySQL to find a users calendar and address book IDs:
+mysql --defaults-file=/etc/mysql/debian.cnf mailcow_database_name -e "SELECT uri FROM calendars where principaluri='principals/you@domain.tld';"
+mysql --defaults-file=/etc/mysql/debian.cnf mailcow_database_name -e "SELECT uri FROM addressbooks where principaluri='principals/you@domain.tld';"
 </pre></div>
 
 <p data-toggle="collapse" style="cursor:help;" data-target="#debugging"><strong>Debugging</strong></p>
@@ -458,7 +462,7 @@ dsync -u bob.cat@domain.com backup maildir:/var/mailbackup/
 </div>
 
 <?php
-} 
+}
 elseif (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "domainadmin") {
 header('Location: mailbox.php');
 die("Permission denied");
