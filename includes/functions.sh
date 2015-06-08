@@ -216,7 +216,7 @@ EOF
 					apt-key adv --keyserver keyserver.ubuntu.com --recv E5267A6C > /dev/null 2>&1
 					apt-get -y update >/dev/null
 				fi
-				apt-get -y install apache2 apache2-utils >/dev/null
+				apt-get -y install apache2 apache2-utils libapache2-mod-php5 >/dev/null
 			elif [[ $conf_httpd == "nginx" ]]; then
 				echo "$(textb [INFO]) - Installing Nginx..."
 				apt-get -y install nginx-extras >/dev/null
