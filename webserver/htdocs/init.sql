@@ -120,6 +120,7 @@ CREATE TABLE IF NOT EXISTS groupmembers (
     UNIQUE(principal_id, member_id)
 );
 
+
 CREATE TABLE IF NOT EXISTS propertystorage (
     id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
     path VARBINARY(1024) NOT NULL,
@@ -127,7 +128,6 @@ CREATE TABLE IF NOT EXISTS propertystorage (
     valuetype INT UNSIGNED,
     value MEDIUMBLOB
 );
-CREATE UNIQUE INDEX path_property ON propertystorage (path(600), name(100));
 
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
