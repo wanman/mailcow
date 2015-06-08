@@ -83,7 +83,7 @@ echo "<tr><td>", $row['username'],
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="control-label col-sm-4" for="name">Assign domains <small>(hold <code>CTRL</code> to select multiple values)</small>:</label>
+		<label class="control-label col-sm-4" for="name">Assign domains (hold <code>CTRL</code> to select multiple values):</label>
 		<div class="col-sm-8">
 			<select style="width:50%" name="domain[]" size="5" multiple>
 <?php
@@ -131,7 +131,7 @@ echo "<option>", $row['domain'], "</option>";
 <div class="panel-body">
 <form method="post">
 	<div class="form-group">
-		<label class="control-label col-sm-4" for="location">Location <small>(will be created if missing)</small></label>
+		<label class="control-label col-sm-4" for="location">Location <small>(will be created if missing)</small>:</label>
 		<div class="col-sm-8">
 		<input type="text" class="form-control" name="location" id="location" value="<?php echo return_mailcow_config("backup_location"); ?>">
 		</div>

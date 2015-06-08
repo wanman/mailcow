@@ -60,6 +60,14 @@ display: none;
 a, a:hover, a:focus {
   color: #333;
 }
+.dropdown-menu>li>a:hover {
+  color: #777 !important;
+}
+@media(max-width:767px)  {
+	.dropdown-menu>li>a:hover {
+		color: #f5f5f5 !important;
+	}
+}
 </style>
 </head>
 <body>
