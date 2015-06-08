@@ -17,7 +17,7 @@ $result = mysqli_fetch_assoc(mysqli_query($link, "SELECT username from admin whe
 	<input type="hidden" name="admin_user_now" value="<?php echo $result['username']; ?>">
 	<div class="form-group">
 		<label class="control-label col-sm-2" for="quota">Administrator:</label>
-		<div class="col-sm-10">          
+		<div class="col-sm-10">
 		<input type="text" class="form-control" name="admin_user" id="quota" value="<?php echo $result['username']; ?>">
 		</div>
 	</div>
@@ -33,7 +33,7 @@ $result = mysqli_fetch_assoc(mysqli_query($link, "SELECT username from admin whe
 		<input type="password" class="form-control" name="admin_pass2" id="admin_pass2">
 		</div>
 	</div>
-	<div class="form-group">        
+	<div class="form-group">
 		<div class="col-sm-offset-2 col-sm-10">
 			<button type="submit" class="btn btn-default btn-raised btn-sm">Save changes</button>
 		</div>
@@ -107,14 +107,14 @@ echo "<option>", $row['domain'], "</option>";
 		<input type="password" class="form-control" name="password2" id="password2" placeholder="">
 		</div>
 	</div>
-	<div class="form-group">        
+	<div class="form-group">
 		<div class="col-sm-offset-4 col-sm-8">
 			<div class="checkbox">
 			<label><input type="checkbox" name="active" checked> Active</label>
 			</div>
 		</div>
 	</div>
-	<div class="form-group">        
+	<div class="form-group">
 		<div class="col-sm-offset-0 col-sm-8">
 			<button type="submit" class="btn btn-default btn-raised btn-sm">Add domain admin</button>
 		</div>
@@ -168,7 +168,7 @@ while ($row = mysqli_fetch_array($resultselect)) {
 		</div>
 	</div>
 	<div class="clearfix"></div>
-	<div class="form-group">        
+	<div class="form-group">
 		<div class="col-sm-offset-4 col-sm-8">
 			<div class="checkbox">
 			<label><input type="checkbox" name="use_backup" <?php if (return_mailcow_config("backup_active") == "on") { echo "checked"; } ?>> Use backup function</label>
@@ -176,7 +176,7 @@ while ($row = mysqli_fetch_array($resultselect)) {
 		</div>
 	</div>
 	<div class="clearfix"></div>
-	<div class="form-group">        
+	<div class="form-group">
 		<div class="col-sm-8">
 			<button type="submit" class="btn btn-default btn-raised btn-sm">Save changes</button>
 		</div>
@@ -462,9 +462,13 @@ mysql --defaults-file=/etc/mysql/debian.cnf mailcow_database_name -e "SELECT uri
 </div>
 
 <?php
-}
+} 
 elseif (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "domainadmin") {
 header('Location: mailbox.php');
+die("Permission denied");
+}
+elseif (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "user") {
+header('Location: user.php');
 die("Permission denied");
 } else {
 ?>

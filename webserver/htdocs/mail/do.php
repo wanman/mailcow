@@ -13,7 +13,7 @@ require_once("inc/header.inc.php");
 require_once "inc/triggers.inc.php";
 if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes") {
 	if (isset($_GET['return']) && $_GET['return'] == "success") {
-		echo '<div class="alert alert-success" role="alert"><strong>Success:</strong> Action successfully completed.</div>';
+		echo '<div class="alert alert-success" role="alert"><strong>Success:</strong> Action successfully completed</div>';
 	}
 	elseif (isset($_GET['adddomain'])) {
 ?>
@@ -34,7 +34,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="aliases">Max. aliases:</label>
-						<div class="col-sm-10">
+						<div class="col-sm-10">          
 						<input type="number" class="form-control" name="aliases" id="aliases" value="200">
 						</div>
 					</div>
@@ -46,7 +46,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="maxquota">Max. size per mailbox (MB):</label>
-						<div class="col-sm-10">
+						<div class="col-sm-10">          
 						<input type="number" class="form-control" name="maxquota" id="maxquota" value="4096">
 						</div>
 					</div>
@@ -56,21 +56,21 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 						<input type="number" class="form-control" name="quota" id="quota" value="10240">
 						</div>
 					</div>
-					<div class="form-group">
+					<div class="form-group">        
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="checkbox">
 							<label><input type="checkbox" name="backupmx"> Backup MX</label>
 							</div>
 						</div>
 					</div>
-					<div class="form-group">
+					<div class="form-group">        
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="checkbox">
 							<label><input type="checkbox" name="active" checked> Active</label>
 							</div>
 						</div>
 					</div>
-					<div class="form-group">
+					<div class="form-group">        
 						<div class="col-sm-offset-2 col-sm-10">
 							<button type="submit" class="btn btn-success btn-sm">Submit</button>
 						</div>
@@ -132,14 +132,14 @@ while ($row = mysqli_fetch_array($result)) {
 							</select>
 						</div>
 					</div>
-					<div class="form-group">
+					<div class="form-group">        
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="checkbox">
 							<label><input type="checkbox" name="active" checked> Active</label>
 							</div>
 						</div>
 					</div>
-					<div class="form-group">
+					<div class="form-group">        
 						<div class="col-sm-offset-2 col-sm-10">
 							<button type="submit" class="btn btn-success btn-sm">Submit</button>
 						</div>
@@ -173,14 +173,14 @@ while ($row = mysqli_fetch_array($resultselect)) {
 							</select>
 						</div>
 					</div>
-					<div class="form-group">
+					<div class="form-group">        
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="checkbox">
 							<label><input type="checkbox" name="active" <?php if (isset($result['active']) && $result['active']=="1") { echo "checked"; }; ?>> Active</label>
 							</div>
 						</div>
 					</div>
-					<div class="form-group">
+					<div class="form-group">        
 						<div class="col-sm-offset-2 col-sm-10">
 							<button type="submit" class="btn btn-success btn-sm">Submit</button>
 						</div>

@@ -11,7 +11,12 @@ if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
 		$_SESSION['mailcow_cc_username'] = $_POST["login_user"];
 		$_SESSION['mailcow_cc_role'] = "domainadmin";
 		header("Location: mailbox.php");
-
+	}
+	elseif (check_login($link, $_POST["login_user"], $_POST["pass_user"]) == "user") {
+		$_SESSION['mailcow_cc_loggedin'] = "yes";
+		$_SESSION['mailcow_cc_username'] = $_POST["login_user"];
+		$_SESSION['mailcow_cc_role'] = "user";
+		header("Location: mailbox.php");
 	}
 }
 if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "admin") {
@@ -78,6 +83,15 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 			break;
 			case "adddomainadmin":
 				add_domain_admin($link, $_POST);
+			break;
+		}
+	}
+}
+if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "user") {
+	if (isset($_POST["mailboxaction"])) {
+		switch ($_POST["mailboxaction"]) {
+			case "setuserpassword":
+				set_user_account($link, $_POST);
 			break;
 		}
 	}

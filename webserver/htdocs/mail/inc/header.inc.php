@@ -93,6 +93,8 @@ a, a:hover, a:focus {
 						<li><a href="/admin.php">Administration</a></li>
 							<?php } if ($logged_in_role == "admin" || $logged_in_role == "domainadmin") { ?>
 						<li><a href="/mailbox.php">Mailboxes</a></li>
+							<?php } if ($logged_in_role == "user") { ?>
+						<li><a href="/mailbox.php">User settings</a></li>
 						<?php } } else { ?>
 						<li><a href="/admin.php">Login</a></li>
 						<?php } ?>

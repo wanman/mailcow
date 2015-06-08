@@ -18,6 +18,13 @@ function check_login($link, $user, $pass) {
 			return "domainadmin";
 		}
 	}
+	$result = mysqli_query($link, "SELECT password FROM mailbox WHERE active='1' AND username='$user'");
+	while ($row = mysqli_fetch_array($result, MYSQL_NUM)) {
+		$row = "'".$row[0]."'";
+		if (strpos(shell_exec("echo $pass | doveadm pw -s SHA512-CRYPT -t $row"), "verified") !== false) {
+			return "user";
+		}
+	}
 	return false;
 }
 function formatBytes($size, $precision = 2) {
@@ -437,6 +444,11 @@ function mailbox_add_mailbox($link, $postarray) {
 	global $logged_in_role;
 	global $logged_in_as;
 	
+	if (empty($default_cal) || empty($default_card)) {
+		header("Location: do.php?event=".base64_encode("Calendar and address book cannot be empty"));
+		die("Calendar and address book cannot be empty");
+	}
+
 	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) { 
 		header("Location: do.php?event=".base64_encode("Permission denied"));
 		die("Permission denied");
@@ -832,6 +844,52 @@ function set_admin_account($link, $postarray) {
 	if (!mysqli_query($link, $mystring)) {
 		header("Location: do.php?event=".base64_encode("MySQL query failed"));
 		die("MySQL query failed");
+	}
+	header('Location: do.php?return=success');
+}
+function set_user_account($link, $postarray) {
+	$name_now = mysqli_real_escape_string($link, $_POST['user_now']);
+	$password_old = mysqli_real_escape_string($link, $_POST['user_old_pass']);
+	$password_new = mysqli_real_escape_string($link, $_POST['user_new_pass']);
+	$password_new2 = mysqli_real_escape_string($link, $_POST['user_new_pass']);
+	
+	if ($_SESSION['mailcow_cc_role'] != "user") {
+		header("Location: do.php?event=".base64_encode("Permission denied"));
+		die("Permission denied");
+	}
+	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $name_now)) || empty ($name_now)) {
+		header("Location: do.php?event=".base64_encode("Invalid username"));
+		die("Invalid username");
+	}
+	if (!empty($password_new2) && !empty($password_new)) {
+		if ($password_new2 != $password_new) {
+			header("Location: do.php?event=".base64_encode("Password mismatch"));
+			die("Password mismatch");
+		}
+		if (!check_login($link, $name_now, $password_old) == "user") {
+			header("Location: do.php?event=".base64_encode("Current password incorrect"));
+			die("Current password incorrect");	
+		}
+		$prep_password = escapeshellcmd($password_new);
+		exec("/usr/bin/doveadm pw -s SHA512-CRYPT -p $prep_password", $hash, $return);
+		if ($return != "0") {
+			header("Location: do.php?event=".base64_encode("Error creating password hash"));
+			die("Error creating password hash");	
+		}
+		$password_sha512c = $hash[0];
+		$update_user = "UPDATE mailbox SET password='$password_sha512c' WHERE username='$name_now';";
+		$update_user .= "UPDATE users SET digesta1=MD5(CONCAT('$name_now', ':SabreDAV:', '$password_new')) WHERE username='$name_now';";
+		if (!mysqli_multi_query($link, $update_user)) {
+			header("Location: do.php?event=".base64_encode("MySQL query failed"));
+			die("MySQL query failed");
+		}
+		while ($link->next_result()) {
+			if (!$link->more_results()) break;
+		}
+	}
+	else {
+		header("Location: do.php?event=".base64_encode("Password cannot be empty"));
+		die("Password cannot be empty");
 	}
 	header('Location: do.php?return=success');
 }
