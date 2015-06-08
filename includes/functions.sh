@@ -399,13 +399,16 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			install -m 755 misc/mc_inst_cron /usr/local/sbin/mc_inst_cron
 			cp -R webserver/htdocs/{mail,dav} /var/www/
 			tar xf /var/www/dav/vendor.tar -C /var/www/dav/ ; rm /var/www/dav/vendor.tar
+			find /var/www/{dav,mail} -type d -exec chmod 755 {} \;
+			find /var/www/{dav,mail} -type f -exec chmod 644 {}  \;
 			sed -i "/date_default_timezone_set/c\date_default_timezone_set('$sys_timezone');" /var/www/dav/server.php
 			touch /var/www/{VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE,MAILBOX_BACKUP}
             sed -i "s/mailcow_sub/$sys_hostname/g" /var/www/mail/autoconfig.xml
 			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
 			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
 			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
-			chown -R www-data: /var/www/ /var/lib/php5/sessions
+			chown -R www-data: /var/www/{mail,dav,VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE,MAILBOX_BACKUP} /var/lib/php5/sessions
+			chown www-data: /var/www/
 			mysql -u $my_mailcowuser -p$my_mailcowpass $my_mailcowdb < webserver/htdocs/init.sql
 			if [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -s -N -e "use $my_mailcowdb; select * from admin;" | wc -l) -lt 1 ]]; then
 				mailcow_admin_pass_hashed=$(doveadm pw -s SHA512-CRYPT -p $mailcow_admin_pass)
