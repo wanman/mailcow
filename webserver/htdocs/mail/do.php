@@ -242,6 +242,18 @@ while ($row = mysqli_fetch_array($result)) {
 						</div>
 					</div>
 					<div class="form-group">
+						<label class="control-label col-sm-2" for="default_cal">Default calendar name:</label>
+						<div class="col-sm-10">
+						<input type="text" class="form-control" name="default_cal" id="default_cal" value="Calendar">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-2" for="default_card">Default address book name:</label>
+						<div class="col-sm-10">
+						<input type="text" class="form-control" name="default_card" id="default_card" value="Address book">
+						</div>
+					</div>
+					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="checkbox">
 							<label><input type="checkbox" name="active" checked> Active</label>

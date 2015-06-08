@@ -417,6 +417,8 @@ function mailbox_add_mailbox($link, $postarray) {
 	$domain = mysqli_real_escape_string($link, $_POST['domain']);
 	$local_part = mysqli_real_escape_string($link, $_POST['local_part']);
 	$name = mysqli_real_escape_string($link, $_POST['name']);
+	$default_cal = mysqli_real_escape_string($link, $_POST['default_cal']);
+	$default_card = mysqli_real_escape_string($link, $_POST['default_card']);
 	$quota_m = mysqli_real_escape_string($link, $_POST['quota']);
 
 	$quota_b = $quota_m*1048576;
@@ -505,9 +507,9 @@ function mailbox_add_mailbox($link, $postarray) {
 	$create_user .= "INSERT INTO principals (uri,email,displayname)
 			VALUES ('principals/$username/calendar-proxy-write', null, null);";
 	$create_user .= "INSERT INTO addressbooks (principaluri, displayname, uri, description, synctoken) 
-			VALUES ('principals/$username','Default address book','default','','1');";
+			VALUES ('principals/$username','$default_card','default','','1');";
 	$create_user .= "INSERT INTO calendars (principaluri, displayname, uri, description, components, transparent) 
-			VALUES ('principals/$username','Default calendar','default','','VEVENT,VTODO', '0');";	
+			VALUES ('principals/$username','$default_cal','default','','VEVENT,VTODO', '0');";	
 	if (!mysqli_multi_query($link, $create_user)) {
 		header("Location: do.php?event=".base64_encode("MySQL query failed"));
 		die("MySQL query failed");
