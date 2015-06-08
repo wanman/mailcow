@@ -50,11 +50,12 @@
 		ErrorLog ${APACHE_LOG_DIR}/error.log
 		CustomLog ${APACHE_LOG_DIR}/access.log combined
 		RewriteEngine on
-		RewriteRule .* /server.php [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
+		RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
+		DirectoryIndex server.php
 		SSLEngine on
 		SSLCertificateFile /etc/ssl/mail/mail.crt
 		SSLCertificateKeyFile /etc/ssl/mail/mail.key
-        ProxyPassMatch ^/(.*\.php(/.*)?)$ unix:/var/run/php5-fpm.sock|fcgi://127.0.0.1:9000/var/www/mail
+		ProxyPassMatch ^/(.*\.php(/.*)?)$ unix:/var/run/php5-fpm.sock|fcgi://127.0.0.1:9001/var/www/dav
 		<FilesMatch "\.(cgi|shtml|phtml|php)$">
 			SSLOptions +StdEnvVars
 		</FilesMatch>

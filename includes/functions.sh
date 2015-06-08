@@ -389,6 +389,7 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 				ln -s /etc/apache2/sites-available/mailcow /etc/apache2/sites-enabled/000-0-mailcow.conf
 				sed -i "s/\"\MAILCOW_HOST.MAILCOW_DOMAIN\"/\"$sys_hostname.$sys_domain\"/g" /etc/apache2/sites-available/mailcow
                 sed -i "s/\"autoconfig.MAILCOW_DOMAIN\"/\"autoconfig.$sys_domain\"/g" /etc/apache2/sites-available/mailcow
+				sed -i "s/MAILCOW_DOMAIN;/$sys_domain;/g" /etc/apache2/sites-available/mailcow
 				a2enmod rewrite ssl proxy proxy_fcgi > /dev/null 2>&1
 			fi
 			cp webserver/php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
