@@ -50,7 +50,11 @@
 		ErrorLog ${APACHE_LOG_DIR}/error.log
 		CustomLog ${APACHE_LOG_DIR}/access.log combined
 		RewriteEngine on
-		RewriteRule .* /server.php [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
+		RewriteRule ^/(.*)$ /server.php [L]
+		php_flag output_buffering off
+		php_flag always_populate_raw_post_data off
+		php_flag magic_quotes_gpc off
+		php_flag mbstring.func_overload off
 		DirectoryIndex server.php
 		SSLEngine on
 		SSLCertificateFile /etc/ssl/mail/mail.crt

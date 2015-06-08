@@ -24,13 +24,12 @@ server {
 	add_header Strict-Transport-Security max-age=15768000;
 	ssl_session_cache shared:SSL:5m;
 	ssl_session_timeout 30m;
-    server_name dav.MAILCOW_DOMAIN;
-    root /var/www/dav;
-    index server.php;
-	rewrite ^/.well-known/caldav /calendars redirect;
-	rewrite ^/.well-known/carddav /addressbooks redirect;
+	server_name dav.MAILCOW_DOMAIN;
+	root /var/www/dav;
+	index server.php;
+	rewrite ^/.well-known/caldav /calendars/ redirect;
+	rewrite ^/.well-known/carddav /addressbooks/ redirect;
 	charset utf-8;
-
 	location / {
 		try_files $uri $uri/ /server.php?$args;
 	}

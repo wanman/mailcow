@@ -18,7 +18,8 @@ require_once("inc/header.inc.php");
 				</ul>
 				<small><b>Cal- and CardDAV</b></small>
 				<ul>
-					<li><code>https://dav.<?php echo $MYHOSTNAME_1.'.'.$MYHOSTNAME_2; ?>/principals/you@<?php echo $MYHOSTNAME_1.'.'.$MYHOSTNAME_2; ?>/</code></li>
+					<li><code>https://dav.<?php echo $MYHOSTNAME_1.'.'.$MYHOSTNAME_2; ?>/</code></li>
+					<small>(Append <code>principals/you@<?php echo $MYHOSTNAME_1.'.'.$MYHOSTNAME_2; ?>/</code> on errors)</small>
 				</ul>
 				<small>Please use your full email address as login name.</small>
 			</div>
