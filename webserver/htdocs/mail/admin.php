@@ -136,6 +136,7 @@ echo "<option>", $row['domain'], "</option>";
 		<input type="text" class="form-control" name="location" id="location" value="<?php echo return_mailcow_config("backup_location"); ?>">
 		</div>
 	</div>
+	<br /><br />
 	<div class="clearfix"></div>
 	<div class="form-group">
 		<label class="control-label col-sm-4" for="runtime">Runtime</label>
@@ -361,6 +362,7 @@ _submission._tcp    IN SRV     0 1 587 <?php echo $MYHOSTNAME; ?>.
 @                   IN MX 10   <?php echo $MYHOSTNAME_0, "\n"; ?>
 @                   IN TXT     "v=spf1 mx -all"
 autoconfig          IN A       <?php echo $IP, "\n"; ?>
+dav                 IN A       <?php echo $IP, "\n"; ?>
 <?php echo str_pad($MYHOSTNAME_0, 20); ?>IN A       <?php echo $IP, "\n"; ?>
 
 ; !!!!!!!!!!!!!!!!

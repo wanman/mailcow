@@ -403,14 +403,8 @@ while ($row = mysqli_fetch_array($result)) {
 			$deletedomain = mysqli_real_escape_string($link, $_GET["deletedomain"]);
 			if (mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$deletedomain' AND ((domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role'))"))) {
 				echo '<div class="alert alert-warning" role="alert"><strong>Warning:</strong> You are about to delete a domain!</div>';
-				echo "<p>This will also delete mailboxes assigned to the domain <strong>$deletedomain.</strong> See list below (if any).</p>";
-				$query = "SELECT username FROM mailbox WHERE domain='$deletedomain'";
-				$result = mysqli_query($link, $query);
-				echo "<ul>";
-				while ($row = mysqli_fetch_array($result)) {
-					echo "<li>", $row['username'], "</li>";
-				}
-				echo "</ul>";
+				echo "<p>This will also delete domain alises assigned to the domain</p>";
+				echo "<p><strong>Domain must be empty to be deleted!</b></p>";
 				?>
 				<form class="form-horizontal" role="form" method="post">
 				<input type="hidden" name="mailboxaction" value="deletedomain">

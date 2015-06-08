@@ -62,15 +62,15 @@ function return_mailcow_config($s) {
 	switch ($s) {
 		case "backup_location":
 			preg_match("/LOCATION=(.*)/", file_get_contents($GLOBALS['mc_mailbox_backup']) , $result);
-			return $result[1];
+			if (!empty($result[1])) { return $result[1]; } else { return "/backup/mail"; }
 			break;
 		case "backup_runtime":
 			preg_match("/RUNTIME=(.*)/", file_get_contents($GLOBALS['mc_mailbox_backup']) , $result);
-			return $result[1];
+			if (!empty($result[1])) { return $result[1]; } else { return false; }
 			break;
 		case "backup_active":
 			preg_match("/BACKUP=(.*)/", file_get_contents("/var/www/MAILBOX_BACKUP") , $result);
-			return $result[1];
+			if (!empty($result[1])) { return $result[1]; } else { return false; }
 			break;
 		case "extlist":
 			$read_mime_check = file($GLOBALS["mailcow_reject_attachments"])[0];
@@ -697,12 +697,12 @@ function mailbox_delete_domain($link, $postarray) {
 		header("Location: do.php?event=".base64_encode("Domain name invalid"));
 		die("Domain name invalid");
 	}
-	$mystring = "DELETE FROM quota2 WHERE username IN (SELECT username FROM mailbox WHERE domain='$domain')";
-	if (!mysqli_query($link, $mystring)) {
-		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed");
+	$mystring = "SELECT username FROM mailbox WHERE domain='$domain';";
+	if (!mysqli_query($link, $mystring) || !empty(mysqli_result(mysqli_query($link, $mystring)))) {
+		header("Location: do.php?event=".base64_encode("Domain is not empty! Please delete mailboxes first."));
+		die("Domain is not empty! Please delete mailboxes first.");
 	}
-	foreach (array("domain", "alias", "mailbox", "domain_admins") as $deletefrom) {
+	foreach (array("domain", "alias", "domain_admins") as $deletefrom) {
 		$mystring = "DELETE FROM $deletefrom WHERE domain='$domain'";
 		if (!mysqli_query($link, $mystring)) {
 			header("Location: do.php?event=".base64_encode("MySQL query failed"));
