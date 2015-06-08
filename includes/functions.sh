@@ -373,7 +373,8 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			su debian-spamd -c "sa-update 2> /dev/null"
 			;;
 		webserver)
-			rm -rf /var/www/{mail,dav} 2> /dev/null
+			# Testing: Keep added files
+			#rm -rf /var/www/{mail,dav} 2> /dev/null
 			if [[ $conf_httpd == "nginx" ]]; then
 				rm /etc/nginx/sites-enabled/{000-0-mailcow,000-0-fufix} 2>/dev/null
 				cp webserver/nginx/conf/sites-available/mailcow /etc/nginx/sites-available/
@@ -401,7 +402,7 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			cp -R webserver/htdocs/{mail,dav} /var/www/
 			tar xf /var/www/dav/vendor.tar -C /var/www/dav/ ; rm /var/www/dav/vendor.tar
 			find /var/www/{dav,mail} -type d -exec chmod 755 {} \;
-			find /var/www/{dav,mail} -type f -exec chmod 644 {}  \;
+			find /var/www/{dav,mail} -type f -exec chmod 644 {} \;
 			sed -i "/date_default_timezone_set/c\date_default_timezone_set('$sys_timezone');" /var/www/dav/server.php
 			touch /var/www/{VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE,MAILBOX_BACKUP}
             sed -i "s/mailcow_sub/$sys_hostname/g" /var/www/mail/autoconfig.xml
