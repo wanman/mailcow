@@ -127,7 +127,7 @@ echo "<option>", $row['domain'], "</option>";
 <h4><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Configuration</h4>
 
 <div class="panel panel-default">
-<div class="panel-heading">Backup</div>
+<div class="panel-heading">Backup mail</div>
 <div class="panel-body">
 <form method="post">
 	<div class="form-group">

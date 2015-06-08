@@ -49,6 +49,8 @@
 		DocumentRoot /var/www/dav
 		ErrorLog ${APACHE_LOG_DIR}/error.log
 		CustomLog ${APACHE_LOG_DIR}/access.log combined
+		RewriteEngine on
+		RewriteRule .* /server.php [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
 		SSLEngine on
 		SSLCertificateFile /etc/ssl/mail/mail.crt
 		SSLCertificateKeyFile /etc/ssl/mail/mail.key

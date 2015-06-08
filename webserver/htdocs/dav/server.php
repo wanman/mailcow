@@ -37,5 +37,7 @@ $server->addPlugin(new \Sabre\CalDAV\Plugin());
 $server->addPlugin(new \Sabre\CardDAV\Plugin());
 $server->addPlugin(new \Sabre\DAVACL\Plugin());
 $server->addPlugin(new \Sabre\DAV\Sync\Plugin());
+$server->addPlugin(new \Sabre\CardDAV\VCFExportPlugin());
+$server->addPlugin(new \Sabre\CalDAV\ICSExportPlugin());
 
 $server->exec();
