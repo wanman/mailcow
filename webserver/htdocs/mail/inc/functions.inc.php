@@ -123,14 +123,17 @@ function set_mailcow_config($s, $v = "", $vext = "") {
 	switch ($s) {
 		case "backup":
 			$file="/var/www/MAILBOX_BACKUP";
-			if (($v['use_backup'] != "on" && $v['use_backup'] != "off") || 
+			if (($v['use_backup'] != "on" && $v['use_backup'] != "") || 
 				($v['runtime'] != "hourly" && $v['runtime'] != "daily" && $v['runtime'] != "monthly")) {
-				header("Location: do.php?event=".base64_encode("Invalid form data"));
-				die("Invalid form data");
+					header("Location: do.php?event=".base64_encode("Invalid form data"));
+					die("Invalid form data");
 			}
 			if (!ctype_alnum(str_replace("/", "", $v['location']))) {
 				header("Location: do.php?event=".base64_encode("Invalid form data"));
 				die("Invalid form data");
+			}
+			if (!isset($v['use_backup']) || empty($v['use_backup'])) {
+				$v['use_backup']="off";
 			}
 			file_put_contents($file, "BACKUP=".$v['use_backup'].PHP_EOL, LOCK_EX);
 			file_put_contents($file, "MBOX=(".PHP_EOL, FILE_APPEND | LOCK_EX);
@@ -890,6 +893,76 @@ function set_user_account($link, $postarray) {
 	else {
 		header("Location: do.php?event=".base64_encode("Password cannot be empty"));
 		die("Password cannot be empty");
+	}
+	header('Location: do.php?return=success');
+}
+function set_fetch_mail($link, $postarray) {
+	global $logged_in_as;
+	$logged_in_as = escapeshellcmd($logged_in_as); 
+	$imap_host = explode(":", escapeshellcmd($_POST['imap_host']))[0];
+	$imap_port = explode(":", escapeshellcmd($_POST['imap_host']))[1];
+	$imap_username = escapeshellcmd($_POST['imap_username']);
+	$imap_password = escapeshellcmd($_POST['imap_password']);
+	$imap_enc = escapeshellcmd($_POST['imap_enc']);
+	$imap_exclude = explode(",", str_replace(array(', ', ' , ', ' ,'), ',', escapeshellcmd($_POST['imap_exclude'])));
+	if ($_SESSION['mailcow_cc_role'] != "user") {
+		header("Location: do.php?event=".base64_encode("Permission denied"));
+		die("Permission denied");
+	}
+	if ($imap_enc != "/ssl" && $imap_enc != "/tls" && $imap_enc != "none") {
+		header("Location: do.php?event=".base64_encode("Invalid encryption mechanism"));
+		die("Invalid encryption mechanism");
+	} 
+	if ($imap_enc == "none") {
+		$imap_enc = "";
+	}
+	if (!is_numeric($imap_port) || empty ($imap_port)) {
+		header("Location: do.php?event=".base64_encode("Invalid port"));
+		die("Invalid Port");
+	}
+	if (!ctype_alnum(str_replace(array('@', '.', '-', '\\', '/'), '', $imap_username)) || empty ($imap_username)) {
+		header("Location: do.php?event=".base64_encode("Invalid username"));
+		die("Invalid username");
+	}
+	if (!ctype_alnum(str_replace(array(', ', ' , ', ' ,', ' '), '', escapeshellcmd($_POST['imap_exclude']))) && !empty($_POST['imap_exclude'])) {
+		header("Location: do.php?event=".base64_encode("Invalid excludes definied"));
+		die("Invalid excludes definied");
+	}
+	if (!$imap = imap_open("{".$imap_host.":".$imap_port."/imap/novalidate-cert".$imap_enc."}", $imap_username, $imap_password, OP_HALFOPEN, 1)) {
+		header("Location: do.php?event=".base64_encode("Cannot connect to IMAP server"));
+		die("Cannot connect to IMAP server");
+	}
+	if ($imap_enc == "none") {
+		$imap_enc = "";
+	}
+	elseif ($imap_enc == "/ssl") {
+		$imap_enc = "imaps";
+	}
+	elseif ($imap_enc == "/tls") {
+		$imap_enc = "starttls";
+	}
+	if(count($imap_exclude) > 1) {
+		foreach ($imap_exclude as $each_exclude) {
+			$exclude_parameter .= "-x ".$each_exclude."* ";
+		}
+	}
+	ini_set('max_execution_time', 3600);
+	exec('sudo /usr/bin/doveadm -o imapc_port='.$imap_port.' -o imapc_ssl='.$imap_enc.' \
+	-o imapc_host='.$imap_host.' \
+	-o imapc_user='.$imap_username.' \
+	-o imapc_password='.$imap_password.' \
+	-o imapc_ssl_verify=no \
+	-o ssl_client_ca_dir=/etc/ssl/certs \
+	-o imapc_features="rfc822.size fetch-headers" \
+	-o mail_prefetch_count=20 sync -1 \
+	-x "Shared*" -x "Public*" -x "Archives*" '.$exclude_parameter.' \
+	-R -U -u '.$logged_in_as.' imapc:', $out, $return);
+	if ($return == "2") {
+		exec('sudo /usr/bin/doveadm quota recalc -A', $out, $return);
+	}
+	if ($return != "0") {
+		header("Location: do.php?event=".base64_encode("Died with exit code $return"));
+		die("Died with exit code $return");
 	}
 	header('Location: do.php?return=success');
 }

@@ -289,7 +289,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown www-data: /etc/postfix/mailcow_*
 			sed -i "/%www-data/d" /etc/sudoers 2> /dev/null
 			sed -i "/%vmail/d" /etc/sudoers 2> /dev/null
-			echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/postfix reload, /usr/local/bin/mc-dkim-ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_inst_cron, /usr/bin/tail * /opt/vfilter/log/vfilter.log' >> /etc/sudoers
+			echo '%www-data ALL=(ALL) NOPASSWD: /usr/bin/doveadm * sync *, /usr/bin/doveadm quota recalc -A, /usr/sbin/postfix reload, /usr/local/bin/mc-dkim-ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_inst_cron, /usr/bin/tail * /opt/vfilter/log/vfilter.log' >> /etc/sudoers
 			echo '%vmail ALL=(ALL) NOPASSWD: /usr/bin/spamc*' >> /etc/sudoers
 			;;
 		dovecot)

@@ -3,11 +3,14 @@
 mailcow_admin_pass=$2
 mailcow_admin_user=$1
 
-if [[ ! -z $(mysql --defaults-file=/etc/mysql/debian.cnf mailcow -e "SELECT username from admin where username='$mailcow_admin_user';" -N -B) ]]; then
+if [[ ! -z $(mysql --defaults-file=/etc/mysql/debian.cnf mailcow -e "SELECT username FROM admin WHERE username='$mailcow_admin_user' AND superadmin='1';" -N -B) ]]; then
         mailcow_admin_pass_hashed=$(doveadm pw -s SHA512-CRYPT -p $mailcow_admin_pass)
         mysql --defaults-file=/etc/mysql/debian.cnf mailcow -e "DELETE FROM admin WHERE username='$mailcow_admin_user';"
         mysql --defaults-file=/etc/mysql/debian.cnf mailcow -e "INSERT INTO admin VALUES ('$mailcow_admin_user','$mailcow_admin_pass_hashed',1,now(),now(),1);"
 else
         echo "Admin not found"
+        echo
+        echo "Valid usernames: "
+        mysql --defaults-file=/etc/mysql/debian.cnf mailcow -e "SELECT username FROM admin where superadmin='1';" -N -B
         exit 1
 fi

@@ -177,6 +177,7 @@ while ($row = mysqli_fetch_array($resultselect)) {
 	</div>
 	<div class="clearfix"></div>
 	<div class="form-group">
+	<input type="hidden" name="trigger_backup">
 		<div class="col-sm-8">
 			<button type="submit" class="btn btn-default btn-raised btn-sm">Save changes</button>
 		</div>
@@ -406,13 +407,13 @@ nano /opt/vfilter/replies
 ; mailcow comes with plugins helping to export Cal- and CardDAV data to .vcf and .ics files.
 ; Each user can export data he has access to.
 ; You can generate these exports by finding a url to your calendar, and adding ?export at the end of the url. This will automatically trigger a download:
-https://<?php echo $MYHOSTNAME, "\n"; ?>/calendars/you@domain.tld/default?export
+https://dav.<?php echo $MYHOSTNAME_1.$MYHOSTNAME_2; ?>/calendars/you@domain.tld/default?export
 
 ; The same procedure for address books:
-https://<?php echo $MYHOSTNAME, "\n"; ?>/addressbooks/you@domain.tld/default?export
+https://dav.<?php echo $MYHOSTNAME_1.$MYHOSTNAME_2; ?>/addressbooks/you@domain.tld/default?export
 
-; Please use a Cal-/CardDAV client of your choice to find out the ID of self-created calendars and address books.
-; Administrators can use MySQL to find a users calendar and address book IDs:
+; Please use a Cal-/CardDAV client of your choice to find out the URI of self-created calendars and address books.
+; Administrators can use MySQL to find a users calendar and address book URI:
 mysql --defaults-file=/etc/mysql/debian.cnf mailcow_database_name -e "SELECT uri FROM calendars where principaluri='principals/you@domain.tld';"
 mysql --defaults-file=/etc/mysql/debian.cnf mailcow_database_name -e "SELECT uri FROM addressbooks where principaluri='principals/you@domain.tld';"
 </pre></div>

@@ -23,7 +23,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 	if (isset($_POST["admin_user"])) {
 		set_admin_account($link, $_POST);
 	}
-	if (isset($_POST["use_backup"])) {
+	if (isset($_POST["trigger_backup"])) {
 		set_mailcow_config("backup", $_POST);
 	}
 	if (isset($_GET["del"])) {
@@ -92,6 +92,9 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 		switch ($_POST["mailboxaction"]) {
 			case "setuserpassword":
 				set_user_account($link, $_POST);
+			break;
+			case "addfetchmail":
+				set_fetch_mail($link, $_POST);
 			break;
 		}
 	}
