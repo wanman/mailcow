@@ -18,5 +18,6 @@ do
         zip -qr $LOCATION/mail\_$LOCALPART\_$DATE.zip $LOCATION/$LOCALPART
         rm -r $LOCATION/$LOCALPART
 done
+doveadm quota recalc -A
 EOF
 chmod +x /etc/cron.$RUNTIME/mailcow_backup
