@@ -156,7 +156,7 @@ echo "<option>", $row['domain'], "</option>";
 <?php
 $resultselect = mysqli_query($link, "SELECT username FROM mailbox");
 while ($row = mysqli_fetch_array($resultselect)) {
-	if (strpos(file_get_contents($mc_mailbox_backup), $row['username'])) {
+	if (strpos(file_get_contents($MC_MBOX_BACKUP), $row['username'])) {
 		echo "<option selected>", $row['username'], "</option>";
 	}
 	else {

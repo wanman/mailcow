@@ -68,11 +68,11 @@ function dl_clamav_positives() {
 function return_mailcow_config($s) {
 	switch ($s) {
 		case "backup_location":
-			preg_match("/LOCATION=(.*)/", file_get_contents($GLOBALS['mc_mailbox_backup']) , $result);
+			preg_match("/LOCATION=(.*)/", file_get_contents($GLOBALS['MC_MBOX_BACKUP']) , $result);
 			if (!empty($result[1])) { return $result[1]; } else { return "/backup/mail"; }
 			break;
 		case "backup_runtime":
-			preg_match("/RUNTIME=(.*)/", file_get_contents($GLOBALS['mc_mailbox_backup']) , $result);
+			preg_match("/RUNTIME=(.*)/", file_get_contents($GLOBALS['MC_MBOX_BACKUP']) , $result);
 			if (!empty($result[1])) { return $result[1]; } else { return false; }
 			break;
 		case "backup_active":
