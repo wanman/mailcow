@@ -147,7 +147,7 @@ checkconfig() {
 installtask() {
 	case $1 in
 		environment)
-			getpublicipv4=$(wget -q4O- icanhazip.com)
+			getpublicipv4=$(wget -t1 -T10 -q4O- icanhazip.com)
 			if [[ $getpublicipv4 =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
 				cat > /etc/hosts<<'EOF'
 127.0.0.1 localhost
