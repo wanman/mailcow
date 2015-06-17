@@ -60,7 +60,8 @@ A summary of what software is installed with which features enabled.
 
 **Postfix**
 * Postscreen activated
-* Submission port (TCP/587), TLS-only
+* Submission port (587/TCP), TLS-only
+* SMTPS (465/TCP)
 * The restrictions used are a good compromise between blocking spam and avoiding false-positives
 * Incoming and outgoing spam protection
 * VirusTotal Uploader for incoming mail
@@ -100,6 +101,7 @@ apt-get purge exim4*
 | Service               | Protocol | Port |
 | -------------------   |:--------:|:-----|
 | Postfix Submission    | TCP      | 587  |
+| Postfix SMTPS         | TCP      | 465  |
 | Postfix SMTP          | TCP      | 25   |
 | Dovecot IMAP          | TCP      | 143  |
 | Dovecot IMAPS         | TCP      | 993  |
