@@ -42,7 +42,7 @@ Debian Squeeze is not supported.
 Please see https://www.debinux.de/mailcow for further information.
 Feel free to leave a comment or question.
 
-![fufix v0.10](https://www.debinux.de/wp-content/uploads/2014/10/fufix010.png "fufix v0.10")
+**Please see this album on imgur.com for screenshots -> http://imgur.com/a/x5IST#0**
 
 # Introduction
 A summary of what software is installed with which features enabled.
