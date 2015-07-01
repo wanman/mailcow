@@ -422,6 +422,7 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			else
 				echo "$(textb [INFO]) - At least one administrator exists, will not create another mailcow administrator"
 			fi
+			sed -i "s/MAILCOW_DB/$my_mailcowdb/g" /usr/local/sbin/mailcow_resetadmin
 			cp misc/mailcow_resetadmin /usr/local/sbin/mailcow_resetadmin ; chmod +x /usr/local/sbin/mailcow_resetadmin
 			# Cleaning up old files
 			sed -i '/test -d /var/run/fetchmail/d' /etc/rc.local > /dev/null 2>&1
