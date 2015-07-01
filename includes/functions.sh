@@ -609,6 +609,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 
 	installtask roundcube
 	sed -i "s/conf_rcdeskey/$old_des_key_rc/g" /var/www/mail/rc/config/config.inc.php
+	chmod +x /var/www/mail/rc/bin/updatedb.sh
 	/var/www/mail/rc/bin/updatedb.sh --package=roundcube --dir=/var/www/mail/rc/SQL
 	returnwait "Roundcube configuration" "OpenDKIM configuration"
 
