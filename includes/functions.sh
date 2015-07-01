@@ -412,8 +412,8 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			chown -R www-data: /var/www/{mail,dav,VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE,MAILBOX_BACKUP} /var/lib/php5/sessions
 			chown www-data: /var/www/
 			mysql -u $my_mailcowuser -p$my_mailcowpass $my_mailcowdb < webserver/htdocs/init.sql
-			if [[ -z $(mysql --defaults-file=/etc/mysql/debian.cnf mailcow -e "SHOW INDEX FROM propertystorage WHERE KEY_NAME = 'path_property';" -N -B) ]]; then
-				mysql --defaults-file=/etc/mysql/debian.cnf mailcow -e "CREATE UNIQUE INDEX path_property ON propertystorage (path(600), name(100));" -N -B
+			if [[ -z $(mysql --defaults-file=/etc/mysql/debian.cnf $my_mailcowdb -e "SHOW INDEX FROM propertystorage WHERE KEY_NAME = 'path_property';" -N -B) ]]; then
+				mysql --defaults-file=/etc/mysql/debian.cnf $my_mailcowdb -e "CREATE UNIQUE INDEX path_property ON propertystorage (path(600), name(100));" -N -B
 			fi
 			if [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -s -N -e "use $my_mailcowdb; select * from admin;" | wc -l) -lt 1 ]]; then
 				mailcow_admin_pass_hashed=$(doveadm pw -s SHA512-CRYPT -p $mailcow_admin_pass)
