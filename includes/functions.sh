@@ -477,7 +477,10 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			if [[ ! -f /var/log/mail.warn ]]; then
 				touch /var/log/mail.warn
 			fi
-			cp fail2ban/conf/jail.local /etc/fail2ban/jail.local
+			if [[ ! -f /etc/fail2ban/jail.local ]]; then
+				cp fail2ban/conf/jail.local /etc/fail2ban/jail.local
+			fi
+			cp fail2ban/conf/jail.d/*.conf /etc/fail2ban/jail.d/
 			rm -rf fail2ban/inst/$fail2ban_version
 			[[ -z $(grep fail2ban /etc/rc.local) ]] && sed -i '/^exit 0/i\test -d /var/run/fail2ban || install -m 755 -d /var/run/fail2ban/' /etc/rc.local
 			mkdir /var/run/fail2ban/ 2> /dev/null
@@ -609,9 +612,12 @@ A backup will be stored in ./before_upgrade_$timestamp
 	returnwait "Webserver configuration" "Roundcube configuration"
 
 	installtask roundcube
-	sed -i "s/conf_rcdeskey/$old_des_key_rc/g" /var/www/mail/rc/config/config.inc.php
-	chmod +x /var/www/mail/rc/bin/updatedb.sh
-	/var/www/mail/rc/bin/updatedb.sh --package=roundcube --dir=/var/www/mail/rc/SQL
+	# y not use the update tool of roundcube?
+	# saves user configuration and plugins/skins
+	# TODO: err, if already up2date
+	tar xf roundcube/inst/$roundcube_version.tar -C roundcube/inst/
+	chmod +x roundcube/inst/$roundcube_version/bin/installto.sh
+	roundcube/inst/$roundcube_version/bin/installto.sh /var/www/mail/rc
 	returnwait "Roundcube configuration" "OpenDKIM configuration"
 
 	installtask opendkim
@@ -621,6 +627,11 @@ A backup will be stored in ./before_upgrade_$timestamp
 	returnwait "Rsyslogd configuration" "Fail2ban configuration"
 
 	installtask fail2ban
+	# restore user configuration (*.local)
+	cp before_upgrade_$timestamp/fail2ban/*.local /etc/fail2ban/
+	cp before_upgrade_$timestamp/fail2ban/action.d/*.local /etc/fail2ban/action.d/
+	cp before_upgrade_$timestamp/fail2ban/filter.d/*.local /etc/fail2ban/filter.d/
+	cp before_upgrade_$timestamp/fail2ban/jail.d/*.local /etc/fail2ban/jail.d/
 	returnwait "Fail2ban configuration" "Restarting services"
 
 	installtask restartservices
