@@ -477,7 +477,10 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 			if [[ ! -f /var/log/mail.warn ]]; then
 				touch /var/log/mail.warn
 			fi
-			cp fail2ban/conf/jail.local /etc/fail2ban/jail.local
+			if [[ ! -f /etc/fail2ban/jail.local ]]; then
+				cp fail2ban/conf/jail.local /etc/fail2ban/jail.local
+			fi
+			cp fail2ban/conf/jail.d/*.conf /etc/fail2ban/jail.d/
 			rm -rf fail2ban/inst/$fail2ban_version
 			[[ -z $(grep fail2ban /etc/rc.local) ]] && sed -i '/^exit 0/i\test -d /var/run/fail2ban || install -m 755 -d /var/run/fail2ban/' /etc/rc.local
 			mkdir /var/run/fail2ban/ 2> /dev/null
@@ -621,6 +624,11 @@ A backup will be stored in ./before_upgrade_$timestamp
 	returnwait "Rsyslogd configuration" "Fail2ban configuration"
 
 	installtask fail2ban
+	# restore user configuration (*.local)
+	cp before_upgrade_$timestamp/fail2ban/*.local /etc/fail2ban/
+	cp before_upgrade_$timestamp/fail2ban/action.d/*.local /etc/fail2ban/action.d/
+	cp before_upgrade_$timestamp/fail2ban/filter.d/*.local /etc/fail2ban/filter.d/
+	cp before_upgrade_$timestamp/fail2ban/jail.d/*.local /etc/fail2ban/jail.d/
 	returnwait "Fail2ban configuration" "Restarting services"
 
 	installtask restartservices
