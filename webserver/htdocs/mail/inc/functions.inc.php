@@ -460,7 +460,7 @@ function mailbox_add_mailbox($link, $postarray) {
 		header("Location: do.php?event=".base64_encode("Domain name invalid"));
 		die("Domain name invalid");
 	}
-	if (!ctype_alnum(str_replace(array('.', '-'), '', $local_part) || empty ($local_part)) {
+	if (!ctype_alnum(str_replace(array('.', '-'), '', $local_part)) || empty ($local_part)) {
 		header("Location: do.php?event=".base64_encode("Mailbox alias must be alphanumeric"));
 		die("Mailbox alias must be alphanumeric");
 	}
