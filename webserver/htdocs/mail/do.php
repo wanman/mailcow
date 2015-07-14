@@ -201,7 +201,7 @@ while ($row = mysqli_fetch_array($resultselect)) {
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="local_part">Mailbox Alias (left part of mail address) <small>(alphanumeric)</small>:</label>
 						<div class="col-sm-10">
-							<input type="text" pattern="[a-zA-Z0-9 ]+" class="form-control" name="local_part" id="local_part" required>
+							<input type="text" pattern="[a-zA-Z0-9.- ]+" class="form-control" name="local_part" id="local_part" required>
 						</div>
 					</div>
 					<div class="form-group">

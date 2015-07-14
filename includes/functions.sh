@@ -515,7 +515,7 @@ DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
 	esac
 }
 upgradetask() {
-	if [[ -z $(cat /etc/{fufix_version,mailcow_version} 2> /dev/null | grep -E "0.7|0.8|0.9|0.10") ]]; then
+	if [[ -z $(cat /etc/{fufix_version,mailcow_version} 2> /dev/null | grep -E "0.7|0.8|0.9|0.10|0.11") ]]; then
 		echo "$(redb [ERR]) - Upgrade not supported"
 		return 1
 	fi
