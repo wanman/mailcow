@@ -423,9 +423,9 @@ while ($row = mysqli_fetch_array($result)) {
 		}
 	}
 	elseif (isset($_GET["deletealias"])) {
-		if (!filter_var($_GET["deletealias"], FILTER_VALIDATE_EMAIL)) {
+		if (!ctype_alnum(str_replace(array('.', '@', '-'), '', $_GET["deletealias"])) || empty($_GET["deletealias"])) {
 			header("Location: do.php?event=".base64_encode("Your provided alias name is invalid"));
-			die("Your provided alias name is invalid"); 
+			die("Your provided alias name is invalid");
 		}
 		else {
 			$deletealias = mysqli_real_escape_string($link, $_GET["deletealias"]);
