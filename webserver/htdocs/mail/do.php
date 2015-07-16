@@ -83,7 +83,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 				<form class="form-horizontal" role="form" method="post">
 					<input type="hidden" name="mailboxaction" value="addalias">
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="address">Alias address <small>(full e-mail address, <u>@domain.tld for catch-all</u>)</small>:</label>
+						<label class="control-label col-sm-2" for="address">Alias address <small>(full e-mail address, @domain.tld for <span style='color:#ec466a'>catch-all</span>)</small>:</label>
 						<div class="col-sm-10">
 						<input type="text" class="form-control" name="address" id="address">
 						</div>
