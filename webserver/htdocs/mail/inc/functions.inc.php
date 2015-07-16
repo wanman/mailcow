@@ -752,9 +752,9 @@ function mailbox_delete_alias($link, $postarray) {
 		header("Location: do.php?event=".base64_encode("Permission denied"));
 		die("Permission denied");
 	}
-	if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
+	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $address))) {
 		header("Location: do.php?event=".base64_encode("Mail address invalid"));
-		die("Mail address invalid"); 
+		die("Mail address invalid");
 	}
 	$mystring = "DELETE FROM alias WHERE address='$address' AND address NOT IN (SELECT username FROM mailbox)";
 	if (!mysqli_query($link, $mystring)) {
