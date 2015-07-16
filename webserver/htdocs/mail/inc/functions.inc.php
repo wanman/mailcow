@@ -368,20 +368,29 @@ function mailbox_add_alias($link, $postarray) {
 	$domain = substr($address, strpos($address, '@')+1);
 	global $logged_in_role;
 	global $logged_in_as;
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) { 
-		header("Location: do.php?event=".base64_encode("Permission denied"));
-		die("Permission denied");
+	if (empty($domain)) {
+		header("Location: do.php?event=".base64_encode("Domain cannot be empty"));
+		die("Domain cannot by empty");
+	}
+	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) {
+		header("Location: do.php?event=".base64_encode("Permission denied or invalid format"));
+		die("Permission denied or invalid format");
 	}
 	if (isset($_POST['active']) && $_POST['active'] == "on") { $active = "1"; } else { $active = "0"; }
-	if (!filter_var($address, FILTER_VALIDATE_EMAIL) || !filter_var($goto, FILTER_VALIDATE_EMAIL)) {
+	if ((!filter_var($address, FILTER_VALIDATE_EMAIL) && empty($domain)) || !filter_var($goto, FILTER_VALIDATE_EMAIL)) {
 		header("Location: do.php?event=".base64_encode("Mail address format invalid"));
 		die("Mail address format invalid");
 	}
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain'"))) { 
+	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain'"))) {
 		header("Location: do.php?event=".base64_encode("Domain $domain not found"));
 		die("Domain $domain not found");
 	}
-	$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('$address', '$goto', '$domain', now(), now(), '$active')";
+	if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
+		$mystring = "UPDATE alias SET goto='$goto' WHERE address='@$domain'";
+	}
+	else {
+		$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('$address', '$goto', '$domain', now(), now(), '$active')";
+	}
 	if (!mysqli_query($link, $mystring)) {
 		header("Location: do.php?event=".base64_encode("MySQL query failed"));
 		die("MySQL query failed");

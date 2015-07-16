@@ -186,8 +186,14 @@ $result = mysqli_query($link, "SELECT address, goto, domain, active FROM alias W
 (domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 
 'admin'='$logged_in_role')");
 while ($row = mysqli_fetch_array($result)) {
-	echo "<tr><td>", $row['address'],
-	"</td><td>", $row['goto'],
+        echo "<tr><td>";
+        if(!filter_var($row['address'], FILTER_VALIDATE_EMAIL)) {
+                echo "<b style='color:#ec466a'>Catch-all</b> for ", $row['address'];
+        }
+        else {
+                echo $row['address'];
+        }
+	echo "</td><td>", $row['goto'],
 	"</td><td>", $row['domain'],
 	"</td><td>", $row['active'],
 	"</td><td><a href=\"do.php?deletealias=", $row['address'], "\">delete</a>",
