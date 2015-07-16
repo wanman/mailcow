@@ -385,6 +385,10 @@ function mailbox_add_alias($link, $postarray) {
 		header("Location: do.php?event=".base64_encode("Domain $domain not found"));
 		die("Domain $domain not found");
 	}
+	if (!mysqli_result(mysqli_query($link, "SELECT username from FROM mailbox WHERE username='$goto'"))) {
+		header("Location: do.php?event=".base64_encode("Destination address unknown"));
+		die("Destination address unknown");
+	}
 	if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
 		$mystring = "UPDATE alias SET goto='$goto' WHERE address='@$domain'";
 	}
