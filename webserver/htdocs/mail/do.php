@@ -34,7 +34,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="aliases">Max. aliases:</label>
-						<div class="col-sm-10">          
+						<div class="col-sm-10">
 						<input type="number" class="form-control" name="aliases" id="aliases" value="200">
 						</div>
 					</div>
@@ -46,7 +46,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="maxquota">Max. size per mailbox (MB):</label>
-						<div class="col-sm-10">          
+						<div class="col-sm-10">
 						<input type="number" class="form-control" name="maxquota" id="maxquota" value="4096">
 						</div>
 					</div>
@@ -56,21 +56,21 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 						<input type="number" class="form-control" name="quota" id="quota" value="10240">
 						</div>
 					</div>
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="checkbox">
 							<label><input type="checkbox" name="backupmx"> Backup MX</label>
 							</div>
 						</div>
 					</div>
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="checkbox">
 							<label><input type="checkbox" name="active" checked> Active</label>
 							</div>
 						</div>
 					</div>
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<button type="submit" class="btn btn-success btn-sm">Submit</button>
 						</div>
@@ -85,7 +85,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="address">Alias address <small>(full e-mail address)</small>:</label>
 						<div class="col-sm-10">
-						<input type="email" class="form-control" name="address" id="address">
+						<input type="text" class="form-control" name="address" id="address">
 						</div>
 					</div>
 					<div class="form-group">
@@ -94,14 +94,14 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 						<input type="email" class="form-control" name="goto" id="goto">
 						</div>
 					</div>
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="checkbox">
 							<label><input type="checkbox" name="active" checked> Active</label>
 							</div>
 						</div>
 					</div>
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<button type="submit" class="btn btn-success btn-sm">Submit</button>
 						</div>
@@ -132,14 +132,14 @@ while ($row = mysqli_fetch_array($result)) {
 							</select>
 						</div>
 					</div>
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="checkbox">
 							<label><input type="checkbox" name="active" checked> Active</label>
 							</div>
 						</div>
 					</div>
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<button type="submit" class="btn btn-success btn-sm">Submit</button>
 						</div>
@@ -173,14 +173,14 @@ while ($row = mysqli_fetch_array($resultselect)) {
 							</select>
 						</div>
 					</div>
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="checkbox">
 							<label><input type="checkbox" name="active" <?php if (isset($result['active']) && $result['active']=="1") { echo "checked"; }; ?>> Active</label>
 							</div>
 						</div>
 					</div>
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<button type="submit" class="btn btn-success btn-sm">Submit</button>
 						</div>
@@ -225,7 +225,7 @@ while ($row = mysqli_fetch_array($result)) {
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="quota">Quota (MB), 0 = unlimited:</label>
-						<div class="col-sm-10">          
+						<div class="col-sm-10">
 						<input type="number" class="form-control" name="quota" id="quota" value="1024">
 						</div>
 					</div>
@@ -260,7 +260,7 @@ while ($row = mysqli_fetch_array($result)) {
 							</div>
 						</div>
 					</div>
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<button type="submit" class="btn btn-success btn-sm">Submit</button>
 						</div>
@@ -289,7 +289,7 @@ while ($row = mysqli_fetch_array($result)) {
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="aliases">Max. aliases:</label>
-						<div class="col-sm-10">          
+						<div class="col-sm-10">
 						<input type="number" class="form-control" name="aliases" id="aliases" value="<?php echo $result['aliases']; ?>">
 						</div>
 					</div>
@@ -301,7 +301,7 @@ while ($row = mysqli_fetch_array($result)) {
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="maxquota">Max. size per mailbox (MB):</label>
-						<div class="col-sm-10">          
+						<div class="col-sm-10">
 						<input type="number" class="form-control" name="maxquota" id="maxquota" value="<?php echo $result['maxquota']; ?>">
 						</div>
 					</div>
@@ -311,21 +311,21 @@ while ($row = mysqli_fetch_array($result)) {
 						<input type="number" class="form-control" name="quota" id="quota" value="<?php echo $result['quota']; ?>">
 						</div>
 					</div>
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="checkbox">
 							<label><input type="checkbox" name="backupmx" <?php if (isset($result['backupmx']) && $result['backupmx']=="1") { echo "checked"; }; ?>> Backup MX</label>
 							</div>
 						</div>
 					</div>
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="checkbox">
 							<label><input type="checkbox" name="active" <?php if (isset($result['active']) && $result['active']=="1") { echo "checked"; }; ?>> Active</label>
 							</div>
 						</div>
 					</div>
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<button type="submit" class="btn btn-success btn-sm">Submit</button>
 						</div>
@@ -359,7 +359,7 @@ while ($row = mysqli_fetch_array($result)) {
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="quota">Quota (MB), 0 = unlimited:</label>
-						<div class="col-sm-10">          
+						<div class="col-sm-10">
 						<input type="number" class="form-control" name="quota" id="quota" value="<?php echo $result['quota']; ?>">
 						</div>
 					</div>
@@ -382,7 +382,7 @@ while ($row = mysqli_fetch_array($result)) {
 							</div>
 						</div>
 					</div>
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<button type="submit" class="btn btn-success btn-sm">Submit</button>
 						</div>
@@ -409,7 +409,7 @@ while ($row = mysqli_fetch_array($result)) {
 				<form class="form-horizontal" role="form" method="post">
 				<input type="hidden" name="mailboxaction" value="deletedomain">
 				<input type="hidden" name="domain" value="<?php echo $deletedomain ?>">
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-1 col-sm-10">
 							<button type="submit" class="btn btn-default btn-sm">Delete</button>
 						</div>
@@ -443,7 +443,7 @@ while ($row = mysqli_fetch_array($result)) {
 				<form class="form-horizontal" role="form" method="post">
 				<input type="hidden" name="address" value="<?php echo $deletealias ?>">
 				<input type="hidden" name="mailboxaction" value="deletealias">
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-1 col-sm-10">
 							<button type="submit" class="btn btn-default btn-sm">Delete</button>
 						</div>
@@ -470,7 +470,7 @@ while ($row = mysqli_fetch_array($result)) {
 				<form class="form-horizontal" role="form" method="post">
 				<input type="hidden" name="alias_domain" value="<?php echo $deletealiasdomain ?>">
 				<input type="hidden" name="mailboxaction" value="deletealiasdomain">
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-1 col-sm-10">
 							<button type="submit" class="btn btn-default btn-sm">Delete</button>
 						</div>
@@ -497,7 +497,7 @@ while ($row = mysqli_fetch_array($result)) {
 				<form class="form-horizontal" role="form" method="post">
 				<input type="hidden" name="username" value="<?php echo $deletedomainadmin ?>">
 				<input type="hidden" name="mailboxaction" value="deletedomainadmin">
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-1 col-sm-10">
 							<button type="submit" class="btn btn-default btn-sm">Delete</button>
 						</div>
@@ -531,7 +531,7 @@ while ($row = mysqli_fetch_array($result)) {
 				<form class="form-horizontal" role="form" method="post">
 				<input type="hidden" name="mailboxaction" value="deletemailbox">
 				<input type="hidden" name="username" value="<?php echo $deletemailbox ?>">
-					<div class="form-group">        
+					<div class="form-group">
 						<div class="col-sm-offset-1 col-sm-10">
 							<button type="submit" class="btn btn-default btn-sm">Delete</button>
 						</div>
