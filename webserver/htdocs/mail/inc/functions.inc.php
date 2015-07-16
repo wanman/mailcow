@@ -390,7 +390,7 @@ function mailbox_add_alias($link, $postarray) {
 		die("Destination address unknown");
 	}
 	if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
-		$mystring = "UPDATE alias SET goto='$goto' WHERE address='@$domain'";
+		$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('$domain', '$goto', '$domain', now(), now(), '$active')";
 	}
 	else {
 		$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('$address', '$goto', '$domain', now(), now(), '$active')";
