@@ -33,7 +33,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 					</thead>
 					<tbody>
 <?php
-$result = mysqli_query($link, "SELECT domain, aliases, mailboxes, maxquota, quota, active FROM 
+$result = mysqli_query($link, "SELECT domain, aliases, mailboxes, maxquota, quota, CASE active WHEN 1 THEN 'Yes' ELSE 'No' END AS active FROM 
 domain WHERE 
 domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role'");
 while ($row = mysqli_fetch_array($result)) {
@@ -83,7 +83,7 @@ while ($row = mysqli_fetch_array($result)) {
 					</thead>
 					<tbody>
 <?php
-$result = mysqli_query($link, "SELECT alias_domain, target_domain, active FROM 
+$result = mysqli_query($link, "SELECT alias_domain, target_domain, CASE active WHEN 1 THEN 'Yes' ELSE 'No' END AS active FROM 
 alias_domain WHERE 
 target_domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role'");
 while ($row = mysqli_fetch_array($result)) {
@@ -131,7 +131,7 @@ while ($row = mysqli_fetch_array($result)) {
 					</thead>
 					<tbody>
 <?php
-$result = mysqli_query($link, "SELECT mailbox.username, name, active, domain, quota, bytes, messages 
+$result = mysqli_query($link, "SELECT mailbox.username, name, CASE active WHEN 1 THEN 'Yes' ELSE 'No' END AS active, domain, quota, bytes, messages 
 FROM mailbox, quota2 WHERE (mailbox.username = quota2.username) AND 
 (domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role')");
 while ($row = mysqli_fetch_array($result)) {
@@ -181,7 +181,7 @@ if((formatBytes($row['quota'], 2)) == "0" ) { echo "&#8734;"; } else { echo form
 					</thead>
 					<tbody>
 <?php
-$result = mysqli_query($link, "SELECT address, goto, domain, active FROM alias WHERE 
+$result = mysqli_query($link, "SELECT address, goto, domain, CASE active WHEN 1 THEN 'Yes' ELSE 'No' END AS active FROM alias WHERE 
 (address NOT IN (SELECT username FROM mailbox) AND address!=goto) AND 
 (domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 
 'admin'='$logged_in_role')");
