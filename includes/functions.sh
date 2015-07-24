@@ -289,7 +289,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown www-data: /etc/postfix/mailcow_*
 			sed -i "/%www-data/d" /etc/sudoers 2> /dev/null
 			sed -i "/%vmail/d" /etc/sudoers 2> /dev/null
-			echo '%www-data ALL=(ALL) NOPASSWD: /usr/bin/doveadm * sync *, /usr/bin/doveadm quota recalc -A, /usr/sbin/postfix reload, /usr/local/bin/mc-dkim-ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_inst_cron, /usr/bin/tail * /opt/vfilter/log/vfilter.log' >> /etc/sudoers
+			echo '%www-data ALL=(ALL) NOPASSWD: /usr/bin/doveadm * sync *, /usr/bin/doveadm quota recalc -A, /usr/sbin/dovecot reload, /usr/sbin/postfix reload, /usr/local/bin/mc-dkim-ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_inst_cron, /usr/bin/tail * /opt/vfilter/log/vfilter.log' >> /etc/sudoers
 			echo '%vmail ALL=(ALL) NOPASSWD: /usr/bin/spamc*' >> /etc/sudoers
 			;;
 		dovecot)
@@ -304,6 +304,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown root:dovecot "/etc/dovecot/dovecot-dict-sql.conf"; chmod 640 "/etc/dovecot/dovecot-dict-sql.conf"
 			chown root:vmail "/etc/dovecot/dovecot-mysql.conf"; chmod 640 "/etc/dovecot/dovecot-mysql.conf"
 			chown root:root "/etc/dovecot/dovecot.conf"; chmod 644 "/etc/dovecot/dovecot.conf"
+			chown www-data:www-data "/etc/dovecot/mailcow_public_folder.conf"; chmod 644 "/etc/dovecot/mailcow_public_folder.conf"
 			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/$sys_hostname.$sys_domain/g" /etc/dovecot/*
 			sed -i "s/MAILCOW_DOMAIN/$sys_domain/g" /etc/dovecot/*
 			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /etc/dovecot/*

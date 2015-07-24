@@ -24,6 +24,9 @@ $mailcow_anonymize_headers = "/etc/postfix/mailcow_anonymize_headers.pcre";
 $mailcow_reject_attachments = "/etc/postfix/mailcow_reject_attachments.regex";
 $mailcow_sender_access = "/etc/postfix/mailcow_sender_access";
 
+/* Dovecot */
+$mailcow_public_folder= "/etc/dovecot/mailcow_public_folder.conf";
+
 /* OpenDKIM DNS desc */
 $mailcow_opendkim_dnstxt_folder = "/etc/opendkim/dnstxt";
 

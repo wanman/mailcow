@@ -26,6 +26,10 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 	if (isset($_POST["trigger_backup"])) {
 		set_mailcow_config("backup", $_POST);
 	}
+	if (isset($_POST["trigger_public_folder"])) {
+		set_mailcow_config("public_folder", $_POST);
+		dovecot_reload();
+	}
 	if (isset($_GET["del"])) {
 		opendkim_table("delete", $_GET["del"]);
 	}

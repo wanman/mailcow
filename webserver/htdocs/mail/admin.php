@@ -187,6 +187,42 @@ while ($row = mysqli_fetch_array($resultselect)) {
 </div>
 
 <div class="panel panel-default">
+<div class="panel-heading">Public folders</div>
+<div class="panel-body">
+<form method="post">
+	<div class="form-group">
+		<label class="control-label col-sm-4" for="location">Folder name <small>(alphanumeric)</small>:</label>
+		<div class="col-sm-8">
+		<input type="text" class="form-control" name="public_folder_name" id="public_folder_name" value="<?php echo return_mailcow_config("public_folder_name"); ?>">
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-offset-4 col-sm-8">
+			<div class="checkbox">
+			<label><input type="checkbox" name="use_public_folder" <?php echo return_mailcow_config("public_folder_status"); ?>> Enable public folder</label>
+			</div>
+			<small>Toggling this option does not delete mail in any public folder.</small>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-offset-4 col-sm-8">
+			<div class="checkbox">
+			<label><input type="checkbox" name="public_folder_pvt" <?php echo return_mailcow_config("public_folder_pvt"); ?>> Enable per-user seen flag</label>
+			</div>
+			<small>A "per-user seen flag"-enabled system will not mark a mail as read for User B, when User A has seen it, but User B did not.</small>
+		</div>
+	</div>
+	<div class="form-group">
+	<input type="hidden" name="trigger_public_folder">
+		<div class="col-sm-8">
+			<button type="submit" class="btn btn-default btn-raised btn-sm">Save changes</button>
+		</div>
+	</div>
+</form>
+</div>
+</div>
+
+<div class="panel panel-default">
 <div class="panel-heading">Attachments</div>
 <div class="panel-body">
 <form method="post">

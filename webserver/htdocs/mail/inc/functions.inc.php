@@ -92,6 +92,21 @@ function return_mailcow_config($s) {
 			$state = file_get_contents($GLOBALS["mailcow_anonymize_headers"]);
 			if (!empty($state)) { return "checked"; } else { return false; }
 			break;
+		case "public_folder_status":
+			$state = file_get_contents($GLOBALS["mailcow_public_folder"]);
+			if (!empty($state)) { return "checked"; } else { return false; }
+			break;
+		case "public_folder_name":
+			$state = file_get_contents($GLOBALS["mailcow_public_folder"]);
+			if (!empty($state)) { return explode(";;", $state)[1]; } else { return false; }
+			break;
+		case "public_folder_pvt":
+			$state = file_get_contents($GLOBALS["mailcow_public_folder"]);
+			if (!empty($state)) {
+				$PVT = explode(";;", $state)[3];
+				if ($PVT == "on") { return "checked"; } else { return false; }
+			}
+			break;
 		case "vtenable":
 			$state = file_get_contents($GLOBALS["VT_ENABLE"]);
 			if (!empty($state)) { return "checked"; } else { return false; }
@@ -221,6 +236,36 @@ function set_mailcow_config($s, $v = "", $vext = "") {
 				header('Location: do.php?return=success');
 			}
 			break;
+		case "public_folder":
+			if (!ctype_alnum(str_replace("/", "", $v['public_folder_name'])))
+			{
+				header("Location: do.php?event=" . base64_encode("Invalid form data"));
+				die("Invalid form data");
+			}
+			if (isset($v['public_folder_pvt']) && $v['public_folder_pvt'] == "on") {
+				$PVT = ':INDEXPVT=~/Maildir/public';
+			}
+			else {
+				$PVT = '';
+			}
+			$template = '# ;;'.$v['public_folder_name'].';;
+# ;;'.$v['public_folder_pvt'].';;
+namespace {
+  type = public
+  separator = /
+  prefix = '.$v['public_folder_name'].'/
+  location = maildir:/var/mail/public'.$PVT.'
+  subscriptions = no
+}';
+			if (isset($v['use_public_folder']) && $v['use_public_folder'] == "on")	{
+				file_put_contents($GLOBALS["mailcow_public_folder"], $template);
+				header('Location: do.php?return=success');
+			}
+			else {
+				file_put_contents($GLOBALS["mailcow_public_folder"], "");
+				header('Location: do.php?return=success');
+			}
+			break;
 		case "senderaccess":
 			file_put_contents($GLOBALS["mailcow_sender_access"], "");
 			$sender_array = array_keys(array_flip(preg_split("/((\r?\n)|(\r\n?))/", $v)));
@@ -326,6 +371,9 @@ function echo_sys_info($what, $extra="") {
 }
 function postfix_reload() {
 	shell_exec("sudo /usr/sbin/postfix reload");
+}
+function dovecot_reload() {
+	shell_exec("sudo /usr/sbin/dovecot reload");
 }
 function mailbox_add_domain($link, $postarray) {
 	if ($_SESSION['mailcow_cc_role'] != "admin") {
