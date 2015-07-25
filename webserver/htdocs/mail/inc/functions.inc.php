@@ -1046,6 +1046,13 @@ function add_domain_admin($link, $postarray) {
 		header("Location: do.php?event=".base64_encode("Invalid username"));
 		die("Invalid username");
 	}
+	$qstring = "SELECT username FROM admin WHERE username='$username'";
+	$qresult = mysqli_query($link, $qstring);
+	$num_results = mysqli_num_rows($qresult);
+	if ($num_results != 0) {
+		header("Location: do.php?event=".base64_encode("Username exists in system"));
+		die("Username exists in system");
+	}
 	if (!empty($password) && !empty($password2)) {
 		if ($password != $password2) {
 			header("Location: do.php?event=".base64_encode("Password mismatch"));
