@@ -253,9 +253,12 @@ function set_mailcow_config($s, $v = "", $vext = "") {
 namespace {
   type = public
   separator = /
-  prefix = '.$v['public_folder_name'].'/
-  location = maildir:/var/mail/public'.$PVT.'
+  prefix = Public/
+  location = maildir:/var/vmail/public'.$PVT.'
   subscriptions = no
+  mailbox '.$v['public_folder_name'].' {
+    auto = subscribe
+  }
 }';
 			if (isset($v['use_public_folder']) && $v['use_public_folder'] == "on")	{
 				file_put_contents($GLOBALS["mailcow_public_folder"], $template);
