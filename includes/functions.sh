@@ -333,14 +333,9 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			killall freshclam 2> /dev/null
 			rm -f /var/lib/clamav/* 2> /dev/null
 			sed -i '/DatabaseMirror/d' /etc/clamav/freshclam.conf
-			country_code=$(curl http://ipinfo.io/country -s 2> /dev/null)
-			if [[ ! -z $country_code && ${#country_code} == "2" ]]; then
-				echo "DatabaseMirror db.${country_code,,}.clamav.net
-DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
-			else
-				echo "DatabaseMirror db.uk.clamav.net
-DatabaseMirror db.local.clamav.net" >> /etc/clamav/freshclam.conf
-			fi
+			echo "DatabaseMirror clamav.netcologne.de
+DatabaseMirror clamav.internet24.eu
+DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			if [[ -f /etc/apparmor.d/usr.sbin.clamd || -f /etc/apparmor.d/local/usr.sbin.clamd ]]; then
 				rm /etc/apparmor.d/usr.sbin.clamd > /dev/null 2>&1
 				rm /etc/apparmor.d/local/usr.sbin.clamd > /dev/null 2>&1
