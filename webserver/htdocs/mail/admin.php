@@ -335,7 +335,6 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <div class="panel-heading">DKIM Signing</div>
 <div class="panel-body">
 <p>Default behaviour is to sign with relaxed header and body canonicalization algorithm.</p>
-<p><strong>DKIM signing will not be used when when "Anonymize outgoing mail" is enabled.</strong></p>
 <form method="post">
 <h4>Active keys</h4>
 <?php opendkim_table() ?>
