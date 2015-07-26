@@ -243,7 +243,7 @@ function set_mailcow_config($s, $v = "", $vext = "") {
 				die("Invalid form data");
 			}
 			if (isset($v['public_folder_pvt']) && $v['public_folder_pvt'] == "on") {
-				$PVT = ':INDEXPVT=~/Maildir/public';
+				$PVT = ':INDEXPVT=~/public';
 			}
 			else {
 				$PVT = '';

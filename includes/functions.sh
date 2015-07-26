@@ -311,7 +311,11 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /etc/dovecot/*
 			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /etc/dovecot/*
 			mkdir /etc/dovecot/conf.d 2> /dev/null
-			mkdir -p /var/vmail/sieve
+			mkdir -p /var/vmail/sieve 2> /dev/null
+			mkdir -p /var/vmail/public 2> /dev/null
+			if [ ! -f /var/vmail/public/dovecot-acl ]; then
+				echo "anyone lrwstipekxa" > /var/vmail/public/dovecot-acl
+			fi
 			cp dovecot/conf/spam-global.sieve /var/vmail/sieve/spam-global.sieve
 			touch /var/vmail/sieve/default.sieve
 			install -m 755 misc/mc_msg_size /usr/local/sbin/mc_msg_size

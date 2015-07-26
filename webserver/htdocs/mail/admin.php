@@ -189,6 +189,7 @@ while ($row = mysqli_fetch_array($resultselect)) {
 <div class="panel panel-default">
 <div class="panel-heading">Public folders</div>
 <div class="panel-body">
+<p>A namespace "Public" is created. Belows public folder name indicates the name of the first auto-created mailbox within this namespace.</p>
 <form method="post">
 	<div class="form-group">
 		<label class="control-label col-sm-4" for="location">Folder name <small>(alphanumeric)</small>:</label>
