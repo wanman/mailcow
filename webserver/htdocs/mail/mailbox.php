@@ -193,8 +193,11 @@ while ($row = mysqli_fetch_array($result)) {
         else {
                 echo $row['address'];
         }
-	echo "</td><td>", $row['goto'],
-	"</td><td>", $row['domain'],
+	echo "</td><td>";
+	foreach(explode(",", $row['goto']) as $goto) {
+		echo $goto, '<br />';
+	}
+	echo "</td><td>", $row['domain'],
 	"</td><td>", $row['active'],
 	"</td><td><a href=\"do.php?deletealias=", $row['address'], "\">delete</a>",
 	"</td></tr>";

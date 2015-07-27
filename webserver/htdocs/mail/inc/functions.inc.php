@@ -415,20 +415,30 @@ function mailbox_add_domain($link, $postarray) {
 }
 function mailbox_add_alias($link, $postarray) {
 	$address = mysqli_real_escape_string($link, $_POST['address']);
-	$goto = mysqli_real_escape_string($link, $_POST['goto']);
+	foreach ($_POST['goto'] as $goto) {
+		if (!filter_var($goto, FILTER_VALIDATE_EMAIL)) {
+			header("Location: do.php?event=" . base64_encode("Destination address invalid"));
+			die("Destination address invalid");
+		}
+		if (!mysqli_result(mysqli_query($link, "SELECT username FROM mailbox WHERE username='$goto'"))) {
+			header("Location: do.php?event=" . base64_encode("Destination address unknown"));
+			die("Destination address unknown");
+		}
+	}
+	$goto = implode(",", $_POST['goto']);
 	$domain = substr($address, strpos($address, '@')+1);
 	global $logged_in_role;
 	global $logged_in_as;
 	if (empty($domain)) {
-		header("Location: do.php?event=".base64_encode("Domain cannot be empty"));
-		die("Domain cannot by empty");
+		header("Location: do.php?event=".base64_encode("Alias address or catch-all for domain cannot by empty"));
+		die("Alias address or catch-all for domain cannot by empty");
 	}
 	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) {
 		header("Location: do.php?event=".base64_encode("Permission denied or invalid format"));
 		die("Permission denied or invalid format");
 	}
 	if (isset($_POST['active']) && $_POST['active'] == "on") { $active = "1"; } else { $active = "0"; }
-	if ((!filter_var($address, FILTER_VALIDATE_EMAIL) && empty($domain)) || !filter_var($goto, FILTER_VALIDATE_EMAIL)) {
+	if (!filter_var($address, FILTER_VALIDATE_EMAIL) && empty($domain)) {
 		header("Location: do.php?event=".base64_encode("Mail address format invalid"));
 		die("Mail address format invalid");
 	}

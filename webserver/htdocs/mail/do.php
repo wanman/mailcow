@@ -91,7 +91,14 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="goto">Destination <small>(full e-mail address)</small>:</label>
 						<div class="col-sm-10">
-						<input type="email" class="form-control" name="goto" id="goto">
+							<select name="goto[]" size="10" multiple>
+<?php
+$result = mysqli_query($link, "SELECT username, domain FROM mailbox WHERE domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role'");
+while ($row = mysqli_fetch_array($result)) {
+	echo "<option>", $row['username'], "</option>";
+}
+?>
+							</select>
 						</div>
 					</div>
 					<div class="form-group">
