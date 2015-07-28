@@ -429,6 +429,13 @@ function mailbox_add_alias($link, $postarray) {
 	$domain = substr($address, strpos($address, '@')+1);
 	global $logged_in_role;
 	global $logged_in_as;
+	$qstring = "SELECT address FROM alias WHERE address='$address'";
+	$qresult = mysqli_query($link, $qstring);
+	$num_results = mysqli_num_rows($qresult);
+	if ($num_results != 0) {
+		header("Location: do.php?event=".base64_encode("Alias exists in system"));
+		die("Alias exists in system");
+	}
 	if (empty($domain)) {
 		header("Location: do.php?event=".base64_encode("Alias address or catch-all for domain cannot by empty"));
 		die("Alias address or catch-all for domain cannot by empty");
@@ -445,10 +452,6 @@ function mailbox_add_alias($link, $postarray) {
 	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain'"))) {
 		header("Location: do.php?event=".base64_encode("Domain $domain not found"));
 		die("Domain $domain not found");
-	}
-	if (!mysqli_result(mysqli_query($link, "SELECT username FROM mailbox WHERE username='$goto'"))) {
-		header("Location: do.php?event=".base64_encode("Destination address unknown"));
-		die("Destination address unknown");
 	}
 	if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
 		$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('@$domain', '$goto', '$domain', now(), now(), '$active')";
@@ -605,6 +608,42 @@ function mailbox_add_mailbox($link, $postarray) {
 	}
 	while ($link->next_result()) {
 		if (!$link->more_results()) break;
+	}
+	header('Location: do.php?return=success');
+}
+function mailbox_edit_alias($link, $postarray) {
+	global $logged_in_role;
+	global $logged_in_as;
+	$address = mysqli_real_escape_string($link, $_POST['address']);
+	$domain = substr($address, strpos($address, '@')+1);
+	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) {
+		header("Location: do.php?event=".base64_encode("Permission denied or invalid format"));
+		die("Permission denied or invalid format");
+	}
+	if (empty($_POST['goto'])) {
+		header("Location: do.php?event=" . base64_encode("Destination address must not be empty"));
+		die("Destination address must not be empty");
+	}
+	foreach ($_POST['goto'] as $goto) {
+		if (!filter_var($goto, FILTER_VALIDATE_EMAIL)) {
+			header("Location: do.php?event=" . base64_encode("Destination address invalid"));
+			die("Destination address invalid");
+		}
+		if (!mysqli_result(mysqli_query($link, "SELECT username FROM mailbox WHERE username='$goto'"))) {
+			header("Location: do.php?event=" . base64_encode("Destination address unknown"));
+			die("Destination address unknown");
+		}
+	}
+	$goto = implode(",", $_POST['goto']);
+	if (isset($_POST['active']) && $_POST['active'] == "on") { $active = "1"; } else { $active = "0"; }
+	if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
+		header("Location: do.php?event=".base64_encode("Mail address format invalid"));
+		die("Mail address format invalid");
+	}
+	$mystring = "UPDATE alias SET goto='$goto' WHERE address='$address'";
+	if (!mysqli_query($link, $mystring)) {
+		header("Location: do.php?event=".base64_encode("MySQL query failed"));
+		die("MySQL query failed");
 	}
 	header('Location: do.php?return=success');
 }
@@ -856,6 +895,9 @@ function mailbox_delete_mailbox($link, $postarray) {
 		die("Mail address invalid"); 
 	}
 	$delete_user = "DELETE FROM alias WHERE goto='$username';";
+	$delete_user = "UPDATE alias SET goto=REPLACE(goto, ',$username,', ',');";
+	$delete_user = "UPDATE alias SET goto=REPLACE(goto, ',$username', '');";
+	$delete_user = "UPDATE alias SET goto=REPLACE(goto, '$username,', '');";
 	$delete_user .= "DELETE FROM quota2 WHERE username='$username';";
 	$delete_user .= "DELETE FROM calendarobjects WHERE calendarid IN (SELECT id from calendars where principaluri='principals/$username');";
 	$delete_user .= "DELETE FROM cards WHERE addressbookid IN (SELECT id from calendars where principaluri='principals/$username');";

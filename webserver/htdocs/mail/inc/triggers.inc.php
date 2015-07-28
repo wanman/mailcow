@@ -112,6 +112,9 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 			case "addalias":
 				mailbox_add_alias($link, $_POST);
 			break;
+			case "editalias":
+				mailbox_edit_alias($link, $_POST);
+			break;
 			case "addaliasdomain":
 				mailbox_add_alias_domain($link, $_POST);
 			break;

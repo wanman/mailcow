@@ -115,6 +115,59 @@ while ($row = mysqli_fetch_array($result)) {
 					</div>
 				</form>
 <?php }
+	elseif (isset($_GET['editalias'])) {
+		if (!filter_var($_GET["editalias"], FILTER_VALIDATE_EMAIL) || empty($_GET["editalias"])) {
+			header("Location: do.php?event=".base64_encode("Your provided alias name is invalid"));
+			die("Your provided alias name is invalid");
+		}
+		else {
+			$editalias = mysqli_real_escape_string($link, $_GET["editalias"]);
+			if (mysqli_fetch_array(mysqli_query($link, "SELECT address FROM alias where address='$editalias'")) && $logged_in_role == "admin") {
+			$result = mysqli_fetch_assoc(mysqli_query($link, "SELECT active, goto FROM alias WHERE address='$editalias'"));
+	?>
+				<h4>Change alias attributes for <strong><?php echo $editalias ?></strong></h4>
+				<br />
+				<form class="form-horizontal" role="form" method="post">
+				<input type="hidden" name="mailboxaction" value="editalias">
+				<input type="hidden" name="address" value="<?php echo $editalias ?>">
+					<div class="form-group">
+						<label class="control-label col-sm-2" for="name">Destination address(es) <small>(hold CTRL to select multiple domains)</small>:</label>
+						<div class="col-sm-10">
+							<select name="goto[]" size="5" multiple>
+<?php
+$resultselect = mysqli_query($link, "SELECT username FROM mailbox");
+while ($rowsel = mysqli_fetch_array($resultselect)) {
+	if (in_array($rowsel['username'], explode(",", $result['goto']))) {
+		echo '<option selected>'.$rowsel['username'].'</option>';
+	}
+	else {
+		echo '<option>'.$rowsel['username'].'</option>';
+	}
+}
+?>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<div class="checkbox">
+							<label><input type="checkbox" name="active" <?php if (isset($result['active']) && $result['active']=="1") { echo "checked"; }; ?>> Active</label>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<button type="submit" class="btn btn-success btn-sm">Submit</button>
+						</div>
+					</div>
+				</form>
+	<?php
+			}
+			else {
+				echo 'Action not supported.';
+			}
+		}
+	}
 	elseif (isset($_GET['addaliasdomain'])) {
 ?>
 				<h4>Add domain alias</h4>

@@ -199,8 +199,11 @@ while ($row = mysqli_fetch_array($result)) {
 	}
 	echo "</td><td>", $row['domain'],
 	"</td><td>", $row['active'],
-	"</td><td><a href=\"do.php?deletealias=", $row['address'], "\">delete</a>",
-	"</td></tr>";
+	"</td><td><a href=\"do.php?deletealias=", $row['address'], "\">delete</a>";
+	if(filter_var($row['address'], FILTER_VALIDATE_EMAIL)) {
+		echo " | <a href=\"do.php?editalias=", $row['address'], "\">edit</a>";
+	}
+	echo "</td></tr>";
 }
 ?>
 					</tbody>
