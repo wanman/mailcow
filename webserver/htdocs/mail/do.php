@@ -83,13 +83,13 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 				<form class="form-horizontal" role="form" method="post">
 					<input type="hidden" name="mailboxaction" value="addalias">
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="address">Alias address <small>(full e-mail address OR @domain.tld for <span style='color:#ec466a'>catch-all</span>)</small>:</label>
+						<label class="control-label col-sm-2" for="address">Alias address <small>(full email address OR @domain.tld for <span style='color:#ec466a'>catch-all</span>)</small>:</label>
 						<div class="col-sm-10">
 						<input type="text" class="form-control" name="address" id="address">
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="goto">Destination <small>(full e-mail address)</small>:</label>
+						<label class="control-label col-sm-2" for="goto">Destination address(es):</label>
 						<div class="col-sm-10">
 							<select name="goto[]" size="10" multiple>
 <?php
@@ -122,7 +122,7 @@ while ($row = mysqli_fetch_array($result)) {
 		}
 		else {
 			$editalias = mysqli_real_escape_string($link, $_GET["editalias"]);
-			if (mysqli_fetch_array(mysqli_query($link, "SELECT address FROM alias where address='$editalias'")) && $logged_in_role == "admin") {
+			if (mysqli_fetch_array(mysqli_query($link, "SELECT address, domain FROM alias WHERE address='$editalias' AND domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role';"))) {
 			$result = mysqli_fetch_assoc(mysqli_query($link, "SELECT active, goto FROM alias WHERE address='$editalias'"));
 	?>
 				<h4>Change alias attributes for <strong><?php echo $editalias ?></strong></h4>
