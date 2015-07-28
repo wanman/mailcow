@@ -425,6 +425,10 @@ function mailbox_add_alias($link, $postarray) {
 			die("Destination address unknown");
 		}
 	}
+	if (empty($_POST['goto'])) {
+		header("Location: do.php?event=" . base64_encode("Destination address must not be empty"));
+		die("Destination address must not be empty");
+	}
 	$goto = implode(",", $_POST['goto']);
 	$domain = substr($address, strpos($address, '@')+1);
 	global $logged_in_role;

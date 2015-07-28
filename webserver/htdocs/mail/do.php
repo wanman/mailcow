@@ -135,7 +135,7 @@ while ($row = mysqli_fetch_array($result)) {
 						<div class="col-sm-10">
 							<select name="goto[]" size="5" multiple>
 <?php
-$resultselect = mysqli_query($link, "SELECT username FROM mailbox");
+$resultselect = mysqli_query($link, "SELECT username, domain FROM mailbox WHERE domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role';");
 while ($rowsel = mysqli_fetch_array($resultselect)) {
 	if (in_array($rowsel['username'], explode(",", $result['goto']))) {
 		echo '<option selected>'.$rowsel['username'].'</option>';
