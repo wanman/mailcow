@@ -899,9 +899,9 @@ function mailbox_delete_mailbox($link, $postarray) {
 		die("Mail address invalid"); 
 	}
 	$delete_user = "DELETE FROM alias WHERE goto='$username';";
-	$delete_user = "UPDATE alias SET goto=REPLACE(goto, ',$username,', ',');";
-	$delete_user = "UPDATE alias SET goto=REPLACE(goto, ',$username', '');";
-	$delete_user = "UPDATE alias SET goto=REPLACE(goto, '$username,', '');";
+	$delete_user .= "UPDATE alias SET goto=REPLACE(goto, ',$username,', ',');";
+	$delete_user .= "UPDATE alias SET goto=REPLACE(goto, ',$username', '');";
+	$delete_user .= "UPDATE alias SET goto=REPLACE(goto, '$username,', '');";
 	$delete_user .= "DELETE FROM quota2 WHERE username='$username';";
 	$delete_user .= "DELETE FROM calendarobjects WHERE calendarid IN (SELECT id from calendars where principaluri='principals/$username');";
 	$delete_user .= "DELETE FROM cards WHERE addressbookid IN (SELECT id from calendars where principaluri='principals/$username');";
