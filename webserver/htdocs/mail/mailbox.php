@@ -36,20 +36,33 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 $result = mysqli_query($link, "SELECT domain, aliases, mailboxes, maxquota, quota, CASE active WHEN 1 THEN 'Yes' ELSE 'No' END AS active FROM 
 domain WHERE 
 domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role'");
-while ($row = mysqli_fetch_array($result)) {
-	echo "<tr><td>", $row['domain'],
-	"</td><td>", mysqli_result(mysqli_query($link, "SELECT count(*) FROM alias WHERE domain='$row[domain]' and address NOT IN (SELECT username FROM mailbox)")),
-		" of ", $row['aliases'],
-	"</td><td>", mysqli_result(mysqli_query($link, "SELECT count(*) FROM mailbox WHERE domain='$row[domain]'")),
-		" of ", $row['mailboxes'],
-	"</td><td>", $row['maxquota'], "M",
-	"</td><td>", mysqli_result(mysqli_query($link, "SELECT coalesce(round(sum(quota)/1048576), 0) FROM mailbox WHERE domain='$row[domain]'")),
-		"M of ", $row['quota'], "M",
-	"</td><td>", $row['active'],
-	"</td><td><a href=\"do.php?deletedomain=", $row['domain'], "\">delete</a> | <a href=\"do.php?editdomain=", $row['domain'], "\">edit</a>",
-	"</td></tr>";
-}
+while ($row = mysqli_fetch_array($result)):
 ?>
+						<tr>
+							<td>
+<?php
+$getpostmaster = mysqli_query($link, "SELECT alias.active as aactive, mailbox.active as mactive, username, address FROM alias, mailbox WHERE 
+(username='postmaster@$row[domain]' OR address='postmaster@$row[domain]')");
+$postmasterstatus = mysqli_fetch_assoc($getpostmaster);
+if (!isset($postmasterstatus['address']) || ($postmasterstatus['aactive'] == "0" || $postmasterstatus['mactive'] == "0")):
+?>
+							<span style="color:red">!</span>
+<?php
+endif;
+?>
+
+							<?= $row['domain']; ?></td>
+							<td><?= mysqli_result(mysqli_query($link, "SELECT count(*) FROM alias WHERE domain='$row[domain]' and address NOT IN (SELECT username FROM mailbox)")); ?> of <?= $row['aliases']; ?></td>
+							<td><?= mysqli_result(mysqli_query($link, "SELECT count(*) FROM mailbox WHERE domain='$row[domain]'")); ?> of <?= $row['mailboxes']; ?></td>
+							<td><?= $row['maxquota']; ?>M</td>
+							<td><?= mysqli_result(mysqli_query($link, "SELECT coalesce(round(sum(quota)/1048576), 0) FROM mailbox WHERE domain='$row[domain]'")); ?>M of <?= $row['quota']; ?>M</td>
+							<td><?= $row['active']; ?></td>
+							<td><a href="do.php?deletedomain=<?= $row['domain']; ?>">delete</a> | 
+							<a href="do.php?editdomain=<?= $row['domain']; ?>">edit</a></td>
+<?php
+endwhile;
+?>
+	</tr>
 					</tbody>
 				</table>
 				</div>
@@ -86,14 +99,16 @@ while ($row = mysqli_fetch_array($result)) {
 $result = mysqli_query($link, "SELECT alias_domain, target_domain, CASE active WHEN 1 THEN 'Yes' ELSE 'No' END AS active FROM 
 alias_domain WHERE 
 target_domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role'");
-while ($row = mysqli_fetch_array($result)) {
-	echo "<tr><td>", $row['alias_domain'],
-	"</td><td>", $row['target_domain'],
-	"</td><td>", $row['active'],
-	"</td><td><a href=\"do.php?deletealiasdomain=", $row['alias_domain'], "\">delete</a>",
-	"</td></tr>";
-}
+while ($row = mysqli_fetch_array($result)):
 ?>
+	<tr><td><?= $row['alias_domain']; ?>
+	</td><td><?= $row['target_domain']; ?>
+	</td><td><?= $row['active']; ?>
+	</td><td><a href="do.php?deletealiasdomain=<?= $row['alias_domain']; ?>">delete</a>
+	</td></tr>
+<?php
+endwhile;
+?>							
 					</tbody>
 				</table>
 				</div>
@@ -134,18 +149,30 @@ while ($row = mysqli_fetch_array($result)) {
 $result = mysqli_query($link, "SELECT mailbox.username, name, CASE active WHEN 1 THEN 'Yes' ELSE 'No' END AS active, domain, quota, bytes, messages 
 FROM mailbox, quota2 WHERE (mailbox.username = quota2.username) AND 
 (domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role')");
-while ($row = mysqli_fetch_array($result)) {
-	echo "<tr><td>", $row['username'],
-	"</td><td>", $row['name'],
-	"</td><td>", $row['domain'],
-	"</td><td>";
-if((formatBytes($row['quota'], 2)) == "0" ) { echo "&#8734;"; } else { echo formatBytes($row['quota'], 2); }
-	echo "</td><td>", formatBytes($row['bytes'], 2),
-	"</td><td>", $row['messages'],
-	"</td><td>", $row['active'],
-	"</td><td><a href=\"do.php?deletemailbox=", $row['username'], "\">delete</a> | <a href=\"do.php?editmailbox=", $row['username'], "\">edit</a>",
-	"</td></tr>";
+while ($row = mysqli_fetch_array($result)):
+?>
+	<tr>
+		<td><?= $row['username']; ?></td>
+		<td><?= $row['name']; ?></td>
+		<td><?= $row['domain']; ?></td>
+		<td>
+<?php
+if ((formatBytes($row['quota'], 2)) == "0" ) {
+	echo "&#8734;";
 }
+else {
+	echo formatBytes($row['quota'], 2);
+}
+?>
+		</td>
+			<td><?= formatBytes($row['bytes'], 2); ?></td>
+			<td><?= $row['messages']; ?></td>
+			<td><?= $row['active']; ?></td>
+			<td><a href="do.php?deletemailbox=<?= $row['username']; ?>">delete</a> | 
+			<a href="do.php?editmailbox=<?= $row['username']; ?>">edit</a></td>
+		</tr>
+<?php
+endwhile;
 ?>
 					</tbody>
 				</table>
@@ -185,35 +212,53 @@ $result = mysqli_query($link, "SELECT address, goto, domain, CASE active WHEN 1 
 (address NOT IN (SELECT username FROM mailbox) AND address!=goto) AND 
 (domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 
 'admin'='$logged_in_role')");
-while ($row = mysqli_fetch_array($result)) {
-        echo "<tr><td>";
-        if(!filter_var($row['address'], FILTER_VALIDATE_EMAIL)) {
-                echo "<b style='color:#ec466a'>Catch-all</b> for ", $row['address'];
-        }
-        else {
-                echo $row['address'];
-        }
-	echo "</td><td>";
-	foreach(explode(",", $row['goto']) as $goto) {
-		echo $goto, '<br />';
-	}
-	echo "</td><td>", $row['domain'],
-	"</td><td>", $row['active'],
-	"</td><td><a href=\"do.php?deletealias=", $row['address'], "\">delete</a>";
-	if(filter_var($row['address'], FILTER_VALIDATE_EMAIL)) {
-		echo " | <a href=\"do.php?editalias=", $row['address'], "\">edit</a>";
-	}
-	echo "</td></tr>";
+while ($row = mysqli_fetch_array($result)):
+?>
+					<tr>
+						<td>
+<?php		
+if(!filter_var($row['address'], FILTER_VALIDATE_EMAIL)) {
+	echo "<b style='color:#ec466a'>Catch-all</b> for ", $row['address'];
 }
+else {
+	echo $row['address'];
+}
+?>
+						</td>
+						<td>
+<?php
+foreach(explode(",", $row['goto']) as $goto):
+?>
+			<?= $goto; ?><br />
+<?php
+endforeach;
+?>
+						</td>
+						<td><?= $row['domain']; ?></td>
+						<td><?= $row['active']; ?></td>
+						<td><a href="do.php?deletealias=<?= $row['address']; ?>">delete</a> 
+<?php
+if(filter_var($row['address'], FILTER_VALIDATE_EMAIL)):
+?>
+	| <a href="do.php?editalias=<?= $row['address']; ?>">edit</a>
+<?php
+endif;
+?>
+						</td>
+					</tr>
+<?php
+endwhile;
 ?>
 					</tbody>
 				</table>
 				</div>
 			</div>
+			<span style="color:red">!</span><small> - missing/inactive postmaster mailbox/alias</small>
 		</div>
 	</div>
 </div>
-<?php }
+<?php
+}
 else {
 	header('Location: admin.php');
 }
