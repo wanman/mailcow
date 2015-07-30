@@ -644,7 +644,7 @@ function mailbox_edit_alias($link, $postarray) {
 		header("Location: do.php?event=".base64_encode("Mail address format invalid"));
 		die("Mail address format invalid");
 	}
-	$mystring = "UPDATE alias SET goto='$goto' WHERE address='$address'";
+	$mystring = "UPDATE alias SET goto='$goto', active='$active' WHERE address='$address'";
 	if (!mysqli_query($link, $mystring)) {
 		header("Location: do.php?event=".base64_encode("MySQL query failed"));
 		die("MySQL query failed");
