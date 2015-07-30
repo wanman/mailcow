@@ -46,12 +46,16 @@ $getpostmaster = mysqli_query($link, "SELECT alias.active as aactive, mailbox.ac
 $postmasterstatus = mysqli_fetch_assoc($getpostmaster);
 if (!isset($postmasterstatus['address']) || ($postmasterstatus['aactive'] == "0" || $postmasterstatus['mactive'] == "0")):
 ?>
-							<span style="color:red">!</span>
+							<span style="border-bottom:1px dotted red;" data-toggle="tooltip" title="No active postmaster mailbox or alias"><?= $row['domain']; ?></span>
+<?php
+else:
+?>
+
+							<?= $row['domain']; ?>
 <?php
 endif;
 ?>
-
-							<?= $row['domain']; ?></td>
+							</td>
 							<td><?= mysqli_result(mysqli_query($link, "SELECT count(*) FROM alias WHERE domain='$row[domain]' and address NOT IN (SELECT username FROM mailbox)")); ?> of <?= $row['aliases']; ?></td>
 							<td><?= mysqli_result(mysqli_query($link, "SELECT count(*) FROM mailbox WHERE domain='$row[domain]'")); ?> of <?= $row['mailboxes']; ?></td>
 							<td><?= $row['maxquota']; ?>M</td>
@@ -253,7 +257,6 @@ endwhile;
 				</table>
 				</div>
 			</div>
-			<span style="color:red">!</span><small> - missing/inactive postmaster mailbox/alias</small>
 		</div>
 	</div>
 </div>
