@@ -191,12 +191,12 @@ EOF
 		installpackages)
 			echo "$(textb [INFO]) - Installing prerequisites..."
 			apt-get -y update > /dev/null ; apt-get -y install lsb-release whiptail apt-utils ssl-cert > /dev/null 2>&1
-            dist_codename=$(lsb_release -cs)
-            dist_id=$(lsb_release -is)
-            if [[ $dist_id == "Debian" ]]; then
-                apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7638D0442B90D010 > /dev/null 2>&1
-                apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8B48AD6246925553 > /dev/null 2>&1
-            fi
+        		dist_codename=$(lsb_release -cs)
+			dist_id=$(lsb_release -is)
+			if [[ $dist_id == "Debian" ]]; then
+				apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7638D0442B90D010 > /dev/null 2>&1
+				apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8B48AD6246925553 > /dev/null 2>&1
+			fi
 			/usr/sbin/make-ssl-cert generate-default-snakeoil --force-overwrite
 			# Detect and edit repos
 			if [[ $dist_codename == "wheezy" ]] && [[ -z $(grep -E "^deb(.*)wheezy-backports(.*)" /etc/apt/sources.list) ]]; then
@@ -208,28 +208,31 @@ EOF
 				echo "$(textb [INFO]) - Installing jq from wheezy-backports..."
 				apt-get -y update >/dev/null ; apt-get -y --force-yes install jq -t wheezy-backports >/dev/null
 			fi
-            if [[ $conf_httpd == "apache2" ]]; then
-				echo "$(textb [INFO]) - Installing Apache2 and components..."
+			if [[ $conf_httpd == "apache2" ]]; then
 				if [[ $dist_codename == "trusty" ]]; then
 					echo "$(textb [INFO]) - Adding ondrej/apache2 repository..."
 					echo "deb http://ppa.launchpad.net/ondrej/apache2/ubuntu trusty main" > /etc/apt/sources.list.d/ondrej.list
 					apt-key adv --keyserver keyserver.ubuntu.com --recv E5267A6C > /dev/null 2>&1
 					apt-get -y update >/dev/null
 				fi
-				apt-get -y install apache2 apache2-utils libapache2-mod-php5 >/dev/null
+				webserver_backend="apache2 apache2-utils libapache2-mod-php5"
 			elif [[ $conf_httpd == "nginx" ]]; then
-				echo "$(textb [INFO]) - Installing Nginx..."
-				apt-get -y install nginx-extras >/dev/null
+				webserver_backend="nginx-extras"
 			fi
 			echo "$(textb [INFO]) - Installing packages unattended, please stand by, errors will be reported."
 			if [[ $(lsb_release -is) == "Ubuntu" ]]; then
 				echo "$(yellowb [WARN]) - You are running Ubuntu. The installation will not fail, though you may see a lot of output until the installation is finished."
 			fi
 			apt-get -y update >/dev/null
+			if [[ $my_usemariadb == "yes" ]]; then
+				database_backend="mariadb-client mariadb-server"
+			else
+				database_backend="mysql-client mysql-server"
+			fi
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install zip jq dnsutils python-setuptools libmail-spf-perl libmail-dkim-perl \
 openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
-php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc mysql-client mysql-server mailutils pyzor razor \
+php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc ${database_backend} ${webserver_backend} mailutils pyzor razor \
 postfix-mysql postfix-pcre spamassassin spamc sudo bzip2 curl mpack opendkim opendkim-tools unzip clamav-daemon \
 fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl bsd-mailx > /dev/null
 			if [ "$?" -ne "0" ]; then
