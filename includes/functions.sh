@@ -99,7 +99,9 @@ checkports() {
 	elif [[ $(nc -z localhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -e ""; echo $?) -eq 0 ]]; then
 		echo "$(textb [INFO]) - Useable MySQL instance found, will not re-configure MySQL"
 		if [[ -z $(mysql -V | grep -i "mariadb") && $my_usemariadb == "yes" ]]; then
-			echo "$(redb [ERR]) - Found MariaDB but \"my_usemariadb\" is \"no\""
+			echo "$(redb [ERR]) - Found MySQL server but \"my_usemariadb\" is \"yes\""
+		elif [[ ! -z $(mysql -V | grep -i "mariadb") && $my_usemariadb != "yes" ]]; then
+			echo "$(redb [ERR]) - Found MariaDB server but \"my_usemariadb\" is not \"yes\""
 		fi
 		mysql_useable=1
 		my_rootpw="not changed"
