@@ -98,6 +98,9 @@ checkports() {
 		exit 1
 	elif [[ $(nc -z localhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -e ""; echo $?) -eq 0 ]]; then
 		echo "$(textb [INFO]) - Useable MySQL instance found, will not re-configure MySQL"
+		if [[ -z $(mysql -V | grep -i "mariadb") && $my_usemariadb == "yes" ]]; then
+			echo "$(redb [ERR]) - Found MariaDB but \"my_usemariadb\" is \"no\""
+		fi
 		mysql_useable=1
 		my_rootpw="not changed"
 	fi
@@ -349,7 +352,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				service apparmor restart > /dev/null 2>&1
 			fi
 			freshclam
-            ;;
+			;;
 		opendkim)
 			echo 'SOCKET="inet:10040@localhost"' > /etc/default/opendkim
 			mkdir -p /etc/opendkim/{keyfiles,dnstxt} 2> /dev/null
@@ -392,7 +395,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				cp webserver/apache2/conf/sites-available/mailcow /etc/apache2/sites-available/
 				ln -s /etc/apache2/sites-available/mailcow /etc/apache2/sites-enabled/000-0-mailcow.conf
 				sed -i "s/\"\MAILCOW_HOST.MAILCOW_DOMAIN\"/\"$sys_hostname.$sys_domain\"/g" /etc/apache2/sites-available/mailcow
-                sed -i "s/\"autoconfig.MAILCOW_DOMAIN\"/\"autoconfig.$sys_domain\"/g" /etc/apache2/sites-available/mailcow
+				sed -i "s/\"autoconfig.MAILCOW_DOMAIN\"/\"autoconfig.$sys_domain\"/g" /etc/apache2/sites-available/mailcow
 				sed -i "s/MAILCOW_DOMAIN;/$sys_domain;/g" /etc/apache2/sites-available/mailcow
 				a2enmod rewrite ssl proxy proxy_fcgi > /dev/null 2>&1
 			fi
@@ -408,7 +411,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			find /var/www/{dav,mail} -type f -exec chmod 644 {} \;
 			sed -i "/date_default_timezone_set/c\date_default_timezone_set('$sys_timezone');" /var/www/dav/server.php
 			touch /var/www/{VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE,MAILBOX_BACKUP}
-            sed -i "s/mailcow_sub/$sys_hostname/g" /var/www/mail/autoconfig.xml
+			sed -i "s/mailcow_sub/$sys_hostname/g" /var/www/mail/autoconfig.xml
 			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
 			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
 			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
