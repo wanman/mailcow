@@ -538,7 +538,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			;;
 	esac
 }
-upgradetask() {
+pgradetask() {
 	if [[ -z $(cat /etc/{fufix_version,mailcow_version} 2> /dev/null | grep -E "0.7|0.8|0.9|0.10|0.11") ]]; then
 		echo "$(redb [ERR]) - Upgrade not supported"
 		return 1
@@ -595,7 +595,8 @@ A backup will be stored in ./before_upgrade_$timestamp
 	echo -en "Creating backups in ./before_upgrade_$timestamp... \t"
 		mkdir before_upgrade_$timestamp
 		cp -R /var/www/mail/ before_upgrade_$timestamp/mail_wwwroot
-		mysqldump --defaults-file=$my_defaultsfile --all-databases > backup_all_databases.sql 2>/dev/null
+		mysqldump -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} > backup_mailcow_db.sql 2>/dev/null
+		mysqldump -u ${my_rcuser} -p${my_rcpass} ${my_rcdb} > backup_mailcow_db.sql 2>/dev/null
 		cp -R /etc/{postfix,dovecot,spamassassin,fail2ban,$conf_httpd,mysql,php5,clamav} before_upgrade_$timestamp/
     echo -e "$(greenb "[OK]")"
 	echo -en "\nStopping services, this may take a few seconds... \t\t"
@@ -662,7 +663,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 
 	installtask restartservices
 	returnwait "Restarting services" "Finish upgrade"
-	mysql --defaults-file=$my_defaultsfile -e "GRANT SELECT ON $my_mailcowdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
+	mysql -u ${my_mailcowuser} -p${my_mailcowpass} -e "GRANT SELECT ON $my_mailcowdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
 	echo Done.
 	echo
 	echo "\"installer.log\" file updated."
