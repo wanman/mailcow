@@ -1,6 +1,6 @@
 <?php
 /* Database connection*/
-$database_host = "localhost";
+$database_host = "my_dbhost";
 $database_user = "my_mailcowuser";
 $database_pass = "my_mailcowpass";
 $database_name = "my_mailcowdb";

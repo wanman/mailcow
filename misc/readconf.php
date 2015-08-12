@@ -5,11 +5,13 @@ include_once "/var/www/mail/inc/vars.inc.php";
 include_once "/var/www/mail/pfadmin/config.local.php";
 
 if(!empty($database_user)) {
+echo $database_host, PHP_EOL;
 echo $database_user, PHP_EOL;
 echo $database_pass, PHP_EOL;
 echo $database_name, PHP_EOL;
 }
 else {
+echo $CONF['database_host'], PHP_EOL;
 echo $CONF['database_user'], PHP_EOL;
 echo $CONF['database_password'], PHP_EOL;
 echo $CONF['database_name'], PHP_EOL;

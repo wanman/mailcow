@@ -93,53 +93,53 @@ checkports() {
 		fi
 	done
 	[[ $blocked_port -eq 1 ]] && exit 1
-	if [[ $(nc -z localhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -e ""; echo $?) -ne 0 ]]; then
-		echo "$(redb [ERR]) - No useable MySQL instance found (/etc/mysql/debian.cnf missing?)"
+	if [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --defaults-file=$my_defaultsfile -e ""; echo $?) -ne 0 ]]; then
+		echo "$(redb [ERR]) - No useable MySQL instance found, please check \$my_defaultsfile"
 		exit 1
-	elif [[ $(nc -z localhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -e ""; echo $?) -eq 0 ]]; then
+	elif [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --defaults-file=$my_defaultsfile -e ""; echo $?) -eq 0 ]]; then
 		echo "$(textb [INFO]) - Useable MySQL instance found, will not re-configure MySQL"
 		if [[ -z $(mysql -V | grep -i "mariadb") && $my_usemariadb == "yes" ]]; then
 			echo "$(redb [ERR]) - Found MySQL server but \"my_usemariadb\" is \"yes\""
+			exit 1
 		elif [[ ! -z $(mysql -V | grep -i "mariadb") && $my_usemariadb != "yes" ]]; then
 			echo "$(redb [ERR]) - Found MariaDB server but \"my_usemariadb\" is not \"yes\""
+			exit 1
 		fi
 		mysql_useable=1
 		my_rootpw="not changed"
 	fi
+	if [[ $my_forceexisting == "yes" ]] && [[ $mysql_useable != "1" ]]; then
+		echo "$(redb [ERR]) - No useable database instance found, but forced to use one."
+		exit 1
+	fi
 }
 
 checkconfig() {
-    if [[ $conf_done = "no" ]]; then
-        echo "$(redb [ERR]) - Error in configuration file"
-        echo "Is \"conf_done\" set to \"yes\"?"
-        echo
-        exit 1
-    fi
 	if [[ ${#cert_country} -ne 2 ]]; then
-        echo "$(redb [ERR]) - Country code must consist of exactly two characters (DE/US/UK etc.)"
-        exit 1
-    fi
+		echo "$(redb [ERR]) - Country code must consist of exactly two characters (DE/US/UK etc.)"
+		exit 1
+	fi
 	if [[ $conf_httpd != "nginx" && $conf_httpd != "apache2" ]]; then
 		echo "$(redb [ERR]) - \"conf_httpd\" is neither nginx nor apache2"
 		exit 1
 	elif [[ $conf_httpd = "apache2" && -z $(apt-cache show apache2 | grep Version | grep "2.4") ]]; then
 		echo "$(redb [ERR]) - Unable to install Apache 2.4, please use Nginx or upgrade your distribution"
-        exit 1
+		exit 1
 	fi
-    for var in sys_hostname sys_domain sys_timezone my_mailcowdb my_mailcowuser my_mailcowpass my_rootpw my_rcuser my_rcpass my_rcdb mailcow_admin_user mailcow_admin_pass cert_country cert_state cert_city cert_org
-    do
-        if [[ -z ${!var} ]]; then
-            echo "$(redb [ERR]) - Parameter $var must not be empty."
-            echo
-            exit 1
-        fi
-    done
-    pass_count=$(grep -o "[0-9]" <<< $mailcow_admin_pass | wc -l)
-    pass_chars=$(echo $mailcow_admin_pass | egrep "^.{8,255}" | \
+	for var in sys_hostname sys_domain sys_timezone my_dbhost my_defaultsfile my_mailcowdb my_mailcowuser my_mailcowpass my_rootpw my_rcuser my_rcpass my_rcdb mailcow_admin_user mailcow_admin_pass cert_country cert_state cert_city cert_org
+	do
+		if [[ -z ${!var} ]]; then
+			echo "$(redb [ERR]) - Parameter $var must not be empty."
+			echo
+			exit 1
+		fi
+	done
+	pass_count=$(grep -o "[0-9]" <<< $mailcow_admin_pass | wc -l)
+	pass_chars=$(echo $mailcow_admin_pass | egrep "^.{8,255}" | \
 	egrep "[ABCDEFGHIJKLMNOPQRSTUVXYZ]" | \
 	egrep "[abcdefghijklmnopqrstuvxyz"] | \
 	egrep "[0-9]")
-    if [[ $pass_count -lt 2 || -z $pass_chars ]]; then
+	if [[ $pass_count -lt 2 || -z $pass_chars ]]; then
 		echo "$(redb [ERR]) - mailcow administrator password does not meet password policy requirements (8 char., 2 num., UPPER- + lowercase)"
 		echo
 		exit 1
@@ -269,12 +269,12 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		mysql)
 			if [[ $mysql_useable -ne 1 ]]; then
-				mysql --defaults-file=/etc/mysql/debian.cnf -e "UPDATE mysql.user SET Password=PASSWORD('$my_rootpw') WHERE USER='root'; FLUSH PRIVILEGES;"
+				mysql --defaults-file=$my_defaultsfile -e "UPDATE mysql.user SET Password=PASSWORD('$my_rootpw') WHERE USER='root'; FLUSH PRIVILEGES;"
 			fi
-			mysql --defaults-file=/etc/mysql/debian.cnf -e "DROP DATABASE IF EXISTS $my_mailcowdb; DROP DATABASE IF EXISTS $my_rcdb;"
-			mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_mailcowdb; GRANT ALL PRIVILEGES ON $my_mailcowdb.* TO '$my_mailcowuser'@'localhost' IDENTIFIED BY '$my_mailcowpass';"
-			mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'localhost' IDENTIFIED BY '$my_rcpass';"
-			mysql --defaults-file=/etc/mysql/debian.cnf -e "GRANT SELECT ON $my_mailcowdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
+			mysql --defaults-file=$my_defaultsfile -e "DROP DATABASE IF EXISTS $my_mailcowdb; DROP DATABASE IF EXISTS $my_rcdb;"
+			mysql --defaults-file=$my_defaultsfile -e "CREATE DATABASE $my_mailcowdb; GRANT ALL PRIVILEGES ON $my_mailcowdb.* TO '$my_mailcowuser'@'localhost' IDENTIFIED BY '$my_mailcowpass';"
+			mysql --defaults-file=$my_defaultsfile -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'localhost' IDENTIFIED BY '$my_rcpass';"
+			mysql --defaults-file=$my_defaultsfile -e "GRANT SELECT ON $my_mailcowdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
 			;;
 		postfix)
 			cp -R postfix/conf/* /etc/postfix/
@@ -295,6 +295,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /etc/postfix/sql/*
 			postmap /etc/postfix/mailcow_sender_access
 			chown www-data: /etc/postfix/mailcow_*
+			chmod 755 /var/spool/
 			sed -i "/%www-data/d" /etc/sudoers 2> /dev/null
 			sed -i "/%vmail/d" /etc/sudoers 2> /dev/null
 			echo '%www-data ALL=(ALL) NOPASSWD: /usr/bin/doveadm * sync *, /usr/bin/doveadm quota recalc -A, /usr/sbin/dovecot reload, /usr/sbin/postfix reload, /usr/local/bin/mc-dkim-ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_inst_cron, /usr/bin/tail * /opt/vfilter/log/vfilter.log' >> /etc/sudoers
@@ -414,19 +415,20 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			sed -i "/date_default_timezone_set/c\date_default_timezone_set('$sys_timezone');" /var/www/dav/server.php
 			touch /var/www/{VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE,MAILBOX_BACKUP}
 			sed -i "s/mailcow_sub/$sys_hostname/g" /var/www/mail/autoconfig.xml
+			sed -i "s/my_dbhost/$my_dbhost/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
 			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
 			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
 			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
 			chown -R www-data: /var/www/{mail,dav,VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE,MAILBOX_BACKUP} /var/lib/php5/sessions
 			chown www-data: /var/www/
-			mysql -u $my_mailcowuser -p$my_mailcowpass $my_mailcowdb < webserver/htdocs/init.sql
-			if [[ -z $(mysql --defaults-file=/etc/mysql/debian.cnf $my_mailcowdb -e "SHOW INDEX FROM propertystorage WHERE KEY_NAME = 'path_property';" -N -B) ]]; then
-				mysql --defaults-file=/etc/mysql/debian.cnf $my_mailcowdb -e "CREATE UNIQUE INDEX path_property ON propertystorage (path(600), name(100));" -N -B
+			mysql --defaults-file=$my_defaultsfile $my_mailcowdb < webserver/htdocs/init.sql
+			if [[ -z $(mysql --defaults-file=$my_defaultsfile $my_mailcowdb -e "SHOW INDEX FROM propertystorage WHERE KEY_NAME = 'path_property';" -N -B) ]]; then
+				mysql --defaults-file=$my_defaultsfile $my_mailcowdb -e "CREATE UNIQUE INDEX path_property ON propertystorage (path(600), name(100));" -N -B
 			fi
-			if [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -s -N -e "use $my_mailcowdb; select * from admin;" | wc -l) -lt 1 ]]; then
+			if [[ $(mysql --defaults-file=$my_defaultsfile -s -N -e "use $my_mailcowdb; select * from admin;" | wc -l) -lt 1 ]]; then
 				mailcow_admin_pass_hashed=$(doveadm pw -s SHA512-CRYPT -p $mailcow_admin_pass)
-				mysql -u $my_mailcowuser -p$my_mailcowpass $my_mailcowdb -e "INSERT INTO admin VALUES ('$mailcow_admin_user','$mailcow_admin_pass_hashed',1,now(),now(),1);"
-				mysql -u $my_mailcowuser -p$my_mailcowpass $my_mailcowdb -e "INSERT INTO domain_admins (username, domain, created, active) VALUES ('$mailcow_admin_user', 'ALL', now(), '1');"
+				mysql --defaults-file=$my_defaultsfile $my_mailcowdb -e "INSERT INTO admin VALUES ('$mailcow_admin_user','$mailcow_admin_pass_hashed',1,now(),now(),1);"
+				mysql --defaults-file=$my_defaultsfile $my_mailcowdb -e "INSERT INTO domain_admins (username, domain, created, active) VALUES ('$mailcow_admin_user', 'ALL', now(), '1');"
 			else
 				echo "$(textb [INFO]) - At least one administrator exists, will not create another mailcow administrator"
 			fi
@@ -446,14 +448,15 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/rc/plugins/password/config.inc.php
 			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/rc/plugins/password/config.inc.php
 			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/rc/plugins/password/config.inc.php
+			sed -i "s/my_dbhost/$my_dbhost/g" /var/www/mail/rc/config/config.inc.php
 			sed -i "s/my_rcuser/$my_rcuser/g" /var/www/mail/rc/config/config.inc.php
 			sed -i "s/my_rcpass/$my_rcpass/g" /var/www/mail/rc/config/config.inc.php
 			sed -i "s/my_rcdb/$my_rcdb/g" /var/www/mail/rc/config/config.inc.php
 			conf_rcdeskey=$(genpasswd)
 			sed -i "s/conf_rcdeskey/$conf_rcdeskey/g" /var/www/mail/rc/config/config.inc.php
 			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/$sys_hostname.$sys_domain/g" /var/www/mail/rc/config/config.inc.php
-			if [[ $(mysql --defaults-file=/etc/mysql/debian.cnf -s -N -e "use $my_rcdb; show tables;" | wc -l) -lt 5 ]]; then
-				mysql -u $my_rcuser -p$my_rcpass $my_rcdb < /var/www/mail/rc/SQL/mysql.initial.sql
+			if [[ $(mysql --defaults-file=$my_defaultsfile -s -N -e "use $my_rcdb; show tables;" | wc -l) -lt 5 ]]; then
+				mysql --defaults-file=$my_defaultsfile $my_rcdb < /var/www/mail/rc/SQL/mysql.initial.sql
 			fi
 			if [[ ! -d /var/www/mail/rc/plugins/carddav ]]; then
 				wget --quiet https://codeload.github.com/blind-coder/rcmcarddav/zip/master -O /tmp/master.zip && unzip -o /tmp/master.zip -d /var/www/mail/rc/plugins/ > /dev/null
@@ -466,7 +469,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				(instcarddav > /dev/null 2>&1)
 				cp /var/www/mail/rc/plugins/carddav/skins/larry/carddav.css /var/www/mail/rc/skins/larry/
 				mv /var/www/mail/rc/plugins/carddav/{config.inc.php.dist,config.inc.php}
-				mysql --defaults-file=/etc/mysql/debian.cnf ${my_rcdb} < /var/www/mail/rc/plugins/carddav/dbinit/mysql.sql
+				mysql --defaults-file=$my_defaultsfile ${my_rcdb} < /var/www/mail/rc/plugins/carddav/dbinit/mysql.sql
 			fi
 			chown -R www-data: /var/www/
 			rm -rf roundcube/inst/$roundcube_version
@@ -555,15 +558,16 @@ upgradetask() {
 	sys_timezone=$(cat /etc/timezone)
 	timestamp=$(date +%Y%m%d_%H%M%S)
 	readconf=( $(php -f misc/readconf.php) )
-	my_mailcowuser=${readconf[0]}
-	my_mailcowpass=${readconf[1]}
-	my_mailcowdb=${readconf[2]}
-	old_des_key_rc=${readconf[3]}
-	my_rcuser=${readconf[4]}
-	my_rcpass=${readconf[5]}
-	my_rcdb=${readconf[6]}
-
-	for var in conf_httpd sys_hostname sys_domain sys_timezone my_mailcowdb my_mailcowuser my_mailcowpass my_rcuser my_rcpass my_rcdb
+	my_dbhost=${readconf[7]}
+	my_mailcowuser=${readconf[1]}
+	my_mailcowpass=${readconf[2]}
+	my_mailcowdb=${readconf[3]}
+	old_des_key_rc=${readconf[4]}
+	my_rcuser=${readconf[5]}
+	my_rcpass=${readconf[6]}
+	my_rcdb=${readconf[7]}
+	[[ -z $my_dbhost ]] && my_dbhost="localhost"
+	for var in conf_httpd sys_hostname sys_domain sys_timezone my_dbhost my_mailcowdb my_mailcowuser my_mailcowpass my_rcuser my_rcpass my_rcdb
 	do
 		if [[ -z ${!var} ]]; then
 			echo "$(redb [ERR]) - Could not gather required information, upgrade failed..."
@@ -591,7 +595,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 	echo -en "Creating backups in ./before_upgrade_$timestamp... \t"
 		mkdir before_upgrade_$timestamp
 		cp -R /var/www/mail/ before_upgrade_$timestamp/mail_wwwroot
-		mysqldump --defaults-file=/etc/mysql/debian.cnf --all-databases > backup_all_databases.sql 2>/dev/null
+		mysqldump --defaults-file=$my_defaultsfile --all-databases > backup_all_databases.sql 2>/dev/null
 		cp -R /etc/{postfix,dovecot,spamassassin,fail2ban,$conf_httpd,mysql,php5,clamav} before_upgrade_$timestamp/
     echo -e "$(greenb "[OK]")"
 	echo -en "\nStopping services, this may take a few seconds... \t\t"
@@ -630,6 +634,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 	returnwait "Spamassassin configuration" "Webserver configuration"
 
 	installtask webserver
+	rm -rf /var/lib/php5/sessions/*
 	returnwait "Webserver configuration" "Roundcube configuration"
 
 	installtask roundcube
@@ -657,7 +662,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 
 	installtask restartservices
 	returnwait "Restarting services" "Finish upgrade"
-	mysql --defaults-file=/etc/mysql/debian.cnf -e "GRANT SELECT ON $my_mailcowdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
+	mysql --defaults-file=$my_defaultsfile -e "GRANT SELECT ON $my_mailcowdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
 	echo Done.
 	echo
 	echo "\"installer.log\" file updated."

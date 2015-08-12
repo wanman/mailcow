@@ -133,6 +133,9 @@ nano mailcow.config
 * **sys_domain** - Domain name. "$sys_hostname.$sys_domain" equals to FQDN.
 * **sys_timezone** - The timezone must be definied in a valid format (Europe/Berlin, America/New_York etc.)
 * **conf_httpd** - Select wether to use Nginx ("nginx") or Apache2 ("apache2"). Nginx is default.
+* **my_dbhost** - ADVANCED: Leave as-is ("localhost") for a local database installation
+* **my_defaultsfile** - ADVANCED: Leave as-is for a local database installation. If you want to install the database on a remote server, create a proper mysql defaults file to connect to the remote host.
+* **my_forceexisting** - ADVANCED: Exit if no useable MySQL installation was found.
 * **my_mailcowdb, my_mailcowuser, my_mailcowpass** - MySQL database name, username and password for use with Postfix. **You can use the default values.**
 * **my_rcdb, my_rcuser, my_rcpass** - MySQL database name, username and password for Roundcube. **You can use the default values.**
 * **my_rootpw** - MySQL root password is generated automatically by default. You can define a complex password here if you want to.

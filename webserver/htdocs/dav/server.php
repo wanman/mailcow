@@ -3,7 +3,7 @@ date_default_timezone_set('Europe/Berlin');
 
 $baseUri = '/';
 
-$pdo = new PDO('mysql:dbname=my_mailcowdb;host=localhost', 'my_mailcowuser', 'my_mailcowpass');
+$pdo = new PDO('mysql:dbname=my_mailcowdb;host=my_dbhost', 'my_mailcowuser', 'my_mailcowpass');
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 function exception_error_handler($errno, $errstr, $errfile, $errline) {

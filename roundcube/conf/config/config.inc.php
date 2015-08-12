@@ -1,6 +1,6 @@
 <?php
 $config = array();
-$config['db_dsnw'] = 'mysql://my_rcuser:my_rcpass@localhost/my_rcdb';
+$config['db_dsnw'] = 'mysql://my_rcuser:my_rcpass@my_dbhost/my_rcdb';
 $config['default_host'] = 'tls://MAILCOW_HOST.MAILCOW_DOMAIN';
 $config['smtp_server'] = 'tls://MAILCOW_HOST.MAILCOW_DOMAIN';
 $config['smtp_port'] = 587;
