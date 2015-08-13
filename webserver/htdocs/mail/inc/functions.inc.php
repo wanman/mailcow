@@ -25,6 +25,11 @@ function check_login($link, $user, $pass) {
 			return "user";
 		}
 	}
+	session_unset();
+	session_destroy();
+	session_write_close();
+	setcookie(session_name(),'',0,'/');
+	session_regenerate_id(true);
 	return false;
 }
 function formatBytes($size, $precision = 2) {
@@ -35,8 +40,8 @@ function formatBytes($size, $precision = 2) {
 	}
 	return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
 }
-function mysqli_result($res,$row=0,$col=0) { 
-    $numrows = mysqli_num_rows($res); 
+function mysqli_result($res,$row=0,$col=0) {
+    $numrows = mysqli_num_rows($res);
     if ($numrows && $row <= ($numrows-1) && $row >=0){
         mysqli_data_seek($res,$row);
         $resrow = (is_numeric($col)) ? mysqli_fetch_row($res) : mysqli_fetch_assoc($res);
