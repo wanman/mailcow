@@ -558,7 +558,7 @@ upgradetask() {
 	sys_timezone=$(cat /etc/timezone)
 	timestamp=$(date +%Y%m%d_%H%M%S)
 	readconf=( $(php -f misc/readconf.php) )
-	my_dbhost=${readconf[7]}
+	my_dbhost=${readconf[0]}
 	my_mailcowuser=${readconf[1]}
 	my_mailcowpass=${readconf[2]}
 	my_mailcowdb=${readconf[3]}
