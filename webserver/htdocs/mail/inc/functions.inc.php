@@ -29,7 +29,6 @@ function check_login($link, $user, $pass) {
 	session_destroy();
 	session_write_close();
 	setcookie(session_name(),'',0,'/');
-	session_regenerate_id(true);
 	return false;
 }
 function formatBytes($size, $precision = 2) {

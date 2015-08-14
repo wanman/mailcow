@@ -12,7 +12,6 @@ require_once "inc/vars.inc.php";
 $link = mysqli_connect($database_host, $database_user, $database_pass, $database_name);
 require_once "inc/functions.inc.php";
 require_once "inc/triggers.inc.php";
-session_regenerate_id(true);
 ?>
 <!DOCTYPE html>
 <html lang="en">
