@@ -26,9 +26,9 @@ echo --------------------------------- >> installer.log
         ;;
 esac
 
+source mailcow.config
 checksystem
 checkports
-source mailcow.config
 checkconfig
 
 echo "    $(textb "Hostname")            $sys_hostname
