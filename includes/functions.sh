@@ -95,13 +95,12 @@ checkports() {
 	[[ $blocked_port -eq 1 ]] && exit 1
 	if [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --defaults-file=$my_defaultsfile -e ""; echo $?) -ne 0 ]]; then
 		echo "$(redb [ERR]) - No useable MySQL instance found, please check \$my_defaultsfile"
-		exit 1
 	elif [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --defaults-file=$my_defaultsfile -e ""; echo $?) -eq 0 ]]; then
 		echo "$(textb [INFO]) - Useable MySQL instance found, will not re-configure MySQL"
-		if [[ -z $(mysql -V | grep -i "mariadb") && $my_usemariadb == "yes" ]]; then
-			echo "$(redb [ERR]) - Found MySQL server but \"my_usemariadb\" is \"yes\""
+		if [[ ! -z $(which mysql) ]] && [[ -z $(mysql -V | grep -i "mariadb") && $my_usemariadb == "yes" ]]; then
+			echo "$(yellowb [WARN]) - Found MySQL server but \"my_usemariadb\" is \"yes\""
 			exit 1
-		elif [[ ! -z $(mysql -V | grep -i "mariadb") && $my_usemariadb != "yes" ]]; then
+		elif [[ ! -z $(which mysql) ]] && [[ ! -z $(mysql -V | grep -i "mariadb") && $my_usemariadb != "yes" ]]; then
 			echo "$(redb [ERR]) - Found MariaDB server but \"my_usemariadb\" is not \"yes\""
 			exit 1
 		fi
@@ -229,10 +228,14 @@ EOF
 				echo "$(yellowb [WARN]) - You are running Ubuntu. The installation will not fail, though you may see a lot of output until the installation is finished."
 			fi
 			apt-get -y update >/dev/null
-			if [[ $my_usemariadb == "yes" ]]; then
-				database_backend="mariadb-client mariadb-server"
+			if [[ $my_dbhost == "localhost" || $my_dbhost == "127.0.0.1" ]] && [[ $my_upgradetask != "yes" ]]; then
+				if [[ $my_usemariadb == "yes" ]]; then
+					database_backend="mariadb-client mariadb-server"
+				else
+					database_backend="mysql-client mysql-server"
+				fi
 			else
-				database_backend="mysql-client mysql-server"
+				database_backend=""
 			fi
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install zip jq dnsutils python-setuptools libmail-spf-perl libmail-dkim-perl \
 openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
@@ -567,6 +570,7 @@ upgradetask() {
 	my_rcpass=${readconf[6]}
 	my_rcdb=${readconf[7]}
 	[[ -z $my_dbhost ]] && my_dbhost="localhost"
+	my_upgradetask="yes"
 	for var in conf_httpd sys_hostname sys_domain sys_timezone my_dbhost my_mailcowdb my_mailcowuser my_mailcowpass my_rcuser my_rcpass my_rcdb
 	do
 		if [[ -z ${!var} ]]; then
@@ -581,8 +585,8 @@ $(textb "Hostname")        ${sys_hostname}
 $(textb "Domain")          ${sys_domain}
 $(textb "FQDN")            ${sys_hostname}.${sys_domain}
 $(textb "Timezone")        ${sys_timezone}
-$(textb "mailcow MySQL")   ${my_mailcowuser}:${my_mailcowpass}/${my_mailcowdb}
-$(textb "Roundcube MySQL") ${my_rcuser}:${my_rcpass}/${my_rcdb}
+$(textb "mailcow MySQL")   ${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}/${my_mailcowdb}
+$(textb "Roundcube MySQL") ${my_rcuser}:${my_rcpass}@${my_dbhost}/${my_rcdb}
 $(textb "Web server")      ${conf_httpd^}
 
 --------------------------------------------------------
