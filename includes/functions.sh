@@ -542,7 +542,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 	esac
 }
 upgradetask() {
-	if [[ -z $(cat /etc/{fufix_version,mailcow_version} 2> /dev/null | grep -E "0.7|0.8|0.9|0.10|0.11") ]]; then
+	if [[ -z $(cat /etc/{fufix_version,mailcow_version} 2> /dev/null | grep -E "0.9|0.10|0.11") ]]; then
 		echo "$(redb [ERR]) - Upgrade not supported"
 		return 1
 	fi
@@ -667,7 +667,6 @@ A backup will be stored in ./before_upgrade_$timestamp
 
 	installtask restartservices
 	returnwait "Restarting services" "Finish upgrade"
-	mysql -u ${my_mailcowuser} -p${my_mailcowpass} -e "GRANT SELECT ON $my_mailcowdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
 	echo Done.
 	echo
 	echo "\"installer.log\" file updated."
