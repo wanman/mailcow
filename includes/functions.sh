@@ -93,12 +93,12 @@ checkports() {
 		fi
 	done
 	[[ $blocked_port -eq 1 ]] && exit 1
-	if [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --defaults-file=$my_defaultsfile -e ""; echo $?) -ne 0 ]]; then
-		echo "$(redb [ERR]) - No useable MySQL instance found, please check \$my_defaultsfile"
-	elif [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --defaults-file=$my_defaultsfile -e ""; echo $?) -eq 0 ]]; then
-		echo "$(textb [INFO]) - Useable MySQL instance found, will not re-configure MySQL"
+	if [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql -u root -p${my_rootpw} -e ""; echo $?) -ne 0 ]]; then
+		echo "$(redb [ERR]) - Cannot connect to SQL database server at ${my_dbhost} with given root password"
+	elif [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql -u root -p${my_rootpw} -e ""; echo $?) -eq 0 ]]; then
+		echo "$(textb [INFO]) - Successfully connected to SQL server at ${my_dbhost}"
 		if [[ ! -z $(which mysql) ]] && [[ -z $(mysql -V | grep -i "mariadb") && $my_usemariadb == "yes" ]]; then
-			echo "$(yellowb [WARN]) - Found MySQL server but \"my_usemariadb\" is \"yes\""
+			echo "$(redb [ERR]) - Found MySQL server but \"my_usemariadb\" is \"yes\""
 			exit 1
 		elif [[ ! -z $(which mysql) ]] && [[ ! -z $(mysql -V | grep -i "mariadb") && $my_usemariadb != "yes" ]]; then
 			echo "$(redb [ERR]) - Found MariaDB server but \"my_usemariadb\" is not \"yes\""
@@ -107,8 +107,8 @@ checkports() {
 		mysql_useable=1
 		my_rootpw="not changed"
 	fi
-	if [[ $my_forceexisting == "yes" ]] && [[ $mysql_useable != "1" ]]; then
-		echo "$(redb [ERR]) - No useable database instance found, but forced to use one."
+	if [[ $my_useexisting == "yes" ]] && [[ $mysql_useable != "1" ]]; then
+		echo "$(redb [ERR]) - No useable database instance found"
 		exit 1
 	fi
 }
@@ -272,12 +272,12 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		mysql)
 			if [[ $mysql_useable -ne 1 ]]; then
-				mysql --defaults-file=$my_defaultsfile -e "UPDATE mysql.user SET Password=PASSWORD('$my_rootpw') WHERE USER='root'; FLUSH PRIVILEGES;"
+				mysql -u root -p${my_rootpw} -e "UPDATE mysql.user SET Password=PASSWORD('$my_rootpw') WHERE USER='root'; FLUSH PRIVILEGES;"
 			fi
-			mysql --defaults-file=$my_defaultsfile -e "DROP DATABASE IF EXISTS $my_mailcowdb; DROP DATABASE IF EXISTS $my_rcdb;"
-			mysql --defaults-file=$my_defaultsfile -e "CREATE DATABASE $my_mailcowdb; GRANT ALL PRIVILEGES ON $my_mailcowdb.* TO '$my_mailcowuser'@'localhost' IDENTIFIED BY '$my_mailcowpass';"
-			mysql --defaults-file=$my_defaultsfile -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'localhost' IDENTIFIED BY '$my_rcpass';"
-			mysql --defaults-file=$my_defaultsfile -e "GRANT SELECT ON $my_mailcowdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
+			mysql -u root -p${my_rootpw} -e "DROP DATABASE IF EXISTS $my_mailcowdb; DROP DATABASE IF EXISTS $my_rcdb;"
+			mysql -u root -p${my_rootpw} -e "CREATE DATABASE $my_mailcowdb; GRANT ALL PRIVILEGES ON $my_mailcowdb.* TO '$my_mailcowuser'@'localhost' IDENTIFIED BY '$my_mailcowpass';"
+			mysql -u root -p${my_rootpw} -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'localhost' IDENTIFIED BY '$my_rcpass';"
+			mysql -u root -p${my_rootpw} -e "GRANT SELECT ON $my_mailcowdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
 			;;
 		postfix)
 			cp -R postfix/conf/* /etc/postfix/
