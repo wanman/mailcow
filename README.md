@@ -132,21 +132,15 @@ nano mailcow.config
 * **sys_hostname** - Hostname without domain
 * **sys_domain** - Domain name. "$sys_hostname.$sys_domain" equals to FQDN.
 * **sys_timezone** - The timezone must be definied in a valid format (Europe/Berlin, America/New_York etc.)
-
 * **conf_httpd** - Select wether to use Nginx ("nginx") or Apache2 ("apache2"). Nginx is default.
-
 * **my_dbhost** - ADVANCED: Leave as-is ("localhost") for a local database installation.
 * **my_mailcowdb, my_mailcowuser, my_mailcowpass** - SQL database name, username and password for use with Postfix. **You can use the default values.**
 * **my_rcdb, my_rcuser, my_rcpass** - SQL database name, username and password for Roundcube. **You can use the default values.**
 * **my_rootpw** - SQL root password is generated automatically by default. You can define a complex password here if you want to. *Set to your current root password to use an existing SQL instance*.
-
 * **mailcow_admin_user and mailcow_admin_pass** - mailcow administrator. Password policy: minimum length 8 chars, must contain uppercase and lowercase letters and at least 2 digits. **You can use the default values**
-
 * **"cert-" vars** - Used for the self-signed certificate. CN will be the servers FQDN. "cert_country" must be a vaild two letter country code.
-
 * **inst_debug** - Sets Bash mode -x
 * An unattended installation is possible, but not recommended ("inst_unattended")
-* Set **conf_done** to **yes** or anything except "no".
 
 **Empty configuration values are invalid!**
 
