@@ -95,6 +95,7 @@ checkports() {
 	[[ $blocked_port -eq 1 ]] && exit 1
 	if [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql -u root -p${my_rootpw} -e ""; echo $?) -ne 0 ]]; then
 		echo "$(redb [ERR]) - Cannot connect to SQL database server at ${my_dbhost} with given root password"
+		exit 1
 	elif [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql -u root -p${my_rootpw} -e ""; echo $?) -eq 0 ]]; then
 		echo "$(textb [INFO]) - Successfully connected to SQL server at ${my_dbhost}"
 		if [[ ! -z $(which mysql) ]] && [[ -z $(mysql -V | grep -i "mariadb") && $my_usemariadb == "yes" ]]; then
@@ -106,10 +107,6 @@ checkports() {
 		fi
 		mysql_useable=1
 		my_rootpw="not changed"
-	fi
-	if [[ $my_useexisting == "yes" ]] && [[ $mysql_useable != "1" ]]; then
-		echo "$(redb [ERR]) - No useable database instance found"
-		exit 1
 	fi
 }
 
