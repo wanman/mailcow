@@ -98,6 +98,7 @@ checkports() {
 		exit 1
 	elif [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql -u root -p${my_rootpw} -e ""; echo $?) -eq 0 ]]; then
 		echo "$(textb [INFO]) - Successfully connected to SQL server at ${my_dbhost}"
+		echo
 		if [[ ! -z $(which mysql) ]] && [[ -z $(mysql -V | grep -i "mariadb") && $my_usemariadb == "yes" ]]; then
 			echo "$(redb [ERR]) - Found MySQL server but \"my_usemariadb\" is \"yes\""
 			exit 1
