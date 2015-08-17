@@ -39,9 +39,6 @@ For **Debian and Debian based distributions**.
 This script is permanently **tested on Debian stable (8.x) and old-stable (7.x)**.
 Debian Squeeze is not supported.
 
-Please see https://www.debinux.de/mailcow for further information.
-Feel free to leave a comment or question.
-
 **Please see this album on imgur.com for screenshots -> http://imgur.com/a/x5IST#0**
 
 # Introduction
@@ -133,11 +130,12 @@ nano mailcow.config
 * **sys_domain** - Domain name. "$sys_hostname.$sys_domain" equals to FQDN.
 * **sys_timezone** - The timezone must be definied in a valid format (Europe/Berlin, America/New_York etc.)
 * **conf_httpd** - Select wether to use Nginx ("nginx") or Apache2 ("apache2"). Nginx is default.
-* **my_dbhost** - ADVANCED: Leave as-is ("localhost") for a local database installation.
+* **my_dbhost** - ADVANCED: Leave as-is ("localhost") for a local database installation. Anything but "localhost" or "127.0.0.1" is recognized as a remote installation.
+* **my_usemariadb** - Use MariaDB instead of MySQL. Only valid for local databases. Installer stops when MariaDB is detected, but MySQL selected - and vice versa.
 * **my_mailcowdb, my_mailcowuser, my_mailcowpass** - SQL database name, username and password for use with Postfix. **You can use the default values.**
 * **my_rcdb, my_rcuser, my_rcpass** - SQL database name, username and password for Roundcube. **You can use the default values.**
 * **my_rootpw** - SQL root password is generated automatically by default. You can define a complex password here if you want to. *Set to your current root password to use an existing SQL instance*.
-* **mailcow_admin_user and mailcow_admin_pass** - mailcow administrator. Password policy: minimum length 8 chars, must contain uppercase and lowercase letters and at least 2 digits. **You can use the default values**
+* **mailcow_admin_user and mailcow_admin_pass** - mailcow administrator. Password policy: minimum length 8 chars, must contain uppercase and lowercase letters and at least 2 digits. **You can use the default values**.
 * **"cert-" vars** - Used for the self-signed certificate. CN will be the servers FQDN. "cert_country" must be a vaild two letter country code.
 * **inst_debug** - Sets Bash mode -x
 * An unattended installation is possible, but not recommended ("inst_unattended")
