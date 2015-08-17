@@ -575,7 +575,7 @@ upgradetask() {
 	for var in conf_httpd sys_hostname sys_domain sys_timezone my_dbhost my_mailcowdb my_mailcowuser my_mailcowpass my_rcuser my_rcpass my_rcdb
 	do
 		if [[ -z ${!var} ]]; then
-			echo "$(redb [ERR]) - Could not gather required information: \"${!var}\" empty, upgrade failed..."
+			echo "$(redb [ERR]) - Could not gather required information: \"${var}\" empty, upgrade failed..."
 			echo
 			exit 1
 		fi

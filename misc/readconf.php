@@ -2,6 +2,7 @@
 error_reporting(0);
 include_once "/var/www/mail/rc/config/config.inc.php";
 include_once "/var/www/mail/inc/vars.inc.php";
+include_once "/var/www/mail/pfadmin/config.inc.php";
 include_once "/var/www/mail/pfadmin/config.local.php";
 
 if(!empty($database_user)) {
