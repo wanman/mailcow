@@ -447,19 +447,21 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			mkdir -p /var/www/mail/rc
 			tar xf roundcube/inst/${roundcube_version}.tar -C roundcube/inst/
 			cp -R roundcube/inst/${roundcube_version}/* /var/www/mail/rc/
-			cp -R roundcube/conf/* /var/www/mail/rc/
-			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/rc/plugins/password/config.inc.php
-			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/rc/plugins/password/config.inc.php
-			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/rc/plugins/password/config.inc.php
-			sed -i "s/my_dbhost/$my_dbhost/g" /var/www/mail/rc/config/config.inc.php
-			sed -i "s/my_rcuser/$my_rcuser/g" /var/www/mail/rc/config/config.inc.php
-			sed -i "s/my_rcpass/$my_rcpass/g" /var/www/mail/rc/config/config.inc.php
-			sed -i "s/my_rcdb/$my_rcdb/g" /var/www/mail/rc/config/config.inc.php
-			conf_rcdeskey=$(genpasswd)
-			sed -i "s/conf_rcdeskey/$conf_rcdeskey/g" /var/www/mail/rc/config/config.inc.php
-			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /var/www/mail/rc/config/config.inc.php
-			if [[ $(mysql -u ${my_rcuser} -p${my_rcpass} ${my_rcdb} -s -N -e "SHOW TABLES;" | wc -l) -lt 5 ]]; then
+			if [[ $my_upgradetask != "yes" ]]; then
+				cp -R roundcube/conf/* /var/www/mail/rc/
+				sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/rc/plugins/password/config.inc.php
+				sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/rc/plugins/password/config.inc.php
+				sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/rc/plugins/password/config.inc.php
+				sed -i "s/my_dbhost/$my_dbhost/g" /var/www/mail/rc/config/config.inc.php
+				sed -i "s/my_rcuser/$my_rcuser/g" /var/www/mail/rc/config/config.inc.php
+				sed -i "s/my_rcpass/$my_rcpass/g" /var/www/mail/rc/config/config.inc.php
+				sed -i "s/my_rcdb/$my_rcdb/g" /var/www/mail/rc/config/config.inc.php
+				sed -i "s/conf_rcdeskey/$(genpasswd)/g" /var/www/mail/rc/config/config.inc.php
+				sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /var/www/mail/rc/config/config.inc.php
 				mysql -u ${my_rcuser} -p${my_rcpass} ${my_rcdb} < /var/www/mail/rc/SQL/mysql.initial.sql
+			else
+				chmod +x roundcube/inst/${roundcube_version}/bin/installto.sh
+				roundcube/inst/${roundcube_version}/bin/installto.sh /var/www/mail/rc
 			fi
 			if [[ ! -d /var/www/mail/rc/plugins/carddav ]]; then
 				wget --quiet https://codeload.github.com/blind-coder/rcmcarddav/zip/master -O /tmp/master.zip && unzip -o /tmp/master.zip -d /var/www/mail/rc/plugins/ > /dev/null
@@ -478,8 +480,8 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			rm -rf roundcube/inst/${roundcube_version}
 			rm -rf /var/www/mail/rc/installer/
 			;;
-        rsyslogd)
-            if [[ -d /etc/rsyslog.d ]]; then
+		rsyslogd)
+			if [[ -d /etc/rsyslog.d ]]; then
 				rm /etc/rsyslog.d/10-fufix > /dev/null 2>&1
 				cp rsyslog/conf/10-mailcow /etc/rsyslog.d/
 				service rsyslog restart > /dev/null 2>&1
@@ -645,12 +647,6 @@ A backup will be stored in ./before_upgrade_$timestamp
 	returnwait "Webserver configuration" "Roundcube configuration"
 
 	installtask roundcube
-	# y not use the update tool of roundcube?
-	# saves user configuration and plugins/skins
-	# TODO: err, if already up2date
-	tar xf roundcube/inst/${roundcube_version}.tar -C roundcube/inst/
-	chmod +x roundcube/inst/${roundcube_version}/bin/installto.sh
-	roundcube/inst/${roundcube_version}/bin/installto.sh /var/www/mail/rc
 	returnwait "Roundcube configuration" "OpenDKIM configuration"
 
 	installtask opendkim
