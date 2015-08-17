@@ -107,7 +107,6 @@ checkports() {
 			exit 1
 		fi
 		mysql_useable=1
-		my_rootpw="not changed"
 	fi
 }
 
