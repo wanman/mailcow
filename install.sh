@@ -38,7 +38,6 @@ echo "    $(textb "Hostname")            $sys_hostname
     $(textb "mailcow MySQL")       ${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}/${my_mailcowdb}
     $(textb "Roundcube MySQL")     ${my_rcuser}:${my_rcpass}@${my_dbhost}/${my_rcdb}
     $(textb "mailcow admin user")  ${mailcow_admin_user}
-
 "
 
 returnwait "Reading configuration" "System environment"
