@@ -125,7 +125,7 @@ checkconfig() {
 		echo "$(redb [ERR]) - Unable to install Apache 2.4, please use Nginx or upgrade your distribution"
 		exit 1
 	fi
-	for var in sys_hostname sys_domain sys_timezone my_dbhost my_defaultsfile my_mailcowdb my_mailcowuser my_mailcowpass my_rootpw my_rcuser my_rcpass my_rcdb mailcow_admin_user mailcow_admin_pass cert_country cert_state cert_city cert_org
+	for var in sys_hostname sys_domain sys_timezone my_dbhost my_mailcowdb my_mailcowuser my_mailcowpass my_rootpw my_rcuser my_rcpass my_rcdb mailcow_admin_user mailcow_admin_pass cert_country cert_state cert_city cert_org
 	do
 		if [[ -z ${!var} ]]; then
 			echo "$(redb [ERR]) - Parameter $var must not be empty."
