@@ -93,6 +93,10 @@ checkports() {
 		fi
 	done
 	[[ $blocked_port -eq 1 ]] && exit 1
+	if [[ -z $(which mysql) ]];then
+		echo "$(textb [INFO]) - Installing prerequisites for port checks"
+		apt-get -y update > /dev/null ; apt-get -y install mysql-client > /dev/null 2>&1
+	fi
 	if [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql -u root -p${my_rootpw} -e ""; echo $?) -ne 0 ]]; then
 		echo "$(redb [ERR]) - Cannot connect to SQL database server at ${my_dbhost} with given root password"
 		exit 1
@@ -191,7 +195,7 @@ EOF
 			;;
 		installpackages)
 			echo "$(textb [INFO]) - Installing prerequisites..."
-			apt-get -y update > /dev/null ; apt-get -y install lsb-release whiptail apt-utils ssl-cert mysql-client > /dev/null 2>&1
+			apt-get -y update > /dev/null ; apt-get -y install lsb-release whiptail apt-utils ssl-cert > /dev/null 2>&1
         		dist_codename=$(lsb_release -cs)
 			dist_id=$(lsb_release -is)
 			if [[ $dist_id == "Debian" ]]; then
