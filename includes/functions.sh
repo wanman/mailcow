@@ -191,7 +191,7 @@ EOF
 			;;
 		installpackages)
 			echo "$(textb [INFO]) - Installing prerequisites..."
-			apt-get -y update > /dev/null ; apt-get -y install lsb-release whiptail apt-utils ssl-cert > /dev/null 2>&1
+			apt-get -y update > /dev/null ; apt-get -y install lsb-release whiptail apt-utils ssl-cert mysql-client > /dev/null 2>&1
         		dist_codename=$(lsb_release -cs)
 			dist_id=$(lsb_release -is)
 			if [[ $dist_id == "Debian" ]]; then
