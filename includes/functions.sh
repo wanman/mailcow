@@ -102,7 +102,7 @@ checkports() {
 		exit 1
 	elif [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --host ${my_dbhost} -u root -p${my_rootpw} -e ""; echo $?) -eq 0 ]]; then
 		if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "SHOW GRANTS" | grep "WITH GRANT OPTION") ]]; then
-			echo "$(redb [ERR]) - Missing GRANT OPTION"
+			echo "$(redb [ERR]) - SQL root user is missing GRANT OPTION"
 			exit 1
 		fi
 		echo "$(textb [INFO]) - Successfully connected to SQL server at ${my_dbhost}"
