@@ -1,7 +1,7 @@
 # mysql_virtual_mailbox_maps.cf
 user = my_mailcowuser
 password = my_mailcowpass
-hosts = localhost
+hosts = my_dbhost
 dbname = my_mailcowdb
 query           = SELECT maildir FROM mailbox WHERE username='%s' AND active = '1'
 #expansion_limit = 100

@@ -301,6 +301,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /etc/postfix/sql/*
 			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /etc/postfix/sql/*
 			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /etc/postfix/sql/*
+			sed -i "s/my_dbhost/$my_dbhost/g" /etc/postfix/sql/*
 			postmap /etc/postfix/mailcow_sender_access
 			chown www-data: /etc/postfix/mailcow_*
 			chmod 755 /var/spool/
@@ -327,6 +328,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /etc/dovecot/*
 			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /etc/dovecot/*
 			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /etc/dovecot/*
+			sed -i "s/my_dbhost/$my_dbhost/g" /etc/dovecot/*
 			mkdir /etc/dovecot/conf.d 2> /dev/null
 			mkdir -p /var/vmail/sieve 2> /dev/null
 			mkdir -p /var/vmail/public 2> /dev/null
