@@ -101,6 +101,10 @@ checkports() {
 		echo "$(redb [ERR]) - Cannot connect to SQL database server at ${my_dbhost} with given root password"
 		exit 1
 	elif [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --host ${my_dbhost} -u root -p${my_rootpw} -e ""; echo $?) -eq 0 ]]; then
+		if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "SHOW GRANTS" | grep "WITH GRANT OPTION") ]]; then
+			echo "$(redb [ERR]) - Missing GRANT OPTION"
+			exit 1
+		fi
 		echo "$(textb [INFO]) - Successfully connected to SQL server at ${my_dbhost}"
 		echo
 		if [[ $my_dbhost == "localhost" || $my_dbhost == "127.0.0.1" ]] && [[ -z $(mysql -V | grep -i "mariadb") && $my_usemariadb == "yes" ]]; then
@@ -276,9 +280,9 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 				mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "UPDATE mysql.user SET Password=PASSWORD('$my_rootpw') WHERE USER='root'; FLUSH PRIVILEGES;"
 			fi
 			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "DROP DATABASE IF EXISTS $my_mailcowdb; DROP DATABASE IF EXISTS $my_rcdb;"
-			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "CREATE DATABASE $my_mailcowdb; GRANT ALL PRIVILEGES ON $my_mailcowdb.* TO '$my_mailcowuser'@'localhost' IDENTIFIED BY '$my_mailcowpass';"
-			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'localhost' IDENTIFIED BY '$my_rcpass';"
-			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "GRANT SELECT ON $my_mailcowdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
+			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "CREATE DATABASE $my_mailcowdb; GRANT ALL PRIVILEGES ON $my_mailcowdb.* TO '$my_mailcowuser'@'%' IDENTIFIED BY '$my_mailcowpass';"
+			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'%' IDENTIFIED BY '$my_rcpass';"
+			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "GRANT SELECT ON $my_mailcowdb.* TO 'vmail'@'%'; FLUSH PRIVILEGES;"
 			;;
 		postfix)
 			cp -R postfix/conf/* /etc/postfix/
