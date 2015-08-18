@@ -97,16 +97,16 @@ checkports() {
 		echo "$(textb [INFO]) - Installing prerequisites for port checks"
 		apt-get -y update > /dev/null ; apt-get -y install mysql-client > /dev/null 2>&1
 	fi
-	if [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql -u root -p${my_rootpw} -e ""; echo $?) -ne 0 ]]; then
+	if [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --host ${my_dbhost} -u root -p${my_rootpw} -e ""; echo $?) -ne 0 ]]; then
 		echo "$(redb [ERR]) - Cannot connect to SQL database server at ${my_dbhost} with given root password"
 		exit 1
-	elif [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql -u root -p${my_rootpw} -e ""; echo $?) -eq 0 ]]; then
+	elif [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --host ${my_dbhost} -u root -p${my_rootpw} -e ""; echo $?) -eq 0 ]]; then
 		echo "$(textb [INFO]) - Successfully connected to SQL server at ${my_dbhost}"
 		echo
-		if [[ ! -z $(which mysql) ]] && [[ -z $(mysql -V | grep -i "mariadb") && $my_usemariadb == "yes" ]]; then
+		if [[ $my_dbhost == "localhost" || $my_dbhost == "127.0.0.1" ]] && [[ -z $(mysql -V | grep -i "mariadb") && $my_usemariadb == "yes" ]]; then
 			echo "$(redb [ERR]) - Found MySQL server but \"my_usemariadb\" is \"yes\""
 			exit 1
-		elif [[ ! -z $(which mysql) ]] && [[ ! -z $(mysql -V | grep -i "mariadb") && $my_usemariadb != "yes" ]]; then
+		elif [[ $my_dbhost == "localhost" || $my_dbhost == "127.0.0.1" ]] && [[ ! -z $(mysql -V | grep -i "mariadb") && $my_usemariadb != "yes" ]]; then
 			echo "$(redb [ERR]) - Found MariaDB server but \"my_usemariadb\" is not \"yes\""
 			exit 1
 		fi
@@ -273,12 +273,12 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		mysql)
 			if [[ $mysql_useable -ne 1 ]]; then
-				mysql -u root -p${my_rootpw} -e "UPDATE mysql.user SET Password=PASSWORD('$my_rootpw') WHERE USER='root'; FLUSH PRIVILEGES;"
+				mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "UPDATE mysql.user SET Password=PASSWORD('$my_rootpw') WHERE USER='root'; FLUSH PRIVILEGES;"
 			fi
-			mysql -u root -p${my_rootpw} -e "DROP DATABASE IF EXISTS $my_mailcowdb; DROP DATABASE IF EXISTS $my_rcdb;"
-			mysql -u root -p${my_rootpw} -e "CREATE DATABASE $my_mailcowdb; GRANT ALL PRIVILEGES ON $my_mailcowdb.* TO '$my_mailcowuser'@'localhost' IDENTIFIED BY '$my_mailcowpass';"
-			mysql -u root -p${my_rootpw} -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'localhost' IDENTIFIED BY '$my_rcpass';"
-			mysql -u root -p${my_rootpw} -e "GRANT SELECT ON $my_mailcowdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
+			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "DROP DATABASE IF EXISTS $my_mailcowdb; DROP DATABASE IF EXISTS $my_rcdb;"
+			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "CREATE DATABASE $my_mailcowdb; GRANT ALL PRIVILEGES ON $my_mailcowdb.* TO '$my_mailcowuser'@'localhost' IDENTIFIED BY '$my_mailcowpass';"
+			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'localhost' IDENTIFIED BY '$my_rcpass';"
+			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "GRANT SELECT ON $my_mailcowdb.* TO 'vmail'@'localhost'; FLUSH PRIVILEGES;"
 			;;
 		postfix)
 			cp -R postfix/conf/* /etc/postfix/
@@ -425,14 +425,14 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
 			chown -R www-data: /var/www/{mail,dav,VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE,MAILBOX_BACKUP} /var/lib/php5/sessions
 			chown www-data: /var/www/
-			mysql -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} < webserver/htdocs/init.sql
-			if [[ -z $(mysql -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} -e "SHOW INDEX FROM propertystorage WHERE KEY_NAME = 'path_property';" -N -B) ]]; then
-				mysql -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} -e "CREATE UNIQUE INDEX path_property ON propertystorage (path(600), name(100));" -N -B
+			mysql --host -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} < webserver/htdocs/init.sql
+			if [[ -z $(mysql --host -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} -e "SHOW INDEX FROM propertystorage WHERE KEY_NAME = 'path_property';" -N -B) ]]; then
+				mysql --host -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} -e "CREATE UNIQUE INDEX path_property ON propertystorage (path(600), name(100));" -N -B
 			fi
-			if [[ $(mysql -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} -s -N -e "SELECT * FROM admin;" | wc -l) -lt 1 ]]; then
+			if [[ $(mysql --host -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} -s -N -e "SELECT * FROM admin;" | wc -l) -lt 1 ]]; then
 				mailcow_admin_pass_hashed=$(doveadm pw -s SHA512-CRYPT -p $mailcow_admin_pass)
-				mysql -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} -e "INSERT INTO admin VALUES ('$mailcow_admin_user','$mailcow_admin_pass_hashed',1,now(),now(),1);"
-				mysql -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} -e "INSERT INTO domain_admins (username, domain, created, active) VALUES ('$mailcow_admin_user', 'ALL', now(), '1');"
+				mysql --host -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} -e "INSERT INTO admin VALUES ('$mailcow_admin_user','$mailcow_admin_pass_hashed',1,now(),now(),1);"
+				mysql --host -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} -e "INSERT INTO domain_admins (username, domain, created, active) VALUES ('$mailcow_admin_user', 'ALL', now(), '1');"
 			else
 				echo "$(textb [INFO]) - At least one administrator exists, will not create another mailcow administrator"
 			fi
@@ -459,7 +459,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				sed -i "s/my_rcdb/$my_rcdb/g" /var/www/mail/rc/config/config.inc.php
 				sed -i "s/conf_rcdeskey/$(genpasswd)/g" /var/www/mail/rc/config/config.inc.php
 				sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /var/www/mail/rc/config/config.inc.php
-				mysql -u ${my_rcuser} -p${my_rcpass} ${my_rcdb} < /var/www/mail/rc/SQL/mysql.initial.sql
+				mysql --host -u ${my_rcuser} -p${my_rcpass} ${my_rcdb} < /var/www/mail/rc/SQL/mysql.initial.sql
 			else
 				chmod +x roundcube/inst/${roundcube_version}/bin/installto.sh
 				roundcube/inst/${roundcube_version}/bin/installto.sh /var/www/mail/rc
@@ -475,7 +475,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				(instcarddav > /dev/null 2>&1)
 				cp /var/www/mail/rc/plugins/carddav/skins/larry/carddav.css /var/www/mail/rc/skins/larry/
 				mv /var/www/mail/rc/plugins/carddav/{config.inc.php.dist,config.inc.php}
-				mysql -u ${my_rcuser} -p${my_rcpass} ${my_rcdb} < /var/www/mail/rc/plugins/carddav/dbinit/mysql.sql
+				mysql --host -u ${my_rcuser} -p${my_rcpass} ${my_rcdb} < /var/www/mail/rc/plugins/carddav/dbinit/mysql.sql
 			fi
 			chown -R www-data: /var/www/
 			rm -rf roundcube/inst/${roundcube_version}
