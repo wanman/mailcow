@@ -521,7 +521,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			;;
 		restartservices)
 			[[ -f /lib/systemd/systemd ]] && echo "$(textb [INFO]) - Restarting services, this may take a few seconds..."
-			for var in fail2ban rsyslog ${conf_httpd} php5-fpm spamassassin mysql dovecot postfix opendkim clamav-daemon
+			for var in fail2ban rsyslog ${conf_httpd} php5-fpm spamassassin dovecot postfix opendkim clamav-daemon
 			do
 				service $var stop
 				sleep 1.5
