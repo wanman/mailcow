@@ -89,6 +89,8 @@ rm -rf /etc/spamassassin/
 rm -rf /etc/dovecot/
 rm -rf /etc/postfix/
 rm -rf /etc/fail2ban/
+rm -f /etc/fufix_version
+rm -f /etc/mailcow_version
 rm -rf /etc/mail/postfixadmin
 rm -rf /var/www/mail
 rm -rf /var/run/fetchmail
