@@ -10,6 +10,9 @@ else {
 }
 require_once "inc/vars.inc.php";
 $link = mysqli_connect($database_host, $database_user, $database_pass, $database_name);
+if (!$link) {
+    die('Could not connect to SQL');
+}
 require_once "inc/functions.inc.php";
 require_once "inc/triggers.inc.php";
 ?>
