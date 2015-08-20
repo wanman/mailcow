@@ -329,7 +329,7 @@ while ($row = mysqli_fetch_array($result)) {
 	<?php
 	}
 	elseif (isset($_GET['editdomain'])) {
-		if (!ctype_alnum(str_replace(array('.', '-'), '', $_GET["editdomain"])) || empty($_GET["editdomain"])) { 
+		if (!filter_var($_GET["editdomain"], FILTER_VALIDATE_DOMAIN) || empty($_GET["editdomain"])) {
 			echo 'Your provided domain name is invalid.';
 		}
 		else {
@@ -456,7 +456,7 @@ while ($row = mysqli_fetch_array($result)) {
 		}
 	}
 	elseif (isset($_GET["deletedomain"])) {
-		if(!ctype_alnum(str_replace(array('.', '-'), '', $_GET["deletedomain"])) || empty($_GET["deletedomain"])) { 
+		if(!filter_var($_GET["deletedomain"], FILTER_VALIDATE_DOMAIN) || empty($_GET["deletedomain"])) {
 			echo 'Your provided domain name is invalid.';
 		}
 		else {
@@ -517,7 +517,7 @@ while ($row = mysqli_fetch_array($result)) {
 		}
 	}
 	elseif (isset($_GET["deletealiasdomain"])) {
-		if (!ctype_alnum(str_replace(array('.', '-'), '', $_GET["deletealiasdomain"])) || empty($_GET["deletealiasdomain"])) {
+		if (!filter_var($_GET["deletealiasdomain"], FILTER_VALIDATE_DOMAIN) || empty($_GET["deletealiasdomain"])) {
 			header("Location: do.php?event=".base64_encode("Alias domain name invalid"));
 			die("Alias domain name invalid");
 		}
