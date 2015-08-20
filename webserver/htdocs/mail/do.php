@@ -207,7 +207,7 @@ while ($row = mysqli_fetch_array($result)) {
 				</form>
 <?php }
 	elseif (isset($_GET['editdomainadmin'])) {
-		if (!ctype_alnum(str_replace(array('@', '.'), '', $_GET["editdomainadmin"])) || empty($_GET["editdomainadmin"])) { 
+		if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $_GET["editdomainadmin"])) || empty($_GET["editdomainadmin"])) {
 			echo 'Your provided domain administrator username is invalid.';
 		}
 		else {
@@ -399,7 +399,7 @@ while ($row = mysqli_fetch_array($result)) {
 		}
 	}
 	elseif (isset($_GET['editmailbox'])) {
-		if (!ctype_alnum(str_replace(array('.', '@'), '', $_GET["editmailbox"])) || empty($_GET["editmailbox"])) { 
+		if (!filter_var($_GET["editmailbox"], FILTER_VALIDATE_EMAIL) || empty($_GET["editmailbox"])) {
 			echo 'Your provided mailbox name is invalid.';
 		}
 		else {
