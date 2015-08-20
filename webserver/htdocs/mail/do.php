@@ -329,7 +329,7 @@ while ($row = mysqli_fetch_array($result)) {
 	<?php
 	}
 	elseif (isset($_GET['editdomain'])) {
-		if (!ctype_alnum(str_replace('.', '', $_GET["editdomain"])) || empty($_GET["editdomain"])) { 
+		if (!ctype_alnum(str_replace(array('.', '-'), '', $_GET["editdomain"])) || empty($_GET["editdomain"])) { 
 			echo 'Your provided domain name is invalid.';
 		}
 		else {
@@ -456,7 +456,7 @@ while ($row = mysqli_fetch_array($result)) {
 		}
 	}
 	elseif (isset($_GET["deletedomain"])) {
-		if(!ctype_alnum(str_replace(".", '', $_GET["deletedomain"])) || empty($_GET["deletedomain"])) { 
+		if(!ctype_alnum(str_replace(array('.', '-'), '', $_GET["deletedomain"])) || empty($_GET["deletedomain"])) { 
 			echo 'Your provided domain name is invalid.';
 		}
 		else {
@@ -573,7 +573,7 @@ while ($row = mysqli_fetch_array($result)) {
 	elseif (isset($_GET["deletemailbox"])) {
 		if (!filter_var($_GET["deletemailbox"], FILTER_VALIDATE_EMAIL)) {
 			header("Location: do.php?event=".base64_encode("Your provided mailbox name is invalid"));
-			die("Your provided alias name is invalid"); 
+			die("Your provided alias name is invalid");
 		}
 		else {
 			$deletemailbox = mysqli_real_escape_string($link, $_GET["deletemailbox"]);
