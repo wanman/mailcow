@@ -293,15 +293,18 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown root:postfix "/etc/postfix/sql/mysql_virtual_mailbox_limit_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_mailbox_limit_maps.cf"
 			chown root:postfix "/etc/postfix/sql/mysql_virtual_mailbox_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_mailbox_maps.cf"
 			chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_maps.cf"
+			chown root:postfix "/etc/postfix/sql/mysql_virtual_spamalias_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_spamalias_maps.cf"
 			chown root:postfix "/etc/postfix/sql/mysql_virtual_domains_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_domains_maps.cf"
 			chown root:root "/etc/postfix/master.cf"; chmod 644 "/etc/postfix/master.cf"
 			chown root:root "/etc/postfix/main.cf"; chmod 644 "/etc/postfix/main.cf"
 			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /etc/postfix/* 2> /dev/null
+			cp misc/clean_spam_aliases /etc/cron.daily/clean_spam_aliases
+			chmod 700 /etc/cron.daily/clean_spam_aliases
 			sed -i "s/MAILCOW_DOMAIN/${sys_domain}/g" /etc/postfix/* 2> /dev/null
-			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /etc/postfix/sql/*
-			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /etc/postfix/sql/*
-			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /etc/postfix/sql/*
-			sed -i "s/my_dbhost/$my_dbhost/g" /etc/postfix/sql/*
+			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /etc/postfix/sql/* /etc/cron.daily/clean_spam_aliases
+			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /etc/postfix/sql/* /etc/cron.daily/clean_spam_aliases
+			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /etc/postfix/sql/* /etc/cron.daily/clean_spam_aliases
+			sed -i "s/my_dbhost/$my_dbhost/g" /etc/postfix/sql/* /etc/cron.daily/clean_spam_aliases
 			postmap /etc/postfix/mailcow_sender_access
 			chown www-data: /etc/postfix/mailcow_*
 			chmod 755 /var/spool/
