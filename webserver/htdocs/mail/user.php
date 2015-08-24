@@ -53,7 +53,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 	</thead>
 	<tbody>
 <?php
-$result = mysqli_query($link, "SELECT address, goto, TIMEDIFF(validity, NOW()) as timeleft, validity FROM spamalias WHERE goto='$logged_in_as' AND validity >= NOW()");
+$result = mysqli_query($link, "SELECT address, goto, TIMEDIFF(validity, NOW()) as timeleft, validity FROM spamalias WHERE goto='$logged_in_as' AND validity >= NOW() ORDER BY timeleft ASC");
 while ($row = mysqli_fetch_array($result)) {
 echo "<tr>
 <td>", $row['address'], "</td>
