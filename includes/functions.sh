@@ -552,7 +552,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 	esac
 }
 upgradetask() {
-	if [[ ! -f /etc/mailcow_version ]]; then
+	if [[ ! -f /etc/mailcow_version && ! -f /etc/fufix_version ]]; then
 		echo "$(redb [ERR]) - mailcow is not installed"
 		exit 1
 	fi
