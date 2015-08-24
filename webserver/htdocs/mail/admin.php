@@ -499,7 +499,7 @@ mysql --defaults-file=/etc/mysql/debian.cnf mailcow_database_name -e "SELECT uri
 </div>
 
 <?php
-} 
+}
 elseif (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "domainadmin") {
 header('Location: mailbox.php');
 die("Permission denied");

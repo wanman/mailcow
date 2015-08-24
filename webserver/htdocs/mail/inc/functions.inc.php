@@ -29,6 +29,7 @@ function check_login($link, $user, $pass) {
 	session_destroy();
 	session_write_close();
 	setcookie(session_name(),'',0,'/');
+	sleep(1);
 	return false;
 }
 function formatBytes($size, $precision = 2) {
@@ -713,7 +714,7 @@ function mailbox_edit_domain($link, $postarray) {
 	$mystring = "UPDATE domain SET modified=now(), backupmx='$backupmx', active='$active', quota='$quota', maxquota='$maxquota', mailboxes='$mailboxes', aliases='$aliases', description='$description' WHERE domain='$domain'";
 	if (!mysqli_query($link, $mystring)) {
 		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed"); 
+		die("MySQL query failed");
 	}
 	header('Location: do.php?return=success');
 }
@@ -738,7 +739,7 @@ function mailbox_edit_domainadmin($link, $postarray) {
 	$mystring = "DELETE FROM domain_admins WHERE username='$username'";
 	if (!mysqli_query($link, $mystring)) {
 		header("Location: do.php?event=".base64_encode("MySQL query failed"));
-		die("MySQL query failed"); 
+		die("MySQL query failed");
 	}
 	foreach ($_POST['domain'] as $domain) {
 		$mystring = "INSERT INTO domain_admins (username, domain, created, active) VALUES ('$username', '$domain', now(), '$active')";
@@ -974,12 +975,56 @@ function set_admin_account($link, $postarray) {
 	}
 	header('Location: do.php?return=success');
 }
+function set_time_limited_aliases($link, $postarray) {
+	global $logged_in_as;
+	$domain = substr($logged_in_as, strpos($logged_in_as, '@'));
+	if ($_SESSION['mailcow_cc_role'] != "user" || empty($logged_in_as) || empty($domain)) {
+		header("Location: do.php?event=".base64_encode("Permission denied"));
+		die("Permission denied");
+	}
+	switch ($_POST["action"]) {
+		case "generate":
+			$hours = array(1, 4, 12, 24, 48);
+			$mystring = "";
+			foreach ($hours as $i) {
+				$mystring .= "INSERT INTO spamalias (address, goto, validity) VALUES (CONCAT(SUBSTRING(MD5(RAND()) FROM 1 FOR 12), '$domain'), '$logged_in_as', DATE_ADD(NOW(), INTERVAL $i HOUR));";
+			}
+			if (!mysqli_multi_query($link, $mystring)) {
+				header("Location: do.php?event=".base64_encode(mysqli_error($link)));
+				die("MySQL query failed");
+			}
+			while ($link->next_result()) {
+				if (!$link->more_results()) break;
+			}
+			header('Location: do.php?return=success');
+		break;
+		case "delete":
+			$mystring = "DELETE FROM spamalias WHERE goto='$logged_in_as'";
+			if (!mysqli_query($link, $mystring)) {
+				header("Location: do.php?event=".base64_encode(mysqli_error($link)));
+				die("MySQL query failed");
+			}
+			header('Location: do.php?return=success');
+		break;
+		case "extend":
+			$mystring = "UPDATE spamalias SET validity=DATE_ADD(validity, INTERVAL 1 HOUR) WHERE goto='$logged_in_as' AND validity >= NOW()";
+			if (!mysqli_query($link, $mystring)) {
+				header("Location: do.php?event=".base64_encode(mysqli_error($link)));
+				die("MySQL query failed");
+			}
+			header('Location: do.php?return=success');
+		break;
+		default:
+			header("Location: do.php?event=".base64_encode("Permission denied"));
+			die("Permission denied");
+	}
+}
 function set_user_account($link, $postarray) {
 	$name_now = mysqli_real_escape_string($link, $_POST['user_now']);
 	$password_old = mysqli_real_escape_string($link, $_POST['user_old_pass']);
 	$password_new = mysqli_real_escape_string($link, $_POST['user_new_pass']);
-	$password_new2 = mysqli_real_escape_string($link, $_POST['user_new_pass']);
-	
+	$password_new2 = mysqli_real_escape_string($link, $_POST['user_new_pass2']);
+
 	if ($_SESSION['mailcow_cc_role'] != "user") {
 		header("Location: do.php?event=".base64_encode("Permission denied"));
 		die("Permission denied");
@@ -995,13 +1040,13 @@ function set_user_account($link, $postarray) {
 		}
 		if (!check_login($link, $name_now, $password_old) == "user") {
 			header("Location: do.php?event=".base64_encode("Current password incorrect"));
-			die("Current password incorrect");	
+			die("Current password incorrect");
 		}
 		$prep_password = escapeshellcmd($password_new);
 		exec("/usr/bin/doveadm pw -s SHA512-CRYPT -p $prep_password", $hash, $return);
 		if ($return != "0") {
 			header("Location: do.php?event=".base64_encode("Error creating password hash"));
-			die("Error creating password hash");	
+			die("Error creating password hash");
 		}
 		$password_sha512c = $hash[0];
 		$update_user = "UPDATE mailbox SET password='$password_sha512c' WHERE username='$name_now';";
@@ -1136,12 +1181,12 @@ function add_domain_admin($link, $postarray) {
 		$mystring = "DELETE FROM domain_admins WHERE username='$username'";
 		if (!mysqli_query($link, $mystring)) {
 			header("Location: do.php?event=".base64_encode("MySQL query failed"));
-			die("MySQL query failed"); 
+			die("MySQL query failed");
 		}
 		$mystring = "DELETE FROM admin WHERE username='$username'";
 		if (!mysqli_query($link, $mystring)) {
 			header("Location: do.php?event=".base64_encode("MySQL query failed"));
-			die("MySQL query failed"); 
+			die("MySQL query failed");
 		}
 		foreach ($_POST['domain'] as $domain) {
 			$mystring = "INSERT INTO domain_admins (username, domain, created, active) VALUES ('$username', '$domain', now(), '$active')";

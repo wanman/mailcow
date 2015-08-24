@@ -157,6 +157,13 @@ CREATE TABLE IF NOT EXISTS `alias` (
   KEY `domain` (`domain`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+CREATE TABLE IF NOT EXISTS `spamalias` (
+  `address` varchar(255) NOT NULL,
+  `goto` text NOT NULL,
+  `validity` datetime NOT NULL,
+  PRIMARY KEY (`address`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 CREATE TABLE IF NOT EXISTS `alias_domain` (
   `alias_domain` varchar(255) NOT NULL,
   `target_domain` varchar(255) NOT NULL,

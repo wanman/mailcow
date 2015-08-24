@@ -28,11 +28,52 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 		<input type="password" class="form-control" name="user_new_pass2" id="user_new_pass2" required>
 		</div>
 	</div>
-	<div class="form-group">        
+	<div class="form-group">
 		<div class="col-sm-offset-3 col-sm-9">
 			<button type="submit" class="btn btn-default btn-raised btn-sm">Change password</button>
 		</div>
 	</div>
+</form>
+</div>
+</div>
+
+<div class="panel panel-default">
+<div class="panel-heading">Generate time-limited aliases</div>
+<div class="panel-body">
+<form class="form-horizontal" role="form" method="post">
+<input type="hidden" name="mailboxaction" value="timelimitedaliases">
+<div class="table-responsive">
+<table class="table table-striped" id="timelimitedaliases">
+	<thead>
+	<tr>
+		<th>Alias</th>
+		<th>Valid until</th>
+		<th>Time left (HH:MM:SS)</th>
+	</tr>
+	</thead>
+	<tbody>
+<?php
+$result = mysqli_query($link, "SELECT address, goto, TIMEDIFF(validity, NOW()) as timeleft, validity FROM spamalias WHERE goto='$logged_in_as' AND validity >= NOW()");
+while ($row = mysqli_fetch_array($result)) {
+echo "<tr>
+<td>", $row['address'], "</td>
+<td>", $row['validity'], "</td>
+<td>", $row['timeleft'], "</td>
+</tr>";
+}
+?>
+	</tbody>
+</table>
+</div>
+<p>
+	<div class="form-group">
+		<div class="col-sm-9">
+			<button type="submit" name="action" value="generate" class="btn btn-success btn-sm">Generate random aliases</button>
+			<button type="submit" name="action" value="delete" class="btn btn-danger btn-sm">Delete all aliases</button>
+			<button type="submit" name="action" value="extend" class="btn btn-default btn-sm">Add 1 hour to all aliases</button>
+		</div>
+	</div>
+</p>
 </form>
 </div>
 </div>

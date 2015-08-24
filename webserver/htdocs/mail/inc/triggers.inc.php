@@ -100,6 +100,9 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 			case "addfetchmail":
 				set_fetch_mail($link, $_POST);
 			break;
+			case "timelimitedaliases":
+				set_time_limited_aliases($link, $_POST);
+			break;
 		}
 	}
 }

@@ -145,6 +145,7 @@ virtual_mailbox_domains = proxy:mysql:/etc/postfix/sql/mysql_virtual_domains_map
 # Alias specific mail addresses or domains to other local or remote address.
 virtual_alias_maps =
    proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_maps.cf,
+   proxy:mysql:/etc/postfix/sql/mysql_virtual_spamalias_maps.cf,
    proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_domain_maps.cf,
    proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf
 
