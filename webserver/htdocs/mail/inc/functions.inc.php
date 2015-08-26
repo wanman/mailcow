@@ -835,7 +835,8 @@ function mailbox_delete_domain($link, $postarray) {
 		die("Domain name invalid");
 	}
 	$mystring = "SELECT username FROM mailbox WHERE domain='$domain';";
-	if (!mysqli_query($link, $mystring) || !empty(mysqli_result(mysqli_query($link, $mystring)))) {
+	$myresult = mysqli_result(mysqli_query($link, $mystring));
+	if (!mysqli_query($link, $mystring) || !empty($myresult)) {
 		header("Location: do.php?event=".base64_encode("Domain is not empty! Please delete mailboxes first."));
 		die("Domain is not empty! Please delete mailboxes first.");
 	}
