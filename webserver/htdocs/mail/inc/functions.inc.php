@@ -400,7 +400,7 @@ function mailbox_add_domain($link, $postarray) {
 	}
 	if (isset($postarray['active']) && $postarray['active'] == "on") { $active = "1"; } else { $active = "0"; }
 	if (isset($postarray['backupmx']) && $postarray['backupmx'] == "on") { $backupmx = "1"; } else { $backupmx = "0"; }
-	if (!ctype_alnum(str_replace(array('.', '-'), '', $domain))) {
+	if (!is_valid_domain_name($domain)) {
 		header("Location: do.php?event=".base64_encode("Domain name invalid"));
 		die("Domain name invalid");
 	}
@@ -484,11 +484,11 @@ function mailbox_add_alias_domain($link, $postarray) {
 		die("Permission denied");
 	}
 	if (isset($_POST['active']) && $_POST['active'] == "on") { $active = "1"; } else { $active = "0"; }
-	if (!ctype_alnum(str_replace(array('.', '-'), '', $alias_domain)) || empty ($alias_domain)) {
+	if (!is_valid_domain_name($alias_domain) || empty ($alias_domain)) {
 		header("Location: do.php?event=".base64_encode("Alias domain name invalid"));
 		die("Alias domain name invalid");
 	}
-	if (!ctype_alnum(str_replace(array('.', '-'), '', $target_domain)) || empty ($target_domain)) {
+	if (!is_valid_domain_name($target_domain) || empty ($target_domain)) {
 		header("Location: do.php?event=".base64_encode("Target domain name invalid"));
 		die("Target domain name invalid");
 	}
@@ -542,7 +542,7 @@ function mailbox_add_mailbox($link, $postarray) {
 		header("Location: do.php?event=".base64_encode("Permission denied"));
 		die("Permission denied");
 	}
-	if (!ctype_alnum(str_replace(array('.', '-'), '', $domain)) || empty ($domain)) {
+	if (!is_valid_domain_name($domain) || empty ($domain)) {
 		header("Location: do.php?event=".base64_encode("Domain name invalid"));
 		die("Domain name invalid");
 	}
@@ -550,7 +550,7 @@ function mailbox_add_mailbox($link, $postarray) {
 		header("Location: do.php?event=".base64_encode("Mailbox alias must be alphanumeric"));
 		die("Mailbox alias must be alphanumeric");
 	}
-	if (!is_numeric($quota_m)) { 
+	if (!is_numeric($quota_m)) {
 		header("Location: do.php?event=".base64_encode("Quota is not numeric"));
 		die("Quota is not numeric"); 
 	}
@@ -685,7 +685,7 @@ function mailbox_edit_domain($link, $postarray) {
 			die("$numeric must be numeric");
 		}
 	}
-	if (!ctype_alnum(str_replace(array('.', '-'), '', $domain)) || empty ($domain)) {
+	if (!is_valid_domain_name($domain) || empty ($domain)) {
 		header("Location: do.php?event=".base64_encode("Domain name invalid"));
 		die("Domain name invalid");
 	}
@@ -830,7 +830,7 @@ function mailbox_delete_domain($link, $postarray) {
 		header("Location: do.php?event=".base64_encode("Permission denied"));
 		die("Permission denied");
 	}
-	if (!ctype_alnum(str_replace(array('.', '-'), '', $domain)) || empty ($domain)) {
+	if (!is_valid_domain_name($domain) || empty ($domain)) {
 		header("Location: do.php?event=".base64_encode("Domain name invalid"));
 		die("Domain name invalid");
 	}
@@ -881,7 +881,7 @@ function mailbox_delete_alias_domain($link, $postarray) {
 		header("Location: do.php?event=".base64_encode("Permission denied"));
 		die("Permission denied");
 	}
-	if (!ctype_alnum(str_replace(array('.', '-'), '', $alias_domain))) {
+	if (!is_valid_domain_name($alias_domain)) {
 		header("Location: do.php?event=".base64_encode("Domain name invalid"));
 		die("Domain name invalid");
 	}

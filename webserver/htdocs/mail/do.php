@@ -117,8 +117,7 @@ while ($row = mysqli_fetch_array($result)) {
 <?php }
 	elseif (isset($_GET['editalias'])) {
 		if (!filter_var($_GET["editalias"], FILTER_VALIDATE_EMAIL) || empty($_GET["editalias"])) {
-			header("Location: do.php?event=".base64_encode("Your provided alias name is invalid"));
-			die("Your provided alias name is invalid");
+			echo 'Your provided alias name is invalid';
 		}
 		else {
 			$editalias = mysqli_real_escape_string($link, $_GET["editalias"]);
@@ -456,7 +455,7 @@ while ($row = mysqli_fetch_array($result)) {
 		}
 	}
 	elseif (isset($_GET["deletedomain"])) {
-		if(!is_valid_domain_name($_GET["deletedomain"]) || empty($_GET["deletedomain"])) {
+		if (!is_valid_domain_name($_GET["deletedomain"]) || empty($_GET["deletedomain"])) {
 			echo 'Your provided domain name is invalid.';
 		}
 		else {
@@ -483,9 +482,8 @@ while ($row = mysqli_fetch_array($result)) {
 		}
 	}
 	elseif (isset($_GET["deletealias"])) {
-		if (!ctype_alnum(str_replace(array('.', '@', '-'), '', $_GET["deletealias"])) || empty($_GET["deletealias"])) {
-			header("Location: do.php?event=".base64_encode("Your provided alias name is invalid"));
-			die("Your provided alias name is invalid");
+		if (!filter_var($_GET["deletealias"], FILTER_VALIDATE_EMAIL) || empty($_GET["deletealias"])) {
+			echo 'Your provided alias name is invalid';
 		}
 		else {
 			$deletealias = mysqli_real_escape_string($link, $_GET["deletealias"]);
@@ -518,8 +516,7 @@ while ($row = mysqli_fetch_array($result)) {
 	}
 	elseif (isset($_GET["deletealiasdomain"])) {
 		if (!is_valid_domain_name($_GET["deletealiasdomain"]) || empty($_GET["deletealiasdomain"])) {
-			header("Location: do.php?event=".base64_encode("Alias domain name invalid"));
-			die("Alias domain name invalid");
+			echo 'Alias domain name invalid';
 		}
 		else {
 			$deletealiasdomain = mysqli_real_escape_string($link, $_GET["deletealiasdomain"]);
@@ -545,8 +542,7 @@ while ($row = mysqli_fetch_array($result)) {
 	}
 	elseif (isset($_GET["deletedomainadmin"])) {
 		if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $_GET["deletedomainadmin"])) || empty($_GET["deletedomainadmin"])) {
-			header("Location: do.php?event=".base64_encode("Domain administrator name invalid"));
-			die("Domain administrator name invalid");
+			echo 'Domain administrator name invalid';
 		}
 		else {
 			$deletedomainadmin = mysqli_real_escape_string($link, $_GET["deletedomainadmin"]);
@@ -572,8 +568,7 @@ while ($row = mysqli_fetch_array($result)) {
 	}
 	elseif (isset($_GET["deletemailbox"])) {
 		if (!filter_var($_GET["deletemailbox"], FILTER_VALIDATE_EMAIL)) {
-			header("Location: do.php?event=".base64_encode("Your provided mailbox name is invalid"));
-			die("Your provided alias name is invalid");
+			echo 'Your provided alias name is invalid';
 		}
 		else {
 			$deletemailbox = mysqli_real_escape_string($link, $_GET["deletemailbox"]);
