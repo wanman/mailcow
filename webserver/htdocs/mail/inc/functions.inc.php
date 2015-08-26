@@ -1229,7 +1229,7 @@ function delete_domain_admin($link, $postarray) {
 	}
 	header('Location: do.php?return=success');
 }
-function is_valid_domain_name($domainName) {
+function is_valid_domain_name($domain_name) {
 	return (preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $domain_name)
 		   && preg_match("/^.{1,253}$/", $domain_name)
 		   && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $domain_name));
