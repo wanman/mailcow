@@ -428,11 +428,12 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			find /var/www/{dav,mail} -type f -exec chmod 644 {} \;
 			sed -i "/date_default_timezone_set/c\date_default_timezone_set('${sys_timezone}');" /var/www/dav/server.php
 			touch /var/www/{VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE,MAILBOX_BACKUP}
+			cp misc/mailcow_resetadmin /usr/local/sbin/mailcow_resetadmin ; chmod 700 /usr/local/sbin/mailcow_resetadmin
 			sed -i "s/mailcow_sub/${sys_hostname}/g" /var/www/mail/autoconfig.xml
-			sed -i "s/my_dbhost/$my_dbhost/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
-			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
-			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
-			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
+			sed -i "s/my_dbhost/$my_dbhost/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mailcow_resetadmin
+			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mailcow_resetadmin
+			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mailcow_resetadmin
+			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mailcow_resetadmin
 			chown -R www-data: /var/www/{mail,dav,VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE,MAILBOX_BACKUP} /var/lib/php5/sessions
 			chown www-data: /var/www/
 			mysql --host ${my_dbhost} -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} < webserver/htdocs/init.sql
@@ -446,8 +447,6 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			else
 				echo "$(textb [INFO]) - At least one administrator exists, will not create another mailcow administrator"
 			fi
-			sed -i "s/MAILCOW_DB/$my_mailcowdb/g" /usr/local/sbin/mailcow_resetadmin
-			cp misc/mailcow_resetadmin /usr/local/sbin/mailcow_resetadmin ; chmod +x /usr/local/sbin/mailcow_resetadmin
 			# Cleaning up old files
 			sed -i '/test -d /var/run/fetchmail/d' /etc/rc.local > /dev/null 2>&1
 			rm /etc/cron.d/pfadminfetchmail > /dev/null 2>&1
