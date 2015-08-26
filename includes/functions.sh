@@ -398,6 +398,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 		webserver)
 			# Testing: Keep added files
 			#rm -rf /var/www/{mail,dav} 2> /dev/null
+			mkdir -p /var/www/
 			if [[ ${conf_httpd} == "nginx" ]]; then
 				rm /etc/nginx/sites-enabled/{000-0-mailcow,000-0-fufix} 2>/dev/null
 				cp webserver/nginx/conf/sites-available/mailcow /etc/nginx/sites-available/
