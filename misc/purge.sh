@@ -91,8 +91,10 @@ rm -rf /etc/postfix/
 rm -rf /etc/fail2ban/
 rm -f /etc/fufix_version
 rm -f /etc/mailcow_version
+rm -f /etc/{cron.daily,cron.hourly,cron.monthly}/mailcow_backup
 rm -rf /etc/mail/postfixadmin
 rm -rf /var/www/mail
+rm -f /etc/cron.daily/clean_spam_aliases
 rm -rf /var/run/fetchmail
 rm -rf /usr/local/lib/python2.7/dist-packages/fail2ban-*
 rm -f /usr/local/bin/fail2ban*
