@@ -18,7 +18,7 @@ $result = mysqli_fetch_assoc(mysqli_query($link, "SELECT username from admin whe
 	<div class="form-group">
 		<label class="control-label col-sm-2" for="quota">Administrator:</label>
 		<div class="col-sm-10">
-		<input type="text" class="form-control" name="admin_user" id="quota" value="<?php echo $result['username']; ?>">
+		<input type="text" class="form-control" name="admin_user" id="admin_user" value="<?php echo $result['username']; ?>" required>
 		</div>
 	</div>
 	<div class="form-group">
