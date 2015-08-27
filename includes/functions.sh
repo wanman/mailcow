@@ -368,6 +368,13 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				rm /etc/apparmor.d/local/usr.sbin.clamd > /dev/null 2>&1
 				service apparmor restart > /dev/null 2>&1
 			fi
+			cp -f clamav/clamav-unofficial-sigs.sh /usr/local/bin/clamav-unofficial-sigs.sh
+			chmod +x /usr/local/bin/clamav-unofficial-sigs.sh
+			cp -f clamav/clamav-unofficial-sigs.conf /etc/clamav-unofficial-sigs.conf
+			cp -f clamav/clamav-unofficial-sigs.8 /usr/share/man/man8/clamav-unofficial-sigs.8
+			cp -f clamav/clamav-unofficial-sigs-cron /etc/cron.d/clamav-unofficial-sigs-cron
+			cp -f clamav/clamav-unofficial-sigs-logrotate /etc/logrotate.d/clamav-unofficial-sigs-logrotate
+			mkdir -p /var/log/clamav-unofficial-sigs 2> /dev/null
 			freshclam
 			;;
 		opendkim)
@@ -398,7 +405,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 		webserver)
 			# Testing: Keep added files
 			#rm -rf /var/www/{mail,dav} 2> /dev/null
-			mkdir -p /var/www/
+			mkdir -p /var/www/ 2> /dev/null
 			if [[ ${conf_httpd} == "nginx" ]]; then
 				rm /etc/nginx/sites-enabled/{000-0-mailcow,000-0-fufix} 2>/dev/null
 				cp webserver/nginx/conf/sites-available/mailcow /etc/nginx/sites-available/
