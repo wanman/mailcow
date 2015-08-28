@@ -96,7 +96,7 @@ echo "<tr>
 <?php
 $result = mysqli_query($link, "SELECT components, uri, displayname FROM calendars WHERE principaluri='principals/$logged_in_as'");
 while ($row = mysqli_fetch_array($result)) {
-echo "<tr><td>", str_replace(array('VEVENT', 'VTODO', ','), array('Calendar', 'Tasks', ', '), $row['components']), 
+echo "<tr><td>", str_replace(array('VEVENT', 'VTODO', ','), array('Calendar', 'Tasks', ', '), $row['components']),
 "</td><td>", $row['uri'],
 "</td><td>", $row['displayname'],
 "</td><td><a href=\"https://dav.".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/$logged_in_as/".$row['uri']."?export\">Download (ICS format)</a>",
@@ -140,7 +140,7 @@ echo "<tr><td>Address book</td><td>", $row['uri'],
 	</div>
 	<div class="form-group">
 		<label class="control-label col-sm-2" for="imap_password">IMAP password:</label>
-		<div class="col-sm-10">          
+		<div class="col-sm-10">
 		<input type="password" class="form-control" name="imap_password" id="imap_password">
 		</div>
 	</div>
@@ -150,7 +150,7 @@ echo "<tr><td>Address book</td><td>", $row['uri'],
 		<input type="text" class="form-control" name="imap_exclude" id="imap_exclude" placeholder="Folder1, Folder2, Folder3">
 		</div>
 	</div>
-	<div class="form-group">   
+	<div class="form-group">
 		<div class="col-sm-offset-2 col-sm-10">
 			<div class="radio">
 				<label><input type="radio" name="imap_enc" value="/ssl" checked>SSL</label>
@@ -163,7 +163,7 @@ echo "<tr><td>Address book</td><td>", $row['uri'],
 			</div>
 		</div>
 	</div>
-	<div class="form-group">        
+	<div class="form-group">
 		<div class="col-sm-offset-2 col-sm-10">
 			<button type="submit" class="btn btn-success btn-sm">Sync now</button>
 		</div>

@@ -401,6 +401,9 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			razor-admin -register -home /etc/razor
 			su debian-spamd -c "pyzor --homedir /etc/mail/spamassassin/.pyzor discover 2> /dev/null"
 			su debian-spamd -c "sa-update 2> /dev/null"
+			if [[ -f /lib/systemd/systemd ]]; then
+				systemctl enable spamassassin
+			fi
 			;;
 		webserver)
 			# Testing: Keep added files
