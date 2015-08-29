@@ -187,6 +187,60 @@ while ($row = mysqli_fetch_array($resultselect)) {
 </div>
 
 <div class="panel panel-default">
+<div class="panel-heading">Postfix restrictions</div>
+<div class="panel-body">
+<?php
+$srr_values = return_mailcow_config("srr");
+?>
+<form method="post">
+	<div class="form-group">
+		<label class="control-label col-sm-4" for="location">Recipient restrictions</label>
+		<div class="col-sm-8">
+			<div class="checkbox">
+			<label><input type="checkbox" name="reject_invalid_helo_hostname" <?php if (preg_match('/reject_invalid_helo_hostname/', $srr_values)) { echo "checked"; } ?>> Reject invalid HELO hostnames <b>(reject_invalid_helo_hostname)</b></label>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-offset-4 col-sm-8">
+			<div class="checkbox">
+			<label><input type="checkbox" name="reject_unknown_helo_hostname" <?php if (preg_match('/reject_unknown_helo_hostname/', $srr_values)) { echo "checked"; } ?>> Reject unknown HELO hostname (no MX- or A-Record) <b>(reject_unknown_helo_hostname)</b></label>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-offset-4 col-sm-8">
+			<div class="checkbox">
+			<label><input type="checkbox" name="reject_unknown_reverse_client_hostname" <?php if (preg_match('/reject_unknown_reverse_client_hostname/', $srr_values)) { echo "checked"; } ?>> Reject when the client IP address has no address -> name mapping (missing/invalid PTR check) <b>(reject_unknown_reverse_client_hostname)</b></label>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-offset-4 col-sm-8">
+			<div class="checkbox">
+			<label><input type="checkbox" name="reject_unknown_client_hostname" <?php if (preg_match('/reject_unknown_client_hostname/', $srr_values)) { echo "checked"; } ?>> Reject when the client IP address has no address -> name mapping and/or returned name does not match the IP (exact PTR match check) <b>(reject_unknown_client_hostname)</b></label>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-offset-4 col-sm-8">
+			<div class="checkbox">
+			<label><input type="checkbox" name="reject_non_fqdn_helo_hostname" <?php if (preg_match('/reject_non_fqdn_helo_hostname/', $srr_values)) { echo "checked"; } ?>> Reject when HELO hostname is not a FQDN <b>(reject_non_fqdn_helo_hostname)</b></label>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+	<input type="hidden" name="srr">
+		<div class="col-sm-8">
+			<button type="submit" class="btn btn-default btn-raised btn-sm">Save changes</button>
+		</div>
+	</div>
+</form>
+</div>
+</div>
+
+
+<div class="panel panel-default">
 <div class="panel-heading">Public folders</div>
 <div class="panel-body">
 <p>A namespace "Public" is created. Belows public folder name indicates the name of the first auto-created mailbox within this namespace.</p>
@@ -516,7 +570,7 @@ die("Permission denied");
 	<input name="login_user" type="name" id="login_user" class="form-control" placeholder="Username" required autofocus>
 	<input name="pass_user" type="password" id="pass_user" class="form-control" placeholder="Password" required>
 	<input type="submit" class="btn btn-sm btn-success" value="Login">
-	<p><small><strong>Hint:</strong> Use "mailcow_resetadmin" to reset the password.</small></p>
+	<p><small><strong>Hint:</strong> Run "mc_resetadmin" from a shell to reset the password.</small></p>
 </form>
 </div>
 </div>

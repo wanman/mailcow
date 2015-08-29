@@ -298,19 +298,21 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown root:root "/etc/postfix/master.cf"; chmod 644 "/etc/postfix/master.cf"
 			chown root:root "/etc/postfix/main.cf"; chmod 644 "/etc/postfix/main.cf"
 			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /etc/postfix/* 2> /dev/null
-			cp misc/clean_spam_aliases /etc/cron.daily/clean_spam_aliases
-			chmod 700 /etc/cron.daily/clean_spam_aliases
+			cp misc/mc_clean_spam_aliases /etc/cron.daily/mc_clean_spam_aliases
+			cp misc/mc_pfset /usr/local/sbin/mc_pfset
+			chmod +x /usr/local/sbin/mc_pfset
+			chmod 700 /etc/cron.daily/mc_clean_spam_aliases
 			sed -i "s/MAILCOW_DOMAIN/${sys_domain}/g" /etc/postfix/* 2> /dev/null
-			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /etc/postfix/sql/* /etc/cron.daily/clean_spam_aliases
-			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /etc/postfix/sql/* /etc/cron.daily/clean_spam_aliases
-			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /etc/postfix/sql/* /etc/cron.daily/clean_spam_aliases
-			sed -i "s/my_dbhost/$my_dbhost/g" /etc/postfix/sql/* /etc/cron.daily/clean_spam_aliases
+			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /etc/postfix/sql/* /etc/cron.daily/mc_clean_spam_aliases
+			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /etc/postfix/sql/* /etc/cron.daily/mc_clean_spam_aliases
+			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /etc/postfix/sql/* /etc/cron.daily/mc_clean_spam_aliases
+			sed -i "s/my_dbhost/$my_dbhost/g" /etc/postfix/sql/* /etc/cron.daily/mc_clean_spam_aliases
 			postmap /etc/postfix/mailcow_sender_access
 			chown www-data: /etc/postfix/mailcow_*
 			chmod 755 /var/spool/
 			sed -i "/%www-data/d" /etc/sudoers 2> /dev/null
 			sed -i "/%vmail/d" /etc/sudoers 2> /dev/null
-			echo '%www-data ALL=(ALL) NOPASSWD: /usr/bin/doveadm * sync *, /usr/bin/doveadm quota recalc -A, /usr/sbin/dovecot reload, /usr/sbin/postfix reload, /usr/local/bin/mc-dkim-ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_inst_cron, /usr/bin/tail * /opt/vfilter/log/vfilter.log' >> /etc/sudoers
+			echo '%www-data ALL=(ALL) NOPASSWD: /usr/bin/doveadm * sync *, /usr/local/sbin/mc_pfset *, /usr/bin/doveadm quota recalc -A, /usr/sbin/dovecot reload, /usr/sbin/postfix reload, /usr/local/sbin/mc_dkim_ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_inst_cron, /usr/bin/tail * /opt/vfilter/log/vfilter.log' >> /etc/sudoers
 			echo '%vmail ALL=(ALL) NOPASSWD: /usr/bin/spamc*' >> /etc/sudoers
 			;;
 		dovecot)
@@ -381,7 +383,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			echo 'SOCKET="inet:10040@localhost"' > /etc/default/opendkim
 			mkdir -p /etc/opendkim/{keyfiles,dnstxt} 2> /dev/null
 			touch /etc/opendkim/{KeyTable,SigningTable}
-			install -m 755 opendkim/conf/mc-dkim-ctrl /usr/local/bin/
+			install -m 755 misc/mc_dkim_ctrl /usr/local/sbin/
 			install -m 644 opendkim/conf/opendkim.conf /etc/opendkim.conf
 			;;
 		spamassassin)
@@ -439,12 +441,12 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			find /var/www/{dav,mail} -type f -exec chmod 644 {} \;
 			sed -i "/date_default_timezone_set/c\date_default_timezone_set('${sys_timezone}');" /var/www/dav/server.php
 			touch /var/www/{VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE,MAILBOX_BACKUP}
-			cp misc/mailcow_resetadmin /usr/local/sbin/mailcow_resetadmin ; chmod 700 /usr/local/sbin/mailcow_resetadmin
+			cp misc/mc_resetadmin /usr/local/sbin/mc_resetadmin ; chmod 700 /usr/local/sbin/mc_resetadmin
 			sed -i "s/mailcow_sub/${sys_hostname}/g" /var/www/mail/autoconfig.xml
-			sed -i "s/my_dbhost/$my_dbhost/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mailcow_resetadmin
-			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mailcow_resetadmin
-			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mailcow_resetadmin
-			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mailcow_resetadmin
+			sed -i "s/my_dbhost/$my_dbhost/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin
+			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin
+			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin
+			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin
 			chown -R www-data: /var/www/{mail,dav,VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE,MAILBOX_BACKUP} /var/lib/php5/sessions
 			chown www-data: /var/www/
 			mysql --host ${my_dbhost} -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} < webserver/htdocs/init.sql

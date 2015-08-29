@@ -30,6 +30,10 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 		set_mailcow_config("public_folder", $_POST);
 		dovecot_reload();
 	}
+	if (isset($_POST["srr"])) {
+		set_mailcow_config("srr", $_POST);
+		postfix_reload();
+	}
 	if (isset($_GET["del"])) {
 		opendkim_table("delete", $_GET["del"]);
 	}

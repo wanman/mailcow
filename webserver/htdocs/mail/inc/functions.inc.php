@@ -274,6 +274,21 @@ namespace {
 				header('Location: do.php?return=success');
 			}
 			break;
+		case "srr":
+			$srr_parameters = "";
+			$valid_srr = array("reject_invalid_helo_hostname", "reject_unknown_helo_hostname", "reject_unknown_reverse_client_hostname", "reject_unknown_client_hostname", "reject_non_fqdn_helo_hostname");
+			$srr = (array_keys($v));
+			foreach ($srr as $restriction) {
+				if (in_array($restriction, $valid_srr)) {
+					$srr_parameters .= $restriction." ";
+				}
+			}
+			exec("sudo /usr/local/sbin/mc_pfset set-srr \"$srr_parameters\"", $out, $return);
+			if ($return != "0") {
+				header("Location: do.php?event=".base64_encode("Cannot set Postfix recipient restrictions"));
+				die("Cannot set Postfix recipient restrictions");
+			}
+			break;
 		case "senderaccess":
 			file_put_contents($GLOBALS["mailcow_sender_access"], "");
 			$sender_array = array_keys(array_flip(preg_split("/((\r?\n)|(\r\n?))/", $v)));
@@ -317,7 +332,7 @@ function opendkim_table($action = "show", $which = "") {
 			}
 			$selector = explode("_", $which)[0];
 			$domain = explode("_", $which)[1];
-			exec("sudo /usr/local/bin/mc-dkim-ctrl del $selector $domain", $hash, $return);
+			exec("sudo /usr/local/sbin/mc_dkim_ctrl del $selector $domain", $hash, $return);
 			if ($return != "0") {
 				header("Location: do.php?event=".base64_encode("Cannot delete domain record. Does it exist?"));
 				die("Cannot delete domain record. Does it exist?");
@@ -331,7 +346,7 @@ function opendkim_table($action = "show", $which = "") {
 				header("Location: do.php?event=".base64_encode("Invalid format"));
 				die("Invalid format");
 			}
-			exec("sudo /usr/local/bin/mc-dkim-ctrl add $selector $domain", $hash, $return);
+			exec("sudo /usr/local/sbin/mc_dkim_ctrl add $selector $domain", $hash, $return);
 			if ($return != "0") {
 				header("Location: do.php?event=".base64_encode("Cannot add this domain. Does it already exist?"));
 				die("Cannot add this domain. Does it already exist?");

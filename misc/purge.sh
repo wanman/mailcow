@@ -94,7 +94,8 @@ rm -f /etc/mailcow_version
 rm -f /etc/{cron.daily,cron.hourly,cron.monthly}/mailcow_backup
 rm -rf /etc/mail/postfixadmin
 rm -rf /var/www/mail
-rm -f /etc/cron.daily/clean_spam_aliases
+rm -f /usr/local/sbin/mc_*
+rm -f /etc/cron.daily/mc_clean_spam_aliases
 rm -rf /var/run/fetchmail
 rm -rf /usr/local/lib/python2.7/dist-packages/fail2ban-*
 rm -f /usr/local/bin/fail2ban*
@@ -113,4 +114,4 @@ rm -rf /opt/vfilter/
 rm -f /etc/cron.d/pfadminfetchmail
 rm -f /etc/cron.daily/spam*
 rm -rf /etc/opendkim*
-rm -f /usr/local/bin/mc_msg_size
+rm -f /usr/local/bin/mc_*
