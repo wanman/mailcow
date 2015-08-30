@@ -309,7 +309,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /etc/postfix/sql/* /etc/cron.daily/mc_clean_spam_aliases
 			sed -i "s/my_dbhost/$my_dbhost/g" /etc/postfix/sql/* /etc/cron.daily/mc_clean_spam_aliases
 			postmap /etc/postfix/mailcow_sender_access
-			postmap /etc/postfix/relay_recipients
 			chown www-data: /etc/postfix/mailcow_*
 			chmod 755 /var/spool/
 			sed -i "/%www-data/d" /etc/sudoers 2> /dev/null
@@ -342,10 +341,10 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			if [ ! -f /var/vmail/public/dovecot-acl ]; then
 				echo "anyone lrwstipekxa" > /var/vmail/public/dovecot-acl
 			fi
-			cp dovecot/conf/spam-global.sieve /var/vmail/sieve/spam-global.sieve
+			cp dovecot/conf/global.sieve /var/vmail/sieve/global.sieve
 			touch /var/vmail/sieve/default.sieve
 			install -m 755 misc/mc_msg_size /usr/local/sbin/mc_msg_size
-			sievec /var/vmail/sieve/spam-global.sieve
+			sievec /var/vmail/sieve/global.sieve
 			chown -R vmail:vmail /var/vmail
 			install -m 755 dovecot/conf/doverecalcq /etc/cron.daily/
 			;;
