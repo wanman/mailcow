@@ -97,7 +97,7 @@ mydestination = MAILCOW_HOST.MAILCOW_DOMAIN, localhost.MAILCOW_DOMAIN, localhost
 relayhost =
 
 # We relay for those domains
-relay_domains= proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_domain_maps.cf
+relay_domains= proxy:mysql:/etc/postfix/sql/mysql_virtual_mxdomain_maps.cf
 
 # Relay only for this accounts
 relay_recipient_maps = hash:/etc/postfix/relay_recipients
