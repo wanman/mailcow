@@ -134,6 +134,9 @@ function return_mailcow_config($s) {
 				echo $each_expl[0], "\n";
 			}
 			break;
+		case "srr":
+			return shell_exec("sudo /usr/local/sbin/mc_pfset get-srr");
+			break;
 		case "maxmsgsize":
 			return shell_exec("echo $(( $(/usr/sbin/postconf -h message_size_limit) / 1048576 ))");
 			break;
