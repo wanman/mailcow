@@ -58,7 +58,7 @@ $result = mysqli_fetch_assoc(mysqli_query($link, "SELECT username from admin whe
 	</thead>
 	<tbody>
 <?php
-$result = mysqli_query($link, "SELECT username, LOWER(GROUP_CONCAT(DISTINCT domain SEPARATOR ', ')) AS domain, active FROM domain_admins WHERE username NOT IN (SELECT username FROM admin WHERE superadmin='1') GROUP BY username");
+$result = mysqli_query($link, "SELECT username, LOWER(GROUP_CONCAT(DISTINCT domain SEPARATOR ', ')) AS domain, CASE active WHEN 1 THEN 'Yes' ELSE 'No' END AS active FROM domain_admins WHERE username NOT IN (SELECT username FROM admin WHERE superadmin='1') GROUP BY username");
 while ($row = mysqli_fetch_array($result)) {
 echo "<tr><td>", $row['username'],
 "</td><td>", $row['domain'],
