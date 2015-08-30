@@ -341,10 +341,10 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			if [ ! -f /var/vmail/public/dovecot-acl ]; then
 				echo "anyone lrwstipekxa" > /var/vmail/public/dovecot-acl
 			fi
-			cp dovecot/conf/spam-global.sieve /var/vmail/sieve/spam-global.sieve
+			cp dovecot/conf/global.sieve /var/vmail/sieve/global.sieve
 			touch /var/vmail/sieve/default.sieve
 			install -m 755 misc/mc_msg_size /usr/local/sbin/mc_msg_size
-			sievec /var/vmail/sieve/spam-global.sieve
+			sievec /var/vmail/sieve/global.sieve
 			chown -R vmail:vmail /var/vmail
 			install -m 755 dovecot/conf/doverecalcq /etc/cron.daily/
 			;;
