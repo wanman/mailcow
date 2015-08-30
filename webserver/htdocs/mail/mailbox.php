@@ -27,6 +27,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 							<th>Mailboxes</th>
 							<th>Max. quota per mailbox</th>
 							<th>Domain Quota</th>
+							<th>Backup MX</th>
 							<th>Active</th>
 							<th>Action</th>
 						</tr>
@@ -60,6 +61,7 @@ endif;
 							<td><?= mysqli_result(mysqli_query($link, "SELECT count(*) FROM mailbox WHERE domain='$row[domain]'")); ?> of <?= $row['mailboxes']; ?></td>
 							<td><?= $row['maxquota']; ?>M</td>
 							<td><?= mysqli_result(mysqli_query($link, "SELECT coalesce(round(sum(quota)/1048576), 0) FROM mailbox WHERE domain='$row[domain]'")); ?>M of <?= $row['quota']; ?>M</td>
+							<td><?= $row['backupmx']; ?></td>
 							<td><?= $row['active']; ?></td>
 							<td><a href="do.php?deletedomain=<?= $row['domain']; ?>">delete</a> | 
 							<a href="do.php?editdomain=<?= $row['domain']; ?>">edit</a></td>
