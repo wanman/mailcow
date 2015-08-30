@@ -1,0 +1,7 @@
+# relay all emails for the domain
+# @example.de     OK
+# relay only for one mail address
+# user@example.de   OK
+# reject one user, relay the rest (the correct sequence is important!)
+# user@example.de   REJECT
+# @example.de       OK
