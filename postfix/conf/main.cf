@@ -96,11 +96,11 @@ mydestination = MAILCOW_HOST.MAILCOW_DOMAIN, localhost.MAILCOW_DOMAIN, localhost
 # We lookup MX records to send non-local mail, so this stays empty
 relayhost =
 
-# We relay for those domains
+# We relay for these domains
 relay_domains= proxy:mysql:/etc/postfix/sql/mysql_virtual_mxdomain_maps.cf
 
-# Relay only for this accounts
-relay_recipient_maps = hash:/etc/postfix/relay_recipients
+# Relay only for these accounts
+relay_recipient_maps = proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_maps.cf
 
 # Trusted SMTP clients with more privileges. Trusted clients can relay mail.
 mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
