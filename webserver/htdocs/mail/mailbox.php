@@ -33,7 +33,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 					</thead>
 					<tbody>
 <?php
-$result = mysqli_query($link, "SELECT domain, aliases, mailboxes, maxquota, quota, CASE active WHEN 1 THEN 'Yes' ELSE 'No' END AS active FROM 
+$result = mysqli_query($link, "SELECT domain, aliases, mailboxes, maxquota, quota, CASE backupmx WHEN 1 THEN 'Yes' ELSE 'No' END AS backupmx, CASE active WHEN 1 THEN 'Yes' ELSE 'No' END AS active FROM 
 domain WHERE 
 domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role'");
 while ($row = mysqli_fetch_array($result)):
@@ -44,7 +44,7 @@ while ($row = mysqli_fetch_array($result)):
 $getpostmaster = mysqli_query($link, "SELECT alias.active as aactive, mailbox.active as mactive, username, address FROM alias, mailbox WHERE 
 (username='postmaster@$row[domain]' OR address='postmaster@$row[domain]')");
 $postmasterstatus = mysqli_fetch_assoc($getpostmaster);
-if (!isset($postmasterstatus['address']) || ($postmasterstatus['aactive'] == "0" || $postmasterstatus['mactive'] == "0")):
+if ($row[backupmx] == "No" && !isset($postmasterstatus['address']) || ($postmasterstatus['aactive'] == "0" || $postmasterstatus['mactive'] == "0")):
 ?>
 							<span style="border-bottom:1px dotted red;" data-toggle="tooltip" title="No active postmaster mailbox or alias"><?= $row['domain']; ?></span>
 <?php
