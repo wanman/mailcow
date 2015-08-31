@@ -18,7 +18,6 @@ fufix is now known as mailcow!
   - [Postfix](#postfix)
   - [HTTPd](#httpd)
   - [Fail2ban](#fail2ban)
-  - [Postfixadmin](#postfixadmin)
   - [Dovecot](#dovecot)
     - [Trash folder quota](#trash-folder-quota)
     - [Dovecot SQL parameter](#dovecot-sql-parameter)
@@ -74,11 +73,6 @@ A summary of what software is installed with which features enabled.
 * (IMAP) Quotas
 * LMTP service for Postfix virtual transport
 * SSL based on BetterCrypto
-
-**Postfixadmin**
-* Automatically creates an Administrator
-* Full quota support
-* Fetchmail support
 
 **Roundcube**
 * ManageSieve support (w/ vacation)
@@ -229,12 +223,6 @@ Default configuration parameters (example: retry count) can be reviewed in `/etc
 I recommend to use `/etc/fail2ban/jail.local` to add or modify the configuration. 
 `jail.local` has higher priority than `jail.conf`.
 
-## Postfixadmin
-The file "config.local.php" is copied to the target directory `/var/www/mail/pfadmin`. Some parameters like "domain.tld" are dummies and replaced by the installer.
-
-You can change some of these values to fit your personal needs by just editing or adding them to this file. 
-All values inside "config.local.php" override the global configuration file (`config.inc.php`) of Postfixadmin. No need to reload any service afterwards. 
-
 **Default quotas in MiB**
 
 ## Dovecot
@@ -255,7 +243,7 @@ Dovecots SQL parameters can be found in either `/etc/dovecot/dovecot-dict-sql.co
 
 - `dovecot-mysql.conf` contains some basic SQL commands:
 **driver** - What database  
-**connect** - How to connect to the MySQL database   **default_pass_scheme** - Password scheme. If you edit this you also need to adjust Postfixadmin!  
+**connect** - How to connect to the MySQL database   **default_pass_scheme** - Password scheme.  
 **password_query** - Validate passwords.  
 **user_query** - Validate users.  
 **iterate_query** - Iterate users, also needed by a lot of "doveadm" commands.  
