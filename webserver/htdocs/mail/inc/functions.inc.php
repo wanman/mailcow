@@ -1003,17 +1003,15 @@ function set_time_limited_aliases($link, $postarray) {
 	}
 	switch ($_POST["action"]) {
 		case "generate":
-			$hours = array(1, 4, 12, 24, 48);
-			$mystring = "";
-			foreach ($hours as $i) {
-				$mystring .= "INSERT INTO spamalias (address, goto, validity) VALUES (CONCAT(SUBSTRING(MD5(RAND()) FROM 1 FOR 12), '$domain'), '$logged_in_as', DATE_ADD(NOW(), INTERVAL $i HOUR));";
+			if (!is_numeric($_POST["validity"]) || $_POST["validity"] > 672) {
+				header("Location: do.php?event=".base64_encode("Invalid form data"));
+				die("Invalid form data");
 			}
-			if (!mysqli_multi_query($link, $mystring)) {
+			$hours = $_POST["validity"];
+			$mystring = "INSERT INTO spamalias (address, goto, validity) VALUES (CONCAT(SUBSTRING(MD5(RAND()) FROM 1 FOR 12), '$domain'), '$logged_in_as', DATE_ADD(NOW(), INTERVAL $hours HOUR));";
+			if (!mysqli_query($link, $mystring)) {
 				header("Location: do.php?event=".base64_encode(mysqli_error($link)));
 				die("MySQL query failed");
-			}
-			while ($link->next_result()) {
-				if (!$link->more_results()) break;
 			}
 			header('Location: do.php?return=success');
 		break;
