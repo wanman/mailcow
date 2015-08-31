@@ -114,7 +114,7 @@ while ($row = mysqli_fetch_array($result)):
 	</td></tr>
 <?php
 endwhile;
-?>							
+?>
 					</tbody>
 				</table>
 				</div>
@@ -152,13 +152,24 @@ endwhile;
 					</thead>
 					<tbody>
 <?php
-$result = mysqli_query($link, "SELECT mailbox.username, name, CASE active WHEN 1 THEN 'Yes' ELSE 'No' END AS active, domain, quota, bytes, messages 
-FROM mailbox, quota2 WHERE (mailbox.username = quota2.username) AND 
-(domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role')");
+$result = mysqli_query($link, "SELECT domain.backupmx, mailbox.username, mailbox.name, CASE mailbox.active WHEN 1 THEN 'Yes' ELSE 'No' END AS active, mailbox.domain, mailbox.quota, quota2.bytes, quota2.messages 
+FROM mailbox, quota2, domain WHERE (mailbox.username = quota2.username) AND (domain.domain = mailbox.domain) AND 
+(mailbox.domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role')");
 while ($row = mysqli_fetch_array($result)):
 ?>
 	<tr>
+<?php
+if ($row['backupmx'] == "0"):
+?>
 		<td><?= $row['username']; ?></td>
+<?php
+else:
+?>
+		<td><i class="glyphicon glyphicon-forward"></i> <?= $row['username']; ?></td>
+<?php
+endif;
+?>
+
 		<td><?= $row['name']; ?></td>
 		<td><?= $row['domain']; ?></td>
 		<td>
@@ -184,6 +195,7 @@ endwhile;
 				</table>
 				</div>
 			</div>
+			<ul><small><i class="glyphicon glyphicon-forward"></i> indicates a relayed recipient on a <b>backup mx</b> domain</small></ul>
 		</div>
 	</div>
 	<div class="row">
