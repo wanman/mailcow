@@ -37,6 +37,9 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 </div>
 </div>
 
+<ul><b>Did you know?</b> You can tag your mail address like "<?php echo explode('@', $logged_in_as)[0]; ?><b>+Private</b>@<?php echo explode('@', $logged_in_as)[1]; ?>" to automatically create a subfolder named "Private" in your inbox.<$
+<br />
+
 <div class="panel panel-default">
 <div class="panel-heading">Generate time-limited aliases</div>
 <div class="panel-body">
