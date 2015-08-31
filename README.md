@@ -22,8 +22,10 @@ In future versions mailcow will provide Cal- and CardDAV support.
 
 For **Debian and Debian based distributions**. 
 
-This script is permanently **tested on Debian stable (8.x) and old-stable (7.x)**.
+This script is permanently **tested on Debian stable (8.x)**.
 Debian Squeeze is not supported.
+
+Ubuntu 14.04 is fine but not recommended.
 
 **Please see this album on imgur.com for screenshots -> http://imgur.com/a/x5IST#0**
 
