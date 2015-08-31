@@ -343,7 +343,7 @@ while ($row = mysqli_fetch_array($result)) {
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="description">Description:</label>
 						<div class="col-sm-10">
-						<input type="text" class="form-control" name="description" id="description" value="<?php echo $result['description']; ?>">
+						<input type="text" class="form-control" name="description" id="description" value="<?php echo htmlspecialchars($result['description']); ?>">
 						</div>
 					</div>
 					<div class="form-group">
