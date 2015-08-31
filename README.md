@@ -9,20 +9,7 @@ fufix is now known as mailcow!
 - [Before You Begin](#before-you-begin)
 - [Installation](#installation)
 - [Upgrade](#upgrade)
-- [Configuration and common tasks](#configuration-and-common-tasks)
-  - [SSL certificate](#ssl-certificate)
-  - [Spamassassin](#spamassassin)
-    - [Autolearn](#autolearn)
-    - [Spam rewrite](#spam-rewrite)
-    - [Spamassassin daemon options](#spamassassin-daemon-options)
-  - [Postfix](#postfix)
-  - [HTTPd](#httpd)
-  - [Fail2ban](#fail2ban)
-  - [Dovecot](#dovecot)
-    - [Trash folder quota](#trash-folder-quota)
-    - [Dovecot SQL parameter](#dovecot-sql-parameter)
-  - [Roundcube](#roundcube)
-  - [Change attachment/message size](#change-attachmentmessage-size)
+- [SSL certificate](#ssl-certificate)
 - [Uninstall](#uninstall)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -48,25 +35,30 @@ A summary of what software is installed with which features enabled.
 * Automatically generated passwords with high complexity
 * Self-signed SSL certificate for all installed and supporting services
 * Nginx or Apache2 installation (+PHP5-FPM)
-* MySQL database backend
-* DNS-Checks by Google DNS (PTR, A-Record, SPF etc.)
+* MySQL or MariaDB database backend, remote database support
+* DNS-Checks (PTR, A-Record, SPF etc.)
 * Learn ham and spam, [Heinlein Support](https://www.heinlein-support.de/) SA rules included
 * Fail2ban brute force protection
-* A "mailcow control center" via browser
+* A "mailcow control center" via browser: Add domains, mailboxes, aliases and more
+* Tagged mail like "username+tag@domain.tld" will be moved to folder "tag"
+* Advanced ClamAV filters (ClamAV can be turned off, quarantined items can be downloaded)
 
 **Postfix**
 * Postscreen activated
 * Submission port (587/TCP), TLS-only
 * SMTPS (465/TCP)
-* The restrictions used are a good compromise between blocking spam and avoiding false-positives
+* The default restrictions used are a good compromise between blocking spam and avoiding false-positives
+* Change recipient restrictions in control center
+* Blacklist senders in control center
 * Incoming and outgoing spam protection
 * VirusTotal Uploader for incoming mail
 * SSL based on BetterCrypto
-* OpenDKIM milter
+* OpenDKIM, manage signatures in control center
 
 **Dovecot**
 * Default mailboxes to subscribe to automatically (Inbox, Sent, Drafts, Trash, Junk, Archive - "SPECIAL-USE" tags)
 * Sieve/ManageSieve
+* Public folder support via control center
 * per-user ACL
 * Shared Namespace (per-user seen-flag)
 * Global sieve filter: Move mail marked as spam into "Junk"
@@ -162,118 +154,10 @@ To start the upgrade, run the following command:
 ./install.sh -u
 ```
 
-# Configuration and common tasks
-To help you modify the configuration, I created this little overview to get you started.
-
-## SSL certificate
+# SSL certificate
 The SSL certificate is located at `/etc/ssl/mail/mail.{key,crt}`.
 You can replace it by just copying over your own files. 
 Services effected and necessary to restart are `postfix`, `dovecot` and `nginx` (Nginx if installed, Apache2 does not have a body size limitation configured).
-
-## Spamassassin
-Spamassassin main configuration file:
-* **/etc/spamassassin/local.cf**
-
-### Autolearn
-Move undetected spam to "Junk" to make Spamassassin autolearn it. This is done by a daily cronjob.
-
-Ham (non-spam) is learned the same way. Move false-positives to your inbox to autolearn them.
-
-### Spam rewrite
-mailcow adds `rewrite_header Subject [SPAM]` and `report_safe 2` to prefix [SPAM] to junk mail and forward spam as attachment instead of original message (text/plain). 
-
-The prefix "[SPAM]" is not important for the sieve filter and can be changed to whatever text. Spam will be moved when te Spam Flag is set the header.
-
-### Spamassassin daemon options
-Default startup options for Spamassassin in `/etc/default/spamassassin`:
-- Enabled "spamd" by adding `ENABLED=1`
-- Enabled cronjob by setting `CRON=1`
-- Modified OPTIONS line to `OPTIONS="--create-prefs --max-children 5 --helper-home-dir"`.
-
-## Postfix
-The files "main.cf" and "master.cf" contain a lot of changes. You should now what you do if you modify these files.
-* **/etc/postfix/main.cf**
-* **/etc/postfix/master.cf**
-
-I try to comment as much as possible inside these files to help you understand the configuration.
-
-You also find the SQL based maps for virtual transport here:
-* **/etc/postfix/sql/*.cf**
-
-For a quick overview of the restrictions [click here](https://github.com/andryyy/mailcow/blob/master/postfix/conf/main.cf).
-
-## HTTPd
-A site named "000-0-mail" is copied to `/etc/{nginx,apache2}/sites-available` - depending on your configuration - and enabled via symbolic link to `[...]/sites-enabled`.
-
-The sites root location is `/var/www/mail/`. 
-
-Other sites will not be touched/changed/removed by mailcow (>= v0.9).
-
-A PHP socket (>> `/var/run/php5-fpm-mail.sock`) configuration is located at `/etc/php5/fpm/pool.d/mail.conf`. 
-Some PHP parameters are set right here to override those in `/etc/php5/fpm/php.ini`.
-
-Both Apache2 and Nginx will make use of FastCGI to call PHP5. Apache2 uses a **non-free** module *mod_fastcgi*.
-
-## Fail2ban
-A file `/etc/fail2ban/jail.local` is created with some pre-configured jails.
-
-Ban time is set to 1h. "Jails" are created to lock unauthorized users (Postfix SASL [authentication], Sieve. etc.).
-Default configuration parameters (example: retry count) can be reviewed in `/etc/fail2ban/jail.conf`.
-
-I recommend to use `/etc/fail2ban/jail.local` to add or modify the configuration. 
-`jail.local` has higher priority than `jail.conf`.
-
-**Default quotas in MiB**
-
-## Dovecot
-If you really need to edit Dovecots configuration, you can find the required files in `/etc/dovecot`.
-
-`/etc/dovecot/dovecot.conf` holds the default configuration. To keep it simple I chose not to split the configuration into multiple files. 
-
-### Trash folder quota
-
-The folder "Trash" is configured to allow an extra 100% of the set quota to allow moving mails to trash when a mailbox reaches >=51% of its quota. 
-
-This is defined with `quota_rule2 = Trash:storage=+100%%` in `/etc/dovecot/dovecot.conf`.
-
-### Dovecot SQL parameter
-Dovecots SQL parameters can be found in either `/etc/dovecot/dovecot-dict-sql.conf` or `/etc/dovecot/dovecot-mysql.conf`.
-
-- `dovecot-dict-sql.conf` holds instructions for reading a users quota.
-
-- `dovecot-mysql.conf` contains some basic SQL commands:
-**driver** - What database  
-**connect** - How to connect to the MySQL database   **default_pass_scheme** - Password scheme.  
-**password_query** - Validate passwords.  
-**user_query** - Validate users.  
-**iterate_query** - Iterate users, also needed by a lot of "doveadm" commands.  
-
-
-Furthermore a script `doverecalcq` is copied to `/etc/cron.daily` to recalculate quotas of all users daily.
- 
-A system with a very large amount of virtual users should not do this on a daily basis. I recommend to move the script to "cron.weekly" then.
-
-*Dovecot saves messages to `/var/vmail/DOMAINNAME/USERNAME` in maildir format.*
-
-## Roundcube
-
-Roundcube is configured by multiple configuration files.
-
-There are two files for the general configuration:
-
-`/var/www/mail/rc/config/defaults.php.inc` and `/var/www/mail/rc/config/config.php.inc`. 
-The later file is the one you want to edit. Every parameter set in `config.php.inc` will override the parameter set in `defaults.php.inc`.
-
-Some plug-ins come with a seperate "config.inc.php" file. You can find them in `/var/www/mail/rc/plugins/PLUGIN_NAME/`.
-
-If no domain is specified for a login address, the webservers domain part will be appended.
-
-## Change attachment/message size
-Default file size limit is set to 25 MB. If you want to change this, either use the mailcow control center or the command `mailcow_msg_size` in a terminal:
-
-```
-mailcow_msg_size VALUE_IN_MB
-``` 
 
 # Uninstall
 Run `bash misc/purge.sh` from within mailcow directory to remove mailcow main components.
