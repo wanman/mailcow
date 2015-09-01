@@ -279,7 +279,13 @@ namespace {
 			break;
 		case "srr":
 			$srr_parameters = "";
-			$valid_srr = array("reject_invalid_helo_hostname", "reject_unknown_helo_hostname", "reject_unknown_reverse_client_hostname", "reject_unknown_client_hostname", "reject_non_fqdn_helo_hostname");
+			$valid_srr = array(
+				"reject_invalid_helo_hostname",
+				"reject_unknown_helo_hostname",
+				"reject_unknown_reverse_client_hostname",
+				"reject_unknown_client_hostname",
+				"reject_non_fqdn_helo_hostname"
+				);
 			$srr = (array_keys($v));
 			foreach ($srr as $restriction) {
 				if (in_array($restriction, $valid_srr)) {
