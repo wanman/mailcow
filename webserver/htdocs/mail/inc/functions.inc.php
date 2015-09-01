@@ -467,10 +467,10 @@ function mailbox_add_alias($link, $postarray) {
 		die("Alias $address already exists");
 	}
 	if (empty($domain)) {
-		header("Location: do.php?event=".base64_encode("Alias address or catch-all for domain cannot by em$
+		header("Location: do.php?event=".base64_encode("Alias address or catch-all for domain cannot by empty"));
 		die("Alias address or catch-all for domain cannot by empty");
 	}
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain' AND (domain NOT I$
+	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) {
 		header("Location: do.php?event=".base64_encode("Permission denied or invalid format"));
 		die("Permission denied or invalid format");
 	}
@@ -484,10 +484,10 @@ function mailbox_add_alias($link, $postarray) {
 		die("Domain $domain not found");
 	}
 	if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
-		$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('@$domain$
+		$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('@$domain', '$goto', '$domain', now(), now(), '$active')";
 	}
 	else {
-		$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('$address$
+		$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('$address', '$goto', '$domain', now(), now(), '$active')";
 	}
 	if (!mysqli_query($link, $mystring)) {
 		header("Location: do.php?event=".base64_encode("MySQL query failed"));
