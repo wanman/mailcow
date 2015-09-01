@@ -10,6 +10,7 @@ fufix is now known as mailcow!
 - [Installation](#installation)
 - [Upgrade](#upgrade)
 - [SSL certificate](#ssl-certificate)
+- [Fetch mail with getmail4](#getmail4)
 - [Uninstall](#uninstall)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -160,6 +161,65 @@ To start the upgrade, run the following command:
 The SSL certificate is located at `/etc/ssl/mail/mail.{key,crt}`.
 You can replace it by just copying over your own files. 
 Services effected and necessary to restart are `postfix`, `dovecot` and `nginx` (Nginx if installed, Apache2 does not have a body size limitation configured).
+
+# Getmail4
+Install getmail4:
+```
+apt-get install getmail4
+```
+Create a getmail4 profile (as root):
+```
+mkdir ~/.getmail/
+nano ~/.getmail/profile1
+```
+Example profile (do not forget to set me@my-mailcow.tld):
+```
+[retriever]
+# Use SimpleIMAPSSLRetriever for IMAPS, SimpleIMAPRetriever for IMAP etc.
+# Available retrievers: SimpleIMAPRetriever, SimpleIMAPSSLRetriever, SimplePOP3SSLRetriever, SimplePOP3Retriever
+type = SimpleIMAPSSLRetriever
+server = imap.googlemail.com
+#server = imap-mail.outlook.com
+username = MYUSERNAME
+password = MYPASSWORD
+mailboxes = ("[Gmail]/All Mail",)
+#mailboxes = ("[Gmail]/Alle Nachrichten",)
+#mailboxes = ("INBOX", "INBOX.spam",)
+port = 993
+
+[destination]
+type = MDA_external
+path = /usr/lib/dovecot/deliver
+# Remember to change the destination address
+arguments = ("-e", "-f", "%(sender)", "-d", "me@my-mailcow.tld")
+user = vmail
+group = vmail
+
+[options]
+# Email header will not be altered
+received = false
+delivered_to = false
+# Only fetch missing mails
+read_all = false
+verbose = 2
+message_log = /root/.getmail/deliver.log
+message_log_verbose = true
+```
+This profile delivers directly to Dovecot and does not need to pass a SMTPd process.
+
+You can add a cronjob to run getmail every 10 minutes:
+```
+crontab -e
+```
+Last line:
+```
+*/10 * * * * /usr/bin/getmail -r profile1 --quiet
+```
+Run manually:
+```
+/usr/bin/getmail -r profile1
+```
+You can add an unlimited amount of profiles.
 
 # Uninstall
 Run `bash misc/purge.sh` from within mailcow directory to remove mailcow main components.
