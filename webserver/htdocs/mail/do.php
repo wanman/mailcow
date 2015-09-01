@@ -89,7 +89,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="goto">Destination address(es) - <b>comma separated</b>:</label>
+						<label class="control-label col-sm-2" for="goto" placeholder="first@example.net, second@example.net">Destination address(es) - comma separated:</label>
 						<div class="col-sm-10">
 							<textarea class="form-control" rows="10" name="goto"></textarea>
 						</div>
