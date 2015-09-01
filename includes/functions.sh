@@ -630,7 +630,9 @@ THIS UPGRADE WILL RESET SOME OF YOUR CONFIGURATION FILES
 A backup will be stored in ./before_upgrade_$timestamp
 --------------------------------------------------------
 "
-	read -p "Press ENTER to continue or CTRL-C to cancel the upgrade process"
+	if [[ $inst_unattended != "yes" ]]; then
+		read -p "Press ENTER to continue or CTRL-C to cancel the upgrade process"
+	fi
 	echo -en "Creating backups in ./before_upgrade_$timestamp... \t"
 	mkdir before_upgrade_$timestamp
 	cp -R /var/www/mail/ before_upgrade_$timestamp/mail_wwwroot
