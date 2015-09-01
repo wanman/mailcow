@@ -89,16 +89,9 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="goto">Destination address(es):</label>
+						<label class="control-label col-sm-2" for="goto">Destination address(es) - <b>comma separated</b>:</label>
 						<div class="col-sm-10">
-							<select name="goto[]" size="10" multiple>
-<?php
-$result = mysqli_query($link, "SELECT username, domain FROM mailbox WHERE domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role'");
-while ($row = mysqli_fetch_array($result)) {
-	echo "<option>", $row['username'], "</option>";
-}
-?>
-							</select>
+							<textarea class="form-control" rows="10" name="goto"></textarea>
 						</div>
 					</div>
 					<div class="form-group">
@@ -132,19 +125,7 @@ while ($row = mysqli_fetch_array($result)) {
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="name">Destination address(es) <small>(hold CTRL to select multiple domains)</small>:</label>
 						<div class="col-sm-10">
-							<select name="goto[]" size="5" multiple>
-<?php
-$resultselect = mysqli_query($link, "SELECT username, domain FROM mailbox WHERE domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role';");
-while ($rowsel = mysqli_fetch_array($resultselect)) {
-	if (in_array($rowsel['username'], explode(",", $result['goto']))) {
-		echo '<option selected>'.$rowsel['username'].'</option>';
-	}
-	else {
-		echo '<option>'.$rowsel['username'].'</option>';
-	}
-}
-?>
-							</select>
+							<textarea class="form-control" rows="10" name="goto"><?=$result['goto'] ?></textarea>
 						</div>
 					</div>
 					<div class="form-group">
