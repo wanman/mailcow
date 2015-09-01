@@ -655,7 +655,7 @@ function mailbox_edit_alias($link, $postarray) {
 		die("Destination address must not be empty");
 	}
 	$goto_arr = array_map('trim', explode(',', $_POST['goto']));
-	foreach ($goto_arr $goto) {
+	foreach ($goto_arr as $goto) {
 		if (!filter_var($goto, FILTER_VALIDATE_EMAIL)) {
 			header("Location: do.php?event=" . base64_encode("Destination address $goto invalid"));
 			die("Destination address $goto is invalid");
