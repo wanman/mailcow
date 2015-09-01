@@ -13,6 +13,9 @@ usage() {
 
 	--upgrade | -u
 		Upgrade mailcow to a newer version
+
+	--upgrade-unattended | -uu
+		Upgrade mailcow to a newer version unattended
 	"
 }
 
