@@ -279,7 +279,13 @@ namespace {
 			break;
 		case "srr":
 			$srr_parameters = "";
-			$valid_srr = array("reject_invalid_helo_hostname", "reject_unknown_helo_hostname", "reject_unknown_reverse_client_hostname", "reject_unknown_client_hostname", "reject_non_fqdn_helo_hostname");
+			$valid_srr = array(
+				"reject_invalid_helo_hostname",
+				"reject_unknown_helo_hostname",
+				"reject_unknown_reverse_client_hostname",
+				"reject_unknown_client_hostname",
+				"reject_non_fqdn_helo_hostname"
+				);
 			$srr = (array_keys($v));
 			foreach ($srr as $restriction) {
 				if (in_array($restriction, $valid_srr)) {
@@ -438,21 +444,18 @@ function mailbox_add_domain($link, $postarray) {
 }
 function mailbox_add_alias($link, $postarray) {
 	$address = mysqli_real_escape_string($link, $_POST['address']);
-	foreach ($_POST['goto'] as $goto) {
+	$goto_arr = array_map('trim', explode(',', $_POST['goto']));
+	foreach ($goto_arr as $goto) {
 		if (!filter_var($goto, FILTER_VALIDATE_EMAIL)) {
-			header("Location: do.php?event=" . base64_encode("Destination address invalid"));
-			die("Destination address invalid");
-		}
-		if (!mysqli_result(mysqli_query($link, "SELECT username FROM mailbox WHERE username='$goto'"))) {
-			header("Location: do.php?event=" . base64_encode("Destination address unknown"));
-			die("Destination address unknown");
+			header("Location: do.php?event=" . base64_encode("Destination address $goto is invalid"));
+			die("Destination address $goto is invalid");
 		}
 	}
 	if (empty($_POST['goto'])) {
 		header("Location: do.php?event=" . base64_encode("Destination address must not be empty"));
 		die("Destination address must not be empty");
 	}
-	$goto = implode(",", $_POST['goto']);
+	$goto = implode(",", $goto_arr);
 	$domain = substr($address, strpos($address, '@')+1);
 	global $logged_in_role;
 	global $logged_in_as;
@@ -460,8 +463,8 @@ function mailbox_add_alias($link, $postarray) {
 	$qresult = mysqli_query($link, $qstring);
 	$num_results = mysqli_num_rows($qresult);
 	if ($num_results != 0) {
-		header("Location: do.php?event=".base64_encode("Alias exists in system"));
-		die("Alias exists in system");
+		header("Location: do.php?event=".base64_encode("Alias $address already exists"));
+		die("Alias $address already exists");
 	}
 	if (empty($domain)) {
 		header("Location: do.php?event=".base64_encode("Alias address or catch-all for domain cannot by empty"));
@@ -651,17 +654,14 @@ function mailbox_edit_alias($link, $postarray) {
 		header("Location: do.php?event=" . base64_encode("Destination address must not be empty"));
 		die("Destination address must not be empty");
 	}
-	foreach ($_POST['goto'] as $goto) {
+	$goto_arr = array_map('trim', explode(',', $_POST['goto']));
+	foreach ($goto_arr as $goto) {
 		if (!filter_var($goto, FILTER_VALIDATE_EMAIL)) {
-			header("Location: do.php?event=" . base64_encode("Destination address invalid"));
-			die("Destination address invalid");
-		}
-		if (!mysqli_result(mysqli_query($link, "SELECT username FROM mailbox WHERE username='$goto'"))) {
-			header("Location: do.php?event=" . base64_encode("Destination address unknown"));
-			die("Destination address unknown");
+			header("Location: do.php?event=" . base64_encode("Destination address $goto invalid"));
+			die("Destination address $goto is invalid");
 		}
 	}
-	$goto = implode(",", $_POST['goto']);
+	$goto = implode(",", $goto_arr);
 	if (isset($_POST['active']) && $_POST['active'] == "on") { $active = "1"; } else { $active = "0"; }
 	if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
 		header("Location: do.php?event=".base64_encode("Mail address format invalid"));
@@ -1003,17 +1003,15 @@ function set_time_limited_aliases($link, $postarray) {
 	}
 	switch ($_POST["action"]) {
 		case "generate":
-			$hours = array(1, 4, 12, 24, 48);
-			$mystring = "";
-			foreach ($hours as $i) {
-				$mystring .= "INSERT INTO spamalias (address, goto, validity) VALUES (CONCAT(SUBSTRING(MD5(RAND()) FROM 1 FOR 12), '$domain'), '$logged_in_as', DATE_ADD(NOW(), INTERVAL $i HOUR));";
+			if (!is_numeric($_POST["validity"]) || $_POST["validity"] > 672) {
+				header("Location: do.php?event=".base64_encode("Invalid form data"));
+				die("Invalid form data");
 			}
-			if (!mysqli_multi_query($link, $mystring)) {
+			$hours = $_POST["validity"];
+			$mystring = "INSERT INTO spamalias (address, goto, validity) VALUES (CONCAT(SUBSTRING(MD5(RAND()) FROM 1 FOR 12), '$domain'), '$logged_in_as', DATE_ADD(NOW(), INTERVAL $hours HOUR));";
+			if (!mysqli_query($link, $mystring)) {
 				header("Location: do.php?event=".base64_encode(mysqli_error($link)));
 				die("MySQL query failed");
-			}
-			while ($link->next_result()) {
-				if (!$link->more_results()) break;
 			}
 			header('Location: do.php?return=success');
 		break;

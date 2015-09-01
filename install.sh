@@ -9,7 +9,8 @@ source includes/versions
 source includes/functions.sh
 
 case $1 in
-	"-u" | "--upgrade" )
+	"-u" | "--upgrade" | "-uu" | "--upgrade-unattended" )
+		[[ $1 == "-uu" || $1 == "--upgrade-unattended" ]] && inst_unattended="yes"
 		upgradetask
 		echo $mailcow_version > /etc/mailcow_version
 echo --------------------------------- >> installer.log

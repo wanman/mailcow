@@ -37,6 +37,9 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 </div>
 </div>
 
+<ul><b>Did you know?</b> You can tag your mail address like "<?php echo explode('@', $logged_in_as)[0]; ?><b>+Private</b>@<?php echo explode('@', $logged_in_as)[1]; ?>" to automatically create a subfolder named "Private" in your inbox.<$
+<br />
+
 <div class="panel panel-default">
 <div class="panel-heading">Generate time-limited aliases</div>
 <div class="panel-body">
@@ -65,15 +68,25 @@ echo "<tr>
 	</tbody>
 </table>
 </div>
-<p>
-	<div class="form-group">
-		<div class="col-sm-9">
-			<button type="submit" name="action" value="generate" class="btn btn-success btn-sm">Generate random aliases</button>
-			<button type="submit" name="action" value="delete" class="btn btn-danger btn-sm">Delete all aliases</button>
-			<button type="submit" name="action" value="extend" class="btn btn-default btn-sm">Add 1 hour to all aliases</button>
-		</div>
+<div class="form-group">
+	<div class="col-sm-9">
+		<label for="validity">Validity</label>
+		<select name="validity" size="1">
+			<option value="1">1 hour</option>
+			<option value="6">6 hours</option>
+			<option value="24">1 day</option>
+			<option value="168">1 week</option>
+			<option value="672">4 weeks</option>
+		</select>
 	</div>
-</p>
+</div>
+<div class="form-group">
+	<div class="col-sm-9">
+		<button type="submit" name="action" value="generate" class="btn btn-success btn-sm">Generate random alias</button>
+		<button type="submit" name="action" value="delete" class="btn btn-danger btn-sm">Delete all aliases</button>
+		<button type="submit" name="action" value="extend" class="btn btn-default btn-sm">Add 1 hour to all aliases</button>
+	</div>
+</div>
 </form>
 </div>
 </div>

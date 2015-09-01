@@ -13,6 +13,9 @@ usage() {
 
 	--upgrade | -u
 		Upgrade mailcow to a newer version
+
+	--upgrade-unattended | -uu
+		Upgrade mailcow to a newer version unattended
 	"
 }
 
@@ -427,7 +430,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				ln -s /etc/apache2/sites-available/mailcow /etc/apache2/sites-enabled/000-0-mailcow.conf
 				sed -i "s/\"\MAILCOW_HOST.MAILCOW_DOMAIN\"/\"${sys_hostname}.${sys_domain}\"/g" /etc/apache2/sites-available/mailcow
 				sed -i "s/\"autoconfig.MAILCOW_DOMAIN\"/\"autoconfig.${sys_domain}\"/g" /etc/apache2/sites-available/mailcow
-				sed -i "s/MAILCOW_DOMAIN;/${sys_domain};/g" /etc/apache2/sites-available/mailcow
+				sed -i "s/MAILCOW_DOMAIN\"/${sys_domain}\"/g" /etc/apache2/sites-available/mailcow
 				a2enmod rewrite ssl proxy proxy_fcgi > /dev/null 2>&1
 			fi
 			cp webserver/php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
@@ -627,7 +630,9 @@ THIS UPGRADE WILL RESET SOME OF YOUR CONFIGURATION FILES
 A backup will be stored in ./before_upgrade_$timestamp
 --------------------------------------------------------
 "
-	read -p "Press ENTER to continue or CTRL-C to cancel the upgrade process"
+	if [[ $inst_unattended != "yes" ]]; then
+		read -p "Press ENTER to continue or CTRL-C to cancel the upgrade process"
+	fi
 	echo -en "Creating backups in ./before_upgrade_$timestamp... \t"
 	mkdir before_upgrade_$timestamp
 	cp -R /var/www/mail/ before_upgrade_$timestamp/mail_wwwroot
