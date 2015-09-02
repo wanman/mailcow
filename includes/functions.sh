@@ -418,6 +418,9 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			if [[ ${conf_httpd} == "nginx" ]]; then
 				rm /etc/nginx/sites-enabled/{000-0-mailcow,000-0-fufix} 2>/dev/null
 				cp webserver/nginx/conf/sites-available/mailcow /etc/nginx/sites-available/
+				cp webserver/php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
+				cp webserver/php5-fpm/conf/php-fpm.conf /etc/php5/fpm/php-fpm.conf
+				sed -i "/date.timezone/c\php_admin_value[date.timezone] = ${sys_timezone}" /etc/php5/fpm/pool.d/mail.conf
 				ln -s /etc/nginx/sites-available/mailcow /etc/nginx/sites-enabled/000-0-mailcow 2>/dev/null
 				[[ ! -z $(grep "client_max_body_size" /etc/nginx/nginx.conf) ]] && \
 					sed -i "/client_max_body_size/c\ \ \ \ \ \ \ \ client_max_body_size 25M;" /etc/nginx/nginx.conf || \
@@ -431,12 +434,8 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				sed -i "s/\"\MAILCOW_HOST.MAILCOW_DOMAIN\"/\"${sys_hostname}.${sys_domain}\"/g" /etc/apache2/sites-available/mailcow
 				sed -i "s/\"autoconfig.MAILCOW_DOMAIN\"/\"autoconfig.${sys_domain}\"/g" /etc/apache2/sites-available/mailcow
 				sed -i "s/MAILCOW_DOMAIN\"/${sys_domain}\"/g" /etc/apache2/sites-available/mailcow
+				sed -i "s/MAILCOW_TZ/\"${sys_timezone}\"/g" /etc/apache2/sites-available/mailcow
 				a2enmod rewrite ssl > /dev/null 2>&1
-			fi
-			if [[ ${conf_httpd} == "nginx" ]]; then
-				cp webserver/php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
-				cp webserver/php5-fpm/conf/php-fpm.conf /etc/php5/fpm/php-fpm.conf
-				sed -i "/date.timezone/c\php_admin_value[date.timezone] = ${sys_timezone}" /etc/php5/fpm/pool.d/mail.conf
 			fi
 			mkdir /var/lib/php5/sessions 2> /dev/null
 			chown -R www-data:www-data /var/lib/php5/sessions
