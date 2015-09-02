@@ -229,7 +229,7 @@ EOF
 				fi
 				webserver_backend="apache2 apache2-utils libapache2-mod-php5"
 			elif [[ ${conf_httpd} == "nginx" ]]; then
-				webserver_backend="nginx-extras"
+				webserver_backend="nginx-extras php5-fpm"
 			fi
 			echo "$(textb [INFO]) - Installing packages unattended, please stand by, errors will be reported."
 			if [[ $(lsb_release -is) == "Ubuntu" ]]; then
@@ -247,7 +247,7 @@ EOF
 			fi
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install zip jq dnsutils python-setuptools libmail-spf-perl libmail-dkim-perl \
 openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
-php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-fpm php5-gd php5-imap php-apc subversion \
+php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-gd php5-imap php-apc subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc ${database_backend} ${webserver_backend} mailutils pyzor razor \
 postfix-mysql postfix-pcre spamassassin spamc sudo bzip2 curl mpack opendkim opendkim-tools unzip clamav-daemon \
 fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl bsd-mailx > /dev/null
@@ -427,17 +427,19 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			elif [[ ${conf_httpd} == "apache2" ]]; then
 				rm /etc/apache2/sites-enabled/{000-0-mailcow,000-0-fufix} 2>/dev/null
 				cp webserver/apache2/conf/sites-available/mailcow /etc/apache2/sites-available/
-				ln -s /etc/apache2/sites-available/mailcow /etc/apache2/sites-enabled/000-0-mailcow.conf
+				ln -s /etc/apache2/sites-available/mailcow /etc/apache2/sites-enabled/000-0-mailcow.conf 2>/dev/null
 				sed -i "s/\"\MAILCOW_HOST.MAILCOW_DOMAIN\"/\"${sys_hostname}.${sys_domain}\"/g" /etc/apache2/sites-available/mailcow
 				sed -i "s/\"autoconfig.MAILCOW_DOMAIN\"/\"autoconfig.${sys_domain}\"/g" /etc/apache2/sites-available/mailcow
 				sed -i "s/MAILCOW_DOMAIN\"/${sys_domain}\"/g" /etc/apache2/sites-available/mailcow
-				a2enmod rewrite ssl proxy proxy_fcgi > /dev/null 2>&1
+				a2enmod rewrite ssl > /dev/null 2>&1
 			fi
-			cp webserver/php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
-			cp webserver/php5-fpm/conf/php-fpm.conf /etc/php5/fpm/php-fpm.conf
+			if [[ ${conf_httpd} == "nginx" ]]; then
+				cp webserver/php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
+				cp webserver/php5-fpm/conf/php-fpm.conf /etc/php5/fpm/php-fpm.conf
+				sed -i "/date.timezone/c\php_admin_value[date.timezone] = ${sys_timezone}" /etc/php5/fpm/pool.d/mail.conf
+			fi
 			mkdir /var/lib/php5/sessions 2> /dev/null
 			chown -R www-data:www-data /var/lib/php5/sessions
-			sed -i "/date.timezone/c\php_admin_value[date.timezone] = ${sys_timezone}" /etc/php5/fpm/pool.d/mail.conf
 			install -m 755 misc/mc_inst_cron /usr/local/sbin/mc_inst_cron
 			cp -R webserver/htdocs/{mail,dav} /var/www/
 			tar xf /var/www/dav/vendor.tar -C /var/www/dav/ ; rm /var/www/dav/vendor.tar
@@ -543,7 +545,12 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			;;
 		restartservices)
 			[[ -f /lib/systemd/systemd ]] && echo "$(textb [INFO]) - Restarting services, this may take a few seconds..."
-			for var in fail2ban rsyslog ${conf_httpd} php5-fpm spamassassin dovecot postfix opendkim clamav-daemon
+			if [[ ${conf_httpd} == "nginx" ]]; then
+				fpm="php5-fpm"
+			else
+				fpm=""
+			fi
+			for var in fail2ban rsyslog ${conf_httpd} ${fpm} spamassassin dovecot postfix opendkim clamav-daemon
 			do
 				service $var stop
 				sleep 1.5
@@ -641,7 +648,12 @@ A backup will be stored in ./before_upgrade_$timestamp
 	cp -R /etc/{postfix,dovecot,spamassassin,fail2ban,${conf_httpd},mysql,php5,clamav} before_upgrade_$timestamp/
 	echo -e "$(greenb "[OK]")"
 	echo -en "\nStopping services, this may take a few seconds... \t\t"
-	for var in fail2ban rsyslog ${conf_httpd} php5-fpm spamassassin dovecot postfix opendkim clamav-daemon
+	if [[ ${conf_httpd} == "nginx" ]]; then
+		fpm="php5-fpm"
+	else
+		fpm=""
+	fi
+	for var in fail2ban rsyslog ${conf_httpd} ${fpm} spamassassin dovecot postfix opendkim clamav-daemon
 	do
 		service $var stop > /dev/null 2>&1
 	done
