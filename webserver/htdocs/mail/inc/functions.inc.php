@@ -219,16 +219,27 @@ function set_mailcow_config($s, $v = "", $vext = "") {
 			header('Location: do.php?return=success');
 			break;
 		case "extlist":
-			if ($vext == "reject") {
-				foreach (explode("|", $v) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return false; } }
-				file_put_contents($GLOBALS["mailcow_reject_attachments"], "/name=[^>]*\.($v)/     REJECT     Dangerous files are prohibited on this server.".PHP_EOL);
-				header('Location: do.php?return=success');
-			} elseif ($vext == "filter") {
-				foreach (explode("|", $v) as $each_ext) { if (!ctype_alnum($each_ext) || strlen($each_ext) >= 10 ) { return false; } }
-				file_put_contents($GLOBALS["mailcow_reject_attachments"], "/name=[^>]*\.($v)/     FILTER     vfilter:dummy".PHP_EOL);
-				header('Location: do.php?return=success');
+		if ($vext == "reject") {
+			foreach (explode("|", $v) as $each_ext) {
+				if (!preg_match("/^[a-zA-Z0-9.*]*$/", $each_ext) || strlen($each_ext) >= 10 ) {
+					header("Location: do.php?event=".base64_encode("Extension name $each_ext invalid"));
+					die("Extension name $each_ext invalid");
+				}
 			}
-			break;
+			file_put_contents($GLOBALS["mailcow_reject_attachments"], "/name=[^>]*\.($v)/     REJECT     Dangerous files are prohibited on this server.".PHP_EOL);
+			header('Location: do.php?return=success');
+		}
+		elseif ($vext == "filter") {
+			foreach (explode("|", $v) as $each_ext) {
+				if (!preg_match("/^[a-zA-Z0-9.*]*$/", $each_ext) || strlen($each_ext) >= 10 ) {
+					header("Location: do.php?event=".base64_encode("Extension name $each_ext invalid"));
+					die("Extension name $each_ext invalid");
+				}
+			}
+			file_put_contents($GLOBALS["mailcow_reject_attachments"], "/name=[^>]*\.($v)/     FILTER     vfilter:dummy".PHP_EOL);
+			header('Location: do.php?return=success');
+		}
+		break;
 		case "anonymize":
 			$template = '/^\s*(Received: from)[^\n]*(.*)/ REPLACE $1 [127.0.0.1] (localhost [127.0.0.1])$2
 /^\s*User-Agent/        IGNORE

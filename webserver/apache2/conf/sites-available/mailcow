@@ -4,7 +4,6 @@
 	AddDefaultCharset utf-8
 	ServerName "MAILCOW_HOST.MAILCOW_DOMAIN"
 	DocumentRoot /var/www/mail
-	ProxyPassMatch ^/(.*\.php(/.*)?)$ unix:/var/run/php5-fpm-mail.sock|fcgi://127.0.0.1:9000/var/www/mail
 	RewriteEngine On
 	RewriteCond %{HTTPS} !=on
 	RewriteRule ^/?(.*) https://%{HTTP_HOST}/$1 [L,R,NE]
@@ -32,7 +31,6 @@
 		SSLCertificateKeyFile /etc/ssl/mail/mail.key
 		ErrorDocument 503 /admin.php
         ErrorDocument 500 /admin.php
-        ProxyPassMatch ^/(.*\.php(/.*)?)$ unix:/var/run/php5-fpm-mail.sock|fcgi://127.0.0.1:9000/var/www/mail
 		<FilesMatch "\.(cgi|shtml|phtml|php)$">
 			SSLOptions +StdEnvVars
 		</FilesMatch>
@@ -55,6 +53,7 @@
 		php_flag always_populate_raw_post_data off
 		php_flag magic_quotes_gpc off
 		php_flag mbstring.func_overload off
+		php_value date.timezone MAILCOW_TZ
 		DirectoryIndex server.php
 		SSLEngine on
 		SSLCertificateFile /etc/ssl/mail/mail.crt
