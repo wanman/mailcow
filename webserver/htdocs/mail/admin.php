@@ -285,6 +285,7 @@ $srr_values = return_mailcow_config("srr");
 	<p>Provide a list of dangerous file types. Please take care of the formatting.</p>
 	<input class="form-control" type="text" id="ext" name="ext" value="<?php echo return_mailcow_config("extlist") ?>">
 	<p><pre>Format: ext1|ext1|ext3
+To scan all attachments: .*
 Enter "DISABLED" to disable this feature.</pre></p>
 	<div class="radio">
 		<label>
