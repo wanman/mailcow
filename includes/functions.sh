@@ -491,19 +491,6 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				chmod +x roundcube/inst/${roundcube_version}/bin/installto.sh
 				roundcube/inst/${roundcube_version}/bin/installto.sh /var/www/mail/rc
 			fi
-			if [[ ! -d /var/www/mail/rc/plugins/carddav ]]; then
-				wget --quiet https://codeload.github.com/blind-coder/rcmcarddav/zip/master -O /tmp/master.zip && unzip -o /tmp/master.zip -d /var/www/mail/rc/plugins/ > /dev/null
-				mv /var/www/mail/rc/plugins/rcmcarddav-master /var/www/mail/rc/plugins/carddav
-				instcarddav() {
-				cd /var/www/mail/rc/plugins/carddav
-				curl -sS https://getcomposer.org/installer | php
-				php composer.phar install
-				}
-				(instcarddav > /dev/null 2>&1)
-				cp /var/www/mail/rc/plugins/carddav/skins/larry/carddav.css /var/www/mail/rc/skins/larry/
-				mv /var/www/mail/rc/plugins/carddav/{config.inc.php.dist,config.inc.php}
-				mysql --host ${my_dbhost} -u ${my_rcuser} -p${my_rcpass} ${my_rcdb} < /var/www/mail/rc/plugins/carddav/dbinit/mysql.sql
-			fi
 			chown -R www-data: /var/www/
 			rm -rf roundcube/inst/${roundcube_version}
 			rm -rf /var/www/mail/rc/installer/
