@@ -11,6 +11,7 @@ fufix is now known as mailcow!
 - [Upgrade](#upgrade)
 - [SSL certificate](#ssl-certificate)
 - [Fetch mail with getmail4](#getmail4)
+- [Thunderbird addons and configuration](#thunderbird)
 - [Uninstall](#uninstall)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -220,6 +221,32 @@ Run manually:
 /usr/bin/getmail -r profile1
 ```
 You can add an unlimited amount of profiles.
+
+# Thunderbird plug-ins
+
+## Sieve
+Please use the latest [Sieve nightlys](https://github.com/thsmi/sieve/blob/master/nightly/README.md) for mailcow.
+
+You can download- and drop the .xpi file in your addons manager inside Thunderbird.
+
+## ACL
+Open the addons manager and search for "imap-acl-extension".
+
+[Direct link](https://addons.mozilla.org/de/thunderbird/addon/imap-acl-extension)
+
+## CardDAV
+Please use the latest [SOGo connector](http://www.sogo.nu/files/downloads/extensions/sogo-connector-31.0.1.xpi) for CardDAV support.
+You can download- and drop the .xpi file in your addons manager inside Thunderbird.
+
+Open your address book in Thunderbird, add a "remote location" and use the **full path** to your address book.
+
+You can find and copy the URL by logging in to mailcow with your mail address. Right click on "Open" next to your address book and copy the address.
+
+### CalDAV
+Thunderbird now comes with a fully integrated calendar.
+Please use the **full path** to your calendar.
+
+You can find and copy the URL by logging in to mailcow with your mail address. Right click on "Open" next to your calendar and copy the address.
 
 # Uninstall
 Run `bash misc/purge.sh` from within mailcow directory to remove mailcow main components.
