@@ -226,7 +226,7 @@ Run manually:
 ```
 You can add an unlimited amount of profiles.
 
-# Thunderbird plug-ins
+# Thunderbird
 
 ## Sieve
 Please use the latest [Sieve nightlys](https://github.com/thsmi/sieve/blob/master/nightly/README.md) for mailcow.
