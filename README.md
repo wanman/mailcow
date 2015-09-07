@@ -236,7 +236,7 @@ You can download- and drop the .xpi file in your addons manager inside Thunderbi
 ## ACL
 Open the addons manager and search for "imap-acl-extension".
 
-[Direct link](https://addons.mozilla.org/de/thunderbird/addon/imap-acl-extension)
+[Direct link](https://addons.mozilla.org/en/thunderbird/addon/imap-acl-extension)
 
 ## CardDAV
 Please use the latest [SOGo connector](http://www.sogo.nu/files/downloads/extensions/sogo-connector-31.0.1.xpi) for CardDAV support.
