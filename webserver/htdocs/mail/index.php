@@ -16,11 +16,8 @@ require_once("inc/header.inc.php");
 				<ul>
 					<li><code><?php echo $MYHOSTNAME; ?>:587/tcp</code></li>
 				</ul>
-				<small><b>Cal- and CardDAV</b></small>
-				<ul>
-					<li><code>https://dav.<?php echo $MYHOSTNAME_1.'.'.$MYHOSTNAME_2; ?>/principals/you@<?php echo $MYHOSTNAME_1.'.'.$MYHOSTNAME_2; ?>/</code></li>
-				</ul>
-				<small>Please use your full email address as login name.</small>
+				<small><b>Cal- and CardDAV</b></small><br />
+				<small><a href="user.php" style="text-decoration:underline">Navigate to your personal settings</a> and copy the full path of your desired calendar or address book.</small>
 			</div>
 		</div>
 	</div>
