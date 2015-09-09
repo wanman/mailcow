@@ -528,6 +528,10 @@ function mailbox_add_alias_domain($link, $postarray) {
 		header("Location: do.php?event=".base64_encode("Target domain $target_domain not found"));
 		die("Target domain $target_domain not found");
 	}
+	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain where domain='$alias_domain'"))) {
+		header("Location: do.php?event=".base64_encode("Alias domain $alias_domain not found"));
+		die("Alias domain $alias_domain not found");
+	}
 	if (mysqli_result(mysqli_query($link, "SELECT alias_domain FROM alias_domain where alias_domain='$alias_domain'"))) {
 		header("Location: do.php?event=".base64_encode("Alias domain exists"));
 		die("Alias domain exists");

@@ -43,7 +43,7 @@
 		ServerSignature off
 		TraceEnable off
 		AddDefaultCharset utf-8
-		ServerName "dav.MAILCOW_DOMAIN"
+		ServerName "MAILCOW_DAV_HOST.MAILCOW_DOMAIN"
 		DocumentRoot /var/www/dav
 		ErrorLog ${APACHE_LOG_DIR}/error.log
 		CustomLog ${APACHE_LOG_DIR}/access.log combined

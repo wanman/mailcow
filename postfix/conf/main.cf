@@ -24,6 +24,9 @@ smtpd_tls_auth_only=yes
 # DH parameters, actually 2048 bit long
 smtpd_tls_dh1024_param_file = /etc/ssl/mail/dhparams.pem
 
+# CA path for SMTP client connections to external servers
+smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt
+
 # TLS session cache for SMTPd
 smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
 

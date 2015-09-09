@@ -498,10 +498,10 @@ nano /opt/vfilter/replies
 ; mailcow comes with plugins helping to export Cal- and CardDAV data to .vcf and .ics files.
 ; Each user can export data he has access to.
 ; You can generate these exports by finding a url to your calendar, and adding ?export at the end of the url. This will automatically trigger a download:
-https://dav.<?php echo $MYHOSTNAME_1.$MYHOSTNAME_2; ?>/calendars/you@domain.tld/default?export
+https://<?php echo $DAV_SUBDOMAIN.$MYHOSTNAME_1.$MYHOSTNAME_2; ?>/calendars/you@domain.tld/default?export
 
 ; The same procedure for address books:
-https://dav.<?php echo $MYHOSTNAME_1.$MYHOSTNAME_2; ?>/addressbooks/you@domain.tld/default?export
+https://<?php echo $DAV_SUBDOMAIN.$MYHOSTNAME_1.$MYHOSTNAME_2; ?>/addressbooks/you@domain.tld/default?export
 
 ; Please use a Cal-/CardDAV client of your choice to find out the URI of self-created calendars and address books.
 ; Administrators can use MySQL to find a users calendar and address book URI:

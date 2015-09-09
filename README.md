@@ -1,6 +1,10 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-fufix is now known as mailcow!
+**Please help mailcow to grow with a little donation**
+
+**Contact me for a managed installation**
+
+[![PayPal donate button](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JWBSYHF4SMC68 "Donate to this project using Paypal")
 
 ![mailcow](https://www.debinux.de/256.png)
 
@@ -11,6 +15,7 @@ fufix is now known as mailcow!
 - [Upgrade](#upgrade)
 - [SSL certificate](#ssl-certificate)
 - [Fetch mail with getmail4](#getmail4)
+- [Thunderbird addons and configuration](#thunderbird)
 - [Uninstall](#uninstall)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -118,7 +123,8 @@ nano mailcow.config
 * **sys_hostname** - Hostname without domain
 * **sys_domain** - Domain name. "$sys_hostname.$sys_domain" equals to FQDN.
 * **sys_timezone** - The timezone must be definied in a valid format (Europe/Berlin, America/New_York etc.)
-* **conf_httpd** - Select wether to use Nginx ("nginx") or Apache2 ("apache2"). Nginx is default.
+* **httpd_platform** - Select wether to use Nginx ("nginx") or Apache2 ("apache2"). Nginx is default.
+* **httpd_dav_subdomain** - A dedicated subdomain for Cal- and CardDAV. Must not be sys_hostname.
 * **my_dbhost** - ADVANCED: Leave as-is ("localhost") for a local database installation. Anything but "localhost" or "127.0.0.1" is recognized as a remote installation.
 * **my_usemariadb** - Use MariaDB instead of MySQL. Only valid for local databases. Installer stops when MariaDB is detected, but MySQL selected - and vice versa.
 * **my_mailcowdb, my_mailcowuser, my_mailcowpass** - SQL database name, username and password for use with Postfix. **You can use the default values.**
@@ -220,6 +226,32 @@ Run manually:
 /usr/bin/getmail -r profile1
 ```
 You can add an unlimited amount of profiles.
+
+# Thunderbird
+
+## Sieve
+Please use the latest [Sieve nightlys](https://github.com/thsmi/sieve/blob/master/nightly/README.md) for mailcow.
+
+You can download- and drop the .xpi file in your addons manager inside Thunderbird.
+
+## ACL
+Open the addons manager and search for "imap-acl-extension".
+
+[Direct link](https://addons.mozilla.org/en/thunderbird/addon/imap-acl-extension)
+
+## CardDAV
+Please use the latest [SOGo connector](http://www.sogo.nu/files/downloads/extensions/sogo-connector-31.0.1.xpi) for CardDAV support.
+You can download- and drop the .xpi file in your addons manager inside Thunderbird.
+
+Open your address book in Thunderbird, add a "remote location" and use the **full path** to your address book.
+
+You can find and copy the URL by logging in to mailcow with your mail address. Right click on "Open" next to your address book and copy the address.
+
+### CalDAV
+Thunderbird now comes with a fully integrated calendar.
+Please use the **full path** to your calendar.
+
+You can find and copy the URL by logging in to mailcow with your mail address. Right click on "Open" next to your calendar and copy the address.
 
 # Uninstall
 Run `bash misc/purge.sh` from within mailcow directory to remove mailcow main components.

@@ -112,16 +112,16 @@ while ($row = mysqli_fetch_array($result)) {
 echo "<tr><td>", str_replace(array('VEVENT', 'VTODO', ','), array('Calendar', 'Tasks', ', '), $row['components']),
 "</td><td>", $row['uri'],
 "</td><td>", $row['displayname'],
-"</td><td><a href=\"https://dav.".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/$logged_in_as/".$row['uri']."?export\">Download (ICS format)</a>",
-"</td><td><a href=\"https://dav.".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/$logged_in_as/".$row['uri']."\">Open</a>",
+"</td><td><a href=\"https://".$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/$logged_in_as/".$row['uri']."?export\">Download (ICS format)</a>",
+"</td><td><a href=\"https://".$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/$logged_in_as/".$row['uri']."\">Open</a>",
 "</td></tr>";
 }
 $result = mysqli_query($link, "SELECT uri, displayname FROM addressbooks WHERE principaluri='principals/$logged_in_as'");
 while ($row = mysqli_fetch_array($result)) {
 echo "<tr><td>Address book</td><td>", $row['uri'],
 "</td><td>", $row['displayname'],
-"</td><td><a href=\"https://dav.".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/addressbooks/$logged_in_as/".$row['uri']."?export\">Download (VCF format)</a>",
-"</td><td><a href=\"https://dav.".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/addressbooks/$logged_in_as/".$row['uri']."\">Open</a>",
+"</td><td><a href=\"https://".$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/addressbooks/$logged_in_as/".$row['uri']."?export\">Download (VCF format)</a>",
+"</td><td><a href=\"https://".$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/addressbooks/$logged_in_as/".$row['uri']."\">Open</a>",
 "</td></tr>";
 }
 ?>
