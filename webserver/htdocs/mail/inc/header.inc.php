@@ -59,8 +59,11 @@ display: none;
 .navbar.navbar, .navbar-default.navbar {
   background-color: #463168;
 }
-a, a:hover, a:focus {
+a, a:hover {
   color: #333;
+}
+.dropdown-menu>li>a:focus {
+  color: #777 !important;
 }
 .dropdown-menu>li>a:hover {
   color: #777 !important;
