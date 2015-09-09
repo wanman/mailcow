@@ -126,11 +126,15 @@ checkconfig() {
 		echo "$(redb [ERR]) - Country code must consist of exactly two characters (DE/US/UK etc.)"
 		exit 1
 	fi
-	if [[ ${conf_httpd} != "nginx" && ${conf_httpd} != "apache2" ]]; then
-		echo "$(redb [ERR]) - \"conf_httpd\" is neither nginx nor apache2"
+	if [[ ${httpd_platform} != "nginx" && ${httpd_platform} != "apache2" ]]; then
+		echo "$(redb [ERR]) - \"httpd_platform\" is neither nginx nor apache2"
 		exit 1
-	elif [[ ${conf_httpd} = "apache2" && -z $(apt-cache show apache2 | grep Version | grep "2.4") ]]; then
+	elif [[ ${httpd_platform} = "apache2" && -z $(apt-cache show apache2 | grep Version | grep "2.4") ]]; then
 		echo "$(redb [ERR]) - Unable to install Apache 2.4, please use Nginx or upgrade your distribution"
+		exit 1
+	fi
+	if [[ ${httpd_dav_subdomain} == ${sys_hostname} ]]; then
+		echo "$(redb [ERR]) - \"httpd_dav_subdomain\" must not be \"sys_hostname\""
 		exit 1
 	fi
 	for var in sys_hostname sys_domain sys_timezone my_dbhost my_mailcowdb my_mailcowuser my_mailcowpass my_rootpw my_rcuser my_rcpass my_rcdb mailcow_admin_user mailcow_admin_pass cert_country cert_state cert_city cert_org
@@ -225,7 +229,7 @@ EOF
 				echo "$(textb [INFO]) - Installing jq from wheezy-backports..."
 				apt-get -y update >/dev/null ; apt-get -y --force-yes install jq -t wheezy-backports >/dev/null
 			fi
-			if [[ ${conf_httpd} == "apache2" ]]; then
+			if [[ ${httpd_platform} == "apache2" ]]; then
 				if [[ $dist_codename == "trusty" ]]; then
 					echo "$(textb [INFO]) - Adding ondrej/apache2 repository..."
 					echo "deb http://ppa.launchpad.net/ondrej/apache2/ubuntu trusty main" > /etc/apt/sources.list.d/ondrej.list
@@ -233,7 +237,7 @@ EOF
 					apt-get -y update >/dev/null
 				fi
 				webserver_backend="apache2 apache2-utils libapache2-mod-php5"
-			elif [[ ${conf_httpd} == "nginx" ]]; then
+			elif [[ ${httpd_platform} == "nginx" ]]; then
 				webserver_backend="nginx-extras php5-fpm"
 			fi
 			echo "$(textb [INFO]) - Installing packages unattended, please stand by, errors will be reported."
@@ -421,7 +425,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			# Testing: Keep added files
 			#rm -rf /var/www/{mail,dav} 2> /dev/null
 			mkdir -p /var/www/ 2> /dev/null
-			if [[ ${conf_httpd} == "nginx" ]]; then
+			if [[ ${httpd_platform} == "nginx" ]]; then
 				rm /etc/nginx/sites-enabled/{000-0-mailcow,000-0-fufix} 2>/dev/null
 				cp webserver/nginx/conf/sites-available/mailcow /etc/nginx/sites-available/
 				cp webserver/php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
@@ -432,12 +436,14 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 					sed -i "/client_max_body_size/c\ \ \ \ \ \ \ \ client_max_body_size 25M;" /etc/nginx/nginx.conf || \
 					sed -i "/http {/a\ \ \ \ \ \ \ \ client_max_body_size 25M;" /etc/nginx/nginx.conf
 				sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN;/${sys_hostname}.${sys_domain};/g" /etc/nginx/sites-available/mailcow
+				sed -i "s/MAILCOW_DAV_HOST.MAILCOW_DOMAIN;/${httpd_dav_subdomain}.${sys_domain};/g" /etc/nginx/sites-available/mailcow
 				sed -i "s/MAILCOW_DOMAIN;/${sys_domain};/g" /etc/nginx/sites-available/mailcow
-			elif [[ ${conf_httpd} == "apache2" ]]; then
+			elif [[ ${httpd_platform} == "apache2" ]]; then
 				rm /etc/apache2/sites-enabled/{000-0-mailcow,000-0-fufix} 2>/dev/null
 				cp webserver/apache2/conf/sites-available/mailcow /etc/apache2/sites-available/
 				ln -s /etc/apache2/sites-available/mailcow /etc/apache2/sites-enabled/000-0-mailcow.conf 2>/dev/null
 				sed -i "s/\"\MAILCOW_HOST.MAILCOW_DOMAIN\"/\"${sys_hostname}.${sys_domain}\"/g" /etc/apache2/sites-available/mailcow
+				sed -i "s/\"\MAILCOW_DAV_HOST.MAILCOW_DOMAIN\"/\"${httpd_dav_subdomain}.${sys_domain}\"/g" /etc/apache2/sites-available/mailcow
 				sed -i "s/\"autoconfig.MAILCOW_DOMAIN\"/\"autoconfig.${sys_domain}\"/g" /etc/apache2/sites-available/mailcow
 				sed -i "s/MAILCOW_DOMAIN\"/${sys_domain}\"/g" /etc/apache2/sites-available/mailcow
 				sed -i "s/MAILCOW_TZ/\"${sys_timezone}\"/g" /etc/apache2/sites-available/mailcow
@@ -458,6 +464,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin
 			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin
 			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin
+			sed -i "s/httpd_dav_subdomain/$httpd_dav_subdomain/g" /var/www/mail/inc/vars.inc.php
 			chown -R www-data: /var/www/{mail,dav,VT_API_KEY,VT_ENABLE,VT_ENABLE_UPLOAD,CAV_ENABLE,MAILBOX_BACKUP} /var/lib/php5/sessions
 			chown www-data: /var/www/
 			mysql --host ${my_dbhost} -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} < webserver/htdocs/init.sql
@@ -537,12 +544,12 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			;;
 		restartservices)
 			[[ -f /lib/systemd/systemd ]] && echo "$(textb [INFO]) - Restarting services, this may take a few seconds..."
-			if [[ ${conf_httpd} == "nginx" ]]; then
+			if [[ ${httpd_platform} == "nginx" ]]; then
 				fpm="php5-fpm"
 			else
 				fpm=""
 			fi
-			for var in fail2ban rsyslog ${conf_httpd} ${fpm} spamassassin dovecot postfix opendkim clamav-daemon
+			for var in fail2ban rsyslog ${httpd_platform} ${fpm} spamassassin dovecot postfix opendkim clamav-daemon
 			do
 				service $var stop
 				sleep 1.5
@@ -579,12 +586,12 @@ upgradetask() {
 		exit 1
 	fi
 	if [[ ! -z $(which apache2) && ! -z $(apache2 -v | grep "2.4") ]]; then
-		conf_httpd="apache2"
+		httpd_platform="apache2"
 	elif [[ ! -z $(which nginx) ]]; then
-		conf_httpd="nginx"
+		httpd_platform="nginx"
 	else
 		echo "$(pinkb [NOTICE]) - Falling back to Nginx: Apache 2.4 was not available!"
-		conf_httpd="nginx"
+		httpd_platform="nginx"
 	fi
 	echo "$(textb [INFO]) - Checking for upgrade prerequisites and collecting system information..."
 	if [[ -z $(which lsb_release) ]]; then
@@ -603,9 +610,10 @@ upgradetask() {
 	my_rcuser=${readconf[5]}
 	my_rcpass=${readconf[6]}
 	my_rcdb=${readconf[7]}
+	httpd_dav_subdomain=${readconf[8]}
 	[[ -z $my_dbhost ]] && my_dbhost="localhost"
 	my_upgradetask="yes"
-	for var in conf_httpd sys_hostname sys_domain sys_timezone my_dbhost my_mailcowdb my_mailcowuser my_mailcowpass my_rcuser my_rcpass my_rcdb
+	for var in httpd_platform httpd_dav_subdomain sys_hostname sys_domain sys_timezone my_dbhost my_mailcowdb my_mailcowuser my_mailcowpass my_rcuser my_rcpass my_rcdb
 	do
 		if [[ -z ${!var} ]]; then
 			echo "$(redb [ERR]) - Could not gather required information: \"${var}\" empty, upgrade failed..."
@@ -621,7 +629,9 @@ $(textb "FQDN")            ${sys_hostname}.${sys_domain}
 $(textb "Timezone")        ${sys_timezone}
 $(textb "mailcow MySQL")   ${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}/${my_mailcowdb}
 $(textb "Roundcube MySQL") ${my_rcuser}:${my_rcpass}@${my_dbhost}/${my_rcdb}
-$(textb "Web server")      ${conf_httpd^}
+$(textb "Web server")      ${httpd_platform^}
+$(textb "Web root")        https://${sys_hostname}.${sys_domain}
+$(textb "DAV web root")    https://${httpd_dav_subdomain}.${sys_domain}
 
 --------------------------------------------------------
 THIS UPGRADE WILL RESET SOME OF YOUR CONFIGURATION FILES
@@ -637,15 +647,15 @@ A backup will be stored in ./before_upgrade_$timestamp
 	cp -R /var/www/mail/ before_upgrade_$timestamp/mail_wwwroot
 	mysqldump -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} > backup_mailcow_db.sql 2>/dev/null
 	mysqldump -u ${my_rcuser} -p${my_rcpass} ${my_rcdb} > backup_roundcube_db.sql 2>/dev/null
-	cp -R /etc/{postfix,dovecot,spamassassin,fail2ban,${conf_httpd},mysql,php5,clamav} before_upgrade_$timestamp/
+	cp -R /etc/{postfix,dovecot,spamassassin,fail2ban,${httpd_platform},mysql,php5,clamav} before_upgrade_$timestamp/
 	echo -e "$(greenb "[OK]")"
 	echo -en "\nStopping services, this may take a few seconds... \t\t"
-	if [[ ${conf_httpd} == "nginx" ]]; then
+	if [[ ${httpd_platform} == "nginx" ]]; then
 		fpm="php5-fpm"
 	else
 		fpm=""
 	fi
-	for var in fail2ban rsyslog ${conf_httpd} ${fpm} spamassassin dovecot postfix opendkim clamav-daemon
+	for var in fail2ban rsyslog ${httpd_platform} ${fpm} spamassassin dovecot postfix opendkim clamav-daemon
 	do
 		service $var stop > /dev/null 2>&1
 	done

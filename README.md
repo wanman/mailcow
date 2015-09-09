@@ -123,7 +123,8 @@ nano mailcow.config
 * **sys_hostname** - Hostname without domain
 * **sys_domain** - Domain name. "$sys_hostname.$sys_domain" equals to FQDN.
 * **sys_timezone** - The timezone must be definied in a valid format (Europe/Berlin, America/New_York etc.)
-* **conf_httpd** - Select wether to use Nginx ("nginx") or Apache2 ("apache2"). Nginx is default.
+* **httpd_platform** - Select wether to use Nginx ("nginx") or Apache2 ("apache2"). Nginx is default.
+* **httpd_dav_subdomain** - A dedicated subdomain for Cal- and CardDAV. Must not be sys_hostname.
 * **my_dbhost** - ADVANCED: Leave as-is ("localhost") for a local database installation. Anything but "localhost" or "127.0.0.1" is recognized as a remote installation.
 * **my_usemariadb** - Use MariaDB instead of MySQL. Only valid for local databases. Installer stops when MariaDB is detected, but MySQL selected - and vice versa.
 * **my_mailcowdb, my_mailcowuser, my_mailcowpass** - SQL database name, username and password for use with Postfix. **You can use the default values.**

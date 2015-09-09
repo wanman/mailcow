@@ -21,4 +21,10 @@ echo $config["des_key"], PHP_EOL;
 echo parse_url($config["db_dsnw"])[user], PHP_EOL;
 echo parse_url($config["db_dsnw"])[pass], PHP_EOL;
 echo substr(parse_url($config["db_dsnw"])[path], 1), PHP_EOL;
+if(isset($DAV_SUBDOMAIN)) {
+echo $DAV_SUBDOMAIN;
+}
+else {
+echo "dav";
+}
 ?>
