@@ -166,7 +166,7 @@ if ($row['backupmx'] == "0"):
 <?php
 else:
 ?>
-		<td><i class="glyphicon glyphicon-forward"></i> <?= $row['username']; ?></td>
+		<td><span data-toggle="tooltip" title="Relayed address on backup mx domain"><i class="glyphicon glyphicon-forward"></i> <?= $row['username']; ?></span></td>
 <?php
 endif;
 ?>
@@ -196,7 +196,6 @@ endwhile;
 				</table>
 				</div>
 			</div>
-			<ul><small><i class="glyphicon glyphicon-forward"></i> indicates a relayed recipient on a <b>backup mx</b> domain</small></ul>
 		</div>
 	</div>
 	<div class="row">
