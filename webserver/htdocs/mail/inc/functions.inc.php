@@ -383,6 +383,8 @@ function echo_sys_info($what, $extra="") {
 		case "maildisk":
 			echo preg_replace('/\D/', '', shell_exec('df -h /var/vmail/ | tail -n1 | awk {\'print $5\'}'));
 			break;
+		case "pflog":
+			echo file_get_contents($GLOBALS['PFLOG']);
 		case "mailq":
 			echo shell_exec("mailq");
 			break;
@@ -414,6 +416,9 @@ function echo_sys_info($what, $extra="") {
 }
 function postfix_reload() {
 	shell_exec("sudo /usr/sbin/postfix reload");
+}
+function pflog_renew() {
+	shell_exec("sudo /usr/local/sbin/mc_pflog_renew");
 }
 function dovecot_reload() {
 	shell_exec("sudo /usr/sbin/dovecot reload");

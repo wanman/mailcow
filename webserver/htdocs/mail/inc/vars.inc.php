@@ -36,6 +36,7 @@ $VT_API_KEY = "/var/www/VT_API_KEY";
 $VT_ENABLE = "/var/www/VT_ENABLE";
 $CAV_ENABLE = "/var/www/CAV_ENABLE";
 $VT_ENABLE_UPLOAD = "/var/www/VT_ENABLE_UPLOAD";
+$PFLOG = "/var/www/PFLOG";
 
 $MYHOSTNAME=exec("/usr/sbin/postconf -h myhostname");
 $MYHOSTNAME_0=explode(".", exec("/usr/sbin/postconf -h myhostname"))[0];

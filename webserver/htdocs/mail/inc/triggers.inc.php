@@ -30,6 +30,9 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 		set_mailcow_config("public_folder", $_POST);
 		dovecot_reload();
 	}
+	if (isset($_POST["pflog_renew"])) {
+		pflog_renew();
+	}
 	if (isset($_POST["srr"])) {
 		set_mailcow_config("srr", $_POST);
 		postfix_reload();
