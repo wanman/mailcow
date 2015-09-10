@@ -48,7 +48,7 @@ $getpostmaster = mysqli_query($link, "SELECT alias.active as aactive, mailbox.ac
 $postmasterstatus = mysqli_fetch_assoc($getpostmaster);
 if ($row[backupmx] == "No" && !isset($postmasterstatus['address']) || ($postmasterstatus['aactive'] == "0" || $postmasterstatus['mactive'] == "0")):
 ?>
-							<span style="border-bottom:1px dotted red;" data-toggle="tooltip" title="No active postmaster mailbox or alias"><?= $row['domain']; ?></span>
+							<span data-toggle="tooltip" title="Postmaster missing/invalid"><i class="glyphicon glyphicon-exclamation-sign"></i> <?= $row['domain']; ?></span>
 <?php
 else:
 ?>
