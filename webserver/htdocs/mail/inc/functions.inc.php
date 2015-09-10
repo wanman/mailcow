@@ -384,7 +384,14 @@ function echo_sys_info($what, $extra="") {
 			echo preg_replace('/\D/', '', shell_exec('df -h /var/vmail/ | tail -n1 | awk {\'print $5\'}'));
 			break;
 		case "pflog":
-			echo file_get_contents($GLOBALS['PFLOG']);
+			$pflog_content = file_get_contents($GLOBALS['PFLOG']);
+			if (!file_exists($GLOBALS['PFLOG'])) {
+				echo "none";
+			}
+			else {
+				echo file_get_contents($GLOBALS['PFLOG']);
+			}
+			break;
 		case "mailq":
 			echo shell_exec("mailq");
 			break;
