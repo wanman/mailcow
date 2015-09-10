@@ -552,9 +552,9 @@ mysql --defaults-file=/etc/mysql/debian.cnf mailcow_database_name -e "SELECT uri
 <?php echo_sys_info("mailq");?>
 </pre>
 <h4>Pflogsumm</h4>
-<pre>
+<textarea rows="20" style="font-family:monospace;font-size:9pt;width:100%;">
 <?php echo_sys_info("pflog");?>
-</pre>
+</textarea>
 <form method="post">
 <div class="form-group">
 <input type="hidden" name="pflog_renew" value="1">
