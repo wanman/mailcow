@@ -1,5 +1,6 @@
 <?php
 require_once("inc/header.inc.php");
+$_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 ?>
 <div class="jumbotron">
 	<div class="container">

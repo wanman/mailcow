@@ -4,6 +4,7 @@ require_once("inc/header.inc.php");
 <div class="container">
 <?php
 if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "admin") {
+$_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 ?>
 <h4><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Access</h4>
 

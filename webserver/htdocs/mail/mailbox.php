@@ -1,6 +1,7 @@
 <?php
 require_once("inc/header.inc.php");
 if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && ($_SESSION['mailcow_cc_role'] == "admin" || $_SESSION['mailcow_cc_role'] == "domainadmin")) {
+$_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 ?>
 <div class="container">
 	<div class="row">
