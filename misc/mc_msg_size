@@ -10,6 +10,8 @@ echo "Parameter must be a value in MB."
 exit 1
 fi
 
+if [ -f /etc/nginx/sites-available/mailcow ]; then
+#Nginx
 sed -i "/upload_max_filesize/c\php_admin_value[upload_max_filesize] = ${1}M" /etc/php5/fpm/pool.d/mail.conf
 sed -i "/post_max_size/c\php_admin_value[post_max_size] = $(expr $1 + 1)M" /etc/php5/fpm/pool.d/mail.conf
 [[ -f /etc/nginx/nginx.conf ]] && sed -i "s/client_max_body_size.*/client_max_body_size ${1}m;/g" $(grep -lr "mailcow site configuration" /etc/nginx/sites-available/)
@@ -19,3 +21,18 @@ echo "Reloading services..."
 postfix reload
 [[ -f $(which nginx) ]] && nginx -s reload
 service php5-fpm reload
+
+elif [ -f /etc/apache2/sites-available/mailcow ]; then
+#Apache
+sed -i "/upload_max_filesize/c\php_value upload_max_filesize ${1}M" /etc/apache2/sites-available/mailcow
+sed -i "/post_max_size/c\php_value post_max_size $(expr $1 + 1)M"  /etc/apache2/sites-available/mailcow
+sed -i "s/message_size_limit.*/message_size_limit = $(( $1 * 1048576 ))/g" /etc/postfix/main.cf
+
+echo "Reloading services..."
+postfix reload
+service apache2 reload
+
+else
+echo "Error Unknown Config"
+exit 1
+fi
