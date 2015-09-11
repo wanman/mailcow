@@ -19,7 +19,7 @@ sed -i "s/message_size_limit.*/message_size_limit = $(( $1 * 1048576 ))/g" /etc/
 
 echo "Reloading services..."
 postfix reload
-[[ -f $(which nginx) ]] && nginx -s reload
+nginx -s reload
 service php5-fpm reload
 
 elif [ -f /etc/apache2/sites-available/mailcow ]; then
