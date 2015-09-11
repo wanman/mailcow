@@ -8,127 +8,140 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 ?>
 <h4><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Access</h4>
 
-<div class="panel panel-default">
-<div class="panel-heading">Administrators</div>
-<div class="panel-body">
-<form method="post">
-<?php
-$result = mysqli_fetch_assoc(mysqli_query($link, "SELECT username from admin where superadmin='1' and active='1'"));
-?>
-	<input type="hidden" name="admin_user_now" value="<?=$result['username'];?>">
-	<div class="form-group">
-		<label class="control-label col-sm-2" for="quota">Administrator:</label>
-		<div class="col-sm-10">
-		<input type="text" class="form-control" name="admin_user" id="admin_user" value="<?=$result['username'];?>" required>
+<div class="panel-group" id="accordion_access">
+	<div class="panel panel-default" data-toggle="collapse" data-parent="#accordion_access" data-target="#collapseAdmin">
+		<div class="panel-heading">
+			<a style="cursor:pointer;" class="accordion-toggle">Administrators</a>
 		</div>
-	</div>
-	<div class="form-group">
-		<label class="control-label col-sm-2" for="admin_pass">Password:</label>
-		<div class="col-sm-10">
-		<input type="password" class="form-control" name="admin_pass" id="admin_pass" placeholder="Leave blank for no change">
-		</div>
-	</div>
-	<div class="form-group">
-		<label class="control-label col-sm-2" for="admin_pass2">Password (repeat):</label>
-		<div class="col-sm-10">
-		<input type="password" class="form-control" name="admin_pass2" id="admin_pass2">
-		</div>
-	</div>
-	<div class="form-group">
-		<div class="col-sm-offset-2 col-sm-10">
-			<button type="submit" class="btn btn-default btn-raised btn-sm">Save changes</button>
-		</div>
-	</div>
-</form>
-</div>
-</div>
-
-<div class="panel panel-default">
-<div class="panel-heading">Domain administrators</div>
-<div class="panel-body">
-<form method="post">
-<div class="table-responsive">
-<table class="table table-striped" id="domainadminstable">
-	<thead>
-	<tr>
-		<th>Username</th>
-		<th>Assigned domains</th>
-		<th>Active</th>
-		<th>Action</th>
-	</tr>
-	</thead>
-	<tbody>
-<?php
-$result = mysqli_query($link, "SELECT username, LOWER(GROUP_CONCAT(DISTINCT domain SEPARATOR ', ')) AS domain, CASE active WHEN 1 THEN 'Yes' ELSE 'No' END AS active FROM domain_admins WHERE username NOT IN (SELECT username FROM admin WHERE superadmin='1') GROUP BY username");
-while ($row = mysqli_fetch_array($result)) {
-echo "<tr><td>", $row['username'],
-"</td><td>", $row['domain'],
-"</td><td>", $row['active'],
-"</td><td><a href=\"do.php?deletedomainadmin=", $row['username'], "\">delete</a> | 
-<a href=\"do.php?editdomainadmin=", $row['username'], "\">edit</a>",
-"</td></tr>";
-}
-?>
-	</tbody>
-</table>
-</div>
-</form>
-<small>
-<h4>Add domain administrator</h4>
-<form class="form-horizontal" role="form" method="post">
-<input type="hidden" name="mailboxaction" value="adddomainadmin">
-	<div class="form-group">
-		<label class="control-label col-sm-4" for="username">Username (<code>A-Z</code>, <code>@</code>, <code>-</code>, <code>.</code>).</label>
-		<div class="col-sm-8">
-			<input type="text" class="form-control" name="username" id="username" required>
-		</div>
-	</div>
-	<div class="form-group">
-		<label class="control-label col-sm-4" for="name">Assign domains (hold <code>CTRL</code> to select multiple values):</label>
-		<div class="col-sm-8">
-			<select style="width:50%" name="domain[]" size="5" multiple>
-<?php
-$resultselect = mysqli_query($link, "SELECT domain FROM domain");
-while ($row = mysqli_fetch_array($resultselect)) {
-echo "<option>", $row['domain'], "</option>";
-}
-?>
-			</select>
-		</div>
-	</div>
-	<div class="form-group">
-		<label class="control-label col-sm-4" for="password">Password:</label>
-		<div class="col-sm-8">
-		<input type="password" class="form-control" name="password" id="password" placeholder="">
-		</div>
-	</div>
-	<div class="form-group">
-		<label class="control-label col-sm-4" for="password2">Password (repeat):</label>
-		<div class="col-sm-8">
-		<input type="password" class="form-control" name="password2" id="password2" placeholder="">
-		</div>
-	</div>
-	<div class="form-group">
-		<div class="col-sm-offset-4 col-sm-8">
-			<div class="checkbox">
-			<label><input type="checkbox" name="active" checked> Active</label>
+		<div id="collapseAdmin" class="panel-collapse collapse in">
+			<div class="panel-body">
+				<form method="post">
+				<?php
+				$result = mysqli_fetch_assoc(mysqli_query($link, "SELECT username from admin where superadmin='1' and active='1'"));
+				?>
+					<input type="hidden" name="admin_user_now" value="<?=$result['username'];?>">
+					<div class="form-group">
+						<label class="control-label col-sm-2" for="quota">Administrator:</label>
+						<div class="col-sm-10">
+						<input type="text" class="form-control" name="admin_user" id="admin_user" value="<?=$result['username'];?>" required>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-2" for="admin_pass">Password:</label>
+						<div class="col-sm-10">
+						<input type="password" class="form-control" name="admin_pass" id="admin_pass" placeholder="Leave blank for no change">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-2" for="admin_pass2">Password (repeat):</label>
+						<div class="col-sm-10">
+						<input type="password" class="form-control" name="admin_pass2" id="admin_pass2">
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<button type="submit" class="btn btn-default btn-raised btn-sm">Save changes</button>
+						</div>
+					</div>
+				</form>
 			</div>
 		</div>
 	</div>
-	<div class="form-group">
-		<div class="col-sm-offset-0 col-sm-8">
-			<button type="submit" class="btn btn-default btn-raised btn-sm">Add domain admin</button>
+
+	<div class="panel panel-default" data-toggle="collapse" data-parent="#accordion_access" data-target="#collapseDomAdmins">
+	<div class="panel-heading">
+		<a style="cursor:pointer;" class="accordion-toggle">Domain administrators</a>
+	</div>
+		<div id="collapseDomAdmins" class="panel-collapse collapse out">
+			<div class="panel-body">
+				<form method="post">
+					<div class="table-responsive">
+					<table class="table table-striped" id="domainadminstable">
+						<thead>
+						<tr>
+							<th>Username</th>
+							<th>Assigned domains</th>
+							<th>Active</th>
+							<th>Action</th>
+						</tr>
+						</thead>
+						<tbody>
+					<?php
+					$result = mysqli_query($link, "SELECT username, LOWER(GROUP_CONCAT(DISTINCT domain SEPARATOR ', ')) AS domain, CASE active WHEN 1 THEN 'Yes' ELSE 'No' END AS active FROM domain_admins WHERE username NOT IN (SELECT username FROM admin WHERE superadmin='1') GROUP BY username");
+					while ($row = mysqli_fetch_array($result)) {
+					echo "<tr><td>", $row['username'],
+					"</td><td>", $row['domain'],
+					"</td><td>", $row['active'],
+					"</td><td><a href=\"do.php?deletedomainadmin=", $row['username'], "\">delete</a> | 
+					<a href=\"do.php?editdomainadmin=", $row['username'], "\">edit</a>",
+					"</td></tr>";
+					}
+					?>
+						</tbody>
+					</table>
+					</div>
+				</form>
+				<small>
+				<h4>Add domain administrator</h4>
+				<form class="form-horizontal" role="form" method="post">
+					<input type="hidden" name="mailboxaction" value="adddomainadmin">
+					<div class="form-group">
+						<label class="control-label col-sm-4" for="username">Username (<code>A-Z</code>, <code>@</code>, <code>-</code>, <code>.</code>).</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" name="username" id="username" required>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-4" for="name">Assign domains (hold <code>CTRL</code> to select multiple values):</label>
+						<div class="col-sm-8">
+							<select style="width:50%" name="domain[]" size="5" multiple>
+				<?php
+				$resultselect = mysqli_query($link, "SELECT domain FROM domain");
+				while ($row = mysqli_fetch_array($resultselect)) {
+				echo "<option>", $row['domain'], "</option>";
+				}
+				?>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-4" for="password">Password:</label>
+						<div class="col-sm-8">
+						<input type="password" class="form-control" name="password" id="password" placeholder="">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-4" for="password2">Password (repeat):</label>
+						<div class="col-sm-8">
+						<input type="password" class="form-control" name="password2" id="password2" placeholder="">
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-4 col-sm-8">
+							<div class="checkbox">
+							<label><input type="checkbox" name="active" checked> Active</label>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-0 col-sm-8">
+							<button type="submit" class="btn btn-default btn-raised btn-sm">Add domain admin</button>
+						</div>
+					</div>
+				</form>
+				</small>
+			</div>
 		</div>
 	</div>
-</form>
-</small>
 </div>
-</div>
+
+
 
 <h4><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Configuration</h4>
-
+<div class="panel-group" id="accordion_config">
 <div class="panel panel-default">
-<div class="panel-heading">Backup mail</div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseBackup"><a style="cursor:pointer;" class="accordion-toggle">Backup mail</a></div>
+<div id="collapseBackup" class="panel-collapse collapse in">
 <div class="panel-body">
 <form method="post">
 	<div class="form-group">
@@ -186,9 +199,11 @@ while ($row = mysqli_fetch_array($resultselect)) {
 </form>
 </div>
 </div>
+</div>
 
 <div class="panel panel-default">
-<div class="panel-heading">Postfix restrictions</div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseSrr"><a style="cursor:pointer;" class="accordion-toggle">Postfix restrictions</a></div>
+<div id="collapseSrr" class="panel-collapse collapse">
 <div class="panel-body">
 <?php
 $srr_values = return_mailcow_config("srr");
@@ -239,10 +254,12 @@ $srr_values = return_mailcow_config("srr");
 </form>
 </div>
 </div>
+</div>
 
 
 <div class="panel panel-default">
-<div class="panel-heading">Public folders</div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapsePubFolders"><a style="cursor:pointer;" class="accordion-toggle">Public folders</a></div>
+<div id="collapsePubFolders" class="panel-collapse collapse">
 <div class="panel-body">
 <p>A namespace "Public" is created. Belows public folder name indicates the name of the first auto-created mailbox within this namespace.</p>
 <form method="post">
@@ -277,9 +294,11 @@ $srr_values = return_mailcow_config("srr");
 </form>
 </div>
 </div>
+</div>
 
 <div class="panel panel-default">
-<div class="panel-heading">Attachments</div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseAttachments"><a style="cursor:pointer;" class="accordion-toggle">Attachments</a></div>
+<div id="collapseAttachments" class="panel-collapse collapse">
 <div class="panel-body">
 <form method="post">
 <div class="form-group">
@@ -355,9 +374,11 @@ Enter "DISABLED" to disable this feature.</pre></p>
 </form>
 </div>
 </div>
+</div>
 
 <div class="panel panel-default">
-<div class="panel-heading">Sender Blacklist</div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseSendBL"><a style="cursor:pointer;" class="accordion-toggle">Sender Blacklist</a></div>
+<div id="collapseSendBL" class="panel-collapse collapse">
 <div class="panel-body">
 <form method="post">
 <div class="form-group">
@@ -368,9 +389,11 @@ Enter "DISABLED" to disable this feature.</pre></p>
 </form>
 </div>
 </div>
+</div>
 
 <div class="panel panel-default">
-<div class="panel-heading">Privacy</div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapsePrivacy"><a style="cursor:pointer;" class="accordion-toggle">Privacy</a></div>
+<div id="collapsePrivacy" class="panel-collapse collapse">
 <div class="panel-body">
 <form method="post">
 <div class="form-group">
@@ -387,9 +410,11 @@ Enter "DISABLED" to disable this feature.</pre></p>
 </form>
 </div>
 </div>
+</div>
 
 <div class="panel panel-default">
-<div class="panel-heading">DKIM Signing</div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseDKIM"><a style="cursor:pointer;" class="accordion-toggle">DKIM Signing</a></div>
+<div id="collapseDKIM" class="panel-collapse collapse">
 <div class="panel-body">
 <p>Default behaviour is to sign with relaxed header and body canonicalization algorithm.</p>
 <form method="post">
@@ -414,9 +439,11 @@ Enter "DISABLED" to disable this feature.</pre></p>
 </form>
 </div>
 </div>
+</div>
 
 <div class="panel panel-default">
-<div class="panel-heading">Message Size</div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseMsgSize"><a style="cursor:pointer;" class="accordion-toggle">Message Size</a></div>
+<div id="collapseMsgSize" class="panel-collapse collapse">
 <div class="panel-body">
 	<form class="form-inline" method="post">
 	<p>Current message size limitation: <strong><?=return_mailcow_config("maxmsgsize");?>MB</strong></p>
@@ -429,12 +456,16 @@ Enter "DISABLED" to disable this feature.</pre></p>
 
 </div>
 </div>
+</div>
 
-<br />
-<h2><span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> Maintenance</h2>
+</div>
 
+<h4><span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> Maintenance</h4>
+
+<div class="panel-group" id="accordion_maint">
 <div class="panel panel-default">
-<div class="panel-heading">FAQ</div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_maint" data-target="#collapseFAQ"><a style="cursor:pointer;" class="accordion-toggle">FAQ</a></div>
+<div id="collapseFAQ" class="panel-collapse collapse">
 <div class="panel-body">
 
 <p data-toggle="collapse" style="cursor:help;" data-target="#dnsrecords"><strong>DNS Records</strong></p>
@@ -524,9 +555,12 @@ mysql --defaults-file=/etc/mysql/debian.cnf mailcow_database_name -e "SELECT uri
 
 </div>
 </div>
+</div>
+
 
 <div class="panel panel-default">
-<div class="panel-heading">System Information</div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_maint" data-target="#collapseSysinfo"><a style="cursor:pointer;" class="accordion-toggle">System Information</a></div>
+<div id="collapseSysinfo" class="panel-collapse collapse out">
 <div class="panel-body">
 <p>This is a very simple system information function. Please be aware that a high RAM usage is what you want on a server.</p>
 <div class="row">
@@ -563,6 +597,7 @@ mysql --defaults-file=/etc/mysql/debian.cnf mailcow_database_name -e "SELECT uri
 </form>
 </div>
 </div>
+</div>
 
 <?php
 }
@@ -590,6 +625,7 @@ die("Permission denied");
 <?php
 }
 ?>
+<br />
 <p><b><a href="../">&#8592; go back</a></b></p>
 </div> <!-- /container -->
 <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>

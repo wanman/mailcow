@@ -11,7 +11,7 @@ else {
 require_once "inc/vars.inc.php";
 $link = mysqli_connect($database_host, $database_user, $database_pass, $database_name);
 if (!$link) {
-    die('Could not connect to SQL');
+	die("Connection error: " . mysqli_connect_error());
 }
 require_once "inc/functions.inc.php";
 require_once "inc/triggers.inc.php";
@@ -35,38 +35,41 @@ if (basename($_SERVER['PHP_SELF']) == "mailbox.php") {
 ?>
 <style>
 .row{
-margin-top:40px;
-padding: 0 10px;
+	margin-top:40px;
+	padding: 0 10px;
 }
 .clickable{
-cursor: pointer;
+	cursor: pointer;
 }
 .panel-heading div {
-margin-top: -18px;
-font-size: 15px;
+	margin-top: -18px;
+	font-size: 15px;
 }
-.panel-heading div span{
-margin-left:5px;
+	.panel-heading div span{
+	margin-left:5px;
 }
 .panel-body{
-display: none;
+	display: none;
 }
 </style>
 <?php
 }
 ?>
 <style>
+html {
+	overflow-y:scroll;
+}
 .navbar.navbar, .navbar-default.navbar {
   background-color: #463168;
 }
 a, a:hover {
-  color: #333;
+	color: #333;
 }
 .dropdown-menu>li>a:focus {
-  color: #777 !important;
+	color: #777 !important;
 }
 .dropdown-menu>li>a:hover {
-  color: #777 !important;
+	color: #777 !important;
 }
 @media(max-width:767px)  {
 	.dropdown-menu>li>a:hover {
@@ -93,22 +96,43 @@ a, a:hover {
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Control center<span class="caret"></span></a>
 					<ul class="dropdown-menu" role="menu">
-						<?php if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes") {
-							if ($logged_in_role == "admin") { ?>
+<?php
+if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes"):
+?>
+<?php
+switch ($logged_in_role) {
+	case "admin":
+?>
 						<li><a href="/admin.php">Administration</a></li>
-							<?php } if ($logged_in_role == "admin" || $logged_in_role == "domainadmin") { ?>
+<?php
+	case "domainadmin":
+?>
 						<li><a href="/mailbox.php">Mailboxes</a></li>
-							<?php } if ($logged_in_role == "user") { ?>
-						<li><a href="/mailbox.php">User settings</a></li>
-						<?php } } else { ?>
+<?php
+	break;
+	case "user":
+?>
+						<li><a href="/user.php">User settings</a></li>
+<?php
+}
+else:
+?>
 						<li><a href="/admin.php">Login</a></li>
-						<?php } ?>
+<?php
+endif;
+?>
 					</ul>
 				</li>
+<?php
+if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes"):
+?>
 				<li class="divider"></li>
 				<li>
-					<a href="#" onclick="logout.submit()"><?php	if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes") { echo "Hello, <strong>$logged_in_as</strong> (logout)"; } ?></a>
+					<a href="#" onclick="logout.submit()">Hello, <strong><?=$logged_in_as;?></strong> (logout)</a>
 				</li>
+<?php
+endif;
+?>
 			</ul>
 		</div><!--/.nav-collapse -->
 	</div><!--/.container-fluid -->
