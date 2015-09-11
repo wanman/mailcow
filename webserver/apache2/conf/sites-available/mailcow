@@ -30,6 +30,9 @@
 		SSLCertificateFile /etc/ssl/mail/mail.crt
 		SSLCertificateKeyFile /etc/ssl/mail/mail.key
 		ErrorDocument 503 /admin.php
+		php_value upload_max_filesize 25M
+                php_value post_max_size 26M
+
         ErrorDocument 500 /admin.php
 		<FilesMatch "\.(cgi|shtml|phtml|php)$">
 			SSLOptions +StdEnvVars
