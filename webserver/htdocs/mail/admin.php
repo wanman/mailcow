@@ -361,7 +361,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 			<div class="checkbox">
 					<label>
 					<input name="virustotalcheckonly" type="checkbox"  <?=return_mailcow_config("vtupload");?>>
-					Do <b>not</b> upload files to VirusTotal but check for a previous scan report. This also requires an API key!
+					Do <b>not</b> upload files to VirusTotal but check for a previous scan report.
 					</label>
 			</div>
 			<label for="vtapikey">VirusTotal API Key (<a href="https://www.virustotal.com/documentation/virustotal-community/#retrieve-api-key" target="_blank">?</a>)</label>

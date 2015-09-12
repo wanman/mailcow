@@ -185,27 +185,34 @@ function set_mailcow_config($s, $v = "", $vext = "") {
 			}
 			break;
 		case "vtupload":
-			if ($v != "1") {
-				file_put_contents($GLOBALS["VT_ENABLE_UPLOAD"], "");
+			if ($v == "1") {
+				file_put_contents($GLOBALS["VT_ENABLE_UPLOAD"], "1");
 			}
 			else {
-				file_put_contents($GLOBALS["VT_ENABLE_UPLOAD"], "1");
+				file_put_contents($GLOBALS["VT_ENABLE_UPLOAD"], "");
 			}
 			break;
 		case "vtenable":
-			if ($v != "1") {
-				file_put_contents($GLOBALS["VT_ENABLE"], "");
+			if ($v == "1" && !empty(file_get_contents($GLOBALS["VT_API_KEY"]))) {
+				file_put_contents($GLOBALS["VT_ENABLE"], "1");
+			} 
+			elseif ($v == "1" && empty(file_get_contents($GLOBALS["VT_API_KEY"]))) {
+				$_SESSION['return'] = array(
+					'type' => 'danger',
+					'msg' => 'No VirusTotal API key defined'
+				);
+				break;
 			}
 			else {
-				file_put_contents($GLOBALS["VT_ENABLE"], "1");
+				file_put_contents($GLOBALS["VT_ENABLE"], "");
 			}
 			break;
 		case "cavenable":
-			if ($v != "1") {
-				file_put_contents($GLOBALS["CAV_ENABLE"], "");
+			if ($v == "1") {
+				file_put_contents($GLOBALS["CAV_ENABLE"], "1");
 			}
 			else {
-				file_put_contents($GLOBALS["CAV_ENABLE"], "1");
+				file_put_contents($GLOBALS["CAV_ENABLE"], "");
 			}
 			break;
 		case "maxmsgsize":
@@ -226,12 +233,24 @@ function set_mailcow_config($s, $v = "", $vext = "") {
 			}
 			break;
 		case "vtapikey":
-			if (!ctype_alnum($v)) {
+			if (!ctype_alnum($v) && !empty(file_get_contents($GLOBALS["VT_ENABLE"]))) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
 					'msg' => 'Invalid VirusTotal API key format'
 				);
 				break;
+			}
+			elseif (!empty($v)) {
+				$report_url = 'https://www.virustotal.com/vtapi/v2/file/report?apikey='.$v."&resource=5746BD7E255DD6A8AFA06F7C42C1BA41";
+				$api_reply = file_get_contents($report_url);
+				$api_reply_array = json_decode($api_reply, true);
+				if ($api_reply_array['response_code'] != "1") {
+					$_SESSION['return'] = array(
+						'type' => 'danger',
+						'msg' => 'Cannot verify VirusTotal API key'
+					);
+					break;
+				}
 			}
 			file_put_contents($GLOBALS["VT_API_KEY"], $v);
 			break;
@@ -336,13 +355,23 @@ namespace {
 		case "senderaccess":
 			file_put_contents($GLOBALS["mailcow_sender_access"], "");
 			$sender_array = array_keys(array_flip(preg_split("/((\r?\n)|(\r\n?))/", $v)));
+			$invalid_senders = "";
 			foreach($sender_array as $each) {
 				if ($each != "" && preg_match("/^[a-zA-Z0-9-\ .@]+$/", $each)) {
 					file_put_contents($GLOBALS["mailcow_sender_access"], "$each REJECT Sender not allowed".PHP_EOL, FILE_APPEND);
 				}
+				elseif (!empty($each)) {
+					$invalid_senders .= $each.' ';
+				}
 			}
 			$sender_map = $GLOBALS["mailcow_sender_access"];
 			shell_exec("/usr/sbin/postmap $sender_map");
+			if (!empty($invalid_senders)) {
+				$_SESSION['return'] = array(
+					'type' => 'warning',
+					'msg' => 'Changes saved successfully, but some senders were skipped: '.htmlspecialchars($invalid_senders)
+				);
+			}
 			break;
 	}
 	if (!isset($_SESSION['return'])) {
@@ -378,7 +407,7 @@ function opendkim_table($action = "show", $which = "") {
 			if(!ctype_alnum(str_replace(array("_", "-", "."), "", $which))) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
-					'msg' => 'Invalid form data'
+					'msg' => 'Invalid DKIM record'
 				);
 				break;
 			}
@@ -388,7 +417,7 @@ function opendkim_table($action = "show", $which = "") {
 			if ($return != "0") {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
-					'msg' => 'Cannot delete DKIM domain'
+					'msg' => 'Cannot delete DKIM record'
 				);
 				break;
 			}
@@ -403,7 +432,7 @@ function opendkim_table($action = "show", $which = "") {
 			if(!ctype_alnum($selector) || !ctype_alnum(str_replace(array("-", "."), "", $domain))) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
-					'msg' => 'Invalid form data'
+					'msg' => 'Invalid domain name or selector'
 				);
 				break;
 			}
