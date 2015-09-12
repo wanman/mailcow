@@ -739,6 +739,16 @@ function mailbox_add_mailbox($link, $postarray) {
 		);
 		return false;
 	}
+	$qstring = "SELECT local_part FROM mailbox WHERE local_part='$local_part'";
+	$qresult = mysqli_query($link, $qstring);
+	$num_results = mysqli_num_rows($qresult);
+	if ($num_results != 0) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'Mailbox already exist'
+		);
+		return false;
+	}
 	if (empty($default_cal) || empty($default_card)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1458,7 +1468,7 @@ function set_time_limited_aliases($link, $postarray) {
 			}
 			$_SESSION['return'] = array(
 				'type' => 'success',
-				'msg' => 'Extended time-limited aliases'
+				'msg' => 'Extended time-limited aliases (if any)'
 			);
 		break;
 		default:
