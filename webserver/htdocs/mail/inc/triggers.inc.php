@@ -43,9 +43,6 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 	if (isset($_GET["av_dl"])) {
 		dl_clamav_positives();
 	}
-	if (isset($_POST["vtapikey"])) {
-		set_mailcow_config("vtapikey", $_POST["vtapikey"]);
-	}
 	if (isset($_POST["maxmsgsize"])) {
 		set_mailcow_config("maxmsgsize", $_POST["maxmsgsize"]);
 	}
@@ -57,6 +54,9 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 		opendkim_table("add", $_POST["dkim_selector"] . "_" . $_POST["dkim_domain"]);
 	}
 	if (isset($_POST["trigger_set_attachments"])) {
+		if (isset($_POST["vtapikey"])) {
+			set_mailcow_config("vtapikey", $_POST["vtapikey"]);
+		}
 		if (isset($_POST["virustotalcheckonly"]) && $_POST["virustotalcheckonly"] == "on") {
 			set_mailcow_config("vtupload", "0");
 		} else {
