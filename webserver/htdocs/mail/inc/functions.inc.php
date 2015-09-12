@@ -315,7 +315,8 @@ namespace {
 				"reject_unknown_helo_hostname",
 				"reject_unknown_reverse_client_hostname",
 				"reject_unknown_client_hostname",
-				"reject_non_fqdn_helo_hostname"
+				"reject_non_fqdn_helo_hostname",
+				"z1_greylisting"
 				);
 			$srr = (array_keys($v));
 			foreach ($srr as $restriction) {

@@ -244,9 +244,15 @@ $srr_values = return_mailcow_config("srr");
 		</div>
 	</div>
 	<div class="form-group">
-	<input type="hidden" name="srr">
+		<div class="col-sm-offset-4 col-sm-8">
+			<div class="checkbox">
+			<label><input type="checkbox" name="z1_greylisting" <?php if (preg_match('/z1_greylisting/', $srr_values)) { echo "checked"; } ?>> Use greylisting for unauthenticated, unknown and not whitelisted senders</label>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
 		<div class="col-sm-8">
-			<button type="submit" class="btn btn-default btn-raised btn-sm">Save changes</button>
+			<button type="submit" name="srr" class="btn btn-default btn-raised btn-sm">Save changes</button>
 		</div>
 	</div>
 </form>
