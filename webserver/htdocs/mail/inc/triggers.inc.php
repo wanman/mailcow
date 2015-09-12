@@ -20,7 +20,7 @@ if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
 	}
 }
 if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "admin") {
-	if (isset($_POST["admin_user"])) {
+	if (isset($_POST["trigger_set_admin"])) {
 		set_admin_account($link, $_POST);
 	}
 	if (isset($_POST["trigger_backup"])) {
@@ -43,13 +43,10 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 	if (isset($_GET["av_dl"])) {
 		dl_clamav_positives();
 	}
-	if (file_exists("/tmp/clamav_positives.zip")) {
-		unlink("/tmp/clamav_positives.zip");
-	}
-	if (isset($_POST["vtapikey"]) && ctype_alnum($_POST["vtapikey"])) {
+	if (isset($_POST["vtapikey"])) {
 		set_mailcow_config("vtapikey", $_POST["vtapikey"]);
 	}
-	if (isset($_POST["maxmsgsize"]) && ctype_alnum($_POST["maxmsgsize"])) {
+	if (isset($_POST["maxmsgsize"])) {
 		set_mailcow_config("maxmsgsize", $_POST["maxmsgsize"]);
 	}
 	if (isset($_POST["sender"])) {
@@ -59,12 +56,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 	if (isset($_POST["dkim_selector"])) {
 		opendkim_table("add", $_POST["dkim_selector"] . "_" . $_POST["dkim_domain"]);
 	}
-	if (isset($_POST["ext"])) {
-		if (isset($_POST["vfilter"]) && $_POST["vfilter"] == "filter") {
-			set_mailcow_config("extlist", $_POST["ext"], "filter");
-		} else {
-			set_mailcow_config("extlist", $_POST["ext"], "reject");
-		}
+	if (isset($_POST["trigger_set_attachments"])) {
 		if (isset($_POST["virustotalcheckonly"]) && $_POST["virustotalcheckonly"] == "on") {
 			set_mailcow_config("vtupload", "0");
 		} else {
@@ -80,42 +72,39 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 		} else {
 			set_mailcow_config("cavenable", "0");
 		}
-		postfix_reload();
-	}
-	if (isset($_POST["anonymize_"])) {
-		if (!isset($_POST["anonymize"])) { $_POST["anonymize"] = ""; }
-		set_mailcow_config("anonymize", $_POST["anonymize"]);
-		postfix_reload();
-	}
-	if (isset($_POST["mailboxaction"])) {
-		switch ($_POST["mailboxaction"]) {
-			case "deletedomainadmin":
-				delete_domain_admin($link, $_POST);
-			break;
-			case "adddomainadmin":
-				add_domain_admin($link, $_POST);
-			break;
+		if (isset($_POST["vfilter"]) && $_POST["vfilter"] == "filter") {
+			set_mailcow_config("extlist", $_POST["ext"], "filter");
+		} else {
+			set_mailcow_config("extlist", $_POST["ext"], "reject");
 		}
+		postfix_reload();
+	}
+	if (isset($_POST["trigger_anonymize"])) {
+		isset($_POST['anonymize']) ? $anonymize = 'on' : $anonymize = '';
+		set_mailcow_config("anonymize", $anonymize);
+		postfix_reload();
+	}
+	if (isset($_POST["trigger_add_domain_admin"])) {
+		add_domain_admin($link, $_POST);
+	}
+	if (isset($_POST["trigger_delete_domain_admin"])) {
+		delete_domain_admin($link, $_POST);
 	}
 }
 if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "user") {
-	if (isset($_POST["mailboxaction"])) {
-		switch ($_POST["mailboxaction"]) {
-			case "setuserpassword":
-				set_user_account($link, $_POST);
-			break;
-			case "addfetchmail":
-				set_fetch_mail($link, $_POST);
-			break;
-			case "timelimitedaliases":
-				set_time_limited_aliases($link, $_POST);
-			break;
-		}
+	if (isset($_POST["trigger_set_user_account"])) {
+		set_user_account($link, $_POST);
+	}
+	if (isset($_POST["trigger_set_fetch_mail"])) {
+		set_fetch_mail($link, $_POST);
+	}
+	if (isset($_POST["trigger_set_time_limited_aliases"])) {
+		set_time_limited_aliases($link, $_POST);
 	}
 }
 if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && ($_SESSION['mailcow_cc_role'] == "domainadmin" || $_SESSION['mailcow_cc_role'] == "admin")) {
-	if (isset($_POST["mailboxaction"])) {
-		switch ($_POST["mailboxaction"]) {
+	if (isset($_POST["trigger_mailbox_action"])) {
+		switch ($_POST["trigger_mailbox_action"]) {
 			case "adddomain":
 				mailbox_add_domain($link, $_POST);
 			break;
@@ -156,8 +145,12 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 	}
 }
 if (isset($_POST["logout"])) {
-	$_SESSION['mailcow_cc_loggedin'] = "no";
+	session_unset();
 	session_destroy();
+	session_write_close();
+	setcookie(session_name(),'',0,'/');
+	sleep(1);
+	return false;
 }
 ?>
 

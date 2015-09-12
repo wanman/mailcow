@@ -9,7 +9,6 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 <div class="panel-heading">Change password</div>
 <div class="panel-body">
 <form class="form-horizontal" role="form" method="post">
-	<input type="hidden" name="mailboxaction" value="setuserpassword">
 	<input type="hidden" name="user_now" value="<?php echo $logged_in_as; ?>">
 	<div class="form-group">
 		<label class="control-label col-sm-3" for="user_old_pass">Current password:</label>
@@ -31,7 +30,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 	</div>
 	<div class="form-group">
 		<div class="col-sm-offset-3 col-sm-9">
-			<button type="submit" class="btn btn-default btn-raised btn-sm">Change password</button>
+			<button type="submit" name="trigger_set_user_account" class="btn btn-default btn-raised btn-sm">Change password</button>
 		</div>
 	</div>
 </form>
@@ -45,7 +44,6 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 <div class="panel-heading">Generate time-limited aliases</div>
 <div class="panel-body">
 <form class="form-horizontal" role="form" method="post">
-<input type="hidden" name="mailboxaction" value="timelimitedaliases">
 <div class="table-responsive">
 <table class="table table-striped" id="timelimitedaliases">
 	<thead>
@@ -83,9 +81,9 @@ echo "<tr>
 </div>
 <div class="form-group">
 	<div class="col-sm-9">
-		<button type="submit" name="action" value="generate" class="btn btn-success btn-sm">Generate random alias</button>
-		<button type="submit" name="action" value="delete" class="btn btn-danger btn-sm">Delete all aliases</button>
-		<button type="submit" name="action" value="extend" class="btn btn-default btn-sm">Add 1 hour to all aliases</button>
+		<button type="submit" name="trigger_set_time_limited_aliases" value="generate" class="btn btn-success btn-sm">Generate random alias</button>
+		<button type="submit" name="trigger_set_time_limited_aliases" value="delete" class="btn btn-danger btn-sm">Delete all aliases</button>
+		<button type="submit" name="trigger_set_time_limited_aliases" value="extend" class="btn btn-default btn-sm">Add 1 hour to all aliases</button>
 	</div>
 </div>
 </form>
@@ -139,7 +137,6 @@ echo "<tr><td>Address book</td><td>", $row['uri'],
 <p>The first synchronisation may take a while.</p>
 <small>
 <form class="form-horizontal" role="form" method="post">
-<input type="hidden" name="mailboxaction" value="addfetchmail">
 	<div class="form-group">
 		<label class="control-label col-sm-2" for="imap_host">IMAP Host (with Port)</label>
 		<div class="col-sm-10">
@@ -179,7 +176,7 @@ echo "<tr><td>Address book</td><td>", $row['uri'],
 	</div>
 	<div class="form-group">
 		<div class="col-sm-offset-2 col-sm-10">
-			<button type="submit" class="btn btn-success btn-sm">Sync now</button>
+			<button type="submit" name="trigger_set_fetch_mail" class="btn btn-success btn-sm">Sync now</button>
 		</div>
 	</div>
 </form>

@@ -7,10 +7,9 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 ?>
 <h4><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Access</h4>
-
 <div class="panel-group" id="accordion_access">
-	<div class="panel panel-default" data-toggle="collapse" data-parent="#accordion_access" data-target="#collapseAdmin">
-		<div class="panel-heading">
+	<div class="panel panel-default">
+		<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_access" data-target="#collapseAdmin">
 			<a style="cursor:pointer;" class="accordion-toggle">Administrators</a>
 		</div>
 		<div id="collapseAdmin" class="panel-collapse collapse in">
@@ -40,7 +39,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" class="btn btn-default btn-raised btn-sm">Save changes</button>
+							<button type="submit" name="trigger_set_admin" class="btn btn-default btn-raised btn-sm">Save changes</button>
 						</div>
 					</div>
 				</form>
@@ -48,8 +47,8 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 		</div>
 	</div>
 
-	<div class="panel panel-default" data-toggle="collapse" data-parent="#accordion_access" data-target="#collapseDomAdmins">
-	<div class="panel-heading">
+	<div class="panel panel-default">
+	<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_access" data-target="#collapseDomAdmins">
 		<a style="cursor:pointer;" class="accordion-toggle">Domain administrators</a>
 	</div>
 		<div id="collapseDomAdmins" class="panel-collapse collapse out">
@@ -84,7 +83,6 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 				<small>
 				<h4>Add domain administrator</h4>
 				<form class="form-horizontal" role="form" method="post">
-					<input type="hidden" name="mailboxaction" value="adddomainadmin">
 					<div class="form-group">
 						<label class="control-label col-sm-4" for="username">Username (<code>A-Z</code>, <code>@</code>, <code>-</code>, <code>.</code>).</label>
 						<div class="col-sm-8">
@@ -125,7 +123,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-0 col-sm-8">
-							<button type="submit" class="btn btn-default btn-raised btn-sm">Add domain admin</button>
+							<button type="submit" name="trigger_add_domain_admin" class="btn btn-default btn-raised btn-sm">Add domain admin</button>
 						</div>
 					</div>
 				</form>
@@ -369,7 +367,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 		<p><pre><?php echo_sys_info("vfilterlog", "20");?></pre></p>
 		</div>
 	</div>
-	<br /><button type="submit" class="btn btn-default btn-raised btn-sm">Apply</button>
+	<br /><button type="submit" name="trigger_set_attachments" class="btn btn-default btn-raised btn-sm">Apply</button>
 </div>
 </form>
 </div>
@@ -400,12 +398,11 @@ Enter "DISABLED" to disable this feature.</pre></p>
 	<p>This option enables a PCRE table to remove "User-Agent", "X-Enigmail", "X-Mailer", "X-Originating-IP" and replaces "Received: from" headers with localhost/127.0.0.1.</p>
 	<div class="checkbox">
 	<label>
-	<input type="hidden" name="anonymize_">
 	<input name="anonymize" type="checkbox" <?=return_mailcow_config("anonymize");?>>
 		Anonymize outgoing mail
 	</label>
 	</div>
-	<button type="submit" class="btn btn-default btn-raised btn-sm">Apply</button>
+	<button type="submit" name="trigger_anonymize" class="btn btn-default btn-raised btn-sm">Apply</button>
 </div>
 </form>
 </div>

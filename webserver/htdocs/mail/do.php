@@ -3,7 +3,7 @@ require_once("inc/header.inc.php");
 ?>
 <div class="container">
 	<div class="row">
-		<div class="col-md-14">
+		<div class="col-md-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Edit</h3>
@@ -12,14 +12,10 @@ require_once("inc/header.inc.php");
 <?php
 require_once "inc/triggers.inc.php";
 if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes") {
-	if (isset($_GET['return']) && $_GET['return'] == "success") {
-		echo '<div class="alert alert-success" role="alert"><strong>Success:</strong> Action successfully completed</div>';
-	}
-	elseif (isset($_GET['adddomain'])) {
+	if (isset($_GET['adddomain'])) {
 ?>
 				<h4>Add domain</h4>
 				<form class="form-horizontal" role="form" method="post">
-				<input type="hidden" name="mailboxaction" value="adddomain">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="domain">Domain name:</label>
 						<div class="col-sm-10">
@@ -72,7 +68,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" class="btn btn-success btn-sm">Submit</button>
+							<button type="submit" name="trigger_mailbox_action" value="adddomain" class="btn btn-success btn-sm">Submit</button>
 						</div>
 					</div>
 				</form>
@@ -81,7 +77,6 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 ?>
 				<h4>Add alias</h4>
 				<form class="form-horizontal" role="form" method="post">
-					<input type="hidden" name="mailboxaction" value="addalias">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="address">Alias address <small>(full email address OR @domain.tld for <span style='color:#ec466a'>catch-all</span>)</small>:</label>
 						<div class="col-sm-10">
@@ -103,7 +98,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" class="btn btn-success btn-sm">Submit</button>
+							<button type="submit" name="trigger_mailbox_action" value="addalias" class="btn btn-success btn-sm">Submit</button>
 						</div>
 					</div>
 				</form>
@@ -120,7 +115,6 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 				<h4>Change alias attributes for <strong><?php echo $editalias ?></strong></h4>
 				<br />
 				<form class="form-horizontal" role="form" method="post">
-				<input type="hidden" name="mailboxaction" value="editalias">
 				<input type="hidden" name="address" value="<?php echo $editalias ?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="name">Destination address(es) <small>(comma-separated values)</small>:</label>
@@ -137,7 +131,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" class="btn btn-success btn-sm">Submit</button>
+							<button type="submit" name="trigger_mailbox_action" value="editalias" class="btn btn-success btn-sm">Submit</button>
 						</div>
 					</div>
 				</form>
@@ -152,7 +146,6 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 ?>
 				<h4>Add domain alias</h4>
 				<form class="form-horizontal" role="form" method="post">
-					<input type="hidden" name="mailboxaction" value="addaliasdomain">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="alias_domain">Alias domain:</label>
 						<div class="col-sm-10">
@@ -188,7 +181,7 @@ while ($row = mysqli_fetch_array($result)) {
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" class="btn btn-success btn-sm">Submit</button>
+							<button type="submit" name="trigger_mailbox_action" value="addaliasdomain" class="btn btn-success btn-sm">Submit</button>
 						</div>
 					</div>
 				</form>
@@ -205,7 +198,6 @@ while ($row = mysqli_fetch_array($result)) {
 				<h4>Change assigned domains for domain admin <strong><?php echo $editdomainadmin ?></strong></h4>
 				<br />
 				<form class="form-horizontal" role="form" method="post">
-				<input type="hidden" name="mailboxaction" value="editdomainadmin">
 				<input type="hidden" name="username" value="<?php echo $editdomainadmin ?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="name">Target domain <small>(hold CTRL to select multiple domains)</small>:</label>
@@ -229,7 +221,7 @@ while ($row = mysqli_fetch_array($resultselect)) {
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" class="btn btn-success btn-sm">Submit</button>
+							<button type="submit" name="trigger_mailbox_action" value="editdomainadmin" class="btn btn-success btn-sm">Submit</button>
 						</div>
 					</div>
 				</form>
@@ -244,7 +236,6 @@ while ($row = mysqli_fetch_array($resultselect)) {
 	?>
 				<h4>Add a mailbox</h4>
 				<form class="form-horizontal" role="form" method="post">
-				<input type="hidden" name="mailboxaction" value="addmailbox">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="local_part">Mailbox Alias (left part of mail address) <small>(alphanumeric)</small>:</label>
 						<div class="col-sm-10">
@@ -309,7 +300,7 @@ while ($row = mysqli_fetch_array($result)) {
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" class="btn btn-success btn-sm">Submit</button>
+							<button type="submit" name="trigger_mailbox_action" value="addmailbox" class="btn btn-success btn-sm">Submit</button>
 						</div>
 					</div>
 				</form>
@@ -326,7 +317,6 @@ while ($row = mysqli_fetch_array($result)) {
 	?>
 				<h4>Change settings for domain <strong><?php echo $editdomain ?></strong></h4>
 				<form class="form-horizontal" role="form" method="post">
-				<input type="hidden" name="mailboxaction" value="editdomain">
 				<input type="hidden" name="domain" value="<?php echo $editdomain ?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="description">Description:</label>
@@ -374,7 +364,7 @@ while ($row = mysqli_fetch_array($result)) {
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" class="btn btn-success btn-sm">Submit</button>
+							<button type="submit" name="trigger_mailbox_action" value="editdomain" class="btn btn-success btn-sm">Submit</button>
 						</div>
 					</div>
 				</form>
@@ -396,7 +386,6 @@ while ($row = mysqli_fetch_array($result)) {
 	?>
 				<h4>Change settings for mailbox <strong><?php echo $editmailbox ?></strong></h4>
 				<form class="form-horizontal" role="form" method="post">
-				<input type="hidden" name="mailboxaction" value="editmailbox">
 				<input type="hidden" name="username" value="<?php echo $result['username']; ?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="name">Name:</label>
@@ -431,7 +420,7 @@ while ($row = mysqli_fetch_array($result)) {
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" class="btn btn-success btn-sm">Submit</button>
+							<button type="submit" name="trigger_mailbox_action" value="editmailbox" class="btn btn-success btn-sm">Submit</button>
 						</div>
 					</div>
 				</form>
@@ -453,12 +442,11 @@ while ($row = mysqli_fetch_array($result)) {
 				echo "<p>This will also delete domain alises assigned to the domain</p>";
 				echo "<p><strong>Domain must be empty to be deleted!</b></p>";
 				?>
-				<form class="form-horizontal" role="form" method="post">
-				<input type="hidden" name="mailboxaction" value="deletedomain">
+				<form class="form-horizontal" role="form" method="post" action="mailbox.php">
 				<input type="hidden" name="domain" value="<?php echo $deletedomain ?>">
 					<div class="form-group">
 						<div class="col-sm-offset-1 col-sm-10">
-							<button type="submit" class="btn btn-default btn-sm">Delete</button>
+							<button type="submit" name="trigger_mailbox_action" value="deletedomain" class="btn btn-default btn-sm">Delete</button>
 						</div>
 					</div>
 				</form>
@@ -486,12 +474,11 @@ while ($row = mysqli_fetch_array($result)) {
 				}
 				echo "</ul>";
 				?>
-				<form class="form-horizontal" role="form" method="post">
+				<form class="form-horizontal" role="form" method="post" action="mailbox.php">
 				<input type="hidden" name="address" value="<?php echo $deletealias ?>">
-				<input type="hidden" name="mailboxaction" value="deletealias">
 					<div class="form-group">
 						<div class="col-sm-offset-1 col-sm-10">
-							<button type="submit" class="btn btn-default btn-sm">Delete</button>
+							<button type="submit" name="trigger_mailbox_action" value="deletealias" class="btn btn-default btn-sm">Delete</button>
 						</div>
 					</div>
 				</form>
@@ -512,12 +499,11 @@ while ($row = mysqli_fetch_array($result)) {
 				echo '<div class="alert alert-warning" role="alert"><strong>Warning:</strong> You are about to delete an alias domain!</div>';
 				echo "<p>The server will stop accepting mails for the domain name <strong>$deletealiasdomain</strong>.</p>";
 				?>
-				<form class="form-horizontal" role="form" method="post">
+				<form class="form-horizontal" role="form" method="post" action="mailbox.php">
 				<input type="hidden" name="alias_domain" value="<?php echo $deletealiasdomain ?>">
-				<input type="hidden" name="mailboxaction" value="deletealiasdomain">
 					<div class="form-group">
 						<div class="col-sm-offset-1 col-sm-10">
-							<button type="submit" class="btn btn-default btn-sm">Delete</button>
+							<button type="submit" name="trigger_mailbox_action" value="deletealiasdomain" class="btn btn-default btn-sm">Delete</button>
 						</div>
 					</div>
 				</form>
@@ -538,12 +524,11 @@ while ($row = mysqli_fetch_array($result)) {
 				echo '<div class="alert alert-warning" role="alert"><strong>Warning:</strong> You are about to delete a domain administrator!</div>';
 				echo "<p>The domain administrator <strong>$deletedomainadmin</strong> will not be able to login after deletion.</p>";
 				?>
-				<form class="form-horizontal" role="form" method="post">
+				<form class="form-horizontal" role="form" method="post" action="admin.php">
 				<input type="hidden" name="username" value="<?php echo $deletedomainadmin ?>">
-				<input type="hidden" name="mailboxaction" value="deletedomainadmin">
 					<div class="form-group">
 						<div class="col-sm-offset-1 col-sm-10">
-							<button type="submit" class="btn btn-default btn-sm">Delete</button>
+							<button type="submit" name="trigger_delete_domain_admin" class="btn btn-default btn-sm">Delete</button>
 						</div>
 					</div>
 				</form>
@@ -571,12 +556,11 @@ while ($row = mysqli_fetch_array($result)) {
 				}
 				echo "</ul>";
 				?>
-				<form class="form-horizontal" role="form" method="post">
-				<input type="hidden" name="mailboxaction" value="deletemailbox">
+				<form class="form-horizontal" role="form" method="post" action="mailbox.php">
 				<input type="hidden" name="username" value="<?php echo $deletemailbox ?>">
 					<div class="form-group">
 						<div class="col-sm-offset-1 col-sm-10">
-							<button type="submit" class="btn btn-default btn-sm">Delete</button>
+							<button type="submit" name="trigger_mailbox_action" value="deletemailbox" class="btn btn-default btn-sm">Delete</button>
 						</div>
 					</div>
 				</form>
@@ -586,9 +570,6 @@ while ($row = mysqli_fetch_array($result)) {
 				echo 'Your provided mailbox name does not exist.';
 			}
 		}
-	}
-	elseif (isset($_GET["event"])) {
-		echo '<div class="alert alert-warning" role="alert"><strong>Error:</strong> ' . htmlspecialchars(base64_decode($_GET["event"])) . '</div>';
 	}
 	else {
 		echo '<div class="alert alert-warning" role="alert"><strong>Error:</strong>  No action specified.</div>';

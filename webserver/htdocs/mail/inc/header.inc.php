@@ -31,29 +31,26 @@ require_once "inc/triggers.inc.php";
 <link href="css/material.min.css" rel="stylesheet">
 <link href="css/ripples.min.css" rel="stylesheet">
 <?php
-if (basename($_SERVER['PHP_SELF']) == "mailbox.php") {
+if (basename($_SERVER['PHP_SELF']) == "mailbox.php"):
 ?>
 <style>
-.row{
-	margin-top:40px;
-	padding: 0 10px;
-}
-.clickable{
-	cursor: pointer;
-}
 .panel-heading div {
 	margin-top: -18px;
 	font-size: 15px;
 }
-	.panel-heading div span{
+.panel-heading div span {
 	margin-left:5px;
 }
-.panel-body{
+.panel-body {
 	display: none;
 }
+.clickable {
+	cursor: pointer;
+}
+
 </style>
 <?php
-}
+endif;
 ?>
 <style>
 html {
@@ -138,3 +135,16 @@ endif;
 	</div><!--/.container-fluid -->
 </nav>
 <form action="/admin.php" method="post" id="logout"><input type="hidden" name="logout"></form>
+<?php
+if (isset($_SESSION['return'])):
+?>
+<div class="container">
+	<div class="alert alert-<?=$_SESSION['return']['type'];?>" role="alert">
+	<a href="#" class="close" data-dismiss="alert">&times;</a>
+	<?=$_SESSION['return']['msg'];?>
+	</div>
+</div>
+<?php
+unset($_SESSION['return']);
+endif;
+?>

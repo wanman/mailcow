@@ -5,7 +5,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 ?>
 <div class="container">
 	<div class="row">
-		<div class="col-md-14">
+		<div class="col-md-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 				<h3 class="panel-title">Domains</h3>
@@ -77,7 +77,7 @@ endwhile;
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-md-14">
+		<div class="col-md-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Domain Aliases</h3>
@@ -123,7 +123,7 @@ endwhile;
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-md-14">
+		<div class="col-md-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Mailboxes</h3>
@@ -199,7 +199,7 @@ endwhile;
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-md-14">
+		<div class="col-md-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Aliases</h3>
