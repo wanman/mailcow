@@ -29,14 +29,6 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 		<a class="btn btn-material-grey" href="http://mxtoolbox.com/SuperTool.aspx?action=smtp:<?php echo $MYHOSTNAME ?>" target="_blank">Run &raquo;</a>
 		<br />
 </div> <!-- /container -->
-<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-<script src="js/ripples.min.js"></script>
-<script src="js/material.min.js"></script>
-<script>
-$(document).ready(function() {
-        $.material.init();
-});
-</script>
-</body>
-</html>
+<?php
+require_once("inc/footer.inc.php");
+?>
