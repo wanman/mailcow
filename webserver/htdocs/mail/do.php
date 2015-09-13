@@ -11,7 +11,7 @@ require_once("inc/header.inc.php");
 				<div class="panel-body">
 <?php
 require_once "inc/triggers.inc.php";
-if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes") {
+if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" ) {
 	if (isset($_GET['adddomain'])) {
 ?>
 				<h4>Add domain</h4>
@@ -111,7 +111,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 			$editalias = mysqli_real_escape_string($link, $_GET["editalias"]);
 			if (mysqli_fetch_array(mysqli_query($link, "SELECT address, domain FROM alias WHERE address='$editalias' AND domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role';"))) {
 			$result = mysqli_fetch_assoc(mysqli_query($link, "SELECT active, goto FROM alias WHERE address='$editalias'"));
-	?>
+?>
 				<h4>Change alias attributes for <strong><?php echo $editalias ?></strong></h4>
 				<br />
 				<form class="form-horizontal" role="form" method="post">
@@ -135,10 +135,106 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 						</div>
 					</div>
 				</form>
-	<?php
+<?php
 			}
 			else {
 				echo 'Action not supported.';
+			}
+		}
+	}
+	elseif (isset($_GET['editdav'])) {
+		if (!filter_var($_GET["editdav"], FILTER_VALIDATE_EMAIL) || empty($_GET["editdav"])) {
+			echo 'Your provided DAV user is invalid';
+		}
+		else {
+			$editdav = mysqli_real_escape_string($link, $_GET["editdav"]);
+			if ($editdav == $logged_in_as) {
+?>
+				<h4>Change DAV folder properties</h4>
+				<br />
+				<form class="form-horizontal" role="form" method="post">
+				<div class="table-responsive">
+				<table class="table table-striped" id="domainadminstable">
+					<thead>
+					<tr>
+						<th>Type</th>
+						<th>Display name</th>
+						<th>Read access</th>
+						<th>Write access</th>
+					</tr>
+					</thead>
+					<tbody>
+<?php
+				$result = mysqli_query($link, "SELECT id, displayname FROM calendars WHERE principaluri='principals/$logged_in_as'");
+				while ($row_cal = mysqli_fetch_array($result)) {
+				echo '<tr>
+				<td>Calendar, Tasks</td>
+				<td><input type="text" name="cal_displayname['.$row_cal['id'].']" value="', $row_cal['displayname'], '"></td>
+				<td>
+					<select style="width:100%" name="cal_ro_share['.$row_cal['id'].'][]" size="5" multiple>';
+$result = mysqli_query($link, "SELECT username FROM users
+	WHERE id IN (SELECT member_id FROM groupmembers
+		WHERE principal_id=(SELECT id FROM principals
+			WHERE uri='principals/$logged_in_as/calendar-proxy-read'))
+	AND username!='$logged_in_as'");
+while ($row_cal_ro_selected = mysqli_fetch_array($result)) {
+	echo '<option selected>', $row_cal_ro_selected['username'], '</option>';
+}
+$result = mysqli_query($link, "SELECT username FROM users
+	WHERE id NOT IN (SELECT member_id FROM groupmembers
+		WHERE principal_id=(SELECT id FROM principals
+			WHERE uri='principals/$logged_in_as/calendar-proxy-read'))
+	AND username!='$logged_in_as'");	
+while ($row_cal_ro_unselected = mysqli_fetch_array($result)) {
+	echo '<option>', $row_cal_ro_unselected['username'], '</option>';
+}
+					echo '</select>
+				</td>
+				<td>
+					<select style="width:100%" name="cal_rw_share['.$row_cal['id'].'][]" size="5" multiple>';
+$result = mysqli_query($link, "SELECT username FROM users
+	WHERE id IN (SELECT member_id FROM groupmembers
+		WHERE principal_id=(SELECT id FROM principals
+			WHERE uri='principals/$logged_in_as/calendar-proxy-write'))
+	AND username!='$logged_in_as'");
+while ($row_cal_rw_selected = mysqli_fetch_array($result)) {
+	echo '<option selected>', $row_cal_rw_selected['username'], '</option>';
+}
+$result = mysqli_query($link, "SELECT username FROM users
+	WHERE id NOT IN (SELECT member_id FROM groupmembers
+		WHERE principal_id=(SELECT id FROM principals
+			WHERE uri='principals/$logged_in_as/calendar-proxy-write'))
+	AND username!='$logged_in_as'");
+while ($row_cal_rw_unselected = mysqli_fetch_array($result)) {
+	echo '<option>', $row_cal_rw_unselected['username'], '</option>';
+}
+					echo '</select>
+				</td>
+				</tr>';
+				}
+				$result = mysqli_query($link, "SELECT id, displayname FROM addressbooks WHERE principaluri='principals/$logged_in_as'");
+				while ($row_adb = mysqli_fetch_array($result)) {
+				echo '<tr>
+				<td>Address book</td>
+				<td><input type="text" name="adb_displayname['.$row_adb['id'].']" value="', $row_adb['displayname'], '"></td>
+				<td></td>
+				<td></td>
+				</tr>';
+				}
+				?>
+					</tbody>
+				</table>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<button type="submit" name="trigger_mailbox_action" value="editdav" class="btn btn-success btn-sm">Apply</button>
+					</div>
+				</div>
+				</form>
+	<?php
+			}
+			else {
+				echo 'Your provided username does not exist or cannot be edited.';
 			}
 		}
 	}
@@ -371,7 +467,7 @@ while ($row = mysqli_fetch_array($result)) {
 	<?php
 			}
 			else {
-				echo 'Your provided domain name does not exist or cannot be removed.';
+				echo 'Your provided domain name does not exist or cannot be edited.';
 			}
 		}
 	}
@@ -584,15 +680,6 @@ else {
 	</div>
 <a href="<?=$_SESSION['return_to'];?>">&#8592; go back</a>
 </div> <!-- /container -->
-<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-<script src="js/ripples.min.js"></script>
-<script src="js/material.min.js"></script>
-<script>
-$(document).ready(function() {
-	$.material.init();
-});
-</script>
-</body>
-</html>
-<?php mysqli_close($link); ?>
+<?php
+require_once("inc/footer.inc.php");
+?>

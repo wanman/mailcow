@@ -127,6 +127,9 @@ echo "<tr><td>Address book</td><td>", $row['uri'],
 	</tbody>
 </table>
 </div>
+<div class="col-sm-12">
+	<a href="do.php?editdav=<?=$logged_in_as?>" class="btn btn-default btn-sm">Change details and permissions</a>
+</div>
 </div>
 </div>
 
@@ -184,20 +187,11 @@ echo "<tr><td>Address book</td><td>", $row['uri'],
 </div>
 </div>
 
-</div>
-<?php }
+</div> <!-- /container -->
+<?php
+}
 else {
 	header('Location: admin.php');
 }
- ?>
-<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-<script src="js/ripples.min.js"></script>
-<script src="js/material.min.js"></script>
-<script>
-$(document).ready(function() {
-        $.material.init();
-});
-</script>
-</body>
-</html>
+require_once("inc/footer.inc.php");
+?>

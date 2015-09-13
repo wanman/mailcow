@@ -631,14 +631,6 @@ die("Permission denied");
 <br />
 <p><b><a href="../">&#8592; go back</a></b></p>
 </div> <!-- /container -->
-<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-<script src="js/ripples.min.js"></script>
-<script src="js/material.min.js"></script>
-<script>
-$(document).ready(function() {
-	$.material.init();
-});
-</script>
-</body>
-</html>
+<?php
+require_once("inc/footer.inc.php");
+?>

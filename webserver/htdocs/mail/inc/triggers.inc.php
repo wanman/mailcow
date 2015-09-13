@@ -18,6 +18,13 @@ if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
 		$_SESSION['mailcow_cc_role'] = "user";
 		header("Location: mailbox.php");
 	}
+	else {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'Login failed'
+		);
+		return false;
+	}
 }
 if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "admin") {
 	if (isset($_POST["trigger_set_admin"])) {
@@ -101,6 +108,13 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 	if (isset($_POST["trigger_set_time_limited_aliases"])) {
 		set_time_limited_aliases($link, $_POST);
 	}
+	if (isset($_POST["trigger_mailbox_action"])) {
+		switch ($_POST["trigger_mailbox_action"]) {
+			case "editdav":
+				mailbox_edit_dav($link, $_POST);
+			break;
+		}
+	}
 }
 if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && ($_SESSION['mailcow_cc_role'] == "domainadmin" || $_SESSION['mailcow_cc_role'] == "admin")) {
 	if (isset($_POST["trigger_mailbox_action"])) {
@@ -140,6 +154,9 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 			break;
 			case "deletemailbox":
 				mailbox_delete_mailbox($link, $_POST);
+			break;
+			case "editdav":
+				mailbox_edit_dav($link, $_POST);
 			break;
 		}
 	}

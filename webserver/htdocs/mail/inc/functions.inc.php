@@ -1177,6 +1177,174 @@ function mailbox_edit_mailbox($link, $postarray) {
 		'msg' => 'Saved changes to mailbox '.htmlspecialchars($username)
 	);
 }
+function mailbox_edit_dav($link, $postarray) {
+	global $logged_in_role;
+	global $logged_in_as;
+	/*
+	// Handle address book input
+	// Clean address book principal_ids
+	$clean_adb = "DELETE FROM groupmembers WHERE principal_id
+		IN (SELECT id FROM principals
+			WHERE uri='principals/$logged_in_as/addressbook-proxy-write'
+			OR uri='principals/$logged_in_as/addressbook-proxy-read')";
+	if (!mysqli_query($link, $clean_adb)) { 
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL Error: '.mysqli_error($link)
+		);
+		return false;
+	}
+	*/
+	foreach (array_flip($postarray['adb_displayname']) as $adb_id) {
+		// Check adb access
+		if (!mysqli_result(mysqli_query($link, "SELECT * FROM calendars, addressbooks
+			WHERE calendars.principaluri='principals/$logged_in_as' 
+			AND addressbooks.principaluri='principals/$logged_in_as'
+			AND addressbooks.id='$adb_id'")) && $logged_in_role == "user") { 
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'Permission denied'
+			);
+			return false;
+		}
+		// Set display name for current adb, if not empty
+		$adb_displayname =  mysqli_real_escape_string($link, $postarray['adb_displayname'][$adb_id]);
+		if (empty($adb_displayname)) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'Display name cannot be empty'
+			);
+			return false;
+		}
+		if (!mysqli_query($link, "UPDATE addressbooks SET displayname='$adb_displayname' WHERE id='$adb_id'")) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'MySQL Error: '.mysqli_error($link)
+			);
+			return false;
+		}
+		/*
+		// Setup read-only adb shares
+		if(isset($postarray['adb_ro_share'][$adb_id])) {
+			foreach ($postarray['adb_ro_share'][$adb_id] as $share_with) {
+				$share_with = mysqli_real_escape_string($link, $share_with);
+				$update_string = "INSERT INTO groupmembers (principal_id, member_id)
+					VALUES (
+						(SELECT id FROM principals WHERE uri='principals/$logged_in_as/addressbook-proxy-read'), 
+						(SELECT id FROM users WHERE username='$share_with')
+					)";
+				if (!mysqli_query($link, $update_string)) { 
+					$_SESSION['return'] = array(
+						'type' => 'danger',
+						'msg' => 'MySQL Error: '.mysqli_error($link)
+					);
+					return false;
+				}
+			}
+		}
+		// Setup read/write adb shares
+		if(isset($postarray['adb_rw_share'][$adb_id])) {
+			foreach ($postarray['adb_rw_share'][$adb_id] as $share_with) {
+				$share_with = mysqli_real_escape_string($link, $share_with);
+				$update_string = "INSERT INTO groupmembers (principal_id, member_id)
+					VALUES (
+						(SELECT id FROM principals WHERE uri='principals/$logged_in_as/addressbook-proxy-write'), 
+						(SELECT id FROM users WHERE username='$share_with')
+					)";
+				if (!mysqli_query($link, $update_string)) { 
+					$_SESSION['return'] = array(
+						'type' => 'danger',
+						'msg' => 'MySQL Error: '.mysqli_error($link)
+					);
+					return false;
+				}
+			}
+		}
+		*/
+	}
+	/* Handle calendar input */
+	/* Clean calendar principal_ids */
+	$clean_cal = "DELETE FROM groupmembers WHERE principal_id
+		IN (SELECT id FROM principals
+			WHERE uri='principals/$logged_in_as/calendar-proxy-write'
+			OR uri='principals/$logged_in_as/calendar-proxy-read')";
+	if (!mysqli_query($link, $clean_cal)) { 
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL Error: '.mysqli_error($link)
+		);
+		return false;
+	}
+	foreach (array_flip($postarray['cal_displayname']) as $cal_id) {
+		/* Check cal access */
+		if (!mysqli_result(mysqli_query($link, "SELECT * FROM calendars, addressbooks
+			WHERE calendars.principaluri='principals/$logged_in_as' 
+			AND addressbooks.principaluri='principals/$logged_in_as'
+			AND calendars.id='$cal_id'")) && $logged_in_role == "user") { 
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'Permission denied'
+			);
+			return false;
+		}
+		/* Set display name for current cal, if not empty */
+		$cal_displayname =  mysqli_real_escape_string($link, $postarray['cal_displayname'][$cal_id]);
+		if (empty($cal_displayname)) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'Display name cannot be empty'
+			);
+			return false;
+		}
+		if (!mysqli_query($link, "UPDATE calendars SET displayname='$cal_displayname' WHERE id='$cal_id'")) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'MySQL Error: '.mysqli_error($link)
+			);
+			return false;
+		}
+		/* Setup read-only cal shares */
+		if(isset($postarray['cal_ro_share'][$adb_id])) {
+			foreach ($postarray['cal_ro_share'][$adb_id] as $share_with) {
+				$share_with = mysqli_real_escape_string($link, $share_with);
+				$update_string = "INSERT INTO groupmembers (principal_id, member_id)
+					VALUES (
+						(SELECT id FROM principals WHERE uri='principals/$logged_in_as/calendar-proxy-read'), 
+						(SELECT id FROM users WHERE username='$share_with')
+					)";
+				if (!mysqli_query($link, $update_string)) { 
+					$_SESSION['return'] = array(
+						'type' => 'danger',
+						'msg' => 'MySQL Error: '.mysqli_error($link)
+					);
+					return false;
+				}
+			}
+		}
+		/* Setup read/write cal shares */
+		if(isset($postarray['cal_rw_share'][$adb_id])) {
+			foreach ($postarray['cal_rw_share'][$adb_id] as $share_with) {
+				$share_with = mysqli_real_escape_string($link, $share_with);
+				$update_string = "INSERT INTO groupmembers (principal_id, member_id)
+					VALUES (
+						(SELECT id FROM principals WHERE uri='principals/$logged_in_as/calendar-proxy-write'), 
+						(SELECT id FROM users WHERE username='$share_with')
+					)";
+				if (!mysqli_query($link, $update_string)) { 
+					$_SESSION['return'] = array(
+						'type' => 'danger',
+						'msg' => 'MySQL Error: '.mysqli_error($link)
+					);
+					return false;
+				}
+			}
+		}
+	}
+	$_SESSION['return'] = array(
+		'type' => 'success',
+		'msg' => 'Changes saved successfully'
+	);
+}
 function mailbox_delete_domain($link, $postarray) {
 	$domain = mysqli_real_escape_string($link, $postarray['domain']);
 	if ($_SESSION['mailcow_cc_role'] != "admin") {
