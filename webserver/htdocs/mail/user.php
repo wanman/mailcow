@@ -143,19 +143,19 @@ echo "<tr><td>Address book</td><td>", $row['uri'],
 	<div class="form-group">
 		<label class="control-label col-sm-2" for="imap_host">IMAP Host (with Port)</label>
 		<div class="col-sm-10">
-		<input type="text" class="form-control" name="imap_host" id="imap_host" placeholder="remote.example.com:993">
+		<input type="text" class="form-control" name="imap_host" id="imap_host" placeholder="remote.example.com:993" required>
 		</div>
 	</div>
 	<div class="form-group">
 		<label class="control-label col-sm-2" for="imap_username">IMAP username:</label>
 		<div class="col-sm-10">
-		<input type="text" class="form-control" name="imap_username" id="imap_username">
+		<input type="text" class="form-control" name="imap_username" id="imap_username" required>
 		</div>
 	</div>
 	<div class="form-group">
 		<label class="control-label col-sm-2" for="imap_password">IMAP password:</label>
 		<div class="col-sm-10">
-		<input type="password" class="form-control" name="imap_password" id="imap_password">
+		<input type="password" class="form-control" name="imap_password" id="imap_password" required>
 		</div>
 	</div>
 	<div class="form-group">
