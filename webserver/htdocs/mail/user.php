@@ -56,13 +56,15 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 	<tbody>
 <?php
 $result = mysqli_query($link, "SELECT address, goto, TIMEDIFF(validity, NOW()) as timeleft, validity FROM spamalias WHERE goto='$logged_in_as' AND validity >= NOW() ORDER BY timeleft ASC");
-while ($row = mysqli_fetch_array($result)) {
-echo "<tr>
-<td>", $row['address'], "</td>
-<td>", $row['validity'], "</td>
-<td>", $row['timeleft'], "</td>
-</tr>";
-}
+while ($row = mysqli_fetch_array($result)):
+?>
+		<tr>
+		<td><?=$row['address'];?></td>
+		<td><?=$row['validity'];?></td>
+		<td><?=$row['timeleft'];?></td>
+		</tr>
+<?php
+endwhile;
 ?>
 	</tbody>
 </table>
@@ -80,7 +82,7 @@ echo "<tr>
 	</div>
 </div>
 <div class="form-group">
-	<div class="col-sm-9">
+	<div class="col-sm-12">
 		<button type="submit" name="trigger_set_time_limited_aliases" value="generate" class="btn btn-success btn-sm">Generate random alias</button>
 		<button type="submit" name="trigger_set_time_limited_aliases" value="delete" class="btn btn-danger btn-sm">Delete all aliases</button>
 		<button type="submit" name="trigger_set_time_limited_aliases" value="extend" class="btn btn-default btn-sm">Add 1 hour to all aliases</button>
@@ -108,26 +110,31 @@ echo "<tr>
 	<tbody>
 <?php
 $result = mysqli_query($link, "SELECT substring_index(principaluri,'/',-1) AS owner, components, uri, displayname FROM calendars WHERE principaluri='principals/$logged_in_as'");
-while ($row = mysqli_fetch_array($result)) {
-echo "<tr>
-<td><span class=\"glyphicon glyphicon-calendar\"></span></td>
-<td>", str_replace(array('VEVENT', 'VTODO', ','), array('Calendar', 'Tasks', ', '), $row['components']),
-"</td><td>", $row['uri'],
-"</td><td>", $row['displayname'],
-"</td><td><a href=\"https://".$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri']."?export\">Download (ICS format)</a>",
-"</td><td><a href=\"https://".$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri']."\">Open</a>",
-"</td></tr>";
-}
+while ($row = mysqli_fetch_array($result)):
+?>
+		<tr>
+		<td><span class="glyphicon glyphicon-calendar"></span></td>
+		<td><?=str_replace(array('VEVENT', 'VTODO', ','), array('Calendar', 'Tasks', ', '), $row['components']);?></td>
+		<td><?=$row['uri'];?></td>
+		<td><?=$row['displayname'];?></td>
+		<td><a href="https://<?=$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri'];?>?export">Download (ICS format)</a></td>
+		<td><a href="https://<?=$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri'];?>">Open</a></td>
+		</tr>
+<?php
+endwhile;
 $result = mysqli_query($link, "SELECT substring_index(principaluri,'/',-1) AS owner, uri, displayname FROM addressbooks WHERE principaluri='principals/$logged_in_as'");
-while ($row = mysqli_fetch_array($result)) {
-echo "<tr>
-<td><span class=\"glyphicon glyphicon-earphone\"></span></td>
-<td>Address book</td><td>", $row['uri'],
-"</td><td>", $row['displayname'],
-"</td><td><a href=\"https://".$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/addressbooks/$logged_in_as/".$row['uri']."?export\">Download (VCF format)</a>",
-"</td><td><a href=\"https://".$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/addressbooks/$logged_in_as/".$row['uri']."\">Open</a>",
-"</td></tr>";
-}
+while ($row = mysqli_fetch_array($result)):
+?>
+		<tr>
+		<td><span class="glyphicon glyphicon-earphone"></span></td>
+		<td>Address Book</td>
+		<td><?=$row['uri'];?></td>
+		<td><?=$row['displayname'];?></td>
+		<td><a href="https://<?=$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/addressbooks/".$row['owner']."/".$row['uri'];?>?export">Download (ICS format)</a></td>
+		<td><a href="https://<?=$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/addressbooks/".$row['owner']."/".$row['uri'];?>">Open</a></td>
+		</tr>
+<?php
+endwhile;
 ?>
 	</tbody>
 </table>
@@ -149,26 +156,23 @@ echo "<tr>
 	</thead>
 	<tbody>
 <?php
-$result = mysqli_query($link, "SELECT substring_index(principaluri,'/',-1) AS owner, uri, displayname FROM calendars
-	WHERE CONCAT(principaluri, '/calendar-proxy-read') IN
-		(SELECT uri FROM principals
-			WHERE id IN
-			(SELECT principal_id FROM groupmembers
-				WHERE member_id=(SELECT id FROM users
-					WHERE username='$logged_in_as')))");
-while ($row = mysqli_fetch_array($result)) {
-	$row_explode = explode('/', $row['uri']);
-	$owner = $row_explode[1];
-	$permission = explode('-', $row_explode[2])[2];
-echo "<tr>
-<td><span class=\"glyphicon glyphicon-calendar\"></span></td>
-<td>", str_replace(array('VEVENT', 'VTODO', ','), array('Calendar', 'Tasks', ', '), $row['components']),
-"</td><td>", $row['owner'],
-"</td><td>", $row['displayname'],
-"</td><td><a href=\"https://".$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri']."?export\">Download (ICS format)</a>",
-"</td><td><a href=\"https://".$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri']."\">Open</a>",
-"</td></tr>";
-}
+$result = mysqli_query($link, "SELECT components, substring_index(principaluri,'/',-1) AS owner, uri, displayname FROM calendars
+	WHERE CONCAT(principaluri, '/calendar-proxy-read') OR CONCAT(principaluri, '/calendar-proxy-write') IN (
+		SELECT uri FROM principals WHERE id IN (
+			SELECT principal_id FROM groupmembers WHERE member_id=(
+				SELECT id FROM principals WHERE email='$logged_in_as')));");
+while ($row = mysqli_fetch_array($result)):
+?>
+		<tr>
+		<td><span class="glyphicon glyphicon-calendar"></span></td>
+		<td><?=str_replace(array('VEVENT', 'VTODO', ','), array('Calendar', 'Tasks', ', '), $row['components']);?></td>
+		<td><?=$row['owner'];?></td>
+		<td><?=$row['displayname'];?></td>
+		<td><a href="https://<?=$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri'];?>?export">Download (ICS format)</a></td>
+		<td><a href="https://<?=$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri'];?>">Open</a></td>
+		</tr>
+<?php
+endwhile;
 ?>
 	</tbody>
 </table>
@@ -222,7 +226,7 @@ echo "<tr>
 	</div>
 	<div class="form-group">
 		<div class="col-sm-offset-2 col-sm-10">
-			<button type="submit" name="trigger_set_fetch_mail" class="btn btn-success btn-sm">Sync now</button>
+			<button type="submit" id="trigger_set_fetch_mail" name="trigger_set_fetch_mail" class="btn btn-success btn-sm" disabled>Sync now</button>
 		</div>
 	</div>
 </form>
