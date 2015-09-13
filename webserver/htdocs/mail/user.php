@@ -93,11 +93,12 @@ echo "<tr>
 <div class="panel panel-default">
 <div class="panel-heading">Calendars and Contacts</div>
 <div class="panel-body">
+<h4>My CalDAV and CardDAV items</h4>
 <div class="table-responsive">
 <table class="table table-striped" id="domainadminstable">
 	<thead>
 	<tr>
-		<th>Components</th>
+		<th colspan="2">Components</th>
 		<th>URI</th>
 		<th>Display name</th>
 		<th>Export</th>
@@ -106,18 +107,22 @@ echo "<tr>
 	</thead>
 	<tbody>
 <?php
-$result = mysqli_query($link, "SELECT components, uri, displayname FROM calendars WHERE principaluri='principals/$logged_in_as'");
+$result = mysqli_query($link, "SELECT substring_index(principaluri,'/',-1) AS owner, components, uri, displayname FROM calendars WHERE principaluri='principals/$logged_in_as'");
 while ($row = mysqli_fetch_array($result)) {
-echo "<tr><td>", str_replace(array('VEVENT', 'VTODO', ','), array('Calendar', 'Tasks', ', '), $row['components']),
+echo "<tr>
+<td><span class=\"glyphicon glyphicon-calendar\"></span></td>
+<td>", str_replace(array('VEVENT', 'VTODO', ','), array('Calendar', 'Tasks', ', '), $row['components']),
 "</td><td>", $row['uri'],
 "</td><td>", $row['displayname'],
-"</td><td><a href=\"https://".$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/$logged_in_as/".$row['uri']."?export\">Download (ICS format)</a>",
-"</td><td><a href=\"https://".$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/$logged_in_as/".$row['uri']."\">Open</a>",
+"</td><td><a href=\"https://".$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri']."?export\">Download (ICS format)</a>",
+"</td><td><a href=\"https://".$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri']."\">Open</a>",
 "</td></tr>";
 }
-$result = mysqli_query($link, "SELECT uri, displayname FROM addressbooks WHERE principaluri='principals/$logged_in_as'");
+$result = mysqli_query($link, "SELECT substring_index(principaluri,'/',-1) AS owner, uri, displayname FROM addressbooks WHERE principaluri='principals/$logged_in_as'");
 while ($row = mysqli_fetch_array($result)) {
-echo "<tr><td>Address book</td><td>", $row['uri'],
+echo "<tr>
+<td><span class=\"glyphicon glyphicon-earphone\"></span></td>
+<td>Address book</td><td>", $row['uri'],
 "</td><td>", $row['displayname'],
 "</td><td><a href=\"https://".$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/addressbooks/$logged_in_as/".$row['uri']."?export\">Download (VCF format)</a>",
 "</td><td><a href=\"https://".$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/addressbooks/$logged_in_as/".$row['uri']."\">Open</a>",
@@ -128,7 +133,45 @@ echo "<tr><td>Address book</td><td>", $row['uri'],
 </table>
 </div>
 <div class="col-sm-12">
-	<a href="do.php?editdav=<?=$logged_in_as?>" class="btn btn-default btn-sm">Change details and permissions</a>
+	<p><a href="do.php?editdav=<?=$logged_in_as?>" class="btn btn-default btn-sm btn-raised">Change details and permissions</a></p>
+</div>
+<h4>Shared with me</h4>
+<div class="table-responsive">
+<table class="table table-striped" id="domainadminstable">
+	<thead>
+	<tr>
+		<th colspan="2">Components</th>
+		<th>Owner</th>
+		<th>Display name</th>
+		<th>Export</th>
+		<th>Link</th>
+	</tr>
+	</thead>
+	<tbody>
+<?php
+$result = mysqli_query($link, "SELECT substring_index(principaluri,'/',-1) AS owner, uri, displayname FROM calendars
+	WHERE CONCAT(principaluri, '/calendar-proxy-read') IN
+		(SELECT uri FROM principals
+			WHERE id IN
+			(SELECT principal_id FROM groupmembers
+				WHERE member_id=(SELECT id FROM users
+					WHERE username='$logged_in_as')))");
+while ($row = mysqli_fetch_array($result)) {
+	$row_explode = explode('/', $row['uri']);
+	$owner = $row_explode[1];
+	$permission = explode('-', $row_explode[2])[2];
+echo "<tr>
+<td><span class=\"glyphicon glyphicon-calendar\"></span></td>
+<td>", str_replace(array('VEVENT', 'VTODO', ','), array('Calendar', 'Tasks', ', '), $row['components']),
+"</td><td>", $row['owner'],
+"</td><td>", $row['displayname'],
+"</td><td><a href=\"https://".$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri']."?export\">Download (ICS format)</a>",
+"</td><td><a href=\"https://".$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri']."\">Open</a>",
+"</td></tr>";
+}
+?>
+	</tbody>
+</table>
 </div>
 </div>
 </div>

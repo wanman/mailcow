@@ -172,42 +172,42 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 				<td><input type="text" name="cal_displayname['.$row_cal['id'].']" value="', $row_cal['displayname'], '"></td>
 				<td>
 					<select style="width:100%" name="cal_ro_share['.$row_cal['id'].'][]" size="5" multiple>';
-$result = mysqli_query($link, "SELECT username FROM users
-	WHERE id IN (SELECT member_id FROM groupmembers
-		WHERE principal_id=(SELECT id FROM principals
-			WHERE uri='principals/$logged_in_as/calendar-proxy-read'))
-	AND username!='$logged_in_as'");
-while ($row_cal_ro_selected = mysqli_fetch_array($result)) {
-	echo '<option selected>', $row_cal_ro_selected['username'], '</option>';
-}
-$result = mysqli_query($link, "SELECT username FROM users
-	WHERE id NOT IN (SELECT member_id FROM groupmembers
-		WHERE principal_id=(SELECT id FROM principals
-			WHERE uri='principals/$logged_in_as/calendar-proxy-read'))
-	AND username!='$logged_in_as'");	
-while ($row_cal_ro_unselected = mysqli_fetch_array($result)) {
-	echo '<option>', $row_cal_ro_unselected['username'], '</option>';
-}
+					$result = mysqli_query($link, "SELECT email FROM principals
+						WHERE id IN (SELECT member_id FROM groupmembers
+							WHERE principal_id IN (SELECT id FROM principals
+								WHERE uri='principals/$logged_in_as/calendar-proxy-read'))");
+					while ($row_cal_ro_selected = mysqli_fetch_array($result)) {
+						echo '<option selected>', $row_cal_ro_selected['email'], '</option>';
+					}
+					$result = mysqli_query($link, "SELECT email FROM principals
+						WHERE id NOT IN (SELECT member_id FROM groupmembers
+							WHERE principal_id IN (SELECT id FROM principals
+								WHERE uri='principals/$logged_in_as/calendar-proxy-read'))
+						AND email IS NOT NULL
+						AND email!='$logged_in_as'");
+					while ($row_cal_ro_unselected = mysqli_fetch_array($result)) {
+						echo '<option>', $row_cal_ro_unselected['email'], '</option>';
+					}
 					echo '</select>
 				</td>
 				<td>
 					<select style="width:100%" name="cal_rw_share['.$row_cal['id'].'][]" size="5" multiple>';
-$result = mysqli_query($link, "SELECT username FROM users
-	WHERE id IN (SELECT member_id FROM groupmembers
-		WHERE principal_id=(SELECT id FROM principals
-			WHERE uri='principals/$logged_in_as/calendar-proxy-write'))
-	AND username!='$logged_in_as'");
-while ($row_cal_rw_selected = mysqli_fetch_array($result)) {
-	echo '<option selected>', $row_cal_rw_selected['username'], '</option>';
-}
-$result = mysqli_query($link, "SELECT username FROM users
-	WHERE id NOT IN (SELECT member_id FROM groupmembers
-		WHERE principal_id=(SELECT id FROM principals
-			WHERE uri='principals/$logged_in_as/calendar-proxy-write'))
-	AND username!='$logged_in_as'");
-while ($row_cal_rw_unselected = mysqli_fetch_array($result)) {
-	echo '<option>', $row_cal_rw_unselected['username'], '</option>';
-}
+					$result = mysqli_query($link, "SELECT email FROM principals
+						WHERE id IN (SELECT member_id FROM groupmembers
+							WHERE principal_id IN (SELECT id FROM principals
+								WHERE uri='principals/$logged_in_as/calendar-proxy-write'))");
+					while ($row_cal_rw_selected = mysqli_fetch_array($result)) {
+						echo '<option selected>', $row_cal_rw_selected['email'], '</option>';
+					}
+					$result = mysqli_query($link, "SELECT email FROM principals
+						WHERE id NOT IN (SELECT member_id FROM groupmembers
+							WHERE principal_id IN (SELECT id FROM principals
+								WHERE uri='principals/$logged_in_as/calendar-proxy-write'))
+						AND email IS NOT NULL
+						AND email!='$logged_in_as'");
+					while ($row_cal_rw_unselected = mysqli_fetch_array($result)) {
+						echo '<option>', $row_cal_rw_unselected['email'], '</option>';
+					}
 					echo '</select>
 				</td>
 				</tr>';

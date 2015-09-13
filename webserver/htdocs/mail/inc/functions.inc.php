@@ -1180,23 +1180,9 @@ function mailbox_edit_mailbox($link, $postarray) {
 function mailbox_edit_dav($link, $postarray) {
 	global $logged_in_role;
 	global $logged_in_as;
-	/*
-	// Handle address book input
-	// Clean address book principal_ids
-	$clean_adb = "DELETE FROM groupmembers WHERE principal_id
-		IN (SELECT id FROM principals
-			WHERE uri='principals/$logged_in_as/addressbook-proxy-write'
-			OR uri='principals/$logged_in_as/addressbook-proxy-read')";
-	if (!mysqli_query($link, $clean_adb)) { 
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => 'MySQL Error: '.mysqli_error($link)
-		);
-		return false;
-	}
-	*/
+	/* Handle address book input */
 	foreach (array_flip($postarray['adb_displayname']) as $adb_id) {
-		// Check adb access
+		// Check address book access
 		if (!mysqli_result(mysqli_query($link, "SELECT * FROM calendars, addressbooks
 			WHERE calendars.principaluri='principals/$logged_in_as' 
 			AND addressbooks.principaluri='principals/$logged_in_as'
@@ -1207,7 +1193,7 @@ function mailbox_edit_dav($link, $postarray) {
 			);
 			return false;
 		}
-		// Set display name for current adb, if not empty
+		// Set display name for current address book, if not empty
 		$adb_displayname =  mysqli_real_escape_string($link, $postarray['adb_displayname'][$adb_id]);
 		if (empty($adb_displayname)) {
 			$_SESSION['return'] = array(
@@ -1223,51 +1209,13 @@ function mailbox_edit_dav($link, $postarray) {
 			);
 			return false;
 		}
-		/*
-		// Setup read-only adb shares
-		if(isset($postarray['adb_ro_share'][$adb_id])) {
-			foreach ($postarray['adb_ro_share'][$adb_id] as $share_with) {
-				$share_with = mysqli_real_escape_string($link, $share_with);
-				$update_string = "INSERT INTO groupmembers (principal_id, member_id)
-					VALUES (
-						(SELECT id FROM principals WHERE uri='principals/$logged_in_as/addressbook-proxy-read'), 
-						(SELECT id FROM users WHERE username='$share_with')
-					)";
-				if (!mysqli_query($link, $update_string)) { 
-					$_SESSION['return'] = array(
-						'type' => 'danger',
-						'msg' => 'MySQL Error: '.mysqli_error($link)
-					);
-					return false;
-				}
-			}
-		}
-		// Setup read/write adb shares
-		if(isset($postarray['adb_rw_share'][$adb_id])) {
-			foreach ($postarray['adb_rw_share'][$adb_id] as $share_with) {
-				$share_with = mysqli_real_escape_string($link, $share_with);
-				$update_string = "INSERT INTO groupmembers (principal_id, member_id)
-					VALUES (
-						(SELECT id FROM principals WHERE uri='principals/$logged_in_as/addressbook-proxy-write'), 
-						(SELECT id FROM users WHERE username='$share_with')
-					)";
-				if (!mysqli_query($link, $update_string)) { 
-					$_SESSION['return'] = array(
-						'type' => 'danger',
-						'msg' => 'MySQL Error: '.mysqli_error($link)
-					);
-					return false;
-				}
-			}
-		}
-		*/
 	}
 	/* Handle calendar input */
 	/* Clean calendar principal_ids */
 	$clean_cal = "DELETE FROM groupmembers WHERE principal_id
 		IN (SELECT id FROM principals
-			WHERE uri='principals/$logged_in_as/calendar-proxy-write'
-			OR uri='principals/$logged_in_as/calendar-proxy-read')";
+			WHERE uri='principals/$logged_in_as/calendar-proxy-read'
+			OR uri='principals/$logged_in_as/calendar-proxy-write')";
 	if (!mysqli_query($link, $clean_cal)) { 
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1309,8 +1257,8 @@ function mailbox_edit_dav($link, $postarray) {
 				$share_with = mysqli_real_escape_string($link, $share_with);
 				$update_string = "INSERT INTO groupmembers (principal_id, member_id)
 					VALUES (
-						(SELECT id FROM principals WHERE uri='principals/$logged_in_as/calendar-proxy-read'), 
-						(SELECT id FROM users WHERE username='$share_with')
+						(SELECT id FROM principals WHERE uri='principals/$logged_in_as/calendar-proxy-read'),
+						(SELECT id FROM principals WHERE email='$share_with')
 					)";
 				if (!mysqli_query($link, $update_string)) { 
 					$_SESSION['return'] = array(
@@ -1327,8 +1275,8 @@ function mailbox_edit_dav($link, $postarray) {
 				$share_with = mysqli_real_escape_string($link, $share_with);
 				$update_string = "INSERT INTO groupmembers (principal_id, member_id)
 					VALUES (
-						(SELECT id FROM principals WHERE uri='principals/$logged_in_as/calendar-proxy-write'), 
-						(SELECT id FROM users WHERE username='$share_with')
+						(SELECT id FROM principals WHERE uri='principals/$logged_in_as/calendar-proxy-write'),
+						(SELECT id FROM principals WHERE email='$share_with')
 					)";
 				if (!mysqli_query($link, $update_string)) { 
 					$_SESSION['return'] = array(
