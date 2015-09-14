@@ -46,7 +46,7 @@ while ($row = mysqli_fetch_array($result)):
 $getpostmaster = mysqli_query($link, "SELECT alias.active as aactive, mailbox.active as mactive, username, address FROM alias, mailbox WHERE 
 (username='postmaster@$row[domain]' OR address='postmaster@$row[domain]')");
 $postmasterstatus = mysqli_fetch_assoc($getpostmaster);
-if ($row[backupmx] == "No" && !isset($postmasterstatus['address']) || ($postmasterstatus['aactive'] == "0" || $postmasterstatus['mactive'] == "0")):
+if ($row['backupmx'] == "No" && !isset($postmasterstatus['address']) || ($postmasterstatus['aactive'] == "0" || $postmasterstatus['mactive'] == "0")):
 ?>
 							<span data-toggle="tooltip" title="Postmaster missing/invalid"><i class="glyphicon glyphicon-exclamation-sign"></i> <?= $row['domain']; ?></span>
 <?php
