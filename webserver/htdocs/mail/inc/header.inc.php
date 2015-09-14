@@ -76,7 +76,7 @@ a, a:hover {
 	}
 }
 .collapsing {
-	transition: height 0.1s;
+	transition: height 0.01s;
 }
 </style>
 </head>
