@@ -3,6 +3,7 @@ function check_login($link, $user, $pass) {
 	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $user))) {
 		return false;
 	}
+	$user = strtolower(trim($user));
 	$pass = escapeshellcmd($pass);
 	$result = mysqli_query($link, "SELECT password FROM admin WHERE superadmin='1' AND username='$user'");
 	while ($row = mysqli_fetch_array($result, MYSQL_NUM)) {

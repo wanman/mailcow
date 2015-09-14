@@ -1,20 +1,21 @@
 <?php
 if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
-	if (check_login($link, $_POST["login_user"], $_POST["pass_user"]) == "admin") {
+	$login_user = strtolower(trim($_POST["login_user"]));
+	if (check_login($link, $login_user, $_POST["pass_user"]) == "admin") {
 		$_SESSION['mailcow_cc_loggedin'] = "yes";
-		$_SESSION['mailcow_cc_username'] = $_POST["login_user"];
+		$_SESSION['mailcow_cc_username'] = $login_user;
 		$_SESSION['mailcow_cc_role'] = "admin";
 		header("Location: admin.php");
 	}
-	elseif (check_login($link, $_POST["login_user"], $_POST["pass_user"]) == "domainadmin") {
+	elseif (check_login($link, $login_user, $_POST["pass_user"]) == "domainadmin") {
 		$_SESSION['mailcow_cc_loggedin'] = "yes";
-		$_SESSION['mailcow_cc_username'] = $_POST["login_user"];
+		$_SESSION['mailcow_cc_username'] = $login_user;
 		$_SESSION['mailcow_cc_role'] = "domainadmin";
 		header("Location: mailbox.php");
 	}
-	elseif (check_login($link, $_POST["login_user"], $_POST["pass_user"]) == "user") {
+	elseif (check_login($link, $login_user, $_POST["pass_user"]) == "user") {
 		$_SESSION['mailcow_cc_loggedin'] = "yes";
-		$_SESSION['mailcow_cc_username'] = $_POST["login_user"];
+		$_SESSION['mailcow_cc_username'] = $login_user;
 		$_SESSION['mailcow_cc_role'] = "user";
 		header("Location: mailbox.php");
 	}
