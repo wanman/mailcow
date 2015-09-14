@@ -1,9 +1,9 @@
 <?php
 /* Database connection*/
-$database_host = "localhost";
-$database_user = "mailcow";
-$database_pass = "PBpPJf2qYWg6ZXWfmzm4QWqw";
-$database_name = "mailcow";
+$database_host = "my_dbhost";
+$database_user = "my_mailcowuser";
+$database_pass = "my_mailcowpass";
+$database_name = "my_mailcowdb";
 
 // if NAT or IPv6
 if (isset($_SERVER['SERVER_ADDR'])) {
