@@ -1251,8 +1251,8 @@ function mailbox_edit_dav($link, $postarray) {
 			return false;
 		}
 		/* Setup read-only cal shares */
-		if(isset($postarray['cal_ro_share'][$adb_id])) {
-			foreach ($postarray['cal_ro_share'][$adb_id] as $share_with) {
+		if(isset($postarray['cal_ro_share'][$cal_id])) {
+			foreach ($postarray['cal_ro_share'][$cal_id] as $share_with) {
 				$share_with = mysqli_real_escape_string($link, $share_with);
 				$update_string = "INSERT INTO groupmembers (principal_id, member_id)
 					VALUES (
@@ -1269,8 +1269,8 @@ function mailbox_edit_dav($link, $postarray) {
 			}
 		}
 		/* Setup read/write cal shares */
-		if(isset($postarray['cal_rw_share'][$adb_id])) {
-			foreach ($postarray['cal_rw_share'][$adb_id] as $share_with) {
+		if(isset($postarray['cal_rw_share'][$cal_id])) {
+			foreach ($postarray['cal_rw_share'][$cal_id] as $share_with) {
 				$share_with = mysqli_real_escape_string($link, $share_with);
 				$update_string = "INSERT INTO groupmembers (principal_id, member_id)
 					VALUES (
