@@ -515,7 +515,7 @@ function mailbox_add_domain($link, $postarray) {
 		);
 		return false;
 	}
-	$domain = mysqli_real_escape_string($link, $postarray['domain']);
+	$domain = mysqli_real_escape_string($link, strtolower(trim($postarray['domain'])));
 	$description = mysqli_real_escape_string($link, $postarray['description']);
 	$aliases = mysqli_real_escape_string($link, $postarray['aliases']);
 	$mailboxes = mysqli_real_escape_string($link, $postarray['mailboxes']);
@@ -561,7 +561,7 @@ function mailbox_add_domain($link, $postarray) {
 	);
 }
 function mailbox_add_alias($link, $postarray) {
-	$address = mysqli_real_escape_string($link, $postarray['address']);
+	$address = mysqli_real_escape_string($link, strtolower(trim($postarray['address'])));
 	$goto_arr = array_map('trim', explode(',', $postarray['goto']));
 	foreach ($goto_arr as $goto) {
 		if (!filter_var($goto, FILTER_VALIDATE_EMAIL)) {
@@ -579,7 +579,7 @@ function mailbox_add_alias($link, $postarray) {
 		);
 		return false;
 	}
-	$goto = implode(",", $goto_arr);
+	$goto = implode(",", strtolower(trim($goto_arr)));
 	$domain = substr($address, strpos($address, '@')+1);
 	global $logged_in_role;
 	global $logged_in_as;
@@ -641,8 +641,8 @@ function mailbox_add_alias($link, $postarray) {
 	);
 }
 function mailbox_add_alias_domain($link, $postarray) {
-	$alias_domain = mysqli_real_escape_string($link, $postarray['alias_domain']);
-	$target_domain = mysqli_real_escape_string($link, $postarray['target_domain']);
+	$alias_domain = mysqli_real_escape_string($link, strtolower(trim($postarray['alias_domain'])));
+	$target_domain = mysqli_real_escape_string($link, strtolower(trim($postarray['target_domain'])));
 	global $logged_in_role;
 	global $logged_in_as;
 	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$target_domain' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) { 
@@ -711,8 +711,8 @@ function mailbox_add_alias_domain($link, $postarray) {
 function mailbox_add_mailbox($link, $postarray) {
 	$password = mysqli_real_escape_string($link, $postarray['password']);
 	$password2 = mysqli_real_escape_string($link, $postarray['password2']);
-	$domain = mysqli_real_escape_string($link, $postarray['domain']);
-	$local_part = mysqli_real_escape_string($link, $postarray['local_part']);
+	$domain = mysqli_real_escape_string($link, strtolower(trim($postarray['domain'])));
+	$local_part = mysqli_real_escape_string($link, strtolower(trim($postarray['local_part'])));
 	$name = mysqli_real_escape_string($link, $postarray['name']);
 	$default_cal = mysqli_real_escape_string($link, $postarray['default_cal']);
 	$default_card = mysqli_real_escape_string($link, $postarray['default_card']);
@@ -1767,7 +1767,7 @@ function set_fetch_mail($link, $postarray) {
 	);
 }
 function add_domain_admin($link, $postarray) {
-	$username = mysqli_real_escape_string($link, $postarray['username']);
+	$username = mysqli_real_escape_string($link, strtolower(trim($postarray['username'])));
 	$password = mysqli_real_escape_string($link, $postarray['password']);
 	$password2 = mysqli_real_escape_string($link, $postarray['password2']);
 	if ($_SESSION['mailcow_cc_role'] != "admin") {
