@@ -1,9 +1,9 @@
 <?php
 /* Database connection*/
-$database_host = "my_dbhost";
-$database_user = "my_mailcowuser";
-$database_pass = "my_mailcowpass";
-$database_name = "my_mailcowdb";
+$database_host = "localhost";
+$database_user = "mailcow";
+$database_pass = "PBpPJf2qYWg6ZXWfmzm4QWqw";
+$database_name = "mailcow";
 
 // if NAT or IPv6
 if (isset($_SERVER['SERVER_ADDR'])) {
@@ -42,6 +42,6 @@ $MYHOSTNAME=exec("/usr/sbin/postconf -h myhostname");
 $MYHOSTNAME_0=explode(".", exec("/usr/sbin/postconf -h myhostname"))[0];
 $MYHOSTNAME_1=explode(".", exec("/usr/sbin/postconf -h myhostname"))[1];
 $MYHOSTNAME_2=explode(".", exec("/usr/sbin/postconf -h myhostname"))[2];
-$DAV_SUBDOMAIN="httpd_dav_subdomain";
+$DAV_SUBDOMAIN="dav";
 
 ?>

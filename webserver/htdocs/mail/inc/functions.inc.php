@@ -758,7 +758,6 @@ function mailbox_add_mailbox($link, $postarray) {
 	}
 
 	if (!is_valid_domain_name($domain) || empty ($domain)) {
-		header("Location: do.php?event=".base64_encode("Domain name invalid"));
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Domain name invalid'
@@ -1794,13 +1793,13 @@ function add_domain_admin($link, $postarray) {
 	array_walk($postarray['domain'], function(&$string) use ($link) {
 		$string = mysqli_real_escape_string($link, $string);
 	});
-	$qstring = "SELECT username FROM admin WHERE username='$username'";
+	$qstring = "SELECT mailbox.username, admin.username FROM admin, mailbox WHERE mailbox.username='$username' OR admin.username='$username'";
 	$qresult = mysqli_query($link, $qstring);
 	$num_results = mysqli_num_rows($qresult);
 	if ($num_results != 0) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'Domain admin '.htmlspecialchars($username).' does already exist'
+			'msg' => 'Username '.htmlspecialchars($username).' does already exist'
 		);
 		return false;
 	}

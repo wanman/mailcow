@@ -71,8 +71,8 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 					echo "<tr><td>", $row['username'],
 					"</td><td>", $row['domain'],
 					"</td><td>", $row['active'],
-					"</td><td><a href=\"do.php?deletedomainadmin=", $row['username'], "\">delete</a> | 
-					<a href=\"do.php?editdomainadmin=", $row['username'], "\">edit</a>",
+					"</td><td><a href=\"delete.php?domain_admin=", $row['username'], "\">delete</a> | 
+					<a href=\"edit.php?domain_admin=", $row['username'], "\">edit</a>",
 					"</td></tr>";
 					}
 					?>

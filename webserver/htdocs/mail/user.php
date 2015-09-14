@@ -116,7 +116,7 @@ while ($row = mysqli_fetch_array($result)):
 		<td><span class="glyphicon glyphicon-calendar"></span></td>
 		<td><?=str_replace(array('VEVENT', 'VTODO', ','), array('Calendar', 'Tasks', ', '), $row['components']);?></td>
 		<td><?=$row['uri'];?></td>
-		<td><?=$row['displayname'];?></td>
+		<td><?=htmlspecialchars($row['displayname']);?></td>
 		<td><a href="https://<?=$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri'];?>?export">Download (ICS format)</a></td>
 		<td><a href="https://<?=$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri'];?>">Open</a></td>
 		</tr>
@@ -140,7 +140,7 @@ endwhile;
 </table>
 </div>
 <div class="col-sm-12">
-	<p><a href="do.php?editdav=<?=$logged_in_as?>" class="btn btn-default btn-sm btn-raised">Change details and permissions</a></p>
+	<p><a href="edit.php?dav=<?=$logged_in_as?>" class="btn btn-default btn-sm btn-raised">Change details and permissions</a></p>
 </div>
 <h4>Shared with me</h4>
 <div class="table-responsive">
@@ -167,7 +167,7 @@ while ($row = mysqli_fetch_array($result)):
 		<td><span class="glyphicon glyphicon-calendar"></span></td>
 		<td><?=str_replace(array('VEVENT', 'VTODO', ','), array('Calendar', 'Tasks', ', '), $row['components']);?></td>
 		<td><?=$row['owner'];?></td>
-		<td><?=$row['displayname'];?></td>
+		<td><?=htmlspecialchars($row['displayname']);?></td>
 		<td><a href="https://<?=$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri'];?>?export">Download (ICS format)</a></td>
 		<td><a href="https://<?=$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri'];?>">Open</a></td>
 		</tr>

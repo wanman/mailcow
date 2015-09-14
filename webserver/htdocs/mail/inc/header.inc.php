@@ -75,6 +75,9 @@ a, a:hover {
 		color: #f5f5f5 !important;
 	}
 }
+.collapsing {
+	transition: height 0.1s;
+}
 </style>
 </head>
 <body>
