@@ -252,8 +252,8 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 					<tr>
 						<th>Type</th>
 						<th>Display name</th>
-						<th>Read access</th>
-						<th>Write access</th>
+						<th>Read-only access</th>
+						<th>Read/Write access</th>
 					</tr>
 					</thead>
 					<tbody>

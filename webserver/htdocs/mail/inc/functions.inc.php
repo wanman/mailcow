@@ -1253,6 +1253,10 @@ function mailbox_edit_dav($link, $postarray) {
 		}
 		/* Setup read-only cal shares */
 		if(isset($postarray['cal_ro_share'][$cal_id])) {
+			/* No need to set read-only, when read/write is enabled */
+			if(isset($postarray['cal_rw_share'][$cal_id])) {
+				$postarray['cal_ro_share'][$cal_id] = array_diff($postarray['cal_ro_share'][$cal_id], $postarray['cal_rw_share'][$cal_id]);
+			}
 			foreach ($postarray['cal_ro_share'][$cal_id] as $share_with) {
 				$share_with = mysqli_real_escape_string($link, $share_with);
 				$update_string = "INSERT INTO groupmembers (principal_id, member_id)
