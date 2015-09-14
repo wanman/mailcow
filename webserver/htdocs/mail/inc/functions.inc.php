@@ -739,7 +739,7 @@ function mailbox_add_mailbox($link, $postarray) {
 		);
 		return false;
 	}
-	$qstring = "SELECT local_part FROM mailbox WHERE local_part='$local_part'";
+	$qstring = "SELECT local_part FROM mailbox WHERE local_part='$local_part' and domain='$domain'";
 	$qresult = mysqli_query($link, $qstring);
 	$num_results = mysqli_num_rows($qresult);
 	if ($num_results != 0) {
