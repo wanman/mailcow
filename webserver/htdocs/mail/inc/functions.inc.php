@@ -875,6 +875,45 @@ function mailbox_add_mailbox($link, $postarray) {
 		'msg' => 'Added mailbox '.htmlspecialchars($username)
 	);
 }
+function mailbox_add_dav($link, $postarray) {
+	$displayname = mysqli_real_escape_string($link, $postarray['displayname']);
+	$davtype = mysqli_real_escape_string($link, $postarray['davtype']);
+	global $logged_in_role;
+	global $logged_in_as;
+	if (!filter_var($logged_in_as, FILTER_VALIDATE_EMAIL) || $logged_in_role != "user") {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'Permission denied'
+		);
+		return false;
+	}
+	if (empty($displayname)) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'Display name cannot be empty'
+		);
+		return false;
+	}
+	if ($davtype == "addressbook") {
+		$create_davitem = "INSERT INTO addressbooks (principaluri, displayname, uri, description, synctoken)
+				VALUES ('principals/$logged_in_as', '$displayname', UUID(), '', '1')";
+	}
+	elseif ($davtype == "calendar") {
+		$create_davitem .= "INSERT INTO calendars (principaluri, displayname, uri, description, components, transparent) 
+				VALUES ('principals/$logged_in_as', '$displayname', UUID(), '', 'VEVENT,VTODO' , '0')";	
+	}
+	if (!mysqli_query($link, $create_davitem)) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL Error: '.mysqli_error($link)
+		);
+		return false;
+	}
+	$_SESSION['return'] = array(
+		'type' => 'success',
+		'msg' => 'Added DAV item '.htmlspecialchars($username)
+	);
+}
 function mailbox_edit_alias($link, $postarray) {
 	global $logged_in_role;
 	global $logged_in_as;

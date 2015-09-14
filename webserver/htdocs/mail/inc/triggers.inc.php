@@ -114,6 +114,9 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 			case "editdav":
 				mailbox_edit_dav($link, $_POST);
 			break;
+			case "adddav":
+				mailbox_add_dav($link, $_POST);
+			break;
 		}
 	}
 }

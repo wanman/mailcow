@@ -22,7 +22,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) &&
 		else {
 			$domain = mysqli_real_escape_string($link, $_GET["domain"]);
 			if (mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain' AND ((domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role'))"))) {
-				echo '<div class="alert alert-warning" role="alert"><strong>Warning:</strong> You are about to delete a domain!</div>';
+				echo '<div class="alert alert-danger" role="alert"><strong>Warning:</strong> You are about to delete a domain!</div>';
 				echo "<p>This will also delete domain alises assigned to the domain</p>";
 				echo "<p><strong>Domain must be empty to be deleted!</b></p>";
 				?>
@@ -48,7 +48,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) &&
 		else {
 			$alias = mysqli_real_escape_string($link, $_GET["alias"]);
 			if (mysqli_result(mysqli_query($link, "SELECT goto domain FROM alias WHERE (address='$alias' AND goto!='$alias') AND (domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role')"))) {
-				echo '<div class="alert alert-warning" role="alert"><strong>Warning:</strong> You are about to delete an alias!</div>';
+				echo '<div class="alert alert-danger" role="alert"><strong>Warning:</strong> You are about to delete an alias!</div>';
 				echo "<p>The following users will no longer receive mail for/send mail from alias address <strong>$alias:</strong></p>";
 				$query = "SELECT goto, domain FROM alias WHERE (address='$alias' AND goto!='$alias) AND ((domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role'))";
 				$result = mysqli_query($link, $query);
@@ -80,7 +80,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) &&
 		else {
 			$alias_domain = mysqli_real_escape_string($link, $_GET["alias_domain"]);
 			if (mysqli_result(mysqli_query($link, "SELECT alias_domain, target_domain FROM alias_domain WHERE alias_domain='$alias_domain' AND (target_domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role')"))) {
-				echo '<div class="alert alert-warning" role="alert"><strong>Warning:</strong> You are about to delete an alias domain!</div>';
+				echo '<div class="alert alert-danger" role="alert"><strong>Warning:</strong> You are about to delete an alias domain!</div>';
 				echo "<p>The server will stop accepting mails for the domain name <strong>$alias_domain</strong>.</p>";
 				?>
 				<form class="form-horizontal" role="form" method="post" action="mailbox.php">
@@ -105,7 +105,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) &&
 		else {
 			$domain_admin = mysqli_real_escape_string($link, $_GET["domain_admin"]);
 			if (mysqli_result(mysqli_query($link, "SELECT username FROM domain_admins WHERE username='$domain_admin'")) && $logged_in_role == "admin") {
-				echo '<div class="alert alert-warning" role="alert"><strong>Warning:</strong> You are about to delete a domain administrator!</div>';
+				echo '<div class="alert alert-danger" role="alert"><strong>Warning:</strong> You are about to delete a domain administrator!</div>';
 				echo "<p>The domain administrator <strong>$domain_admin</strong> will not be able to login after deletion.</p>";
 				?>
 				<form class="form-horizontal" role="form" method="post" action="admin.php">
@@ -130,7 +130,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) &&
 		else {
 			$mailbox = mysqli_real_escape_string($link, $_GET["mailbox"]);
 			if (mysqli_result(mysqli_query($link, "SELECT address, domain FROM alias WHERE address='$mailbox' AND (domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role')"))) {
-				echo '<div class="alert alert-warning" role="alert"><strong>Warning:</strong> You are about to delete a mailbox!</div>';
+				echo '<div class="alert alert-danger" role="alert"><strong>Warning:</strong> You are about to delete a mailbox!</div>';
 				echo "<p>The mailbox user <strong>$mailbox</strong> + its address books and calendars will be deleted.</p>";
 				echo "<p>The user will also be removed from the alias addresses listed below (if any).</p>";
 				echo "<ul>";
@@ -156,11 +156,11 @@ if (isset($_SESSION['mailcow_cc_loggedin']) &&
 		}
 	}
 	else {
-		echo '<div class="alert alert-warning" role="alert"><strong>Error:</strong>  No valid action specified.</div>';
+		echo '<div class="alert alert-danger" role="alert"><strong>Error:</strong>  No valid action specified.</div>';
 	}
 }
 else {
-	echo '<div class="alert alert-warning" role="alert">Permission denied</div>';
+	echo '<div class="alert alert-danger" role="alert">Permission denied</div>';
 }
 ?>
 				</div>

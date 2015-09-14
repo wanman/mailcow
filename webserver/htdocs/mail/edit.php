@@ -228,7 +228,7 @@ endwhile;
 		}
 	}
 	else {
-		echo '<div class="alert alert-warning" role="alert"><strong>Error:</strong>  No action specified.</div>';
+		echo '<div class="alert alert-danger" role="alert"><strong>Error:</strong>  No action specified.</div>';
 	}
 }
 elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
@@ -258,8 +258,8 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 					</thead>
 					<tbody>
 					<?php
-					$result = mysqli_query($link, "SELECT id, displayname FROM calendars WHERE principaluri='principals/$logged_in_as'");
-					while ($row_cal = mysqli_fetch_array($result)):
+					$result_row_cal = mysqli_query($link, "SELECT id, displayname FROM calendars WHERE principaluri='principals/$logged_in_as'");
+					while ($row_cal = mysqli_fetch_array($result_row_cal)):
 					?>
 					<tr>
 						<td>Calendar, Tasks</td>
@@ -267,23 +267,23 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 						<td>
 							<select style="width:100%" name="cal_ro_share[<?=$row_cal['id'];?>][]" size="5" multiple>
 							<?php
-							$result = mysqli_query($link, "SELECT email FROM principals
+							$result_rcrs = mysqli_query($link, "SELECT email FROM principals
 								WHERE id IN (SELECT member_id FROM groupmembers
 									WHERE principal_id IN (SELECT id FROM principals
 										WHERE uri='principals/$logged_in_as/calendar-proxy-read'))");
-							while ($row_cal_ro_selected = mysqli_fetch_array($result)):
+							while ($row_cal_ro_selected = mysqli_fetch_array($result_rcrs)):
 							?>
 								<option selected><?=$row_cal_ro_selected['email'];?></option>
 							<?php
 							endwhile;
 
-							$result = mysqli_query($link, "SELECT email FROM principals
+							$result_rcru = mysqli_query($link, "SELECT email FROM principals
 								WHERE id NOT IN (SELECT member_id FROM groupmembers
 									WHERE principal_id IN (SELECT id FROM principals
 										WHERE uri='principals/$logged_in_as/calendar-proxy-read'))
 								AND email IS NOT NULL
 								AND email!='$logged_in_as'");
-							while ($row_cal_ro_unselected = mysqli_fetch_array($result)):
+							while ($row_cal_ro_unselected = mysqli_fetch_array($result_rcru)):
 							?>
 								<option><?=$row_cal_ro_unselected['email'];?></option>
 							<?php
@@ -294,22 +294,22 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 						<td>
 							<select style="width:100%" name="cal_rw_share[<?=$row_cal['id'];?>][]" size="5" multiple>
 							<?php
-							$result = mysqli_query($link, "SELECT email FROM principals
+							$result_rcrws = mysqli_query($link, "SELECT email FROM principals
 								WHERE id IN (SELECT member_id FROM groupmembers
 									WHERE principal_id IN (SELECT id FROM principals
 										WHERE uri='principals/$logged_in_as/calendar-proxy-write'))");
-							while ($row_cal_rw_selected = mysqli_fetch_array($result)):
+							while ($row_cal_rw_selected = mysqli_fetch_array($result_rcrws)):
 							?>
 								<option selected><?=$row_cal_rw_selected['email'];?></option>
 							<?php
 							endwhile;
-							$result = mysqli_query($link, "SELECT email FROM principals
+							$result_rcrwu = mysqli_query($link, "SELECT email FROM principals
 								WHERE id NOT IN (SELECT member_id FROM groupmembers
 									WHERE principal_id IN (SELECT id FROM principals
 										WHERE uri='principals/$logged_in_as/calendar-proxy-write'))
 								AND email IS NOT NULL
 								AND email!='$logged_in_as'");
-							while ($row_cal_rw_unselected = mysqli_fetch_array($result)):
+							while ($row_cal_rw_unselected = mysqli_fetch_array($result_rcrwu)):
 							?>
 								<option><?=$row_cal_rw_unselected['email'];?></option>
 							<?php
@@ -349,11 +349,11 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 		}
 	}
 	else {
-		echo '<div class="alert alert-warning" role="alert"><strong>Error:</strong>  No valid action specified.</div>';
+		echo '<div class="alert alert-danger" role="alert"><strong>Error:</strong>  No valid action specified.</div>';
 	}
 }
 else {
-	echo '<div class="alert alert-warning" role="alert">Permission denied';
+	echo '<div class="alert alert-danger" role="alert">Permission denied';
 }
 ?>
 				</div>

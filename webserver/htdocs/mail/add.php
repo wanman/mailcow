@@ -228,11 +228,54 @@ while ($row = mysqli_fetch_array($result)) {
 <?php
 	}
 	else {
-		echo '<div class="alert alert-warning" role="alert"><strong>Error:</strong>  No valid action specified.</div>';
+		echo '<div class="alert alert-danger" role="alert"><strong>Error:</strong> No valid action specified.</div>';
+	}
+}
+elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
+		isset($_SESSION['mailcow_cc_role']) &&
+		$_SESSION['mailcow_cc_loggedin'] == "yes" &&
+		$_SESSION['mailcow_cc_role'] == "user") {
+	if (isset($_GET['dav'])) {
+?>
+			<h4>Add DAV item</h4>
+			<form class="form-horizontal" role="form" method="post">
+				<div class="form-group">
+					<label class="control-label col-sm-2" for="displayname">Display name:</label>
+					<div class="col-sm-10">
+					<input type="text" class="form-control" name="displayname" id="displayname" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">DAV type:</label>
+					<div class="col-sm-10">
+						<div class="radio radio-default">
+							<label>
+								<input type="radio" name="davtype" id="davtype_calendar" value="calendar" checked>
+								Calendar and tasks
+							</label>
+						</div>
+						<div class="radio radio-default">
+							<label>
+								<input type="radio" name="davtype" id="davtype_addressbook" value="addressbook">
+								Address book
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<button type="submit" name="trigger_mailbox_action" value="adddav" class="btn btn-success btn-sm">Submit</button>
+					</div>
+				</div>
+			</form>
+<?php
+	}
+	else {
+		echo '<div class="alert alert-danger" role="alert"><strong>Error:</strong> No valid action specified.</div>';
 	}
 }
 else {
-	echo '<div class="alert alert-warning" role="alert">Permission denied</div>';
+	echo '<div class="alert alert-danger" role="alert">Permission denied</div>';
 }
 ?>
 				</div>

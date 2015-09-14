@@ -140,15 +140,19 @@ endwhile;
 </table>
 </div>
 <div class="col-sm-12">
-	<p><a href="edit.php?dav=<?=$logged_in_as?>" class="btn btn-default btn-sm btn-raised">Change details and permissions</a></p>
+	<p><a href="add.php?dav" class="btn btn-success btn-sm">Add item</a>
+	<a href="edit.php?dav=<?=$logged_in_as?>" class="btn btn-default btn-sm">Edit details and permissions</a></p>
+</div>
+<div class="col-sm-12">
 </div>
 <h4>Shared with me</h4>
 <div class="table-responsive">
-<table class="table table-striped" id="domainadminstable">
+<table class="table table-striped table-hover" id="domainadminstable">
 	<thead>
 	<tr>
 		<th colspan="2">Components</th>
 		<th>Owner</th>
+		<th>Permission</th>
 		<th>Display name</th>
 		<th>Export</th>
 		<th>Link</th>
@@ -157,16 +161,35 @@ endwhile;
 	<tbody>
 <?php
 $result = mysqli_query($link, "SELECT components, substring_index(principaluri,'/',-1) AS owner, uri, displayname FROM calendars
-	WHERE CONCAT(principaluri, '/calendar-proxy-read') OR CONCAT(principaluri, '/calendar-proxy-write') IN (
+	WHERE CONCAT(principaluri, '/calendar-proxy-read') IN (
 		SELECT uri FROM principals WHERE id IN (
 			SELECT principal_id FROM groupmembers WHERE member_id=(
 				SELECT id FROM principals WHERE email='$logged_in_as')));");
 while ($row = mysqli_fetch_array($result)):
 ?>
-		<tr>
+		<tr class="warning">
 		<td><span class="glyphicon glyphicon-calendar"></span></td>
 		<td><?=str_replace(array('VEVENT', 'VTODO', ','), array('Calendar', 'Tasks', ', '), $row['components']);?></td>
 		<td><?=$row['owner'];?></td>
+		<td>Read-only</td>
+		<td><?=htmlspecialchars($row['displayname']);?></td>
+		<td><a href="https://<?=$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri'];?>?export">Download (ICS format)</a></td>
+		<td><a href="https://<?=$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri'];?>">Open</a></td>
+		</tr>
+<?php
+endwhile;
+$result = mysqli_query($link, "SELECT components, substring_index(principaluri,'/',-1) AS owner, uri, displayname FROM calendars
+	WHERE CONCAT(principaluri, '/calendar-proxy-write') IN (
+		SELECT uri FROM principals WHERE id IN (
+			SELECT principal_id FROM groupmembers WHERE member_id=(
+				SELECT id FROM principals WHERE email='$logged_in_as')));");
+while ($row = mysqli_fetch_array($result)):
+?>
+		<tr class="success">
+		<td><span class="glyphicon glyphicon-calendar"></span></td>
+		<td><?=str_replace(array('VEVENT', 'VTODO', ','), array('Calendar', 'Tasks', ', '), $row['components']);?></td>
+		<td><?=$row['owner'];?></td>
+		<td>Read/Write</td>
 		<td><?=htmlspecialchars($row['displayname']);?></td>
 		<td><a href="https://<?=$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri'];?>?export">Download (ICS format)</a></td>
 		<td><a href="https://<?=$DAV_SUBDOMAIN.".".$MYHOSTNAME_1.".".$MYHOSTNAME_2."/calendars/".$row['owner']."/".$row['uri'];?>">Open</a></td>
