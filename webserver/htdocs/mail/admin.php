@@ -486,8 +486,8 @@ Enter "DISABLED" to disable this feature.</pre></p>
 _imaps._tcp         IN SRV     0 1 993 <?=$MYHOSTNAME;?>.
 _imap._tcp          IN SRV     0 1 143 <?=$MYHOSTNAME;?>.
 _submission._tcp    IN SRV     0 1 587 <?=$MYHOSTNAME;?>.
-_carddavs._tcp      IN SRV     0 1 443 <?=$MYHOSTNAME;?>.
-_caldavs._tcp       IN SRV     0 1 443 <?=$MYHOSTNAME;?>.
+_carddavs._tcp      IN SRV     0 1 443 <?=$DAV_SUBDOMAIN.$MYHOSTNAME_1.$MYHOSTNAME_2;?>.
+_caldavs._tcp       IN SRV     0 1 443 <?=$DAV_SUBDOMAIN.$MYHOSTNAME_1.$MYHOSTNAME_2;?>.
 @                   IN MX 10   <?=$MYHOSTNAME_0, "\n";?>
 @                   IN TXT     "v=spf1 mx -all"
 autoconfig          IN A       <?=$IP, "\n";?>
