@@ -911,7 +911,7 @@ function mailbox_add_dav($link, $postarray) {
 	}
 	$_SESSION['return'] = array(
 		'type' => 'success',
-		'msg' => 'Added DAV item '.htmlspecialchars($username)
+		'msg' => 'Added DAV item'
 	);
 }
 function mailbox_edit_alias($link, $postarray) {
