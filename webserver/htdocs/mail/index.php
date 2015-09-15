@@ -6,12 +6,22 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 	<div class="container">
 		<h2>Welcome @ <?php echo $MYHOSTNAME; ?></h2>
 		<p style="font-weight:300;font-size:24px;margin-right:151px;line-height:30px;margin-top:-2px"><i>Get cownnected...</i></h4>
+		<p><small>Please login using your <i>full@email.address</i></small></p>
 		<div class="row">
 			<div class="col-md-6">
 				<small><b>IMAP (STARTTLS) or IMAPS</b></small>
 				<ul class="ul-horizontal">
 					<li><code><?php echo $MYHOSTNAME; ?>:143/tcp</code></li>
 					<li><code><?php echo $MYHOSTNAME; ?>:993/tcp</code></li>
+				</ul>
+				<small><b>POP3 (STARTTLS) or POP3S</b></small>
+				<ul class="ul-horizontal">
+					<li><code><?php echo $MYHOSTNAME; ?>:110/tcp</code></li>
+					<li><code><?php echo $MYHOSTNAME; ?>:995/tcp</code></li>
+				</ul>
+				<small><b>ManageSieve</b></small>
+				<ul>
+					<li><code><?php echo $MYHOSTNAME; ?>:4190/tcp</code></li>
 				</ul>
 				<small><b>SMTP (STARTTLS)</b></small>
 				<ul>
