@@ -151,6 +151,8 @@ After the installation, visit your dashboard @ **https://hostname.domain.tld**, 
 
 Remember to create an alias- or a mailbox for Postmaster. ;-)
 
+Please set/update all DNS records accordingly. See "FAQ" -> "DNS records" in your mailcow admin panel.
+
 # Upgrade
 **Please run all commands as root**
 
