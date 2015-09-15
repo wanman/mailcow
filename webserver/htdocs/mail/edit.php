@@ -335,7 +335,7 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 						<?php
 						if ($row_cal['uri'] != "default"):
 						?>
-						<td style="text-align:center"><input type="checkbox" name="cal_delete[<?=$row_cal['id'];?>]"></td>
+						<td style="text-align:center"><input type="checkbox" name="cal_delete[]" value="<?=$row_cal['id'];?>"></td>
 						<?php
 						else:
 						?>
@@ -355,7 +355,7 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 						<?php
 						if ($row_adb['uri'] != "default"):
 						?>
-						<td style="text-align:center"><input type="checkbox" name="adb_delete[<?=$row_adb['id'];?>]"></td>
+						<td style="text-align:center"><input type="checkbox" name="adb_delete[]" value="<?=$row_adb['id'];?>"></td>
 						<?php
 						else:
 						?>

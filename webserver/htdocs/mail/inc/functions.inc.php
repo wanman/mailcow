@@ -1322,7 +1322,7 @@ function mailbox_edit_dav($link, $postarray) {
 					(SELECT id FROM principals WHERE uri='principals/$logged_in_as/calendar-proxy-write'),
 					(SELECT id FROM principals WHERE email='$share_with')
 				)";
-			if (!mysqli_query($link, $update_string)) { 
+			if (!mysqli_query($link, $update_string)) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
 					'msg' => 'MySQL Error: '.mysqli_error($link)
@@ -1333,7 +1333,7 @@ function mailbox_edit_dav($link, $postarray) {
 	}
 	/* Delete marked DAV items */
 	if(isset($postarray['adb_delete'])) {
-		foreach (array_flip($postarray['adb_delete']) as $adb_delete_id) {
+		foreach ($postarray['adb_delete'] as $adb_delete_id) {
 			$update_string = "DELETE FROM addressbooks WHERE ID='$adb_delete_id' AND uri!='default'";
 			if (!mysqli_query($link, $update_string)) { 
 				$_SESSION['return'] = array(
@@ -1345,7 +1345,7 @@ function mailbox_edit_dav($link, $postarray) {
 		}
 	}
 	if(isset($postarray['cal_delete'])) {
-		foreach (array_flip($postarray['cal_delete']) as $cal_delete_id) {
+		foreach ($postarray['cal_delete'] as $cal_delete_id) {
 			$update_string = "DELETE FROM calendars WHERE ID='$cal_delete_id' AND uri!='default'";
 			if (!mysqli_query($link, $update_string)) { 
 				$_SESSION['return'] = array(
