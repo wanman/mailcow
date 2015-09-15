@@ -258,7 +258,7 @@ function set_mailcow_config($s, $v = "", $vext = "") {
 		case "extlist":
 		if ($vext == "reject") {
 			foreach (explode("|", $v) as $each_ext) {
-				if (!preg_match("/^[a-zA-Z0-9.*]*$/", $each_ext) || strlen($each_ext) >= 10 ) {
+				if (!preg_match("/^[a-zA-Z0-9.*]*$/", $each_ext) || strlen($each_ext) >= 10 || empty($each_ext)) {
 					$_SESSION['return'] = array(
 						'type' => 'danger',
 						'msg' => 'Invalid extension name "'.htmlspecialchars($each_ext).'"'
@@ -270,7 +270,7 @@ function set_mailcow_config($s, $v = "", $vext = "") {
 		}
 		elseif ($vext == "filter") {
 			foreach (explode("|", $v) as $each_ext) {
-				if (!preg_match("/^[a-zA-Z0-9.*]*$/", $each_ext) || strlen($each_ext) >= 10 ) {
+				if (!preg_match("/^[a-zA-Z0-9.*]*$/", $each_ext) || strlen($each_ext) >= 10 || empty($each_ext)) {
 					$_SESSION['return'] = array(
 						'type' => 'danger',
 						'msg' => 'Invalid extension name "'.htmlspecialchars($each_ext).'"'
