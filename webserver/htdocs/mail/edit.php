@@ -370,7 +370,7 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 					</tbody>
 				</table>
 				</div>
-				<p><small><b>Note:</b> Default addressbooks and calendars cannot be deleted.</small></p>
+				<p><small><b>Note:</b> Default address books and calendars cannot be deleted.</small></p>
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
 						<button type="submit" name="trigger_mailbox_action" value="editdav" class="btn btn-success btn-sm">Apply</button>
