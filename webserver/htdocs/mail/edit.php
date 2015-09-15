@@ -246,88 +246,123 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 				<h4>Change DAV folder properties</h4>
 				<br />
 				<form class="form-horizontal" role="form" method="post">
+				<p><b>Sharing permissions</b></p>
 				<div class="table-responsive">
-				<table class="table table-striped" id="domainadminstable">
+				<table class="table table-striped">
+					<thead>
+					<tr>
+						<th>Read-only</th>
+						<th>Read/Write</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr>
+						<td>
+						<select style="width:100%" name="cal_ro_share[]" size="5" multiple>
+						<?php
+						$result_rcrs = mysqli_query($link, "SELECT email FROM principals
+							WHERE id IN (SELECT member_id FROM groupmembers
+								WHERE principal_id IN (SELECT id FROM principals
+									WHERE uri='principals/$logged_in_as/calendar-proxy-read'))");
+						while ($row_cal_ro_selected = mysqli_fetch_array($result_rcrs)):
+						?>
+							<option selected><?=$row_cal_ro_selected['email'];?></option>
+						<?php
+						endwhile;
+
+						$result_rcru = mysqli_query($link, "SELECT email FROM principals
+							WHERE id NOT IN (SELECT member_id FROM groupmembers
+								WHERE principal_id IN (SELECT id FROM principals
+									WHERE uri='principals/$logged_in_as/calendar-proxy-read'))
+							AND email IS NOT NULL
+							AND email!='$logged_in_as'");
+						while ($row_cal_ro_unselected = mysqli_fetch_array($result_rcru)):
+						?>
+							<option><?=$row_cal_ro_unselected['email'];?></option>
+						<?php
+						endwhile;
+						?>
+						</select>
+						</td>
+						<td>
+						<select style="width:100%" name="cal_rw_share[]" size="5" multiple>
+						<?php
+						$result_rcrws = mysqli_query($link, "SELECT email FROM principals
+							WHERE id IN (SELECT member_id FROM groupmembers
+								WHERE principal_id IN (SELECT id FROM principals
+									WHERE uri='principals/$logged_in_as/calendar-proxy-write'))");
+						while ($row_cal_rw_selected = mysqli_fetch_array($result_rcrws)):
+						?>
+							<option selected><?=$row_cal_rw_selected['email'];?></option>
+						<?php
+						endwhile;
+						$result_rcrwu = mysqli_query($link, "SELECT email FROM principals
+							WHERE id NOT IN (SELECT member_id FROM groupmembers
+								WHERE principal_id IN (SELECT id FROM principals
+									WHERE uri='principals/$logged_in_as/calendar-proxy-write'))
+							AND email IS NOT NULL
+							AND email!='$logged_in_as'");
+						while ($row_cal_rw_unselected = mysqli_fetch_array($result_rcrwu)):
+						?>
+							<option><?=$row_cal_rw_unselected['email'];?></option>
+						<?php
+						endwhile;
+						?>
+						</select>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+				</div>
+				<p><b>Details</b></p>
+				<div class="table-responsive">
+				<table class="table table-striped">
 					<thead>
 					<tr>
 						<th>Type</th>
 						<th>Display name</th>
-						<th>Read-only access</th>
-						<th>Read/Write access</th>
+						<th style="text-align:center;width:65px">Delete</th>
 					</tr>
 					</thead>
 					<tbody>
 					<?php
-					$result_row_cal = mysqli_query($link, "SELECT id, displayname FROM calendars WHERE principaluri='principals/$logged_in_as'");
+					$result_row_cal = mysqli_query($link, "SELECT id, uri, displayname FROM calendars WHERE principaluri='principals/$logged_in_as'");
 					while ($row_cal = mysqli_fetch_array($result_row_cal)):
 					?>
 					<tr>
 						<td>Calendar, Tasks</td>
-						<td><input type="text" name="cal_displayname[<?=$row_cal['id'];?>]" value="<?=$row_cal['displayname'];?>"></td>
-						<td>
-							<select style="width:100%" name="cal_ro_share[<?=$row_cal['id'];?>][]" size="5" multiple>
-							<?php
-							$result_rcrs = mysqli_query($link, "SELECT email FROM principals
-								WHERE id IN (SELECT member_id FROM groupmembers
-									WHERE principal_id IN (SELECT id FROM principals
-										WHERE uri='principals/$logged_in_as/calendar-proxy-read'))");
-							while ($row_cal_ro_selected = mysqli_fetch_array($result_rcrs)):
-							?>
-								<option selected><?=$row_cal_ro_selected['email'];?></option>
-							<?php
-							endwhile;
-
-							$result_rcru = mysqli_query($link, "SELECT email FROM principals
-								WHERE id NOT IN (SELECT member_id FROM groupmembers
-									WHERE principal_id IN (SELECT id FROM principals
-										WHERE uri='principals/$logged_in_as/calendar-proxy-read'))
-								AND email IS NOT NULL
-								AND email!='$logged_in_as'");
-							while ($row_cal_ro_unselected = mysqli_fetch_array($result_rcru)):
-							?>
-								<option><?=$row_cal_ro_unselected['email'];?></option>
-							<?php
-							endwhile;
-							?>
-							</select>
-						</td>
-						<td>
-							<select style="width:100%" name="cal_rw_share[<?=$row_cal['id'];?>][]" size="5" multiple>
-							<?php
-							$result_rcrws = mysqli_query($link, "SELECT email FROM principals
-								WHERE id IN (SELECT member_id FROM groupmembers
-									WHERE principal_id IN (SELECT id FROM principals
-										WHERE uri='principals/$logged_in_as/calendar-proxy-write'))");
-							while ($row_cal_rw_selected = mysqli_fetch_array($result_rcrws)):
-							?>
-								<option selected><?=$row_cal_rw_selected['email'];?></option>
-							<?php
-							endwhile;
-							$result_rcrwu = mysqli_query($link, "SELECT email FROM principals
-								WHERE id NOT IN (SELECT member_id FROM groupmembers
-									WHERE principal_id IN (SELECT id FROM principals
-										WHERE uri='principals/$logged_in_as/calendar-proxy-write'))
-								AND email IS NOT NULL
-								AND email!='$logged_in_as'");
-							while ($row_cal_rw_unselected = mysqli_fetch_array($result_rcrwu)):
-							?>
-								<option><?=$row_cal_rw_unselected['email'];?></option>
-							<?php
-							endwhile;
-							?>
-							</select>
-						</td>
+						<td><input type="text" style="width:100%" name="cal_displayname[<?=$row_cal['id'];?>]" value="<?=$row_cal['displayname'];?>"></td>
+						<?php
+						if ($row_cal['uri'] != "default"):
+						?>
+						<td style="text-align:center"><input type="checkbox" name="cal_delete[<?=$row_cal['id'];?>]"></td>
+						<?php
+						else:
+						?>
+						<td style="text-align:center"><input type="checkbox" disabled></td>
+						<?php
+						endif;
+						?>
 					</tr>
 					<?php
 					endwhile;
-					$result = mysqli_query($link, "SELECT id, displayname FROM addressbooks WHERE principaluri='principals/$logged_in_as'");
-					while ($row_adb = mysqli_fetch_array($result)):
+					$result_row_adb = mysqli_query($link, "SELECT id, uri, displayname FROM addressbooks WHERE principaluri='principals/$logged_in_as'");
+					while ($row_adb = mysqli_fetch_array($result_row_adb)):
 					?>
 					<tr>
 						<td>Address book</td>
-						<td><input type="text" name="adb_displayname[<?=$row_adb['id'];?>]" value="<?=$row_adb['displayname'];?>"></td>
-						<td></td>
-						<td></td>
+						<td><input type="text" style="width:100%" name="adb_displayname[<?=$row_adb['id'];?>]" value="<?=$row_adb['displayname'];?>"></td>
+						<?php
+						if ($row_adb['uri'] != "default"):
+						?>
+						<td style="text-align:center"><input type="checkbox" name="adb_delete[<?=$row_adb['id'];?>]"></td>
+						<?php
+						else:
+						?>
+						<td style="text-align:center"><input type="checkbox" disabled></td>
+						<?php
+						endif;
+						?>
 					</tr>
 					<?php
 					endwhile;
@@ -335,6 +370,7 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 					</tbody>
 				</table>
 				</div>
+				<p><small><b>Note:</b> Default addressbooks and calendars cannot be deleted.</small></p>
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
 						<button type="submit" name="trigger_mailbox_action" value="editdav" class="btn btn-success btn-sm">Apply</button>

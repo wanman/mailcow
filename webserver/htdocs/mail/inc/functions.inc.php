@@ -1290,44 +1290,69 @@ function mailbox_edit_dav($link, $postarray) {
 			);
 			return false;
 		}
-		/* Setup read-only cal shares */
-		if(isset($postarray['cal_ro_share'][$cal_id])) {
-			/* No need to set read-only, when read/write is enabled */
-			if(isset($postarray['cal_rw_share'][$cal_id])) {
-				$postarray['cal_ro_share'][$cal_id] = array_diff($postarray['cal_ro_share'][$cal_id], $postarray['cal_rw_share'][$cal_id]);
-			}
-			foreach ($postarray['cal_ro_share'][$cal_id] as $share_with) {
-				$share_with = mysqli_real_escape_string($link, $share_with);
-				$update_string = "INSERT INTO groupmembers (principal_id, member_id)
-					VALUES (
-						(SELECT id FROM principals WHERE uri='principals/$logged_in_as/calendar-proxy-read'),
-						(SELECT id FROM principals WHERE email='$share_with')
-					)";
-				if (!mysqli_query($link, $update_string)) { 
-					$_SESSION['return'] = array(
-						'type' => 'danger',
-						'msg' => 'MySQL Error: '.mysqli_error($link)
-					);
-					return false;
-				}
+	}
+	/* Setup read-only cal shares */
+	if(isset($postarray['cal_ro_share'])) {
+		/* No need to set read-only, when read/write is enabled */
+		if(isset($postarray['cal_rw_share'])) {
+			$postarray['cal_ro_share'] = array_diff($postarray['cal_ro_share'], $postarray['cal_rw_share']);
+		}
+		foreach ($postarray['cal_ro_share'] as $share_with) {
+			$share_with = mysqli_real_escape_string($link, $share_with);
+			$update_string = "INSERT INTO groupmembers (principal_id, member_id)
+				VALUES (
+					(SELECT id FROM principals WHERE uri='principals/$logged_in_as/calendar-proxy-read'),
+					(SELECT id FROM principals WHERE email='$share_with')
+				)";
+			if (!mysqli_query($link, $update_string)) { 
+				$_SESSION['return'] = array(
+					'type' => 'danger',
+					'msg' => 'MySQL Error: '.mysqli_error($link)
+				);
+				return false;
 			}
 		}
-		/* Setup read/write cal shares */
-		if(isset($postarray['cal_rw_share'][$cal_id])) {
-			foreach ($postarray['cal_rw_share'][$cal_id] as $share_with) {
-				$share_with = mysqli_real_escape_string($link, $share_with);
-				$update_string = "INSERT INTO groupmembers (principal_id, member_id)
-					VALUES (
-						(SELECT id FROM principals WHERE uri='principals/$logged_in_as/calendar-proxy-write'),
-						(SELECT id FROM principals WHERE email='$share_with')
-					)";
-				if (!mysqli_query($link, $update_string)) { 
-					$_SESSION['return'] = array(
-						'type' => 'danger',
-						'msg' => 'MySQL Error: '.mysqli_error($link)
-					);
-					return false;
-				}
+	}
+	/* Setup read/write cal shares */
+	if(isset($postarray['cal_rw_share'])) {
+		foreach ($postarray['cal_rw_share'] as $share_with) {
+			$share_with = mysqli_real_escape_string($link, $share_with);
+			$update_string = "INSERT INTO groupmembers (principal_id, member_id)
+				VALUES (
+					(SELECT id FROM principals WHERE uri='principals/$logged_in_as/calendar-proxy-write'),
+					(SELECT id FROM principals WHERE email='$share_with')
+				)";
+			if (!mysqli_query($link, $update_string)) { 
+				$_SESSION['return'] = array(
+					'type' => 'danger',
+					'msg' => 'MySQL Error: '.mysqli_error($link)
+				);
+				return false;
+			}
+		}
+	}
+	/* Delete marked DAV items */
+	if(isset($postarray['adb_delete'])) {
+		foreach (array_flip($postarray['adb_delete']) as $adb_delete_id) {
+			$update_string = "DELETE FROM addressbooks WHERE ID='$adb_delete_id' AND uri!='default'";
+			if (!mysqli_query($link, $update_string)) { 
+				$_SESSION['return'] = array(
+					'type' => 'danger',
+					'msg' => 'MySQL Error: '.mysqli_error($link)
+				);
+				return false;
+			}
+		}
+	}
+	if(isset($postarray['cal_delete'])) {
+		foreach (array_flip($postarray['cal_delete']) as $cal_delete_id) {
+			$update_string = "DELETE FROM calendars WHERE ID='$cal_delete_id' AND uri!='default'";
+			if (!mysqli_query($link, $update_string)) { 
+				$_SESSION['return'] = array(
+					'type' => 'danger',
+					'msg' => 'MySQL Error: '.mysqli_error($link)
+				);
+				return false;
 			}
 		}
 	}
