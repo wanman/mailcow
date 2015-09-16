@@ -561,83 +561,85 @@ function mailbox_add_domain($link, $postarray) {
 	);
 }
 function mailbox_add_alias($link, $postarray) {
-	$address = mysqli_real_escape_string($link, strtolower(trim($postarray['address'])));
+	$address_arr = array_map('trim', explode(',', $postarray['address']));
 	$goto_arr = array_map('trim', explode(',', $postarray['goto']));
-	foreach ($goto_arr as $goto) {
-		if (!filter_var($goto, FILTER_VALIDATE_EMAIL)) {
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'Destination address '.htmlspecialchars($goto).' is invalid'
-			);
-			return false;
-		}
+	isset($postarray['active']) ? $active = '1' : $active = '0';
+	global $logged_in_role;
+	global $logged_in_as;
+	if (empty($address_arr)) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'Alias address must not be empty'
+		);
+		return false;
 	}
-	if (empty($postarray['goto'])) {
+	if (empty($goto_arr)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Destination address must not be empty'
 		);
 		return false;
 	}
-	$goto = implode(",", strtolower(trim($goto_arr)));
-	$domain = substr($address, strpos($address, '@')+1);
-	global $logged_in_role;
-	global $logged_in_as;
-	$qstring = "SELECT address FROM alias WHERE address='$address'";
-	$qresult = mysqli_query($link, $qstring);
-	$num_results = mysqli_num_rows($qresult);
-	if ($num_results != 0) {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => 'Alias '.htmlspecialchars($address).' already exists'
-		);
-		return false;
-	}
-	if (empty($domain)) {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => 'Alias address or catch-all for domain cannot by empty'
-		);
-		return false;
-	}
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => 'Permission denied'
-		);
-		return false;
-	}
-	isset($postarray['active']) ? $active = '1' : $active = '0';
-	if (!filter_var($address, FILTER_VALIDATE_EMAIL) && empty($domain)) {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => 'Mail address format invalid'
-		);
-		return false;
-	}
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain'"))) {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => 'Domain '.htmlspecialchars($domain).' not found'
-		);
-		return false;
-	}
-	if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
-		$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('@$domain', '$goto', '$domain', now(), now(), '$active')";
-	}
-	else {
-		$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('$address', '$goto', '$domain', now(), now(), '$active')";
-	}
-	if (!mysqli_query($link, $mystring)) {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => 'MySQL Error: '.mysqli_error($link)
-		);
-		return false;
+	foreach ($address_arr as $address) {
+		$domain = substr($address, strpos($address, '@')+1);
+		if (!filter_var($address, FILTER_VALIDATE_EMAIL) && empty($domain)) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'Alias address format invalid'
+			);
+			return false;
+		}
+		if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain'"))) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'Domain '.htmlspecialchars($domain).' not found'
+			);
+			return false;
+		}
+		if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'Permission denied'
+			);
+			return false;
+		}
+		$qstring = "SELECT address FROM alias WHERE address='$address'";
+		$qresult = mysqli_query($link, $qstring);
+		$num_results = mysqli_num_rows($qresult);
+		if ($num_results != 0) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'Alias '.htmlspecialchars($address).' already exists'
+			);
+			return false;
+		}
+		foreach ($goto_arr as $goto) {
+			if (!filter_var($goto, FILTER_VALIDATE_EMAIL)) {
+				$_SESSION['return'] = array(
+					'type' => 'danger',
+					'msg' => 'Destination address '.htmlspecialchars($goto).' is invalid'
+				);
+				return false;
+			}
+		}
+		$goto = implode(",", $goto_arr);
+		if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
+			$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('@$domain', '$goto', '$domain', now(), now(), '$active')";
+		}
+		else {
+			$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('$address', '$goto', '$domain', now(), now(), '$active')";
+		}
+		if (!mysqli_query($link, $mystring)) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'MySQL Error: '.mysqli_error($link)
+			);
+			return false;
+		}
 	}
 	$_SESSION['return'] = array(
 		'type' => 'success',
-		'msg' => 'Added alias address '.htmlspecialchars($address)
+		'msg' => 'Successfully added alias address(es)'
 	);
 }
 function mailbox_add_alias_domain($link, $postarray) {

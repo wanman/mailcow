@@ -82,15 +82,15 @@ if (isset($_SESSION['mailcow_cc_loggedin']) &&
 				<h4>Add alias</h4>
 				<form class="form-horizontal" role="form" method="post">
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="address">Alias address <small>(full email address OR @domain.tld for <span style='color:#ec466a'>catch-all</span>)</small>:</label>
+						<label class="control-label col-sm-2" for="address">Alias address(es) <small>(full email address OR @domain.tld for <span style='color:#ec466a'>catch-all</span>)</small> - comma separated:</label>
 						<div class="col-sm-10">
-						<input type="text" class="form-control" name="address" id="address">
+							<textarea class="form-control" rows="5" name="address"></textarea>
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="goto" placeholder="first@example.net, second@example.net">Destination address(es) - comma separated:</label>
 						<div class="col-sm-10">
-							<textarea class="form-control" rows="10" name="goto"></textarea>
+							<textarea class="form-control" rows="5" name="goto"></textarea>
 						</div>
 					</div>
 					<div class="form-group">
