@@ -426,8 +426,6 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			fi
 			;;
 		webserver)
-			# Testing: Keep added files
-			#rm -rf /var/www/{mail,dav} 2> /dev/null
 			mkdir -p /var/www/ 2> /dev/null
 			if [[ ${httpd_platform} == "nginx" ]]; then
 				rm /etc/nginx/sites-enabled/{000-0-mailcow,000-0-fufix} 2>/dev/null
@@ -439,6 +437,9 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				[[ ! -z $(grep "client_max_body_size" /etc/nginx/nginx.conf) ]] && \
 					sed -i "/client_max_body_size/c\ \ \ \ \ \ \ \ client_max_body_size 25M;" /etc/nginx/nginx.conf || \
 					sed -i "/http {/a\ \ \ \ \ \ \ \ client_max_body_size 25M;" /etc/nginx/nginx.conf
+				[[ ! -z $(grep "server_names_hash_bucket_size" /etc/nginx/nginx.conf) ]] && \
+					sed -i "/server_names_hash_bucket_size/c\ \ \ \ \ \ \ \ server_names_hash_bucket_size 64;" /etc/nginx/nginx.conf || \
+					sed -i "/http {/a\ \ \ \ \ \ \ \ server_names_hash_bucket_size 64;" /etc/nginx/nginx.conf
 				sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN;/${sys_hostname}.${sys_domain};/g" /etc/nginx/sites-available/mailcow
 				sed -i "s/MAILCOW_DAV_HOST.MAILCOW_DOMAIN;/${httpd_dav_subdomain}.${sys_domain};/g" /etc/nginx/sites-available/mailcow
 				sed -i "s/MAILCOW_DOMAIN;/${sys_domain};/g" /etc/nginx/sites-available/mailcow
@@ -564,6 +565,12 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			if [[ -z $(dig -x ${getpublicipv4} @8.8.8.8 | grep -i ${sys_domain}) ]]; then
 				echo "$(yellowb [WARN]) - Remember to setup a PTR record: ${getpublicipv4} does not point to ${sys_domain} (checked by Google DNS)" | tee -a installer.log
 			fi
+			for srv in _carddavs _caldavs _imap _imaps _submission _pop3 _pop3s
+			do
+				if [[ -z $(dig srv ${srv}._tcp.${sys_domain} @8.8.8.8) ]]; then
+					echo "$(textb [INFO]) - Cannot find SRV record \"${srv}._tcp.${sys_domain}\""
+				fi
+			done
 			if [[ -z $(dig ${sys_hostname}.${sys_domain} @8.8.8.8 | grep -i ${getpublicipv4}) ]]; then
 				echo "$(yellowb [WARN]) - Remember to setup A + MX records! (checked by Google DNS)" | tee -a installer.log
 			else
