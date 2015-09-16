@@ -51,7 +51,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 	<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_access" data-target="#collapseDomAdmins">
 		<a style="cursor:pointer;" class="accordion-toggle">Domain administrators</a>
 	</div>
-		<div id="collapseDomAdmins" class="panel-collapse collapse out">
+		<div id="collapseDomAdmins" class="panel-collapse collapse in">
 			<div class="panel-body">
 				<form method="post">
 					<div class="table-responsive">
@@ -90,9 +90,9 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-4" for="name">Assign domains (hold <code>CTRL</code> to select multiple values):</label>
+						<label class="control-label col-sm-4" for="name">Assign domains:</label>
 						<div class="col-sm-8">
-							<select style="width:50%" name="domain[]" size="5" multiple>
+							<select data-placeholder="Search domains..." style="width:100%" name="domain[]" size="5" multiple>
 				<?php
 				$resultselect = mysqli_query($link, "SELECT domain FROM domain");
 				while ($row = mysqli_fetch_array($resultselect)) {
@@ -151,7 +151,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 	<br /><br />
 	<div class="clearfix"></div>
 	<div class="form-group">
-		<label class="control-label col-sm-4" for="runtime">Runtime</label>
+		<label class="control-label col-sm-4" for="runtime">Runtime:</label>
 		<div class="col-sm-8">
 			<select data-placeholder="Select a runtime..." style="width:50%" name="runtime">
 				<option <?php if (return_mailcow_config("backup_runtime") == "hourly") { echo "selected"; } ?>>hourly</option>
@@ -163,7 +163,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 	<br />
 	<div class="clearfix"></div>
 	<div class="form-group">
-		<label class="control-label col-sm-4" for="mailboxes[]">Select mailboxes <small>(hold <code>CTRL</code> to select multiple values)</small>:</label>
+		<label class="control-label col-sm-4" for="mailboxes[]">Select mailbox(es):</label>
 		<div class="col-sm-8">
 			<select data-placeholder="Search users..." style="width:100%" name="mailboxes[]" multiple>
 <?php
