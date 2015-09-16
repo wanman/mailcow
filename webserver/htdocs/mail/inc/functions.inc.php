@@ -447,7 +447,7 @@ function opendkim_table($action = "show", $which = "") {
 			}
 			$_SESSION['return'] = array(
 				'type' => 'success',
-				'msg' => 'Added DKIM record with domain '.$domain.' and selector '.$selector.''
+				'msg' => 'Added DKIM record for domain '.$domain.' with selector '.$selector.''
 			);
 			break;
 	}
