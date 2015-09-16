@@ -484,8 +484,10 @@ Enter "DISABLED" to disable this feature.</pre></p>
 ; ================
 
 [...]
-_imaps._tcp         IN SRV     0 1 993 <?=$MYHOSTNAME;?>.
 _imap._tcp          IN SRV     0 1 143 <?=$MYHOSTNAME;?>.
+_imaps._tcp         IN SRV     0 1 993 <?=$MYHOSTNAME;?>.
+_pop3._tcp          IN SRV     0 1 110 <?=$MYHOSTNAME;?>.
+_pop3s._tcp         IN SRV     0 1 995 <?=$MYHOSTNAME;?>.
 _submission._tcp    IN SRV     0 1 587 <?=$MYHOSTNAME;?>.
 @                   IN MX 10   <?=$MYHOSTNAME_0, "\n";?>
 @                   IN TXT     "v=spf1 mx -all"
