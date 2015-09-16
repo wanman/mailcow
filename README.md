@@ -33,7 +33,7 @@ Debian Squeeze is not supported.
 
 Ubuntu 14.04 is fine but not recommended.
 
-**Please see this album on imgur.com for screenshots -> http://imgur.com/a/x5IST#0**
+**Please see this album on imgur.com for screenshots -> http://imgur.com/a/elHnA**
 
 # Introduction
 A summary of what software is installed with which features enabled.
