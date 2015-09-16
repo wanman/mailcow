@@ -564,6 +564,12 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			if [[ -z $(dig -x ${getpublicipv4} @8.8.8.8 | grep -i ${sys_domain}) ]]; then
 				echo "$(yellowb [WARN]) - Remember to setup a PTR record: ${getpublicipv4} does not point to ${sys_domain} (checked by Google DNS)" | tee -a installer.log
 			fi
+			for srv in _carddavs _caldavs _imap _imaps _submission _pop3 _pop3s
+			do
+				if [[ -z $(dig srv ${srv}._tcp.${sys_domain} @8.8.8.8) ]]; then
+					echo "$(textb [INFO]) - Cannot find SRV record \"${srv}._tcp.${sys_domain}\""
+				fi
+			done
 			if [[ -z $(dig ${sys_hostname}.${sys_domain} @8.8.8.8 | grep -i ${getpublicipv4}) ]]; then
 				echo "$(yellowb [WARN]) - Remember to setup A + MX records! (checked by Google DNS)" | tee -a installer.log
 			else
