@@ -10,7 +10,7 @@ server {
 	listen 80;
 	server_name autoconfig.MAILCOW_DOMAIN;
 	root /var/www/mail/;
-	try_files $uri /autoconfig.xml;
+	rewrite ^ /autoconfig.xml break;
 }
 server {
 	listen 443;
