@@ -153,18 +153,19 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 	<div class="form-group">
 		<label class="control-label col-sm-4" for="runtime">Runtime</label>
 		<div class="col-sm-8">
-			<select style="width:50%" name="runtime" size="3">
+			<select data-placeholder="Select a runtime..." style="width:50%" name="runtime">
 				<option <?php if (return_mailcow_config("backup_runtime") == "hourly") { echo "selected"; } ?>>hourly</option>
 				<option <?php if (return_mailcow_config("backup_runtime") == "daily") { echo "selected"; } ?>>daily</option>
 				<option <?php if (return_mailcow_config("backup_runtime") == "monthly") { echo "selected"; } ?>>monthly</option>
 			</select>
 		</div>
 	</div>
+	<br />
 	<div class="clearfix"></div>
 	<div class="form-group">
 		<label class="control-label col-sm-4" for="mailboxes[]">Select mailboxes <small>(hold <code>CTRL</code> to select multiple values)</small>:</label>
 		<div class="col-sm-8">
-			<select style="width:50%" name="mailboxes[]" size="5" multiple>
+			<select data-placeholder="Search users..." style="width:100%" name="mailboxes[]" multiple>
 <?php
 $resultselect = mysqli_query($link, "SELECT username FROM mailbox");
 while ($row = mysqli_fetch_array($resultselect)) {
@@ -471,7 +472,7 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <div id="collapseFAQ" class="panel-collapse collapse">
 <div class="panel-body">
 
-<p data-toggle="collapse" style="cursor:help;" data-target="#dnsrecords"><strong>DNS records</strong></p>
+<p data-toggle="collapse" style="cursor:help;" data-target="#dnsrecords"><strong>DNS Records</strong></p>
 <div id="dnsrecords" class="collapse out">
 <p>Below you see a list of <em>recommended</em> DNS records.</p>
 <p>While some are mandatory for a mail server (A, MX), others are recommended to build a good reputation score (TXT/SPF) or used for auto-configuration of mail clients (A: "autoconfig" and SRV records).</p>
@@ -483,13 +484,9 @@ Enter "DISABLED" to disable this feature.</pre></p>
 ; ================
 
 [...]
-_imap._tcp          IN SRV     0 1 143 <?=$MYHOSTNAME;?>.
 _imaps._tcp         IN SRV     0 1 993 <?=$MYHOSTNAME;?>.
-_pop3._tcp          IN SRV     0 1 110 <?=$MYHOSTNAME;?>.
-_pop3s._tcp         IN SRV     0 1 995 <?=$MYHOSTNAME;?>.
+_imap._tcp          IN SRV     0 1 143 <?=$MYHOSTNAME;?>.
 _submission._tcp    IN SRV     0 1 587 <?=$MYHOSTNAME;?>.
-_carddavs._tcp      IN SRV     0 1 443 <?=$DAV_SUBDOMAIN.$MYHOSTNAME_1.$MYHOSTNAME_2;?>.
-_caldavs._tcp       IN SRV     0 1 443 <?=$DAV_SUBDOMAIN.$MYHOSTNAME_1.$MYHOSTNAME_2;?>.
 @                   IN MX 10   <?=$MYHOSTNAME_0, "\n";?>
 @                   IN TXT     "v=spf1 mx -all"
 autoconfig          IN A       <?=$IP, "\n";?>

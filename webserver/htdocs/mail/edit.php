@@ -244,21 +244,12 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 			if ($dav == $logged_in_as) {
 ?>
 				<h4>Change DAV folder properties</h4>
-				<br />
+				<p>Share your calendars with other users.</p>
 				<form class="form-horizontal" role="form" method="post">
-				<p><b>Sharing permissions</b></p>
-				<div class="table-responsive">
-				<table class="table table-striped">
-					<thead>
-					<tr>
-						<th>Read-only</th>
-						<th>Read/Write</th>
-					</tr>
-					</thead>
-					<tbody>
-					<tr>
-						<td>
-						<select style="width:100%" name="cal_ro_share[]" size="5" multiple>
+				<div class="row">
+					<div class="col-sm-6">
+						<p><b>Read-only</b></p>
+						<select data-placeholder="Search users..." style="width:100%" name="cal_ro_share[]" size="5" multiple>
 						<?php
 						$result_rcrs = mysqli_query($link, "SELECT email FROM principals
 							WHERE id IN (SELECT member_id FROM groupmembers
@@ -283,9 +274,10 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 						endwhile;
 						?>
 						</select>
-						</td>
-						<td>
-						<select style="width:100%" name="cal_rw_share[]" size="5" multiple>
+					</div>
+					<div class="col-sm-6">
+						<p><b>Read-write</b></p>
+						<select data-placeholder="Search users..." style="width:100%" name="cal_rw_share[]" size="5" multiple>
 						<?php
 						$result_rcrws = mysqli_query($link, "SELECT email FROM principals
 							WHERE id IN (SELECT member_id FROM groupmembers
@@ -309,12 +301,11 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 						endwhile;
 						?>
 						</select>
-						</td>
-					</tr>
-					</tbody>
-				</table>
+					</div>
 				</div>
-				<p><b>Details</b></p>
+				<br />
+				<p>Edit or delete address books and calendars below.
+				<br /><b>Note:</b> Default address books and calendars cannot be deleted.</p>
 				<div class="table-responsive">
 				<table class="table table-striped">
 					<thead>
@@ -370,7 +361,6 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 					</tbody>
 				</table>
 				</div>
-				<p><small><b>Note:</b> Default address books and calendars cannot be deleted.</small></p>
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
 						<button type="submit" name="trigger_mailbox_action" value="editdav" class="btn btn-success btn-sm">Apply</button>
