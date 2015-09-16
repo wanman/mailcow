@@ -567,7 +567,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			fi
 			for srv in _carddavs _caldavs _imap _imaps _submission _pop3 _pop3s
 			do
-				if [[ -z $(dig srv ${srv}._tcp.${sys_domain} @8.8.8.8) ]]; then
+				if [[ -z $(dig srv ${srv}._tcp.${sys_domain} @8.8.8.8 +short) ]]; then
 					echo "$(textb [INFO]) - Cannot find SRV record \"${srv}._tcp.${sys_domain}\""
 				fi
 			done
