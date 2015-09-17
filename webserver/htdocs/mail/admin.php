@@ -536,15 +536,15 @@ nano /opt/vfilter/replies
 ; mailcow comes with plugins helping to export Cal- and CardDAV data to .vcf and .ics files.
 ; Each user can export data he has access to.
 ; You can generate these exports by finding a url to your calendar, and adding ?export at the end of the url. This will automatically trigger a download:
-https://<?=$DAV_SUBDOMAIN.$MYHOSTNAME_1.$MYHOSTNAME_2;?>/calendars/you@domain.tld/default?export
+https://<?=$DAV_SUBDOMAIN.$MYHOSTNAME_1.$MYHOSTNAME_2;?>/calendars/you@example.com/default?export
 
 ; The same procedure for address books:
-https://<?=$DAV_SUBDOMAIN.$MYHOSTNAME_1.$MYHOSTNAME_2;?>/addressbooks/you@domain.tld/default?export
+https://<?=$DAV_SUBDOMAIN.$MYHOSTNAME_1.$MYHOSTNAME_2;?>/addressbooks/you@example.com/default?export
 
 ; Please use a Cal-/CardDAV client of your choice to find out the URI of self-created calendars and address books.
 ; Administrators can use MySQL to find a users calendar and address book URI:
-mysql --defaults-file=/etc/mysql/debian.cnf mailcow_database_name -e "SELECT uri FROM calendars where principaluri='principals/you@domain.tld';"
-mysql --defaults-file=/etc/mysql/debian.cnf mailcow_database_name -e "SELECT uri FROM addressbooks where principaluri='principals/you@domain.tld';"
+mysql --defaults-file=/etc/mysql/debian.cnf mailcow_database_name -e "SELECT uri FROM calendars where principaluri='principals/you@example.com';"
+mysql --defaults-file=/etc/mysql/debian.cnf mailcow_database_name -e "SELECT uri FROM addressbooks where principaluri='principals/you@example.com';"
 </pre></div>
 
 <p data-toggle="collapse" style="cursor:help;" data-target="#debugging"><strong>Debugging</strong></p>

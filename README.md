@@ -48,7 +48,7 @@ A summary of what software is installed with which features enabled.
 * Learn ham and spam, [Heinlein Support](https://www.heinlein-support.de/) SA rules included
 * Fail2ban brute force protection
 * A "mailcow control center" via browser: Add domains, mailboxes, aliases and more
-* Tagged mail like "username+tag@domain.tld" will be moved to folder "tag"
+* Tagged mail like "username+tag@example.com" will be moved to folder "tag"
 * Advanced ClamAV filters (ClamAV can be turned off, quarantined items can be downloaded)
 
 **Postfix**
@@ -147,7 +147,7 @@ Please contact me when you need help or found a bug.
 
 More debugging is about to come. Though everything should work as intended.
 
-After the installation, visit your dashboard @ **https://hostname.domain.tld**, use the logged credentials in `./installer.log`
+After the installation, visit your dashboard @ **https://hostname.example.com**, use the logged credentials in `./installer.log`
 
 Remember to create an alias- or a mailbox for Postmaster. ;-)
 

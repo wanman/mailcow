@@ -9,7 +9,7 @@ $config['managesieve_port'] = null;
 // %h - user's IMAP hostname
 // %n - http hostname ($_SERVER['SERVER_NAME'])
 // %d - domain (http hostname without the first part)
-// For example %n = mail.domain.tld, %d = domain.tld
+// For example %n = mail.example.com, %d = example.com
 $config['managesieve_host'] = 'localhost';
 
 // authentication method. Can be CRAM-MD5, DIGEST-MD5, PLAIN, LOGIN, EXTERNAL
