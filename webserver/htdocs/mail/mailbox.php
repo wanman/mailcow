@@ -44,7 +44,7 @@ while ($row = mysqli_fetch_array($result)):
 							<td>
 <?php
 $getpostmaster = mysqli_query($link, "SELECT alias.active as aactive, mailbox.active as mactive, username, address FROM alias, mailbox WHERE 
-(username='postmaster@$row[domain]' OR address='postmaster@$row[domain]')");
+(username='postmaster@$row[domain]' OR address='postmaster@$row[domain]' OR address='@$row[domain]')");
 $postmasterstatus = mysqli_fetch_assoc($getpostmaster);
 if ($row['backupmx'] == "No" && !isset($postmasterstatus['address']) || ($postmasterstatus['aactive'] == "0" || $postmasterstatus['mactive'] == "0")):
 ?>
