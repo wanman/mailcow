@@ -302,86 +302,6 @@ $srr_values = return_mailcow_config("srr");
 </div>
 
 <div class="panel panel-default">
-<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseAttachments"><a style="cursor:pointer;" class="accordion-toggle">Attachments</a></div>
-<div id="collapseAttachments" class="panel-collapse collapse">
-<div class="panel-body">
-<form method="post">
-<div class="form-group">
-	<p>Provide a list of dangerous file types. Please take care of the formatting.</p>
-	<input class="form-control" type="text" id="ext" name="ext" value="<?=return_mailcow_config("extlist");?>">
-	<p><pre>Format: ext1|ext1|ext3
-To scan all attachments: .*
-Enter "DISABLED" to disable this feature.</pre></p>
-	<div class="radio">
-		<label>
-		<input type="radio" name="vfilter" id="vfilter_reject_button" value="reject" <?php if (!return_mailcow_config("vfilter")) { echo "checked"; } ?>>
-		Reject attachments with a dangerous file extension
-		</label>
-	</div>
-	<div class="radio">
-		<label>
-		<input type="radio" name="vfilter" id="vfilter_scan_button" value="filter" <?=return_mailcow_config("vfilter");?>>
-		Scan attachments with ClamAV and/or upload to VirusTotal
-		</label>
-	</div>
-	<hr>
-	<div class="row">
-		<div class="col-sm-6">
-			<small>
-			<h4>ClamAV</h4>
-			<div class="checkbox">
-					<label>
-					<input name="clamavenable" type="checkbox" <?=return_mailcow_config("cavenable");?>>
-					Use ClamAV to scan mail
-					</label>
-			</div>
-			<p>
-			<ul class="nav nav-pills">
-				<li><a href="?av_dl">Download quarantined items<span class="badge"><?php echo_sys_info("positives");?></span></a></li>
-			</ul></p>
-			<p>Clean directory <code>/opt/vfilter/clamav_positives/</code> to reset counter.</p>
-			<p>Senders of infected messages are informed about failed delivery.</p>
-			</small>
-		</div>
-		<div class="col-sm-6">
-			<small>
-			<h4>VirusTotal Uploader</h4>
-			<div class="checkbox">
-					<label>
-					<input name="virustotalenable" type="checkbox" <?=return_mailcow_config("vtenable");?>>
-					Use the "VirusTotal Uploader" feature
-					</label>
-			</div>
-			<p>Scan dangerous attachments via VirusTotal Public API.</p>
-			<p><b>File handling and limitations</b> (<a href="https://www.virustotal.com/de/documentation/public-api/" target="_blank">VirusTotal Public API v2.0</a>)
-			<ul>
-				<li>Files up to 200M will be hashed. If a previous scan result was found, it will be attached.</em></li>
-				<li>Files smaller than 32M will be uploaded if no previous scan result was found.</em></li>
-			</ul>
-			</p>
-			<div class="checkbox">
-					<label>
-					<input name="virustotalcheckonly" type="checkbox"  <?=return_mailcow_config("vtupload");?>>
-					Do <b>not</b> upload files to VirusTotal but check for a previous scan report.
-					</label>
-			</div>
-			<label for="vtapikey">VirusTotal API Key (<a href="https://www.virustotal.com/documentation/virustotal-community/#retrieve-api-key" target="_blank">?</a>)</label>
-			<p><input class="form-control" id="vtapikey" type="text" name="vtapikey" placeholder="64 characters, alphanumeric" pattern="[a-zA-Z0-9]{64}" value="<?=return_mailcow_config("vtapikey");?>"></p>
-			</small>
-		</div>
-		<div class="col-sm-12">
-		<h4>Filter Log (newest)</h4>
-		<p><pre><?php echo_sys_info("vfilterlog", "20");?></pre></p>
-		</div>
-	</div>
-	<br /><button type="submit" name="trigger_set_attachments" class="btn btn-default btn-raised btn-sm">Apply</button>
-</div>
-</form>
-</div>
-</div>
-</div>
-
-<div class="panel panel-default">
 <div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseSendBL"><a style="cursor:pointer;" class="accordion-toggle">Sender Blacklist</a></div>
 <div id="collapseSendBL" class="panel-collapse collapse">
 <div class="panel-body">
@@ -471,7 +391,6 @@ Enter "DISABLED" to disable this feature.</pre></p>
 <div class="panel-heading" data-toggle="collapse" data-parent="#accordion_maint" data-target="#collapseFAQ"><a style="cursor:pointer;" class="accordion-toggle">FAQ</a></div>
 <div id="collapseFAQ" class="panel-collapse collapse">
 <div class="panel-body">
-
 <p data-toggle="collapse" style="cursor:help;" data-target="#dnsrecords"><strong>DNS Records</strong></p>
 <div id="dnsrecords" class="collapse out">
 <p>Below you see a list of <em>recommended</em> DNS records.</p>
@@ -520,16 +439,6 @@ doveadm move -u jane Archive/2011/09 mailbox INBOX BEFORE 2011-10-01 SINCE 01-Se
 ; Visit http://wiki2.dovecot.org/Tools/Doveadm
 </pre></div>
 
-<p data-toggle="collapse" style="cursor:help;" data-target="#changevfiltermsg"><strong>VirusTotal message presets</strong></p>
-<div id="changevfiltermsg" class="collapse out">
-<pre>
-; The vfilter is installed into /opt/vfilter
-; You should not change any file here unless you know what you are doing
-;
-; Find and edit message presets here:
-nano /opt/vfilter/replies
-</pre></div>
-
 <p data-toggle="collapse" style="cursor:help;" data-target="#backupdav"><strong>Export Cal- and CardDAV data</strong></p>
 <div id="backupdav" class="collapse out">
 <pre>
@@ -552,13 +461,12 @@ mysql --defaults-file=/etc/mysql/debian.cnf mailcow_database_name -e "SELECT uri
 <pre>
 ; Pathes to important log files:
 /var/log/mail.log
-/opt/vfilter/log/vfilter.log
+/var/log/fuglu/fuglu.log
 /var/log/syslog
 /var/log/nginx/error.log
 /var/www/mail/rc/logs/errors
 /var/log/php5-fpm.log
 </pre></div>
-
 </div>
 </div>
 </div>

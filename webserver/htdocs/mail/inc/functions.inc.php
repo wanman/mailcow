@@ -46,28 +46,6 @@ function mysqli_result($res,$row=0,$col=0) {
     }
     return false;
 }
-function dl_clamav_positives() {
-	if (file_exists("/tmp/clamav_positives.zip")) {
-		unlink("/tmp/clamav_positives.zip");
-	}
-	$files = scandir("/opt/vfilter/clamav_positives");
-	$files = array_diff($files, array('.', '..'));
-	if (empty($files)) { return false; }
-	$zipname = "/tmp/clamav_positives.zip";
-	$zip = new ZipArchive;
-	$zip->open($zipname, ZipArchive::CREATE);
-	foreach ($files as $file) {
-		$zip->addFile("/opt/vfilter/clamav_positives/$file", "$file" . ".txt");
-	}
-	$zip->close();
-	header("Content-Disposition: attachment; filename=clamav_positives.zip");
-	header("Content-length: " . filesize("/tmp/clamav_positives.zip"));
-	header("Pragma: no-cache");
-	header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-	header("Expires: 0");
-	readfile("/tmp/clamav_positives.zip");
-
-}
 function return_mailcow_config($s) {
 	switch ($s) {
 		case "backup_location":
@@ -81,15 +59,6 @@ function return_mailcow_config($s) {
 		case "backup_active":
 			preg_match("/BACKUP=(.*)/", file_get_contents("/var/www/MAILBOX_BACKUP") , $result);
 			if (!empty($result[1])) { return $result[1]; } else { return false; }
-			break;
-		case "extlist":
-			$read_mime_check = file($GLOBALS["mailcow_reject_attachments"])[0];
-			preg_match('#\((.*?)\)#', $read_mime_check, $match);
-			return $match[1];
-			break;
-		case "vfilter":
-			$read_mime_check = file($GLOBALS["mailcow_reject_attachments"])[0];
-			if (strpos($read_mime_check,'FILTER') !== false) { return "checked"; } else { return false; }
 			break;
 		case "anonymize":
 			$state = file_get_contents($GLOBALS["mailcow_anonymize_headers"]);
@@ -109,21 +78,6 @@ function return_mailcow_config($s) {
 				$PVT = explode(";;", $state)[3];
 				if ($PVT == "on") { return "checked"; } else { return false; }
 			}
-			break;
-		case "vtenable":
-			$state = file_get_contents($GLOBALS["VT_ENABLE"]);
-			if (!empty($state)) { return "checked"; } else { return false; }
-			break;
-		case "cavenable":
-			$state = file_get_contents($GLOBALS["CAV_ENABLE"]);
-			if (!empty($state)) { return "checked"; } else { return false; }
-			break;
-		case "vtupload":
-			$state = file_get_contents($GLOBALS["VT_ENABLE_UPLOAD"]);
-			if (empty($state)) { return "checked"; } else { return false; }
-			break;
-		case "vtapikey":
-			return file_get_contents($GLOBALS["VT_API_KEY"]);
 			break;
 		case "senderaccess":
 			$state = file($GLOBALS["mailcow_sender_access"]);
@@ -185,37 +139,6 @@ function set_mailcow_config($s, $v = "", $vext = "") {
 				break;
 			}
 			break;
-		case "vtupload":
-			if ($v == "1") {
-				file_put_contents($GLOBALS["VT_ENABLE_UPLOAD"], "1");
-			}
-			else {
-				file_put_contents($GLOBALS["VT_ENABLE_UPLOAD"], "");
-			}
-			break;
-		case "vtenable":
-			if ($v == "1" && !empty(file_get_contents($GLOBALS["VT_API_KEY"]))) {
-				file_put_contents($GLOBALS["VT_ENABLE"], "1");
-			} 
-			elseif ($v == "1" && empty(file_get_contents($GLOBALS["VT_API_KEY"]))) {
-				$_SESSION['return'] = array(
-					'type' => 'danger',
-					'msg' => 'No VirusTotal API key defined'
-				);
-				break;
-			}
-			else {
-				file_put_contents($GLOBALS["VT_ENABLE"], "");
-			}
-			break;
-		case "cavenable":
-			if ($v == "1") {
-				file_put_contents($GLOBALS["CAV_ENABLE"], "1");
-			}
-			else {
-				file_put_contents($GLOBALS["CAV_ENABLE"], "");
-			}
-			break;
 		case "maxmsgsize":
 			if (!ctype_alnum($v)) {
 				$_SESSION['return'] = array(
@@ -233,54 +156,6 @@ function set_mailcow_config($s, $v = "", $vext = "") {
 				break;
 			}
 			break;
-		case "vtapikey":
-			if (!ctype_alnum($v) && !empty(file_get_contents($GLOBALS["VT_ENABLE"]))) {
-				$_SESSION['return'] = array(
-					'type' => 'danger',
-					'msg' => 'Invalid VirusTotal API key format'
-				);
-				break;
-			}
-			elseif (!empty($v)) {
-				$report_url = 'https://www.virustotal.com/vtapi/v2/file/report?apikey='.$v."&resource=5746BD7E255DD6A8AFA06F7C42C1BA41";
-				$api_reply = file_get_contents($report_url);
-				$api_reply_array = json_decode($api_reply, true);
-				if ($api_reply_array['response_code'] != "1") {
-					$_SESSION['return'] = array(
-						'type' => 'danger',
-						'msg' => 'Cannot verify VirusTotal API key'
-					);
-					break;
-				}
-			}
-			file_put_contents($GLOBALS["VT_API_KEY"], $v);
-			break;
-		case "extlist":
-		if ($vext == "reject") {
-			foreach (explode("|", $v) as $each_ext) {
-				if (!preg_match("/^[a-zA-Z0-9.*]*$/", $each_ext) || strlen($each_ext) >= 10 || empty($each_ext)) {
-					$_SESSION['return'] = array(
-						'type' => 'danger',
-						'msg' => 'Invalid extension name "'.htmlspecialchars($each_ext).'"'
-					);
-					return false;
-				}
-			}
-			file_put_contents($GLOBALS["mailcow_reject_attachments"], "/name=[^>]*\.($v)/     REJECT     Dangerous files are prohibited on this server.".PHP_EOL);
-		}
-		elseif ($vext == "filter") {
-			foreach (explode("|", $v) as $each_ext) {
-				if (!preg_match("/^[a-zA-Z0-9.*]*$/", $each_ext) || strlen($each_ext) >= 10 || empty($each_ext)) {
-					$_SESSION['return'] = array(
-						'type' => 'danger',
-						'msg' => 'Invalid extension name "'.htmlspecialchars($each_ext).'"'
-					);
-					return false;
-				}
-			}
-			file_put_contents($GLOBALS["mailcow_reject_attachments"], "/name=[^>]*\.($v)/     FILTER     vfilter:dummy".PHP_EOL);
-		}
-		break;
 		case "anonymize":
 			$template = '/^\s*(Received: from)[^\n]*(.*)/ REPLACE $1 [127.0.0.1] (localhost [127.0.0.1])$2
 /^\s*User-Agent/        IGNORE
@@ -471,30 +346,6 @@ function echo_sys_info($what, $extra="") {
 			break;
 		case "mailq":
 			echo shell_exec("mailq");
-			break;
-		case "positives";
-			$pos = glob('/opt/vfilter/clamav_positives/message*', GLOB_BRACE);
-			if (empty($pos)) {
-				echo "0";
-			}
-			else {
-				echo count($pos);
-			}
-			break;
-		case "vfilterlog":
-			if (is_numeric($extra) && $extra <= 70) {
-				$lines = $extra;
-			}
-			else {
-				$lines = "30";
-			};
-			$output = shell_exec("sudo -u vmail /usr/bin/tail -n $lines /opt/vfilter/log/vfilter.log");
-			if ($output != NULL) {
-				echo $output;
-			}
-			else {
-				echo "none";
-			}
 			break;
 	}
 }

@@ -1,4 +1,5 @@
 report_safe 2
+required_score 5.0
 use_bayes 1
 bayes_auto_learn 1
 skip_rbl_checks 1
@@ -7,4 +8,7 @@ use_razor2 1
 razor_config /etc/razor/razor-agent.conf
 clear_headers
 add_header spam Flag _YESNO_
-add_header spam Report score=_SCORE_ required=_REQD_ tests=_TESTS_
+add_header all Status _YESNO_, score=_SCORE_ required=_REQD_ tests=_TESTS_ autolearn=_AUTOLEARN_
+# Don't trust any network
+clear_internal_networks
+clear_internal_networks
