@@ -89,10 +89,10 @@ installtask postfix
 returnwait "Postfix configuration" "Dovecot configuration"
 
 installtask dovecot
-returnwait "Dovecot configuration" "vfilter configuration"
+returnwait "Dovecot configuration" "FuGlu configuration"
 
-installtask vfilter
-returnwait "vfilter configuration" "ClamAV configuration"
+installtask fuglu
+returnwait "FuGlu configuration" "ClamAV configuration"
 
 installtask clamav
 returnwait "ClamAV configuration" "Spamassassin configuration"

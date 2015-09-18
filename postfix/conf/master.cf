@@ -3,24 +3,28 @@ smtp      inet  n       -       n       -       1       postscreen
 
 # Postscreen passes sane clients to the real SMTP daemon here.
 smtpd      pass  -       -       n       -       -       smtpd
-  -o cleanup_service_name=cleanup_mailcow
-  -o content_filter=spamassassin
+  -o smtpd_helo_restrictions=permit_mynetworks,reject_non_fqdn_helo_hostname
+  -o smtpd_proxy_filter=127.0.0.1:10025
+  -o smtpd_client_connection_count_limit=10
+  -o smtpd_proxy_options=speed_adjust
 
 smtps    inet  n       -       n       -       -       smtpd
   -o smtpd_tls_wrappermode=yes
   -o smtpd_client_restrictions=permit_mynetworks,permit_sasl_authenticated,reject
-  -o content_filter=spamassassin
-  -o smtpd_milters=inet:127.0.0.1:10040
+  -o smtpd_client_restrictions=permit_sasl_authenticated,reject
+  -o smtpd_proxy_filter=127.0.0.1:10025
+  -o smtpd_client_connection_count_limit=10
+  -o smtpd_proxy_options=speed_adjust
 
 # For mail submitting users. Authenticated clients and known networks only.
 submission inet n       -       -       -       -       smtpd
   -o smtpd_client_restrictions=permit_mynetworks,permit_sasl_authenticated,reject
+  -o smtpd_proxy_filter=127.0.0.1:10025
+  -o smtpd_client_connection_count_limit=10
+  -o smtpd_proxy_options=speed_adjust
   -o smtpd_enforce_tls=yes
   -o smtpd_tls_security_level=encrypt
   -o tls_preempt_cipherlist=yes
-  -o content_filter=spamassassin
-  # Though a milter is run before-queue, DKIM signatures will be valid after SA content-filter
-  -o smtpd_milters=inet:127.0.0.1:10040
 
 # Handles TLS connections for postscreen to make them readable
 tlsproxy  unix  -       -       n       -       0       tlsproxy
@@ -28,8 +32,6 @@ tlsproxy  unix  -       -       n       -       0       tlsproxy
 dnsblog   unix  -       -       n       -       0       dnsblog
 pickup    fifo  n       -       -       60      1       pickup
 cleanup   unix  n       -       -       -       0       cleanup
-cleanup_mailcow   unix  n       -       -       -       0       cleanup
-  -o mime_header_checks=regexp:/etc/postfix/mailcow_reject_attachments.regex
 qmgr      fifo  n       -       n       300     1       qmgr
 tlsmgr    unix  -       -       -       1000?   1       tlsmgr
 rewrite   unix  -       -       -       -       -       trivial-rewrite
@@ -64,8 +66,13 @@ scalemail-backend unix	-	n	n	-	2	pipe
 mailman   unix  -       n       n       -       -       pipe
   flags=FR user=list argv=/usr/lib/mailman/bin/postfix-to-mailman.py
   ${nexthop} ${user}
-spamassassin unix -     n       n       -       -       pipe
-  user=debian-spamd argv=/usr/bin/spamc -f -e /usr/sbin/sendmail -oi -f ${sender} ${recipient}
-vfilter    unix  -        n      n       -       1       pipe
-  flags=Rq user=vmail null_sender=
-  argv=/opt/vfilter/vfilter.sh ${sender} ${recipient}
+127.0.0.1:10026 inet n - n - - smtpd
+  -o smtpd_authorized_xforward_hosts=127.0.0.0/8
+  -o smtpd_client_restrictions=
+  -o smtpd_helo_restrictions=
+  -o smtpd_sender_restrictions=
+  -o smtpd_recipient_restrictions=permit_mynetworks,reject
+  -o smtpd_data_restrictions=
+  -o mynetworks=127.0.0.0/8
+  -o receive_override_options=no_unknown_recipient_checks
+  -o smtpd_milters=inet:127.0.0.1:10040

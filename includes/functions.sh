@@ -393,6 +393,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			killall freshclam 2> /dev/null
 			rm -f /var/lib/clamav/* 2> /dev/null
 			sed -i '/DatabaseMirror/d' /etc/clamav/freshclam.conf
+			sed -i '/MaxFileSize/c\MaxFileSize 10240M' /etc/clamav/clamd.conf
+			sed -i '/StreamMaxLength/c\StreamMaxLength 10240M' /etc/clamav/clamd.conf
 			echo "DatabaseMirror clamav.netcologne.de
 DatabaseMirror clamav.internet24.eu
 DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
@@ -704,7 +706,10 @@ A backup will be stored in ./before_upgrade_$timestamp
 	returnwait "Postfix configuration" "Dovecot configuration"
 
 	installtask dovecot
-	returnwait "Dovecot configuration" "ClamAV configuration"
+	returnwait "Dovecot configuration" "FuGlu configuration"
+
+	installtask fuglu
+	returnwait "FuGlu configuration" "ClamAV configuration"
 
 	installtask clamav
 	returnwait "ClamAV configuration" "Spamassassin configuration"
