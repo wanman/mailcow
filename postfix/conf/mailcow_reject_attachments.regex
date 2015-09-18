@@ -1,1 +1,0 @@
-/name=[^>]*\.(bat|com|exe|dll|vbs)/     REJECT     Dangerous files are prohibited on this server.

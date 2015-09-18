@@ -21,7 +21,6 @@ elseif (!filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE)) {
 
 /* Postfix tables */
 $mailcow_anonymize_headers = "/etc/postfix/mailcow_anonymize_headers.pcre";
-$mailcow_reject_attachments = "/etc/postfix/mailcow_reject_attachments.regex";
 $mailcow_sender_access = "/etc/postfix/mailcow_sender_access";
 
 /* Dovecot */
@@ -32,10 +31,6 @@ $mailcow_opendkim_dnstxt_folder = "/etc/opendkim/dnstxt";
 
 /* Data files */
 $MC_MBOX_BACKUP = "/var/www/MAILBOX_BACKUP";
-$VT_API_KEY = "/var/www/VT_API_KEY";
-$VT_ENABLE = "/var/www/VT_ENABLE";
-$CAV_ENABLE = "/var/www/CAV_ENABLE";
-$VT_ENABLE_UPLOAD = "/var/www/VT_ENABLE_UPLOAD";
 $PFLOG = "/var/www/PFLOG";
 
 $MYHOSTNAME=exec("/usr/sbin/postconf -h myhostname");
