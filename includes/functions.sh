@@ -326,8 +326,30 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chmod 755 /var/spool/
 			sed -i "/%www-data/d" /etc/sudoers 2> /dev/null
 			sed -i "/%vmail/d" /etc/sudoers 2> /dev/null
-			echo '%www-data ALL=(ALL) NOPASSWD: /usr/bin/doveadm * sync *, /usr/local/sbin/mc_pfset *, /usr/bin/doveadm quota recalc -A, /usr/sbin/dovecot reload, /usr/sbin/postfix reload, /usr/local/sbin/mc_dkim_ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_pflog_renew, /usr/local/sbin/mc_inst_cron, /usr/bin/tail * /opt/vfilter/log/vfilter.log' >> /etc/sudoers
+			echo '%www-data ALL=(ALL) NOPASSWD: /usr/bin/doveadm * sync *, /usr/local/sbin/mc_pfset *, /usr/bin/doveadm quota recalc -A, /usr/sbin/dovecot reload, /usr/sbin/postfix reload, /usr/local/sbin/mc_dkim_ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_pflog_renew, /usr/local/sbin/mc_inst_cron' >> /etc/sudoers
 			echo '%vmail ALL=(ALL) NOPASSWD: /usr/bin/spamc*' >> /etc/sudoers
+			;;
+		fuglu)
+			userdel fuglu 2> /dev/null
+			groupadd fuglu
+			useradd -g fuglu -s /bin/false fuglu
+			usermod -a -G debian-spamd fuglu
+			usermod -a -G clamav fuglu
+			rm /tmp/fuglu_control.sock 2> /dev/null
+			mkdir /var/log/fuglu 2> /dev/null
+			chown fuglu:fuglu /var/log/fuglu
+			tar xf fuglu/inst/$fuglu_version.tar -C fuglu/inst/ 2> /dev/null
+			(cd fuglu/inst/$fuglu_version ; python setup.py -q install)
+			cp -R fuglu/conf/* /etc/fuglu/
+			if [[ -f /lib/systemd/systemd ]]; then
+				cp fuglu/inst/$fuglu_version/scripts/startscripts/debian/8/fuglu.service /lib/systemd/system/fuglu.service
+				systemctl enable fuglu
+			else
+				cp fuglu/inst/$fuglu_version/scripts/startscripts/debian/7/fuglu /etc/init.d/fuglu
+				chmod +x /etc/init.d/fuglu
+				update-rc.d fuglu defaults
+			fi
+			rm -rf fuglu/inst/$fuglu_version
 			;;
 		dovecot)
 			[[ -z $(grep fs.inotify.max_user_instances /etc/sysctl.conf) ]] && echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.conf
@@ -365,15 +387,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown -R vmail:vmail /var/vmail
 			install -m 755 dovecot/conf/doverecalcq /etc/cron.daily/
 			;;
-		vfilter)
-			mkdir -p /opt/vfilter 2> /dev/null
-			install -m 755 vfilter/vfilter.sh /opt/vfilter/vfilter.sh
-			install -m 644 vfilter/replies /opt/vfilter/replies
-			install -m 600 vfilter/vfilter.conf /opt/vfilter/vfilter.conf
-			sed -i "s/my_dbhost/$my_dbhost/g" /opt/vfilter/vfilter.conf
-			install -m 755 -d /opt/vfilter/clamav_positives
-			chown -R vmail:vmail /opt/vfilter
-			;;
 		clamav)
 			usermod -a -G vmail clamav 2> /dev/null
 			service clamav-freshclam stop > /dev/null 2>&1
@@ -395,6 +408,8 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			cp -f clamav/clamav-unofficial-sigs-cron /etc/cron.d/clamav-unofficial-sigs-cron
 			cp -f clamav/clamav-unofficial-sigs-logrotate /etc/logrotate.d/clamav-unofficial-sigs-logrotate
 			mkdir -p /var/log/clamav-unofficial-sigs 2> /dev/null
+			sed -i '/MaxFileSize/c\MaxFileSize 25M' /etc/clamav/clamd.conf
+			sed -i '/StreamMaxLength/c\StreamMaxLength 25M' /etc/clamav/clamd.conf
 			freshclam 2> /dev/null
 			;;
 		opendkim)
@@ -406,7 +421,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			;;
 		spamassassin)
 			cp spamassassin/conf/local.cf /etc/spamassassin/local.cf
-			sed -i '/^OPTIONS=/s/=.*/="--create-prefs --max-children 5 --helper-home-dir"/' /etc/default/spamassassin
+			sed -i '/^OPTIONS=/s/=.*/="--create-prefs --max-children 5 --helper-home-dir --username debian-spamd --socketpath \/var\/run\/spamd.sock --socketowner debian-spamd --socketgroup debian-spamd"/' /etc/default/spamassassin
 			sed -i '/^CRON=/s/=.*/="1"/' /etc/default/spamassassin
 			sed -i '/^ENABLED=/s/=.*/="1"/' /etc/default/spamassassin
 			# Thanks to mf3hd@GitHub
@@ -689,10 +704,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 	returnwait "Postfix configuration" "Dovecot configuration"
 
 	installtask dovecot
-	returnwait "Dovecot configuration" "vfilter configuration"
-
-	installtask vfilter
-	returnwait "vfilter configuration" "ClamAV configuration"
+	returnwait "Dovecot configuration" "ClamAV configuration"
 
 	installtask clamav
 	returnwait "ClamAV configuration" "Spamassassin configuration"
