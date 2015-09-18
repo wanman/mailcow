@@ -259,7 +259,7 @@ openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecod
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-gd php5-imap php-apc subversion \
 php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc ${database_backend} ${webserver_backend} mailutils pyzor razor \
 postfix postfix-mysql postfix-pcre postgrey pflogsumm spamassassin spamc sudo bzip2 curl mpack opendkim opendkim-tools unzip clamav-daemon \
-fetchmail liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl bsd-mailx > /dev/null
+python-magic unrar-free liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl bsd-mailx > /dev/null
 			if [ "$?" -ne "0" ]; then
 				echo "$(redb [ERR]) - Package installation failed"
 				exit 1
@@ -338,6 +338,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			rm /tmp/fuglu_control.sock 2> /dev/null
 			mkdir /var/log/fuglu 2> /dev/null
 			chown fuglu:fuglu /var/log/fuglu
+			chown fuglu:www-data /etc/fuglu/fuglu.conf
+			chmod g+rw /etc/fuglu/fuglu.conf
 			tar xf fuglu/inst/$fuglu_version.tar -C fuglu/inst/ 2> /dev/null
 			(cd fuglu/inst/$fuglu_version ; python setup.py -q install)
 			cp -R fuglu/conf/* /etc/fuglu/
@@ -609,7 +611,7 @@ upgradetask() {
 		echo "$(redb [ERR]) - mailcow is not installed"
 		exit 1
 	fi
-	if [[ -z $(cat /etc/{fufix_version,mailcow_version} 2> /dev/null | grep -E "0.9|0.10|0.11|0.12") ]]; then
+	if [[ -z $(cat /etc/{fufix_version,mailcow_version} 2> /dev/null | grep -E "0.9|0.10|0.11|0.12|0.13") ]]; then
 		echo "$(redb [ERR]) - Upgrade not supported"
 		exit 1
 	fi

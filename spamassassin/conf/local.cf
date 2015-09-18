@@ -7,3 +7,6 @@ skip_rbl_checks 1
 pyzor_options --homedir /etc/mail/spamassassin/.pyzor
 use_razor2 1
 razor_config /etc/razor/razor-agent.conf
+clear_headers
+add_header spam Flag _YESNO_
+add_header spam Report score=_SCORE_ required=_REQD_ tests=_TESTS_
