@@ -332,7 +332,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 		fuglu)
 			if [[ -z $(grep fuglu /etc/passwd) ]]; then
 				userdel fuglu 2> /dev/null
-				groupadd fuglu 2>
+				groupadd fuglu 2> /dev/null
 				useradd -g fuglu -s /bin/false fuglu
 				usermod -a -G debian-spamd fuglu
 				usermod -a -G clamav fuglu
