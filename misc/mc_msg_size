@@ -24,8 +24,8 @@ service php5-fpm reload
 
 elif [ -f /etc/apache2/sites-available/mailcow ]; then
 #Apache
-sed -i "/upload_max_filesize/c\php_value upload_max_filesize ${1}M" /etc/apache2/sites-available/mailcow
-sed -i "/post_max_size/c\php_value post_max_size $(expr $1 + 1)M"  /etc/apache2/sites-available/mailcow
+sed -i "/upload_max_filesize/c\php_value upload_max_filesize ${1}M" /etc/apache2/sites-available/mailcow.conf
+sed -i "/post_max_size/c\php_value post_max_size $(expr $1 + 1)M"  /etc/apache2/sites-available/mailcow.conf
 sed -i "s/message_size_limit.*/message_size_limit = $(( $1 * 1048576 ))/g" /etc/postfix/main.cf
 
 echo "Reloading services..."
