@@ -7,12 +7,6 @@ server {
 	return 301 https://$host$request_uri;
 }
 server {
-	listen 80;
-	server_name autoconfig.MAILCOW_DOMAIN;
-	root /var/www/mail/;
-	rewrite ^ /autoconfig.xml break;
-}
-server {
 	listen 443;
 	ssl on;
 	ssl_certificate         /etc/ssl/mail/mail.crt;
@@ -62,7 +56,6 @@ server {
 	client_max_body_size 25m;
 	root /var/www/mail;
 	index index.html index.htm index.php;
-	rewrite /.well-known/autoconfig/mail/config-v1.1.xml /autoconfig.xml last;
 	error_page 502 /redir.html;
 	location /redir.html {
 		return 301 /admin.php;

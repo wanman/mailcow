@@ -89,16 +89,15 @@ apt-get purge exim4*
 
 - If there is any firewall, unblock the following ports for incoming connections:
 
-| Service               | Protocol | Port |
-| -------------------   |:--------:|:-----|
-| Postfix Submission    | TCP      | 587  |
-| Postfix SMTPS         | TCP      | 465  |
-| Postfix SMTP          | TCP      | 25   |
-| Dovecot IMAP          | TCP      | 143  |
-| Dovecot IMAPS         | TCP      | 993  |
-| Dovecot ManageSieve   | TCP      | 4190 |
-| HTTPS                 | TCP      | 443  |
-| HTTP (301+autoconfig) | TCP      | 80   |
+| Service               | Protocol | Port   |
+| -------------------   |:--------:|:-------|
+| Postfix Submission    | TCP      | 587    |
+| Postfix SMTPS         | TCP      | 465    |
+| Postfix SMTP          | TCP      | 25     |
+| Dovecot IMAP          | TCP      | 143    |
+| Dovecot IMAPS         | TCP      | 993    |
+| Dovecot ManageSieve   | TCP      | 4190   |
+| HTTP(S)               | TCP      | 80/443 |
 
 - Next it is important that you **do not use Google DNS** or another public DNS which is known to be blocked by DNS-based Blackhole List (DNSBL) providers.
 
