@@ -1,6 +1,6 @@
 <?php
 $config['password_driver'] = 'sql';
-$config['password_db_dsn'] = 'mysql://my_mailcowuser:my_mailcowpass@localhost/my_mailcowdb';
+$config['password_db_dsn'] = 'mysql://my_mailcowuser:my_mailcowpass@my_dbhost/my_mailcowdb';
 $config['password_query'] = 'UPDATE mailbox SET password=%c WHERE username=%u';
 $config['password_crypt_hash'] = 'sha512';
 $config['password_dovecotpw'] = '/usr/bin/doveadm pw';
