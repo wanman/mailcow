@@ -11,7 +11,6 @@ smtpd      pass  -       -       n       -       -       smtpd
 smtps    inet  n       -       n       -       -       smtpd
   -o smtpd_tls_wrappermode=yes
   -o smtpd_client_restrictions=permit_mynetworks,permit_sasl_authenticated,reject
-  -o smtpd_client_restrictions=permit_sasl_authenticated,reject
   -o smtpd_proxy_filter=127.0.0.1:10025
   -o smtpd_client_connection_count_limit=10
   -o smtpd_proxy_options=speed_adjust
