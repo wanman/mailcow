@@ -69,6 +69,7 @@ echo Timezone: ${sys_timezone} >> installer.log
 echo --------------------------------- >> installer.log
 echo Web root: https://${sys_hostname}.${sys_domain} >> installer.log
 echo DAV web root: https://${httpd_dav_subdomain}.${sys_domain} >> installer.log
+echo Autodiscover \(Z-Push\): https://autodiscover.${sys_domain} >> installer.log
 echo --------------------------------- >> installer.log
 echo Fail2ban version: $fail2ban_version >> installer.log
 echo Roundcube version: $roundcube_version >> installer.log

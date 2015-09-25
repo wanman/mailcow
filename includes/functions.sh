@@ -257,7 +257,7 @@ EOF
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install zip jq dnsutils python-setuptools libmail-spf-perl libmail-dkim-perl \
 openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-gd php5-imap php-apc subversion \
-php5-intl php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc ${database_backend} ${webserver_backend} mailutils pyzor razor \
+php5-intl php5-xsl libawl-php php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc ${database_backend} ${webserver_backend} mailutils pyzor razor \
 postfix postfix-mysql postfix-pcre postgrey pflogsumm spamassassin spamc sudo bzip2 curl mpack opendkim opendkim-tools unzip clamav-daemon \
 python-magic unrar-free liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl bsd-mailx > /dev/null
 			if [ "$?" -ne "0" ]; then
@@ -479,10 +479,11 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			mkdir /var/lib/php5/sessions 2> /dev/null
 			chown -R www-data:www-data /var/lib/php5/sessions
 			install -m 755 misc/mc_inst_cron /usr/local/sbin/mc_inst_cron
-			cp -R webserver/htdocs/{mail,dav} /var/www/
+			cp -R webserver/htdocs/{mail,dav,zpush} /var/www/
 			tar xf /var/www/dav/vendor.tar -C /var/www/dav/ ; rm /var/www/dav/vendor.tar
-			find /var/www/{dav,mail} -type d -exec chmod 755 {} \;
-			find /var/www/{dav,mail} -type f -exec chmod 644 {} \;
+			tar xf /var/www/zpush/vendor.tar -C /var/www/zpush/ ; rm /var/www/zpush/vendor.tar
+			find /var/www/{dav,mail,zpush} -type d -exec chmod 755 {} \;
+			find /var/www/{dav,mail,zpush} -type f -exec chmod 644 {} \;
 			sed -i "/date_default_timezone_set/c\date_default_timezone_set('${sys_timezone}');" /var/www/dav/server.php
 			touch /var/www/MAILBOX_BACKUP
 			cp misc/mc_resetadmin /usr/local/sbin/mc_resetadmin ; chmod 700 /usr/local/sbin/mc_resetadmin
@@ -492,8 +493,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin
 			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin
 			sed -i "s/httpd_dav_subdomain/$httpd_dav_subdomain/g" /var/www/mail/inc/vars.inc.php
-			chown -R www-data: /var/www/{mail,dav,MAILBOX_BACKUP} /var/lib/php5/sessions
-			chown www-data: /var/www/
+			chown -R www-data: /var/www/{.,mail,dav,MAILBOX_BACKUP} /var/lib/php5/sessions
 			mysql --host ${my_dbhost} -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} < webserver/htdocs/init.sql
 			if [[ -z $(mysql --host ${my_dbhost} -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} -e "SHOW INDEX FROM propertystorage WHERE KEY_NAME = 'path_property';" -N -B) ]]; then
 				mysql --host ${my_dbhost} -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} -e "CREATE UNIQUE INDEX path_property ON propertystorage (path(600), name(100));" -N -B
@@ -505,6 +505,13 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			else
 				echo "$(textb [INFO]) - At least one administrator exists, will not create another mailcow administrator"
 			fi
+			# zpush
+			sed -i "s/MAILCOW_TIMEZONE/$sys_timezone/g" /var/www/zpush/config.php
+			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /var/www/zpush/backend/imap/config.php
+			sed -i "s/MAILCOW_DAV_HOST.MAILCOW_DOMAIN/${httpd_dav_subdomain}.${sys_domain}/g" /var/www/zpush/backend/caldav/config.php
+			sed -i "s/MAILCOW_DAV_HOST.MAILCOW_DOMAIN/${httpd_dav_subdomain}.${sys_domain}/g" /var/www/zpush/backend/carddav/config.php
+			mkdir /var/{lib,log}/z-push
+			chown -R www-data: /var/{lib,log}/z-push
 			# Cleaning up old files
 			sed -i '/test -d /var/run/fetchmail/d' /etc/rc.local > /dev/null 2>&1
 			rm /etc/cron.d/pfadminfetchmail > /dev/null 2>&1
@@ -586,7 +593,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			;;
 		checkdns)
 			if [[ -z $(dig -x ${getpublicipv4} @8.8.8.8 | grep -i ${sys_domain}) ]]; then
-				echo "$(yellowb [WARN]) - Remember to setup a PTR record: ${getpublicipv4} does not point to ${sys_domain} (checked by Google DNS)" | tee -a installer.log
+				echo "$(yellowb [WARN]) - Remember to setup a PTR record: ${getpublicipv4} does not point to ${sys_domain}" | tee -a installer.log
 			fi
 			for srv in _carddavs _caldavs _imap _imaps _submission _pop3 _pop3s
 			do
@@ -594,15 +601,16 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 					echo "$(textb [INFO]) - Cannot find SRV record \"${srv}._tcp.${sys_domain}\""
 				fi
 			done
-			if [[ -z $(dig ${sys_hostname}.${sys_domain} @8.8.8.8 | grep -i ${getpublicipv4}) ]]; then
-				echo "$(yellowb [WARN]) - Remember to setup A + MX records! (checked by Google DNS)" | tee -a installer.log
-			else
-				if [[ -z $(dig mx ${sys_domain} @8.8.8.8 | grep -i ${sys_hostname}.${sys_domain}) ]] && [[ -z $(dig mx ${sys_hostname}.${sys_domain} @8.8.8.8 | grep -i ${sys_hostname}.${sys_domain}) ]]; then
-					echo "$(yellowb [WARN]) - Remember to setup a MX record pointing to this server (checked by Google DNS)" | tee -a installer.log
+			for a in autodiscover ${sys_hostname} ${httpd_dav_subdomain}
+				if [[ -z $(dig a ${a}.${sys_domain} @8.8.8.8 +short) ]]; then
+					echo "$(yellowb [WARN]) - Cannot find A record \"${a}.${sys_domain}\""
 				fi
+			done
+			if [[ -z $(dig mx ${sys_domain} @8.8.8.8 +short ]]; then
+				echo "$(yellowb [WARN]) - Remember to setup a MX record pointing to this server" | tee -a installer.log
 			fi
 			if [[ -z $(dig ${sys_domain} txt @8.8.8.8 | grep -i spf) ]]; then
-				echo "$(textb [HINT]) - You may want to setup a TXT record for SPF (checked by Google DNS)" | tee -a installer.log
+				echo "$(textb [HINT]) - You may want to setup a TXT record for SPF" | tee -a installer.log
 			fi
 			if [[ ! -z $(host dbltest.com.dbl.spamhaus.org | grep NXDOMAIN) || ! -z $(cat /etc/resolv.conf | grep -E '^nameserver 8.8.|^nameserver 208.67.2') ]]; then
 				echo "$(redb [CRIT]) - You either use OpenDNS, Google DNS or another blocked DNS provider for blacklist lookups. Consider using another DNS server for better spam detection." | tee -a installer.log
@@ -666,6 +674,7 @@ $(textb "Roundcube MySQL") ${my_rcuser}:${my_rcpass}@${my_dbhost}/${my_rcdb}
 $(textb "Web server")      ${httpd_platform^}
 $(textb "Web root")        https://${sys_hostname}.${sys_domain}
 $(textb "DAV web root")    https://${httpd_dav_subdomain}.${sys_domain}
+$(textb "Autodiscover (Z-Push)")    https://autodiscover.${sys_domain}
 
 --------------------------------------------------------
 THIS UPGRADE WILL RESET SOME OF YOUR CONFIGURATION FILES

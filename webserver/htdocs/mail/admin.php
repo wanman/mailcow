@@ -410,7 +410,7 @@ _pop3s._tcp         IN SRV     0 1 995 <?=$MYHOSTNAME;?>.
 _submission._tcp    IN SRV     0 1 587 <?=$MYHOSTNAME;?>.
 @                   IN MX 10   <?=$MYHOSTNAME_0, "\n";?>
 @                   IN TXT     "v=spf1 mx -all"
-autoconfig          IN A       <?=$IP, "\n";?>
+autodiscover        IN A       <?=$IP, "\n";?>
 <?=str_pad($DAV_SUBDOMAIN, 20);?>IN A       <?=$IP, "\n";?>
 <?=str_pad($MYHOSTNAME_0, 20);?>IN A       <?=$IP, "\n";?>
 

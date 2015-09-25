@@ -7,6 +7,44 @@ server {
 	return 301 https://$host$request_uri;
 }
 server {
+        listen 443;
+        ssl on;
+        ssl_certificate         /etc/ssl/mail/mail.crt;
+        ssl_certificate_key     /etc/ssl/mail/mail.key;
+        ssl_prefer_server_ciphers on;
+        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+		ssl_ciphers 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA';
+        ssl_dhparam /etc/ssl/mail/dhparams.pem;
+        add_header Strict-Transport-Security max-age=15768000;
+        ssl_session_cache shared:SSL:5m;
+        ssl_session_timeout 30m;
+        server_name autodiscover.MAILCOW_DOMAIN;
+        root /var/www/zpush;
+        index index.php;
+        charset utf-8;
+        rewrite (?i)^/autodiscover/autodiscover\.xml$ /autodiscover/autodiscover.php;
+        location / {
+                try_files $uri $uri/ /index.php;
+        }
+        location /Microsoft-Server-ActiveSync {
+                rewrite ^(.*)$  /index.php last;
+        }
+        location ~ /(\.ht|Core|Specific) {
+                deny all;
+                return 404;
+        }
+        location ~ ^(.+\.php)(.*)$ {
+                try_files $fastcgi_script_name =404;
+                fastcgi_split_path_info  ^(.+\.php)(.*)$;
+                fastcgi_pass   unix:/var/run/php5-fpm.sock;
+                fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+                fastcgi_param  PATH_INFO        $fastcgi_path_info;
+                include        /etc/nginx/fastcgi_params;
+                fastcgi_index index.php;
+                fastcgi_read_timeout 630;
+        }
+}
+server {
 	listen 443;
 	ssl on;
 	ssl_certificate         /etc/ssl/mail/mail.crt;
