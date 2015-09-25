@@ -602,6 +602,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				fi
 			done
 			for a in autodiscover ${sys_hostname} ${httpd_dav_subdomain}
+			do
 				if [[ -z $(dig a ${a}.${sys_domain} @8.8.8.8 +short) ]]; then
 					echo "$(yellowb [WARN]) - Cannot find A record \"${a}.${sys_domain}\""
 				fi
