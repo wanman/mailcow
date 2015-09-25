@@ -607,7 +607,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 					echo "$(yellowb [WARN]) - Cannot find A record \"${a}.${sys_domain}\""
 				fi
 			done
-			if [[ -z $(dig mx ${sys_domain} @8.8.8.8 +short ]]; then
+			if [[ -z $(dig mx ${sys_domain} @8.8.8.8 +short) ]]; then
 				echo "$(yellowb [WARN]) - Remember to setup a MX record pointing to this server" | tee -a installer.log
 			fi
 			if [[ -z $(dig ${sys_domain} txt @8.8.8.8 | grep -i spf) ]]; then
