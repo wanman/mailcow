@@ -506,11 +506,11 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				echo "$(textb [INFO]) - At least one administrator exists, will not create another mailcow administrator"
 			fi
 			# zpush
-			sed -i "s/MAILCOW_TIMEZONE/$sys_timezone/g" /var/www/zpush/config.php
+			sed -i "s#MAILCOW_TIMEZONE#${sys_timezone}#g" /var/www/zpush/config.php
 			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /var/www/zpush/backend/imap/config.php
 			sed -i "s/MAILCOW_DAV_HOST.MAILCOW_DOMAIN/${httpd_dav_subdomain}.${sys_domain}/g" /var/www/zpush/backend/caldav/config.php
 			sed -i "s/MAILCOW_DAV_HOST.MAILCOW_DOMAIN/${httpd_dav_subdomain}.${sys_domain}/g" /var/www/zpush/backend/carddav/config.php
-			mkdir /var/{lib,log}/z-push
+			mkdir /var/{lib,log}/z-push 2>/dev/null
 			chown -R www-data: /var/{lib,log}/z-push
 			# Cleaning up old files
 			sed -i '/test -d /var/run/fetchmail/d' /etc/rc.local > /dev/null 2>&1
