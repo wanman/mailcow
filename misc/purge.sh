@@ -88,12 +88,13 @@ rm -rf /etc/ssl/mail/
 rm -rf /etc/spamassassin/
 rm -rf /etc/dovecot/
 rm -rf /etc/postfix/
+rm -rf /var/{lib,log}/z-push/
 rm -rf /etc/fail2ban/
 rm -f /etc/fufix_version
 rm -f /etc/mailcow_version
 rm -f /etc/{cron.daily,cron.hourly,cron.monthly}/mailcow_backup
 rm -rf /etc/mail/postfixadmin
-rm -rf /var/www/mail
+rm -rf /var/www/{mail,zpush,dav}
 rm -f /usr/local/sbin/mc_*
 rm -f /etc/cron.daily/mc_clean_spam_aliases
 rm -rf /var/run/fetchmail
