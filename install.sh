@@ -35,7 +35,7 @@ checkconfig
 
 echo "    $(textb "Hostname")            ${sys_hostname}
     $(textb "Domain")              ${sys_domain}
-    $(textb "FQDN")                ${sys_hostname}.$sys_domain}
+    $(textb "FQDN")                ${sys_hostname}.${sys_domain}
     $(textb "Timezone")            ${sys_timezone}
     $(textb "mailcow MySQL")       ${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}/${my_mailcowdb}
     $(textb "Roundcube MySQL")     ${my_rcuser}:${my_rcpass}@${my_dbhost}/${my_rcdb}
