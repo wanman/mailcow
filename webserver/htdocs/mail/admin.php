@@ -302,21 +302,6 @@ $srr_values = return_mailcow_config("srr");
 </div>
 
 <div class="panel panel-default">
-<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseSendBL"><a style="cursor:pointer;" class="accordion-toggle">Sender Blacklist</a></div>
-<div id="collapseSendBL" class="panel-collapse collapse">
-<div class="panel-body">
-<form method="post">
-<div class="form-group">
-	<p>Specify a list of senders or domains to blacklist access:</p>
-	<textarea class="form-control" rows="6" name="sender"><?php return_mailcow_config("senderaccess") ?></textarea>
-	<br /><button type="submit" class="btn btn-default btn-raised btn-sm">Apply</button>
-</div>
-</form>
-</div>
-</div>
-</div>
-
-<div class="panel panel-default">
 <div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapsePrivacy"><a style="cursor:pointer;" class="accordion-toggle">Privacy</a></div>
 <div id="collapsePrivacy" class="panel-collapse collapse">
 <div class="panel-body">

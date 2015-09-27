@@ -54,10 +54,6 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 	if (isset($_POST["maxmsgsize"])) {
 		set_mailcow_config("maxmsgsize", $_POST["maxmsgsize"]);
 	}
-	if (isset($_POST["sender"])) {
-		set_mailcow_config("senderaccess", $_POST["sender"]);
-		postfix_reload();
-	}
 	if (isset($_POST["dkim_selector"])) {
 		opendkim_table("add", $_POST["dkim_selector"] . "_" . $_POST["dkim_domain"]);
 	}

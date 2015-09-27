@@ -1,3 +1,0 @@
-example.tld     REJECT     Sender not allowed
-.sub-domains-of-this.tld     REJECT     Sender not allowed
-user@example.tld     REJECT     Sender not allowed

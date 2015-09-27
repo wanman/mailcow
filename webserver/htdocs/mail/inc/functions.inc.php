@@ -79,13 +79,6 @@ function return_mailcow_config($s) {
 				if ($PVT == "on") { return "checked"; } else { return false; }
 			}
 			break;
-		case "senderaccess":
-			$state = file($GLOBALS["mailcow_sender_access"]);
-			foreach ($state as $each) {
-				$each_expl = explode(" ", $each);
-				echo $each_expl[0], "\n";
-			}
-			break;
 		case "srr":
 			return shell_exec("sudo /usr/local/sbin/mc_pfset get-srr");
 			break;
@@ -226,27 +219,6 @@ namespace {
 					'msg' => 'Cannot set restrictions'
 				);
 				break;
-			}
-			break;
-		case "senderaccess":
-			file_put_contents($GLOBALS["mailcow_sender_access"], "");
-			$sender_array = array_keys(array_flip(preg_split("/((\r?\n)|(\r\n?))/", $v)));
-			$invalid_senders = "";
-			foreach($sender_array as $each) {
-				if ($each != "" && preg_match("/^[a-zA-Z0-9-\ .@]+$/", $each)) {
-					file_put_contents($GLOBALS["mailcow_sender_access"], "$each REJECT Sender not allowed".PHP_EOL, FILE_APPEND);
-				}
-				elseif (!empty($each)) {
-					$invalid_senders .= $each.' ';
-				}
-			}
-			$sender_map = $GLOBALS["mailcow_sender_access"];
-			shell_exec("/usr/sbin/postmap $sender_map");
-			if (!empty($invalid_senders)) {
-				$_SESSION['return'] = array(
-					'type' => 'warning',
-					'msg' => 'Changes saved successfully, but some senders were skipped: '.htmlspecialchars($invalid_senders)
-				);
 			}
 			break;
 	}
