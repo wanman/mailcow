@@ -118,7 +118,7 @@ nano mailcow.config
 
 * **sys_hostname** - Hostname without domain
 * **sys_domain** - Domain name. "$sys_hostname.$sys_domain" equals to FQDN.
-* **sys_timezone** - The timezone must be definied in a valid format (Europe/Berlin, America/New_York etc.)
+* **sys_timezone** - The timezone must be defined in a valid format (Europe/Berlin, America/New_York etc.)
 * **httpd_platform** - Select wether to use Nginx ("nginx") or Apache2 ("apache2"). Nginx is default.
 * **httpd_dav_subdomain** - A dedicated subdomain for Cal- and CardDAV. Must not be sys_hostname.
 * **my_dbhost** - ADVANCED: Leave as-is ("localhost") for a local database installation. Anything but "localhost" or "127.0.0.1" is recognized as a remote installation.
