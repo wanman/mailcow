@@ -41,6 +41,7 @@ A summary of what software is installed with which features enabled.
 * Self-signed SSL certificate for all installed and supporting services
 * Nginx or Apache2 installation (+PHP5-FPM)
 * MySQL or MariaDB database backend, remote database support
+* **Z-Push** integration (IMAP, CalDAV and CardDAV)
 * DNS-Checks (PTR, A-Record, SPF etc.)
 * Learn ham and spam, [Heinlein Support](https://www.heinlein-support.de/) SA rules included
 * Fail2ban brute force protection
