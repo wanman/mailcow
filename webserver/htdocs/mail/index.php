@@ -27,6 +27,8 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 				<ul>
 					<li><code><?php echo $MYHOSTNAME; ?>:587/tcp</code></li>
 				</ul>
+				<small><b>Exchange ActiveSync</b></small><br />
+				<small>ActiveSync support is enabled.</small><br />
 				<small><b>Cal- and CardDAV</b></small><br />
 				<small><a href="user.php" style="text-decoration:underline">Navigate to your personal settings</a> and copy the full path of your desired calendar or address book.</small>
 			</div>
