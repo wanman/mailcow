@@ -65,17 +65,20 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 						</tr>
 						</thead>
 						<tbody>
-					<?php
-					$result = mysqli_query($link, "SELECT username, LOWER(GROUP_CONCAT(DISTINCT domain SEPARATOR ', ')) AS domain, CASE active WHEN 1 THEN 'Yes' ELSE 'No' END AS active FROM domain_admins WHERE username NOT IN (SELECT username FROM admin WHERE superadmin='1') GROUP BY username");
-					while ($row = mysqli_fetch_array($result)) {
-					echo "<tr><td>", $row['username'],
-					"</td><td>", $row['domain'],
-					"</td><td>", $row['active'],
-					"</td><td><a href=\"delete.php?domain_admin=", $row['username'], "\">delete</a> | 
-					<a href=\"edit.php?domain_admin=", $row['username'], "\">edit</a>",
-					"</td></tr>";
-					}
-					?>
+							<?php
+							$result = mysqli_query($link, "SELECT username, LOWER(GROUP_CONCAT(DISTINCT domain SEPARATOR ', ')) AS domain, CASE active WHEN 1 THEN 'Yes' ELSE 'No' END AS active FROM domain_admins WHERE username NOT IN (SELECT username FROM admin WHERE superadmin='1') GROUP BY username");
+							while ($row = mysqli_fetch_array($result)):
+							?>
+							<tr>
+								<td><?=$row['username'];?></td>
+								<td><?=$row['domain'];?></td>
+								<td><?=$row['active'];?></td>
+								<td><a href="delete.php?domain_admin=<?=$row['username'];?>">delete</a> | 
+									<a href="edit.php?domain_admin=<?=$row['username'];?>">edit</a></td>
+							</tr>
+							<?php
+							endwhile;
+							?>
 						</tbody>
 					</table>
 					</div>
@@ -96,7 +99,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 				<?php
 				$resultselect = mysqli_query($link, "SELECT domain FROM domain");
 				while ($row = mysqli_fetch_array($resultselect)) {
-				echo "<option>", $row['domain'], "</option>";
+				echo "<option>".$row['domain']."</option>";
 				}
 				?>
 							</select>
@@ -133,8 +136,6 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 	</div>
 </div>
 
-
-
 <h4><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Configuration</h4>
 <div class="panel-group" id="accordion_config">
 <div class="panel panel-default">
@@ -170,10 +171,10 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 $resultselect = mysqli_query($link, "SELECT username FROM mailbox");
 while ($row = mysqli_fetch_array($resultselect)) {
 	if (strpos(file_get_contents($MC_MBOX_BACKUP), $row['username'])) {
-		echo "<option selected>", $row['username'], "</option>";
+		echo "<option selected>".$row['username']."</option>";
 	}
 	else {
-		echo "<option>", $row['username'], "</option>";
+		echo "<option>".$row['username']."</option>";
 	}
 }
 ?>
@@ -328,7 +329,9 @@ $srr_values = return_mailcow_config("srr");
 <p>Default behaviour is to sign with relaxed header and body canonicalization algorithm.</p>
 <form method="post">
 <h4>Active keys</h4>
-<?php opendkim_table() ?>
+<?php
+opendkim_table();
+?>
 <h4>Add new key</h4>
 <div class="form-group">
 	<div class="row">

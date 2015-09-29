@@ -117,9 +117,9 @@ if (isset($_SESSION['mailcow_cc_loggedin']) &&
 						<div class="col-sm-10">
 							<select name="alias_domain" size="1">
 <?php
-$result = mysqli_query($link, "SELECT domain FROM domain WHERE domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role'");
+$result = mysqli_query($link, "SELECT domain FROM domain WHERE domain IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'='".$logged_in_role."'");
 while ($row = mysqli_fetch_array($result)) {
-	echo "<option>", $row['domain'], "</option>";
+	echo "<option>".$row['domain']."</option>";
 }
 ?>
 							</select>
@@ -130,9 +130,9 @@ while ($row = mysqli_fetch_array($result)) {
 						<div class="col-sm-10">
 							<select name="target_domain" size="1">
 <?php
-$result = mysqli_query($link, "SELECT domain FROM domain WHERE domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role'");
+$result = mysqli_query($link, "SELECT domain FROM domain WHERE domain IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'='".$logged_in_role."'");
 while ($row = mysqli_fetch_array($result)) {
-	echo "<option>", $row['domain'], "</option>";
+	echo "<option>".$row['domain']."</option>";
 }
 ?>
 							</select>
@@ -168,9 +168,9 @@ while ($row = mysqli_fetch_array($result)) {
 						<div class="col-sm-10">
 							<select name="domain" size="1">
 <?php
-$result = mysqli_query($link, "SELECT domain FROM domain WHERE domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role'");
+$result = mysqli_query($link, "SELECT domain FROM domain WHERE domain IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'='".$logged_in_role."'");
 while ($row = mysqli_fetch_array($result)) {
-	echo "<option>", $row['domain'], "</option>";
+	echo "<option>".$row['domain']."</option>";
 }
 ?>
 							</select>

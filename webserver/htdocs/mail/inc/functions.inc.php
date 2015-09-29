@@ -91,7 +91,7 @@ function set_mailcow_config($s, $v = "", $vext = "") {
 	switch ($s) {
 		case "backup":
 			$file="/var/www/MAILBOX_BACKUP";
-			if (($v['use_backup'] != "on" && $v['use_backup'] != "") ||
+			if (isset($v['use_backup']) && ($v['use_backup'] != "on" && $v['use_backup'] != "") ||
 				($v['runtime'] != "hourly" && $v['runtime'] != "daily" && $v['runtime'] != "monthly")) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -111,15 +111,17 @@ function set_mailcow_config($s, $v = "", $vext = "") {
 			}
 			file_put_contents($file, "BACKUP=".$v['use_backup'].PHP_EOL, LOCK_EX);
 			file_put_contents($file, "MBOX=(".PHP_EOL, FILE_APPEND | LOCK_EX);
-			foreach ($v['mailboxes'] as $mbox) {
-				if (!filter_var($mbox, FILTER_VALIDATE_EMAIL)) {
-					$_SESSION['return'] = array(
-						'type' => 'danger',
-						'msg' => 'Invalid form data'
-					);
-					break;
+			if (!empty($v['mailboxes'])) {
+				foreach ($v['mailboxes'] as $mbox) {
+					if (!filter_var($mbox, FILTER_VALIDATE_EMAIL)) {
+						$_SESSION['return'] = array(
+							'type' => 'danger',
+							'msg' => 'Invalid form data'
+						);
+						break;
+					}
+					file_put_contents($file, $mbox.PHP_EOL, FILE_APPEND | LOCK_EX);
 				}
-				file_put_contents($file, $mbox.PHP_EOL, FILE_APPEND | LOCK_EX);
 			}
 			file_put_contents($file, ")".PHP_EOL.'RUNTIME='.$v['runtime'].PHP_EOL, FILE_APPEND | LOCK_EX);
 			file_put_contents($file, "LOCATION=".$v['location'].PHP_EOL, FILE_APPEND | LOCK_EX);
@@ -370,7 +372,7 @@ function mailbox_add_domain($link, $postarray) {
 		}
 	}
 	$mystring = "INSERT INTO domain (domain, description, aliases, mailboxes, maxquota, quota, transport, backupmx, created, modified, active)
-		VALUES ('$domain', '$description', '$aliases', '$mailboxes', '$maxquota', '$quota', 'virtual', '$backupmx', now(), now(), '$active')";
+		VALUES ('".$domain."', '$description', '$aliases', '$mailboxes', '$maxquota', '$quota', 'virtual', '".$backupmx."', now(), now(), '".$active."')";
 	if (!mysqli_query($link, $mystring)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -412,21 +414,21 @@ function mailbox_add_alias($link, $postarray) {
 			);
 			return false;
 		}
-		if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain'"))) {
+		if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='".$domain."'"))) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
 				'msg' => 'Domain '.htmlspecialchars($domain).' not found'
 			);
 			return false;
 		}
-		if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) {
+		if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='".$domain."' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'!='".$logged_in_role."')"))) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
 				'msg' => 'Permission denied'
 			);
 			return false;
 		}
-		$qstring = "SELECT address FROM alias WHERE address='$address'";
+		$qstring = "SELECT address FROM alias WHERE address='".$address."'";
 		$qresult = mysqli_query($link, $qstring);
 		$num_results = mysqli_num_rows($qresult);
 		if ($num_results != 0) {
@@ -447,10 +449,10 @@ function mailbox_add_alias($link, $postarray) {
 		}
 		$goto = implode(",", $goto_arr);
 		if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
-			$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('@$domain', '$goto', '$domain', now(), now(), '$active')";
+			$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('@$domain', '".$goto."', '".$domain."', now(), now(), '".$active."')";
 		}
 		else {
-			$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('$address', '$goto', '$domain', now(), now(), '$active')";
+			$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('".$address."', '".$goto."', '".$domain."', now(), now(), '".$active."')";
 		}
 		if (!mysqli_query($link, $mystring)) {
 			$_SESSION['return'] = array(
@@ -470,7 +472,7 @@ function mailbox_add_alias_domain($link, $postarray) {
 	$target_domain = mysqli_real_escape_string($link, strtolower(trim($postarray['target_domain'])));
 	global $logged_in_role;
 	global $logged_in_as;
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$target_domain' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) { 
+	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$target_domain' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'!='".$logged_in_role."')"))) { 
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Permission denied'
@@ -506,21 +508,21 @@ function mailbox_add_alias_domain($link, $postarray) {
 		);
 		return false;
 	}
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain where domain='$alias_domain'"))) {
+	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain where domain='".$alias_domain."'"))) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Alias domain not found'
 		);
 		return false;
 	}
-	if (mysqli_result(mysqli_query($link, "SELECT alias_domain FROM alias_domain where alias_domain='$alias_domain'"))) {
+	if (mysqli_result(mysqli_query($link, "SELECT alias_domain FROM alias_domain where alias_domain='".$alias_domain."'"))) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Alias domain exists'
 		);
 		return false;
 	}
-	$mystring = "INSERT INTO alias_domain (alias_domain, target_domain, created, modified, active) VALUE ('$alias_domain', '$target_domain', now(), now(), '$active')";
+	$mystring = "INSERT INTO alias_domain (alias_domain, target_domain, created, modified, active) VALUE ('".$alias_domain."', '$target_domain', now(), now(), '".$active."')";
 	if (!mysqli_query($link, $mystring)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -547,8 +549,8 @@ function mailbox_add_mailbox($link, $postarray) {
 	$maildir = $domain."/".$local_part."/";
 	$username = $local_part.'@'.$domain;
 
-	$row_from_domain = mysqli_fetch_assoc(mysqli_query($link, "SELECT mailboxes, maxquota, quota FROM domain WHERE domain='$domain'"));
-	$row_from_mailbox = mysqli_fetch_assoc(mysqli_query($link, "SELECT count(*) as count, coalesce(round(sum(quota)/1048576), 0) as quota FROM mailbox WHERE domain='$domain'"));
+	$row_from_domain = mysqli_fetch_assoc(mysqli_query($link, "SELECT mailboxes, maxquota, quota FROM domain WHERE domain='".$domain."'"));
+	$row_from_mailbox = mysqli_fetch_assoc(mysqli_query($link, "SELECT count(*) as count, coalesce(round(sum(quota)/1048576), 0) as quota FROM mailbox WHERE domain='".$domain."'"));
 
 	$num_mailboxes = $row_from_mailbox['count'];
 	$quota_m_in_use = $row_from_mailbox['quota'];
@@ -558,14 +560,14 @@ function mailbox_add_mailbox($link, $postarray) {
 
 	global $logged_in_role;
 	global $logged_in_as;
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) {
+	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='".$domain."' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'!='".$logged_in_role."')"))) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Permission denied'
 		);
 		return false;
 	}
-	$qstring = "SELECT local_part FROM mailbox WHERE local_part='$local_part' and domain='$domain'";
+	$qstring = "SELECT local_part FROM mailbox WHERE local_part='$local_part' and domain='".$domain."'";
 	$qresult = mysqli_query($link, $qstring);
 	$num_results = mysqli_num_rows($qresult);
 	if ($num_results != 0) {
@@ -637,7 +639,7 @@ function mailbox_add_mailbox($link, $postarray) {
 		);
 		return false;
 	}
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain where domain='$domain'"))) {
+	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain where domain='".$domain."'"))) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Domain not found'
@@ -668,15 +670,15 @@ function mailbox_add_mailbox($link, $postarray) {
 	}
 	isset($postarray['active']) ? $active = '1' : $active = '0';
 	$create_user = "INSERT INTO mailbox (username, password, name, maildir, quota, local_part, domain, created, modified, active) 
-			VALUES ('$username', '$password_sha512c', '$name', '$maildir', '$quota_b', '$local_part', '$domain', now(), now(), '$active');";
+			VALUES ('".$username."', '".$password_sha512c."', '".$name."', '$maildir', '".$quota_b."', '$local_part', '".$domain."', now(), now(), '".$active."');";
 	$create_user .= "INSERT INTO quota2 (username, bytes, messages)
-			VALUES ('$username', '', '');";
+			VALUES ('".$username."', '', '');";
 	$create_user .= "INSERT INTO alias (address, goto, domain, created, modified, active)
-			VALUES ('$username', '$username', '$domain', now(), now(), '$active');";
+			VALUES ('".$username."', '".$username."', '".$domain."', now(), now(), '".$active."');";
 	$create_user .= "INSERT INTO users (username, digesta1)
-			VALUES('$username', MD5(CONCAT('$username', ':SabreDAV:', '$password')));";
+			VALUES('".$username."', MD5(CONCAT('".$username."', ':SabreDAV:', '".$password."')));";
 	$create_user .= "INSERT INTO principals (uri,email,displayname)
-			VALUES ('principals/$username', '$username', '$name');";
+			VALUES ('principals/$username', '".$username."', '".$name."');";
 	$create_user .= "INSERT INTO principals (uri,email,displayname)
 			VALUES ('principals/$username/calendar-proxy-read', null, null);";
 	$create_user .= "INSERT INTO principals (uri,email,displayname)
@@ -744,7 +746,7 @@ function mailbox_edit_alias($link, $postarray) {
 	global $logged_in_as;
 	$address = mysqli_real_escape_string($link, $postarray['address']);
 	$domain = substr($address, strpos($address, '@')+1);
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) {
+	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='".$domain."' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'!='".$logged_in_role."')"))) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Invalid domain name'
@@ -777,7 +779,7 @@ function mailbox_edit_alias($link, $postarray) {
 		);
 		return false;
 	}
-	$mystring = "UPDATE alias SET goto='$goto', active='$active' WHERE address='$address'";
+	$mystring = "UPDATE alias SET goto='".$goto."', active='".$active."' WHERE address='".$address."'";
 	if (!mysqli_query($link, $mystring)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -798,16 +800,16 @@ function mailbox_edit_domain($link, $postarray) {
 	$maxquota = mysqli_real_escape_string($link, $postarray['maxquota']);
 	$quota = mysqli_real_escape_string($link, $postarray['quota']);
 
-	$row_from_mailbox = mysqli_fetch_assoc(mysqli_query($link, "SELECT count(*) as count, max(coalesce(round(quota/1048576), 0)) as maxquota, coalesce(round(sum(quota)/1048576), 0) as quota FROM mailbox WHERE domain='$domain'"));
+	$row_from_mailbox = mysqli_fetch_assoc(mysqli_query($link, "SELECT count(*) as count, max(coalesce(round(quota/1048576), 0)) as maxquota, coalesce(round(sum(quota)/1048576), 0) as quota FROM mailbox WHERE domain='".$domain."'"));
 	$maxquota_in_use = $row_from_mailbox['maxquota'];
 	$domain_quota_m_in_use = $row_from_mailbox['quota'];
 	$mailboxes_in_use = $row_from_mailbox['count'];
-	$aliases_in_use = mysqli_result(mysqli_query($link, "SELECT count(*) FROM alias WHERE domain='$domain' and address NOT IN (SELECT username FROM mailbox)"));
+	$aliases_in_use = mysqli_result(mysqli_query($link, "SELECT count(*) FROM alias WHERE domain='".$domain."' and address NOT IN (SELECT username FROM mailbox)"));
 
 	global $logged_in_role;
 	global $logged_in_as;
 
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) { 
+	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='".$domain."' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'!='".$logged_in_role."')"))) { 
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Permission denied'
@@ -869,7 +871,7 @@ function mailbox_edit_domain($link, $postarray) {
 	}
 	isset($postarray['active']) ? $active = '1' : $active = '0';
 	isset($postarray['backupmx']) ? $backupmx = '1' : $backupmx = '0';
-	$mystring = "UPDATE domain SET modified=now(), backupmx='$backupmx', active='$active', quota='$quota', maxquota='$maxquota', mailboxes='$mailboxes', aliases='$aliases', description='$description' WHERE domain='$domain'";
+	$mystring = "UPDATE domain SET modified=now(), backupmx='".$backupmx."', active='".$active."', quota='$quota', maxquota='$maxquota', mailboxes='$mailboxes', aliases='$aliases', description='$description' WHERE domain='".$domain."'";
 	if (!mysqli_query($link, $mystring)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -909,7 +911,7 @@ function mailbox_edit_domainadmin($link, $postarray) {
 		return false;
 	}
 	isset($postarray['active']) ? $active = '1' : $active = '0';
-	$mystring = "DELETE FROM domain_admins WHERE username='$username'";
+	$mystring = "DELETE FROM domain_admins WHERE username='".$username."'";
 	if (!mysqli_query($link, $mystring)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -918,7 +920,7 @@ function mailbox_edit_domainadmin($link, $postarray) {
 		return false;
 	}
 	foreach ($postarray['domain'] as $domain) {
-		$mystring = "INSERT INTO domain_admins (username, domain, created, active) VALUES ('$username', '$domain', now(), '$active')";
+		$mystring = "INSERT INTO domain_admins (username, domain, created, active) VALUES ('".$username."', '".$domain."', now(), '".$active."')";
 		if (!mysqli_query($link, $mystring)) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -927,7 +929,7 @@ function mailbox_edit_domainadmin($link, $postarray) {
 			return false;
 		}
 	}
-	$mystring = "UPDATE admin SET modified=now(), active='$active' where username='$username'";
+	$mystring = "UPDATE admin SET modified=now(), active='".$active."' where username='".$username."'";
 	if (!mysqli_query($link, $mystring)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -947,15 +949,15 @@ function mailbox_edit_mailbox($link, $postarray) {
 	$name = mysqli_real_escape_string($link, $postarray['name']);
 	$password = mysqli_real_escape_string($link, $postarray['password']);
 	$password2 = mysqli_real_escape_string($link, $postarray['password2']);
-	$domain = mysqli_result(mysqli_query($link, "SELECT domain FROM mailbox WHERE username='$username'"));
-	$quota_m_now = mysqli_result(mysqli_query($link, "SELECT coalesce(round(sum(quota)/1048576), 0) as quota FROM mailbox WHERE username='$username'"));
-	$quota_m_in_use = mysqli_result(mysqli_query($link, "SELECT coalesce(round(sum(quota)/1048576), 0) as quota FROM mailbox WHERE domain='$domain'"));
-	$row_from_domain = mysqli_fetch_assoc(mysqli_query($link, "SELECT quota, maxquota FROM domain WHERE domain='$domain'"));
+	$domain = mysqli_result(mysqli_query($link, "SELECT domain FROM mailbox WHERE username='".$username."'"));
+	$quota_m_now = mysqli_result(mysqli_query($link, "SELECT coalesce(round(sum(quota)/1048576), 0) as quota FROM mailbox WHERE username='".$username."'"));
+	$quota_m_in_use = mysqli_result(mysqli_query($link, "SELECT coalesce(round(sum(quota)/1048576), 0) as quota FROM mailbox WHERE domain='".$domain."'"));
+	$row_from_domain = mysqli_fetch_assoc(mysqli_query($link, "SELECT quota, maxquota FROM domain WHERE domain='".$domain."'"));
 	$maxquota_m = $row_from_domain['maxquota'];
 	$domain_quota_m = $row_from_domain['quota'];
 	global $logged_in_role;
 	global $logged_in_as;
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$domain' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) { 
+	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='".$domain."' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'!='".$logged_in_role."')"))) { 
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Permission denied'
@@ -1010,8 +1012,8 @@ function mailbox_edit_mailbox($link, $postarray) {
 			);
 			return false;
 		}
-		$update_user = "UPDATE mailbox SET modified=now(), active='$active', password='$password_sha512c', name='$name', quota='$quota_b' WHERE username='$username';";
-		$update_user .= "UPDATE users SET digesta1=MD5(CONCAT('$username', ':SabreDAV:', '$password')) WHERE username='$username';";
+		$update_user = "UPDATE mailbox SET modified=now(), active='".$active."', password='".$password_sha512c."', name='".$name."', quota='".$quota_b."' WHERE username='".$username."';";
+		$update_user .= "UPDATE users SET digesta1=MD5(CONCAT('".$username."', ':SabreDAV:', '".$password."')) WHERE username='".$username."';";
 		if (!mysqli_multi_query($link, $update_user)) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -1028,7 +1030,7 @@ function mailbox_edit_mailbox($link, $postarray) {
 		);
 		return true;
 	}
-	$mystring = "UPDATE mailbox SET modified=now(), active='$active', name='$name', quota='$quota_b' WHERE username='$username'";
+	$mystring = "UPDATE mailbox SET modified=now(), active='".$active."', name='".$name."', quota='".$quota_b."' WHERE username='".$username."'";
 	if (!mysqli_query($link, $mystring)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1126,8 +1128,8 @@ function mailbox_edit_dav($link, $postarray) {
 			$share_with = mysqli_real_escape_string($link, $share_with);
 			$update_string = "INSERT INTO groupmembers (principal_id, member_id)
 				VALUES (
-					(SELECT id FROM principals WHERE uri='principals/$logged_in_as/calendar-proxy-read'),
-					(SELECT id FROM principals WHERE email='$share_with')
+					(SELECT id FROM principals WHERE uri='principals/".$logged_in_as."/calendar-proxy-read'),
+					(SELECT id FROM principals WHERE email='".$share_with."')
 				)";
 			if (!mysqli_query($link, $update_string)) { 
 				$_SESSION['return'] = array(
@@ -1144,8 +1146,8 @@ function mailbox_edit_dav($link, $postarray) {
 			$share_with = mysqli_real_escape_string($link, $share_with);
 			$update_string = "INSERT INTO groupmembers (principal_id, member_id)
 				VALUES (
-					(SELECT id FROM principals WHERE uri='principals/$logged_in_as/calendar-proxy-write'),
-					(SELECT id FROM principals WHERE email='$share_with')
+					(SELECT id FROM principals WHERE uri='principals/".$logged_in_as."/calendar-proxy-write'),
+					(SELECT id FROM principals WHERE email='".$share_with."')
 				)";
 			if (!mysqli_query($link, $update_string)) {
 				$_SESSION['return'] = array(
@@ -1159,7 +1161,7 @@ function mailbox_edit_dav($link, $postarray) {
 	/* Delete marked DAV items */
 	if(isset($postarray['adb_delete'])) {
 		foreach ($postarray['adb_delete'] as $adb_delete_id) {
-			$update_string = "DELETE FROM addressbooks WHERE ID='$adb_delete_id' AND uri!='default'";
+			$update_string = "DELETE FROM addressbooks WHERE ID='".$adb_delete_id."' AND uri!='default'";
 			if (!mysqli_query($link, $update_string)) { 
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -1171,7 +1173,7 @@ function mailbox_edit_dav($link, $postarray) {
 	}
 	if(isset($postarray['cal_delete'])) {
 		foreach ($postarray['cal_delete'] as $cal_delete_id) {
-			$update_string = "DELETE FROM calendars WHERE ID='$cal_delete_id' AND uri!='default'";
+			$update_string = "DELETE FROM calendars WHERE ID='".$cal_delete_id."' AND uri!='default'";
 			if (!mysqli_query($link, $update_string)) { 
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -1202,7 +1204,7 @@ function mailbox_delete_domain($link, $postarray) {
 		);
 		return false;
 	}
-	$mystring = "SELECT username FROM mailbox WHERE domain='$domain';";
+	$mystring = "SELECT username FROM mailbox WHERE domain='".$domain."';";
 	$myresult = mysqli_result(mysqli_query($link, $mystring));
 	if (!mysqli_query($link, $mystring) || !empty($myresult)) {
 		$_SESSION['return'] = array(
@@ -1212,7 +1214,7 @@ function mailbox_delete_domain($link, $postarray) {
 		return false;
 	}
 	foreach (array("domain", "alias", "domain_admins") as $deletefrom) {
-		$mystring = "DELETE FROM $deletefrom WHERE domain='$domain'";
+		$mystring = "DELETE FROM $deletefrom WHERE domain='".$domain."'";
 		if (!mysqli_query($link, $mystring)) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -1221,7 +1223,7 @@ function mailbox_delete_domain($link, $postarray) {
 			return false;
 		}
 	}
-	$mystring = "DELETE FROM alias_domain WHERE target_domain='$domain'";
+	$mystring = "DELETE FROM alias_domain WHERE target_domain='".$domain."'";
 	if (!mysqli_query($link, $mystring)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1238,7 +1240,7 @@ function mailbox_delete_alias($link, $postarray) {
 	$address = mysqli_real_escape_string($link, $postarray['address']);
 	global $logged_in_role;
 	global $logged_in_as;
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM alias WHERE address='$address' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) { 
+	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM alias WHERE address='".$address."' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'!='".$logged_in_role."')"))) { 
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Permission denied'
@@ -1252,7 +1254,7 @@ function mailbox_delete_alias($link, $postarray) {
 		);
 		return false;
 	}
-	$mystring = "DELETE FROM alias WHERE address='$address' AND address NOT IN (SELECT username FROM mailbox)";
+	$mystring = "DELETE FROM alias WHERE address='".$address."' AND address NOT IN (SELECT username FROM mailbox)";
 	if (!mysqli_query($link, $mystring)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1269,7 +1271,7 @@ function mailbox_delete_alias_domain($link, $postarray) {
 	$alias_domain = mysqli_real_escape_string($link, $postarray['alias_domain']);
 	global $logged_in_role;
 	global $logged_in_as;
-	if (!mysqli_result(mysqli_query($link, "SELECT target_domain FROM alias_domain WHERE alias_domain='$alias_domain' AND (target_domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) { 
+	if (!mysqli_result(mysqli_query($link, "SELECT target_domain FROM alias_domain WHERE alias_domain='".$alias_domain."' AND (target_domain NOT IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'!='".$logged_in_role."')"))) { 
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Permission denied'
@@ -1283,7 +1285,7 @@ function mailbox_delete_alias_domain($link, $postarray) {
 		);
 		return false;
 	}
-	$mystring = "DELETE FROM alias_domain WHERE alias_domain='$alias_domain'";
+	$mystring = "DELETE FROM alias_domain WHERE alias_domain='".$alias_domain."'";
 	if (!mysqli_query($link, $mystring)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1300,7 +1302,7 @@ function mailbox_delete_mailbox($link, $postarray) {
 	$username = mysqli_real_escape_string($link, $postarray['username']);
 	global $logged_in_role;
 	global $logged_in_as;
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM mailbox WHERE username='$username' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'!='$logged_in_role')"))) { 
+	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM mailbox WHERE username='".$username."' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'!='".$logged_in_role."')"))) { 
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Permission denied'
@@ -1314,20 +1316,20 @@ function mailbox_delete_mailbox($link, $postarray) {
 		);
 		return false;
 	}
-	$delete_user = "DELETE FROM alias WHERE goto='$username';";
-	$delete_user .= "UPDATE alias SET goto=REPLACE(goto, ',$username,', ',');";
-	$delete_user .= "UPDATE alias SET goto=REPLACE(goto, ',$username', '');";
-	$delete_user .= "UPDATE alias SET goto=REPLACE(goto, '$username,', '');";
-	$delete_user .= "DELETE FROM quota2 WHERE username='$username';";
-	$delete_user .= "DELETE FROM calendarobjects WHERE calendarid IN (SELECT id from calendars where principaluri='principals/$username');";
-	$delete_user .= "DELETE FROM cards WHERE addressbookid IN (SELECT id from calendars where principaluri='principals/$username');";
-	$delete_user .= "DELETE FROM mailbox WHERE username='$username';";
-	$delete_user .= "DELETE FROM users WHERE username='$username';";
-	$delete_user .= "DELETE FROM principals WHERE uri='principals/$username';";
-	$delete_user .= "DELETE FROM principals WHERE uri='principals/$username/calendar-proxy-read';";
-	$delete_user .= "DELETE FROM principals WHERE uri='principals/$username/calendar-proxy-write';";
-	$delete_user .= "DELETE FROM addressbooks WHERE principaluri='principals/$username';";
-	$delete_user .= "DELETE FROM calendars WHERE principaluri='principals/$username';";
+	$delete_user = "DELETE FROM alias WHERE goto='".$username."';";
+	$delete_user .= "UPDATE alias SET goto=REPLACE(goto, ',".$username.",', ',');";
+	$delete_user .= "UPDATE alias SET goto=REPLACE(goto, ',".$username."', '');";
+	$delete_user .= "UPDATE alias SET goto=REPLACE(goto, '".$username.",', '');";
+	$delete_user .= "DELETE FROM quota2 WHERE username='".$username."';";
+	$delete_user .= "DELETE FROM calendarobjects WHERE calendarid IN (SELECT id from calendars where principaluri='principals/".$username."');";
+	$delete_user .= "DELETE FROM cards WHERE addressbookid IN (SELECT id from calendars where principaluri='principals/".$username."');";
+	$delete_user .= "DELETE FROM mailbox WHERE username='".$username."';";
+	$delete_user .= "DELETE FROM users WHERE username='".$username."';";
+	$delete_user .= "DELETE FROM principals WHERE uri='principals/".$username."';";
+	$delete_user .= "DELETE FROM principals WHERE uri='principals/".$username."/calendar-proxy-read';";
+	$delete_user .= "DELETE FROM principals WHERE uri='principals/".$username."/calendar-proxy-write';";
+	$delete_user .= "DELETE FROM addressbooks WHERE principaluri='principals/".$username."';";
+	$delete_user .= "DELETE FROM calendars WHERE principaluri='principals/".$username."';";
 	if (!mysqli_multi_query($link, $delete_user)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1387,7 +1389,7 @@ function set_admin_account($link, $postarray) {
 			);
 			return false;
 		}
-		$mystring = "UPDATE admin SET modified=now(), password='$password', username='$name' WHERE username='$name_now'";
+		$mystring = "UPDATE admin SET modified=now(), password='".$password."', username='".$name."' WHERE username='".$name_now."'";
 		if (!mysqli_query($link, $mystring)) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -1397,7 +1399,7 @@ function set_admin_account($link, $postarray) {
 		}
 	}
 	else {
-		$mystring = "UPDATE admin SET modified=now(), username='$name' WHERE username='$name_now'";
+		$mystring = "UPDATE admin SET modified=now(), username='".$name."' WHERE username='".$name_now."'";
 		if (!mysqli_query($link, $mystring)) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -1406,7 +1408,7 @@ function set_admin_account($link, $postarray) {
 			return false;
 		}
 	}
-	$mystring = "UPDATE domain_admins SET username='$name', domain='ALL' WHERE username='$name_now'";
+	$mystring = "UPDATE domain_admins SET username='".$name."', domain='ALL' WHERE username='".$name_now."'";
 	if (!mysqli_query($link, $mystring)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1439,7 +1441,7 @@ function set_time_limited_aliases($link, $postarray) {
 				return false;
 			}
 			$hours = $postarray["validity"];
-			$mystring = "INSERT INTO spamalias (address, goto, validity) VALUES (CONCAT(SUBSTRING(MD5(RAND()) FROM 1 FOR 12), '$domain'), '$logged_in_as', DATE_ADD(NOW(), INTERVAL $hours HOUR));";
+			$mystring = "INSERT INTO spamalias (address, goto, validity) VALUES (CONCAT(SUBSTRING(MD5(RAND()) FROM 1 FOR 12), '".$domain."'), '".$logged_in_as."', DATE_ADD(NOW(), INTERVAL ".$hours." HOUR));";
 			if (!mysqli_query($link, $mystring)) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -1453,7 +1455,7 @@ function set_time_limited_aliases($link, $postarray) {
 			);
 		break;
 		case "delete":
-			$mystring = "DELETE FROM spamalias WHERE goto='$logged_in_as'";
+			$mystring = "DELETE FROM spamalias WHERE goto='".$logged_in_as."'";
 			if (!mysqli_query($link, $mystring)) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -1467,7 +1469,7 @@ function set_time_limited_aliases($link, $postarray) {
 			);
 		break;
 		case "extend":
-			$mystring = "UPDATE spamalias SET validity=DATE_ADD(validity, INTERVAL 1 HOUR) WHERE goto='$logged_in_as' AND validity >= NOW()";
+			$mystring = "UPDATE spamalias SET validity=DATE_ADD(validity, INTERVAL 1 HOUR) WHERE goto='".$logged_in_as."' AND validity >= NOW()";
 			if (!mysqli_query($link, $mystring)) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -1533,8 +1535,8 @@ function set_user_account($link, $postarray) {
 			return false;
 		}
 		$password_sha512c = $hash[0];
-		$update_user = "UPDATE mailbox SET password='$password_sha512c' WHERE username='$name_now';";
-		$update_user .= "UPDATE users SET digesta1=MD5(CONCAT('$name_now', ':SabreDAV:', '$password_new')) WHERE username='$name_now';";
+		$update_user = "UPDATE mailbox SET password='".$password_sha512c."' WHERE username='".$name_now."';";
+		$update_user .= "UPDATE users SET digesta1=MD5(CONCAT('".$name_now."', ':SabreDAV:', '".$password_new."')) WHERE username='".$name_now."';";
 		if (!mysqli_multi_query($link, $update_user)) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -1687,7 +1689,7 @@ function add_domain_admin($link, $postarray) {
 	array_walk($postarray['domain'], function(&$string) use ($link) {
 		$string = mysqli_real_escape_string($link, $string);
 	});
-	$qstring = "SELECT mailbox.username, admin.username FROM admin, mailbox WHERE mailbox.username='$username' OR admin.username='$username'";
+	$qstring = "SELECT mailbox.username, admin.username FROM admin, mailbox WHERE mailbox.username='".$username."' OR admin.username='".$username."'";
 	$qresult = mysqli_query($link, $qstring);
 	$num_results = mysqli_num_rows($qresult);
 	if ($num_results != 0) {
@@ -1723,7 +1725,7 @@ function add_domain_admin($link, $postarray) {
 			return false;
 		}
 	isset($postarray['active']) ? $active = '1' : $active = '0';
-	$mystring = "DELETE FROM domain_admins WHERE username='$username'";
+	$mystring = "DELETE FROM domain_admins WHERE username='".$username."'";
 		if (!mysqli_query($link, $mystring)) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -1731,7 +1733,7 @@ function add_domain_admin($link, $postarray) {
 			);
 			return false;
 		}
-		$mystring = "DELETE FROM admin WHERE username='$username'";
+		$mystring = "DELETE FROM admin WHERE username='".$username."'";
 		if (!mysqli_query($link, $mystring)) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -1740,7 +1742,7 @@ function add_domain_admin($link, $postarray) {
 			return false;
 		}
 		foreach ($postarray['domain'] as $domain) {
-			$mystring = "INSERT INTO domain_admins (username, domain, created, active) VALUES ('$username', '$domain', now(), '$active')";
+			$mystring = "INSERT INTO domain_admins (username, domain, created, active) VALUES ('".$username."', '".$domain."', now(), '".$active."')";
 			if (!mysqli_query($link, $mystring)) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -1749,7 +1751,7 @@ function add_domain_admin($link, $postarray) {
 				return false;
 			}
 		}
-		$mystring = "INSERT INTO admin (username, password, superadmin, created, modified, active) VALUES ('$username', '$password', '0', now(), now(), '$active')";
+		$mystring = "INSERT INTO admin (username, password, superadmin, created, modified, active) VALUES ('".$username."', '".$password."', '0', now(), now(), '".$active."')";
 		if (!mysqli_query($link, $mystring)) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -1786,8 +1788,8 @@ function delete_domain_admin($link, $postarray) {
 		);
 		return false;
 	}
-	$delete_domain = "DELETE FROM domain_admins WHERE username='$username';";
-	$delete_domain .= "DELETE FROM admin WHERE username='$username';";
+	$delete_domain = "DELETE FROM domain_admins WHERE username='".$username."';";
+	$delete_domain .= "DELETE FROM admin WHERE username='".$username."';";
 	if (!mysqli_multi_query($link, $delete_domain)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',

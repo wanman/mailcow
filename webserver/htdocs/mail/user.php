@@ -9,7 +9,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 <div class="panel-heading">Change password</div>
 <div class="panel-body">
 <form class="form-horizontal" role="form" method="post">
-	<input type="hidden" name="user_now" value="<?php echo $logged_in_as; ?>">
+	<input type="hidden" name="user_now" value="<?=$logged_in_as;?>">
 	<div class="form-group">
 		<label class="control-label col-sm-3" for="user_old_pass">Current password:</label>
 		<div class="col-sm-5">
@@ -37,7 +37,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 </div>
 </div>
 
-<ul><b>Did you know?</b> You can tag your mail address like "<?php echo explode('@', $logged_in_as)[0]; ?><b>+Private</b>@<?php echo explode('@', $logged_in_as)[1]; ?>" to automatically create a subfolder named "Private" in your inbox.</ul>
+<ul><b>Did you know?</b> You can tag your mail address like "<?=explode('@', $logged_in_as)[0];?><b>+Private</b>@<?=explode('@', $logged_in_as)[1];?>" to automatically create a subfolder named "Private" in your inbox.</ul>
 <br />
 
 <div class="panel panel-default">
@@ -55,7 +55,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 	</thead>
 	<tbody>
 <?php
-$result = mysqli_query($link, "SELECT address, goto, TIMEDIFF(validity, NOW()) as timeleft, validity FROM spamalias WHERE goto='$logged_in_as' AND validity >= NOW() ORDER BY timeleft ASC");
+$result = mysqli_query($link, "SELECT address, goto, TIMEDIFF(validity, NOW()) as timeleft, validity FROM spamalias WHERE goto='".$logged_in_as."' AND validity >= NOW() ORDER BY timeleft ASC");
 while ($row = mysqli_fetch_array($result)):
 ?>
 		<tr>
@@ -109,7 +109,7 @@ endwhile;
 	</thead>
 	<tbody>
 <?php
-$result = mysqli_query($link, "SELECT substring_index(principaluri,'/',-1) AS owner, components, uri, displayname FROM calendars WHERE principaluri='principals/$logged_in_as'");
+$result = mysqli_query($link, "SELECT substring_index(principaluri,'/',-1) AS owner, components, uri, displayname FROM calendars WHERE principaluri='principals/".$logged_in_as."'");
 while ($row = mysqli_fetch_array($result)):
 ?>
 		<tr>
@@ -122,7 +122,7 @@ while ($row = mysqli_fetch_array($result)):
 		</tr>
 <?php
 endwhile;
-$result = mysqli_query($link, "SELECT substring_index(principaluri,'/',-1) AS owner, uri, displayname FROM addressbooks WHERE principaluri='principals/$logged_in_as'");
+$result = mysqli_query($link, "SELECT substring_index(principaluri,'/',-1) AS owner, uri, displayname FROM addressbooks WHERE principaluri='principals/".$logged_in_as."'");
 while ($row = mysqli_fetch_array($result)):
 ?>
 		<tr>
@@ -164,7 +164,7 @@ $result = mysqli_query($link, "SELECT components, substring_index(principaluri,'
 	WHERE CONCAT(principaluri, '/calendar-proxy-read') IN (
 		SELECT uri FROM principals WHERE id IN (
 			SELECT principal_id FROM groupmembers WHERE member_id=(
-				SELECT id FROM principals WHERE email='$logged_in_as')));");
+				SELECT id FROM principals WHERE email='".$logged_in_as."')));");
 while ($row = mysqli_fetch_array($result)):
 ?>
 		<tr class="warning">
@@ -182,7 +182,7 @@ $result = mysqli_query($link, "SELECT components, substring_index(principaluri,'
 	WHERE CONCAT(principaluri, '/calendar-proxy-write') IN (
 		SELECT uri FROM principals WHERE id IN (
 			SELECT principal_id FROM groupmembers WHERE member_id=(
-				SELECT id FROM principals WHERE email='$logged_in_as')));");
+				SELECT id FROM principals WHERE email='".$logged_in_as."')));");
 while ($row = mysqli_fetch_array($result)):
 ?>
 		<tr class="success">
