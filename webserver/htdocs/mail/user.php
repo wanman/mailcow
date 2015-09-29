@@ -2,14 +2,23 @@
 require_once("inc/header.inc.php");
 if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "user") {
 $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
+$user_details = mysqli_query($link, "SELECT name, username FROM mailbox WHERE username='".$logged_in_as."'");
 ?>
-<div class="container">
 
+
+<div class="container">
 <div class="panel panel-default">
-<div class="panel-heading">Change password</div>
+<div class="panel-heading">Change user details</div>
 <div class="panel-body">
 <form class="form-horizontal" role="form" method="post">
 	<input type="hidden" name="user_now" value="<?=$logged_in_as;?>">
+	<div class="form-group">
+		<label class="control-label col-sm-3" for="user_old_pass">Display name:</label>
+		<div class="col-sm-5">
+		<input type="text" class="form-control" name="user_real_name" id="user_real_name" value="<?=htmlspecialchars(mysqli_fetch_assoc($user_details)['name']);?>" required>
+		</div>
+	</div>
+	<hr>
 	<div class="form-group">
 		<label class="control-label col-sm-3" for="user_old_pass">Current password:</label>
 		<div class="col-sm-5">
@@ -19,18 +28,18 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 	<div class="form-group">
 		<label class="control-label col-sm-3" for="user_new_pass"><small>New password:</small></label>
 		<div class="col-sm-5">
-		<input type="password" class="form-control" name="user_new_pass" id="user_new_pass" required>
+		<input type="password" class="form-control" name="user_new_pass" id="user_new_pass" placeholder="Unchanged if empty">
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="control-label col-sm-3" for="user_new_pass2"><small>New password (repeat):</small></label>
+		<label class="control-label col-sm-3" for="user_new_pass2"><small>Repeat new password:</small></label>
 		<div class="col-sm-5">
-		<input type="password" class="form-control" name="user_new_pass2" id="user_new_pass2" required>
+		<input type="password" class="form-control" name="user_new_pass2" id="user_new_pass2" placeholder="Unchanged if empty">
 		</div>
 	</div>
 	<div class="form-group">
 		<div class="col-sm-offset-3 col-sm-9">
-			<button type="submit" name="trigger_set_user_account" class="btn btn-default btn-raised btn-sm">Change password</button>
+			<button type="submit" name="trigger_set_user_account" class="btn btn-default btn-raised btn-sm">Change user details</button>
 		</div>
 	</div>
 </form>

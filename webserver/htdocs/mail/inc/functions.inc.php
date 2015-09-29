@@ -1492,21 +1492,21 @@ function set_time_limited_aliases($link, $postarray) {
 }
 function set_user_account($link, $postarray) {
 	$name_now = mysqli_real_escape_string($link, $postarray['user_now']);
+	$user_real_name = mysqli_real_escape_string($link, $postarray['user_real_name']);
 	$password_old = mysqli_real_escape_string($link, $postarray['user_old_pass']);
 	$password_new = mysqli_real_escape_string($link, $postarray['user_new_pass']);
 	$password_new2 = mysqli_real_escape_string($link, $postarray['user_new_pass2']);
-
-	if ($_SESSION['mailcow_cc_role'] != "user") {
+	if (!check_login($link, $name_now, $password_old) == "user") {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Permission denied'
 		);
 		return false;
 	}
-	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $name_now)) || empty ($name_now)) {
+	if ($_SESSION['mailcow_cc_role'] != "user") {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'Invalid username'
+			'msg' => 'Permission denied'
 		);
 		return false;
 	}
@@ -1515,13 +1515,6 @@ function set_user_account($link, $postarray) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
 				'msg' => 'Password mismatch'
-			);
-			return false;
-		}
-		if (!check_login($link, $name_now, $password_old) == "user") {
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'Permission denied'
 			);
 			return false;
 		}
@@ -1535,7 +1528,7 @@ function set_user_account($link, $postarray) {
 			return false;
 		}
 		$password_sha512c = $hash[0];
-		$update_user = "UPDATE mailbox SET password='".$password_sha512c."' WHERE username='".$name_now."';";
+		$update_user = "UPDATE mailbox SET modified=NOW(), password='".$password_sha512c."' WHERE username='".$name_now."';";
 		$update_user .= "UPDATE users SET digesta1=MD5(CONCAT('".$name_now."', ':SabreDAV:', '".$password_new."')) WHERE username='".$name_now."';";
 		if (!mysqli_multi_query($link, $update_user)) {
 			$_SESSION['return'] = array(
@@ -1548,12 +1541,15 @@ function set_user_account($link, $postarray) {
 			if (!$link->more_results()) break;
 		}
 	}
-	else {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => 'Password cannot be empty'
-		);
-		return false;
+	if (!empty($user_real_name)) {
+		$mystring = "UPDATE mailbox SET modified=NOW(), name='".$user_real_name."'";
+		if (!mysqli_query($link, $mystring)) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'MySQL Error: '.mysqli_error($link)
+			);
+			return false;
+		}
 	}
 	$_SESSION['return'] = array(
 		'type' => 'success',
@@ -1811,4 +1807,3 @@ function is_valid_domain_name($domain_name) {
 		   && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $domain_name));
 }
 ?>
-
