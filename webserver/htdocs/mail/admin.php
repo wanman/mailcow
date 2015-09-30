@@ -28,7 +28,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="admin_pass">Password:</label>
 						<div class="col-sm-10">
-						<input type="password" class="form-control" name="admin_pass" id="admin_pass" placeholder="Leave blank for no change">
+						<input type="password" class="form-control" name="admin_pass" id="admin_pass" placeholder="Unchanged if empty">
 						</div>
 					</div>
 					<div class="form-group">
