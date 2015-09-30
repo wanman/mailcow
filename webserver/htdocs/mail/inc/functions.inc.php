@@ -3,29 +3,45 @@ function check_login($link, $user, $pass) {
 	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $user))) {
 		return false;
 	}
+	if (!strpos(shell_exec("file --mime-encoding /usr/bin/doveadm"), "binary")) {
+		return false;
+	}
 	$user = strtolower(trim($user));
 	$pass = escapeshellcmd($pass);
 	$result = mysqli_query($link, "SELECT password FROM admin WHERE superadmin='1' AND username='$user'");
 	while ($row = mysqli_fetch_array($result, MYSQL_NUM)) {
 		$row = "'".$row[0]."'";
-		if (strpos(shell_exec("echo $pass | doveadm pw -s SHA512-CRYPT -t $row"), "verified") !== false) {
+		exec("echo ".$pass." | doveadm pw -s SHA512-CRYPT -t ".$row, $out, $return);
+		if (strpos($out[0], "verified") !== false && $return == "0") {
+			unset($_SESSION['ldelay']);
 			return "admin";
 		}
 	}
 	$result = mysqli_query($link, "SELECT password FROM admin WHERE superadmin='0' AND active='1' AND username='$user'");
 	while ($row = mysqli_fetch_array($result, MYSQL_NUM)) {
 		$row = "'".$row[0]."'";
-		if (strpos(shell_exec("echo $pass | doveadm pw -s SHA512-CRYPT -t $row"), "verified") !== false) {
+		exec("echo ".$pass." | doveadm pw -s SHA512-CRYPT -t ".$row, $out, $return);
+		if (strpos($out[0], "verified") !== false && $return == "0") {
+			unset($_SESSION['ldelay']);
 			return "domainadmin";
 		}
 	}
 	$result = mysqli_query($link, "SELECT password FROM mailbox WHERE active='1' AND username='$user'");
 	while ($row = mysqli_fetch_array($result, MYSQL_NUM)) {
 		$row = "'".$row[0]."'";
-		if (strpos(shell_exec("echo $pass | doveadm pw -s SHA512-CRYPT -t $row"), "verified") !== false) {
+		exec("echo ".$pass." | doveadm pw -s SHA512-CRYPT -t ".$row, $out, $return);
+		if (strpos($out[0], "verified") !== false && $return == "0") {
+			unset($_SESSION['ldelay']);
 			return "user";
 		}
 	}
+	if (!isset($_SESSION['ldelay'])) {
+		$_SESSION['ldelay'] = "0.1";
+	}
+	else {
+		$_SESSION['ldelay'] = $_SESSION['ldelay']+0.08;
+	}
+	sleep($_SESSION['ldelay']);
 }
 function formatBytes($size, $precision = 2) {
 	$base = log($size, 1024);
