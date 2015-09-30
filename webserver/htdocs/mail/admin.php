@@ -323,7 +323,7 @@ $srr_values = return_mailcow_config("srr");
 </div>
 
 <div class="panel panel-default">
-<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseDKIM"><a style="cursor:pointer;" class="accordion-toggle">DKIM Signing</a></div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseDKIM"><a style="cursor:pointer;" class="accordion-toggle">DKIM signing</a></div>
 <div id="collapseDKIM" class="panel-collapse collapse">
 <div class="panel-body">
 <p>Default behaviour is to sign with relaxed header and body canonicalization algorithm.</p>
@@ -354,7 +354,7 @@ opendkim_table();
 </div>
 
 <div class="panel panel-default">
-<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseMsgSize"><a style="cursor:pointer;" class="accordion-toggle">Message Size</a></div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseMsgSize"><a style="cursor:pointer;" class="accordion-toggle">Message size</a></div>
 <div id="collapseMsgSize" class="panel-collapse collapse">
 <div class="panel-body">
 	<form class="form-inline" method="post">
