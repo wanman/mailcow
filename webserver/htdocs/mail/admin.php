@@ -14,13 +14,13 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 		</div>
 		<div id="collapseAdmin" class="panel-collapse collapse in">
 			<div class="panel-body">
-				<form method="post">
+				<form class="form-horizontal" role="form" method="post">
 				<?php
 				$result = mysqli_fetch_assoc(mysqli_query($link, "SELECT username from admin where superadmin='1' and active='1'"));
 				?>
 					<input type="hidden" name="admin_user_now" value="<?=$result['username'];?>">
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="quota">Administrator:</label>
+						<label class="control-label col-sm-2" for="admin_user">Administrator:</label>
 						<div class="col-sm-10">
 						<input type="text" class="form-control" name="admin_user" id="admin_user" value="<?=$result['username'];?>" required>
 						</div>
@@ -142,15 +142,13 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 <div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseBackup"><a style="cursor:pointer;" class="accordion-toggle">Backup mail</a></div>
 <div id="collapseBackup" class="panel-collapse collapse in">
 <div class="panel-body">
-<form method="post">
+<form class="form-horizontal" role="form" method="post">
 	<div class="form-group">
 		<label class="control-label col-sm-4" for="location">Location <small>(will be created if missing)</small>:</label>
 		<div class="col-sm-8">
-		<input type="text" class="form-control" name="location" id="location" value="<?=return_mailcow_config("backup_location");?>">
+			<input type="text" class="form-control" name="location" id="location" value="<?=return_mailcow_config("backup_location");?>">
 		</div>
 	</div>
-	<br /><br />
-	<div class="clearfix"></div>
 	<div class="form-group">
 		<label class="control-label col-sm-4" for="runtime">Runtime:</label>
 		<div class="col-sm-8">
@@ -161,8 +159,6 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 			</select>
 		</div>
 	</div>
-	<br />
-	<div class="clearfix"></div>
 	<div class="form-group">
 		<label class="control-label col-sm-4" for="mailboxes[]">Select mailbox(es):</label>
 		<div class="col-sm-8">
@@ -208,7 +204,7 @@ while ($row = mysqli_fetch_array($resultselect)) {
 <?php
 $srr_values = return_mailcow_config("srr");
 ?>
-<form method="post">
+<form class="form-horizontal" role="form" method="post">
 	<div class="form-group">
 		<label class="control-label col-sm-4" for="location">Recipient restrictions</label>
 		<div class="col-sm-8">
@@ -268,7 +264,7 @@ $srr_values = return_mailcow_config("srr");
 <div id="collapsePubFolders" class="panel-collapse collapse">
 <div class="panel-body">
 <p>A namespace "Public" is created. Belows public folder name indicates the name of the first auto-created mailbox within this namespace.</p>
-<form method="post">
+<form class="form-horizontal" role="form" method="post">
 	<div class="form-group">
 		<label class="control-label col-sm-4" for="location">Folder name <small>(alphanumeric)</small>:</label>
 		<div class="col-sm-8">
@@ -306,17 +302,20 @@ $srr_values = return_mailcow_config("srr");
 <div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapsePrivacy"><a style="cursor:pointer;" class="accordion-toggle">Privacy</a></div>
 <div id="collapsePrivacy" class="panel-collapse collapse">
 <div class="panel-body">
-<form method="post">
-<div class="form-group">
-	<p>This option enables a PCRE table to remove "User-Agent", "X-Enigmail", "X-Mailer", "X-Originating-IP" and replaces "Received: from" headers with localhost/127.0.0.1.</p>
-	<div class="checkbox">
-	<label>
-	<input name="anonymize" type="checkbox" <?=return_mailcow_config("anonymize");?>>
-		Anonymize outgoing mail
-	</label>
+<p>This option enables a PCRE table to remove "User-Agent", "X-Enigmail", "X-Mailer", "X-Originating-IP" and replaces "Received: from" headers with localhost/127.0.0.1.</p>
+<form class="form-horizontal" role="form" method="post">
+	<div class="form-group">
+		<div class="col-sm-8">
+			<div class="checkbox">
+				<label><input name="anonymize" type="checkbox" <?=return_mailcow_config("anonymize");?>> Anonymize outgoing mail</label>
+			</div>
+		</div>
 	</div>
-	<button type="submit" name="trigger_anonymize" class="btn btn-default btn-raised btn-sm">Apply</button>
-</div>
+	<div class="form-group">
+		<div class="col-sm-8">
+			<button type="submit" name="trigger_anonymize" class="btn btn-default btn-raised btn-sm">Apply</button>
+		</div>
+	</div>
 </form>
 </div>
 </div>
@@ -327,12 +326,12 @@ $srr_values = return_mailcow_config("srr");
 <div id="collapseDKIM" class="panel-collapse collapse">
 <div class="panel-body">
 <p>Default behaviour is to sign with relaxed header and body canonicalization algorithm.</p>
-<form method="post">
 <h4>Active keys</h4>
 <?php
 opendkim_table();
 ?>
 <h4>Add new key</h4>
+<form class="form-inline" role="form" method="post">
 <div class="form-group">
 	<div class="row">
 		<div class="col-md-4">
@@ -344,7 +343,7 @@ opendkim_table();
 			<input class="form-control" id="dkim_selector" name="dkim_selector" placeholder="default">
 		</div>
 		<div class="col-md-4">
-			<br /><button type="submit" class="btn btn-default btn-raised btn-sm"><span class="glyphicon glyphicon-plus"></span> Add</button>
+			<button type="submit" class="btn btn-default btn-raised btn-sm"><span class="glyphicon glyphicon-plus"></span> Add</button>
 		</div>
 	</div>
 </div>
@@ -407,10 +406,10 @@ opendkim_table();
 <?php echo_sys_info("pflog");?>
 </textarea>
 <form method="post">
-<div class="form-group">
-<input type="hidden" name="pflog_renew" value="1">
-<button type="submit" class="btn btn-success btn-sm">Renew Pflogsumm</button>
-</div>
+	<div class="form-group">
+		<input type="hidden" name="pflog_renew" value="1">
+		<button type="submit" class="btn btn-success btn-sm">Renew Pflogsumm</button>
+	</div>
 </form>
 </div>
 </div>
