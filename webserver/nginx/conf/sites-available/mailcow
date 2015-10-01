@@ -7,6 +7,12 @@ server {
 	return 301 https://$host$request_uri;
 }
 server {
+	listen 80;
+	server_name autodiscover.*;
+	root /var/www/mail;
+	return 301 https://$host$request_uri;
+}
+server {
         listen 443;
         ssl on;
         ssl_certificate         /etc/ssl/mail/mail.crt;
@@ -18,7 +24,7 @@ server {
         add_header Strict-Transport-Security max-age=15768000;
         ssl_session_cache shared:SSL:5m;
         ssl_session_timeout 30m;
-        server_name autodiscover.MAILCOW_DOMAIN;
+        server_name autodiscover.*;
         root /var/www/zpush;
         index index.php;
         charset utf-8;
