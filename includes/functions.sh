@@ -339,8 +339,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			rm /tmp/fuglu_control.sock 2> /dev/null
 			mkdir /var/log/fuglu 2> /dev/null
 			chown fuglu:fuglu /var/log/fuglu
-			chown fuglu:www-data /etc/fuglu/fuglu.conf
-			chmod g+rw /etc/fuglu/fuglu.conf
 			tar xf fuglu/inst/$fuglu_version.tar -C fuglu/inst/ 2> /dev/null
 			(cd fuglu/inst/$fuglu_version ; python setup.py -q install)
 			cp -R fuglu/conf/* /etc/fuglu/
