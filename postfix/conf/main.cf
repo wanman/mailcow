@@ -80,6 +80,9 @@ smtpd_sender_login_maps = proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_maps.
 smtp_tls_cert_file = /etc/ssl/mail/mail.crt
 smtp_tls_key_file = /etc/ssl/mail/mail.key
 
+# Set a higher timeout for connecting, sending and receiving information from/to a proxy (FuGlu)
+smtpd_proxy_timeout = 600s
+
 # Opportunistic TLS. Use TLS if this is supported by the remote SMTP server, otherwise use plaintext.
 smtp_tls_security_level=may
 
