@@ -73,7 +73,7 @@ function return_mailcow_config($s) {
 			if (!empty($result[1])) { return $result[1]; } else { return false; }
 			break;
 		case "backup_active":
-			preg_match("/BACKUP=(.*)/", file_get_contents("/var/www/MAILBOX_BACKUP") , $result);
+			preg_match("/BACKUP=(.*)/", file_get_contents($GLOBALS['MC_MBOX_BACKUP']) , $result);
 			if (!empty($result[1])) { return $result[1]; } else { return false; }
 			break;
 		case "anonymize":
