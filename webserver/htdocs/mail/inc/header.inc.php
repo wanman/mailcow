@@ -28,12 +28,9 @@ require_once "inc/triggers.inc.php";
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css">
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.3.0/css/material.min.css">
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.3.0/css/ripples.min.css">
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.3.0/css/material.min.css.map">
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.3.0/css/ripples.min.css.map">
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.min.css" rel="stylesheet" />
-
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.5/lumen/bootstrap.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.7.4/css/bootstrap-select.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.7.4/css/bootstrap-select.css.map" rel="stylesheet" />
 <?php
 if (basename($_SERVER['PHP_SELF']) == "mailbox.php"):
 ?>
@@ -56,34 +53,9 @@ if (basename($_SERVER['PHP_SELF']) == "mailbox.php"):
 <?php
 endif;
 ?>
-<style>
-html {
-	overflow-y:scroll;
-}
-.navbar.navbar, .navbar-default.navbar {
-  background-color: #463168;
-}
-a, a:hover {
-	color: #333;
-}
-.dropdown-menu>li>a:focus {
-	color: #777 !important;
-}
-.dropdown-menu>li>a:hover {
-	color: #777 !important;
-}
-@media(max-width:767px)  {
-	.dropdown-menu>li>a:hover {
-		color: #f5f5f5 !important;
-	}
-}
-.collapsing {
-	transition: height 0.01s;
-}
-</style>
 </head>
-<body>
-<nav class="navbar navbar-default">
+<body style="padding-top:70px">
+<nav class="navbar navbar-default navbar-fixed-top"  role="navigation">
 	<div class="container-fluid">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -92,7 +64,7 @@ a, a:hover {
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="/"><img src="inc/xs_mailcow.png" /></a>
+			<a class="navbar-brand" href="/"><img style="margin-top:-5px;"src="inc/xs_mailcow.png" /></a>
 		</div>
 		<div id="navbar" class="navbar-collapse collapse">
 			<ul class="nav navbar-nav navbar-right">

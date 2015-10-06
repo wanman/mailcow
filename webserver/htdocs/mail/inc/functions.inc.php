@@ -162,7 +162,7 @@ function set_mailcow_config($s, $v = "", $vext = "") {
 			if ($return != "0") {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
-					'msg' => 'Cannot set max. message size'
+					'msg' => 'Cannot locate mailcow site configuration'
 				);
 				break;
 			}

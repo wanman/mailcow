@@ -249,7 +249,7 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 				<div class="row">
 					<div class="col-sm-6">
 						<p><b>Read-only</b></p>
-						<select data-placeholder="Search users..." style="width:100%" name="cal_ro_share[]" size="5" multiple>
+						<select title="Search users..." style="width:100%" name="cal_ro_share[]" size="5" multiple>
 						<?php
 						$result_rcrs = mysqli_query($link, "SELECT email FROM principals
 							WHERE id IN (SELECT member_id FROM groupmembers
@@ -277,7 +277,7 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 					</div>
 					<div class="col-sm-6">
 						<p><b>Read-write</b></p>
-						<select data-placeholder="Search users..." style="width:100%" name="cal_rw_share[]" size="5" multiple>
+						<select title="Search users..." style="width:100%" name="cal_rw_share[]" size="5" multiple>
 						<?php
 						$result_rcrws = mysqli_query($link, "SELECT email FROM principals
 							WHERE id IN (SELECT member_id FROM groupmembers

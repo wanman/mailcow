@@ -34,12 +34,12 @@ $user_details = mysqli_query($link, "SELECT name, username FROM mailbox WHERE us
 	<div class="form-group">
 		<label class="control-label col-sm-3" for="user_new_pass2"><small>Repeat new password:</small></label>
 		<div class="col-sm-5">
-		<input type="password" class="form-control" name="user_new_pass2" id="user_new_pass2" placeholder="Unchanged if empty">
+		<input type="password" class="form-control" name="user_new_pass2" id="user_new_pass2">
 		</div>
 	</div>
 	<div class="form-group">
 		<div class="col-sm-offset-3 col-sm-9">
-			<button type="submit" name="trigger_set_user_account" class="btn btn-default btn-raised btn-sm">Change user details</button>
+			<button type="submit" name="trigger_set_user_account" class="btn btn-default">Change user details</button>
 		</div>
 	</div>
 </form>
@@ -92,9 +92,9 @@ endwhile;
 </div>
 <div class="form-group">
 	<div class="col-sm-12">
-		<button type="submit" name="trigger_set_time_limited_aliases" value="generate" class="btn btn-success btn-sm">Generate random alias</button>
-		<button type="submit" name="trigger_set_time_limited_aliases" value="delete" class="btn btn-danger btn-sm">Delete all aliases</button>
-		<button type="submit" name="trigger_set_time_limited_aliases" value="extend" class="btn btn-default btn-sm">Add 1 hour to all aliases</button>
+		<button type="submit" name="trigger_set_time_limited_aliases" value="generate" class="btn btn-success">Generate random alias</button>
+		<button type="submit" name="trigger_set_time_limited_aliases" value="delete" class="btn btn-danger">Delete all aliases</button>
+		<button type="submit" name="trigger_set_time_limited_aliases" value="extend" class="btn btn-default">Add 1 hour to all aliases</button>
 	</div>
 </div>
 </form>
@@ -149,10 +149,8 @@ endwhile;
 </table>
 </div>
 <div class="col-sm-12">
-	<p><a href="add.php?dav" class="btn btn-success btn-sm">Add item</a>
-	<a href="edit.php?dav=<?=$logged_in_as?>" class="btn btn-default btn-sm">Edit details and permissions</a></p>
-</div>
-<div class="col-sm-12">
+	<p><a href="add.php?dav" class="btn btn-success btn-default">Add item</a>
+	<a href="edit.php?dav=<?=$logged_in_as?>" class="btn btn-default">Edit details and permissions</a></p>
 </div>
 <h4>Shared with me</h4>
 <div class="table-responsive">
@@ -217,7 +215,6 @@ endwhile;
 <div class="panel-body">
 <p>This is <b>not a recurring task</b>. This feature will perform a one-way synchronisation and leave the remote server as it is, no mails will be deleted on either sides.</p>
 <p>The first synchronisation may take a while.</p>
-<small>
 <form class="form-horizontal" role="form" method="post">
 	<div class="form-group">
 		<label class="control-label col-sm-2" for="imap_host">IMAP host with port:</label>
@@ -258,11 +255,10 @@ endwhile;
 	</div>
 	<div class="form-group">
 		<div class="col-sm-offset-2 col-sm-10">
-			<button type="submit" id="trigger_set_fetch_mail" name="trigger_set_fetch_mail" class="btn btn-success btn-sm" disabled>Sync now</button>
+			<button type="submit" id="trigger_set_fetch_mail" name="trigger_set_fetch_mail" class="btn btn-success" disabled>Sync now</button>
 		</div>
 	</div>
 </form>
-</small>
 </div>
 </div>
 

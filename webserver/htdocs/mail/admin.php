@@ -39,7 +39,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" name="trigger_set_admin" class="btn btn-default btn-raised btn-sm">Save changes</button>
+							<button type="submit" name="trigger_set_admin" class="btn btn-default">Save changes</button>
 						</div>
 					</div>
 				</form>
@@ -87,7 +87,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 				<h4>Add domain administrator</h4>
 				<form class="form-horizontal" role="form" method="post">
 					<div class="form-group">
-						<label class="control-label col-sm-4" for="username">Username (<code>A-Z</code>, <code>@</code>, <code>-</code>, <code>.</code>).</label>
+						<label class="control-label col-sm-4" for="username">Username (<kbd>aA-zZ, @,.-</kbd>):</label>
 						<div class="col-sm-8">
 							<input type="text" class="form-control" name="username" id="username" required>
 						</div>
@@ -95,7 +95,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 					<div class="form-group">
 						<label class="control-label col-sm-4" for="name">Assign domains:</label>
 						<div class="col-sm-8">
-							<select data-placeholder="Search domains..." style="width:100%" name="domain[]" size="5" multiple>
+							<select title="Search domains..." style="width:100%" name="domain[]" size="5" multiple>
 				<?php
 				$resultselect = mysqli_query($link, "SELECT domain FROM domain");
 				while ($row = mysqli_fetch_array($resultselect)) {
@@ -126,7 +126,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-0 col-sm-8">
-							<button type="submit" name="trigger_add_domain_admin" class="btn btn-default btn-raised btn-sm">Add domain admin</button>
+							<button type="submit" name="trigger_add_domain_admin" class="btn btn-default">Add domain admin</button>
 						</div>
 					</div>
 				</form>
@@ -152,7 +152,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 	<div class="form-group">
 		<label class="control-label col-sm-4" for="runtime">Runtime:</label>
 		<div class="col-sm-8">
-			<select data-placeholder="Select a runtime..." style="width:50%" name="runtime">
+			<select title="Select a runtime..." style="width:50%" name="runtime">
 				<option <?php if (return_mailcow_config("backup_runtime") == "hourly") { echo "selected"; } ?>>hourly</option>
 				<option <?php if (return_mailcow_config("backup_runtime") == "daily") { echo "selected"; } ?>>daily</option>
 				<option <?php if (return_mailcow_config("backup_runtime") == "monthly") { echo "selected"; } ?>>monthly</option>
@@ -189,7 +189,7 @@ while ($row = mysqli_fetch_array($resultselect)) {
 	<div class="form-group">
 	<input type="hidden" name="trigger_backup">
 		<div class="col-sm-8">
-			<button type="submit" class="btn btn-default btn-raised btn-sm">Save changes</button>
+			<button type="submit" class="btn btn-default">Save changes</button>
 		</div>
 	</div>
 </form>
@@ -250,7 +250,7 @@ $srr_values = return_mailcow_config("srr");
 	</div>
 	<div class="form-group">
 		<div class="col-sm-8">
-			<button type="submit" name="srr" class="btn btn-default btn-raised btn-sm">Save changes</button>
+			<button type="submit" name="srr" class="btn btn-default">Save changes</button>
 		</div>
 	</div>
 </form>
@@ -290,7 +290,7 @@ $srr_values = return_mailcow_config("srr");
 	<div class="form-group">
 	<input type="hidden" name="trigger_public_folder">
 		<div class="col-sm-8">
-			<button type="submit" class="btn btn-default btn-raised btn-sm">Save changes</button>
+			<button type="submit" class="btn btn-default">Save changes</button>
 		</div>
 	</div>
 </form>
@@ -313,7 +313,7 @@ $srr_values = return_mailcow_config("srr");
 	</div>
 	<div class="form-group">
 		<div class="col-sm-8">
-			<button type="submit" name="trigger_anonymize" class="btn btn-default btn-raised btn-sm">Apply</button>
+			<button type="submit" name="trigger_anonymize" class="btn btn-default">Apply</button>
 		</div>
 	</div>
 </form>
@@ -332,21 +332,15 @@ opendkim_table();
 ?>
 <h4>Add new key</h4>
 <form class="form-inline" role="form" method="post">
-<div class="form-group">
-	<div class="row">
-		<div class="col-md-4">
-			<strong>Domain</strong>
-			<input class="form-control" id="dkim_domain" name="dkim_domain" placeholder="example.org">
-		</div>
-		<div class="col-md-4">
-			<strong>Selector</strong>
-			<input class="form-control" id="dkim_selector" name="dkim_selector" placeholder="default">
-		</div>
-		<div class="col-md-4">
-			<button type="submit" class="btn btn-default btn-raised btn-sm"><span class="glyphicon glyphicon-plus"></span> Add</button>
-		</div>
+	<div class="form-group">
+		<label for="dkim_domain">Domain</label>
+		<input class="form-control" id="dkim_domain" name="dkim_domain" placeholder="example.org">
 	</div>
-</div>
+	<div class="form-group">
+		<label for="dkim_selector">Selector</label>
+		<input class="form-control" id="dkim_selector" name="dkim_selector" placeholder="default">
+	</div>
+	<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Add</button>
 </form>
 </div>
 </div>
@@ -356,15 +350,14 @@ opendkim_table();
 <div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseMsgSize"><a style="cursor:pointer;" class="accordion-toggle">Message size</a></div>
 <div id="collapseMsgSize" class="panel-collapse collapse">
 <div class="panel-body">
-	<form class="form-inline" method="post">
+<form class="form-inline" method="post">
 	<p>Current message size limitation: <strong><?=return_mailcow_config("maxmsgsize");?>MB</strong></p>
-	<p>This changes values in PHP, Nginx and Postfix. Services will be reloaded.</p>
+	<p>This changes your webservers and Postfix configuration. Services will be reloaded.</p>
 	<div class="form-group">
 		<input type="number" class="form-control" id="maxmsgsize" name="maxmsgsize" placeholder="in MB" min="1" max="250">
 	</div>
-	<button type="submit" class="btn btn-default btn-raised btn-sm">Set</button>
-	</form>
-
+	<button type="submit" class="btn btn-default">Set</button>
+</form>
 </div>
 </div>
 </div>
@@ -372,7 +365,6 @@ opendkim_table();
 </div>
 
 <h4><span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> Maintenance</h4>
-
 <div class="panel-group" id="accordion_maint">
 <div class="panel panel-default">
 <div class="panel-heading" data-toggle="collapse" data-parent="#accordion_maint" data-target="#collapseSysinfo"><a style="cursor:pointer;" class="accordion-toggle">System Information</a></div>
@@ -383,7 +375,7 @@ opendkim_table();
 	<div class="col-md-6">
 		<h4>Disk usage (/var/vmail) - <?php echo_sys_info("maildisk");?>%</h4>
 		<div class="progress">
-		  <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?php echo_sys_info("maildisk");?>"
+		  <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="<?php echo_sys_info("maildisk");?>"
 		  aria-valuemin="0" aria-valuemax="100" style="width:<?php echo_sys_info("maildisk");?>%">
 		  </div>
 		</div>
@@ -391,7 +383,7 @@ opendkim_table();
 	<div class="col-md-6">
 		<h4>RAM usage - <?php echo_sys_info("ram");?>%</h4>
 		<div class="progress">
-		  <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?php echo_sys_info("ram");?>"
+		  <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="<?php echo_sys_info("ram");?>"
 		  aria-valuemin="0" aria-valuemax="100" style="width:<?php echo_sys_info("ram");?>%">
 		  </div>
 		</div>
@@ -408,7 +400,7 @@ opendkim_table();
 <form method="post">
 	<div class="form-group">
 		<input type="hidden" name="pflog_renew" value="1">
-		<button type="submit" class="btn btn-success btn-sm">Renew Pflogsumm</button>
+		<button type="submit" class="btn btn-default">Renew Pflogsumm</button>
 	</div>
 </form>
 </div>
@@ -426,14 +418,22 @@ header('Location: user.php');
 die("Permission denied");
 } else {
 ?>
+
 <div class="panel panel-default">
 <div class="panel-heading">Login</div>
 <div class="panel-body">
-<form class="form-signin" method="post">
-	<input name="login_user" type="name" id="login_user" class="form-control" placeholder="Username" required autofocus>
-	<input name="pass_user" type="password" id="pass_user" class="form-control" placeholder="Password" required>
-	<input type="submit" class="btn btn-sm btn-success" value="Login">
-	<p><small><strong>Hint:</strong> Run "mc_resetadmin" from a shell to reset the password.</small></p>
+<form method="post">
+	<div class="form-group">
+		<label for="login_user">Username / Email address:</label>
+		<input name="login_user" type="name" id="login_user" class="form-control" required autofocus>
+	</div>
+	<div class="form-group">
+		<label for="login_user">Password:</label>
+		<input name="pass_user" type="password" id="pass_user" class="form-control" required>
+	</div>
+	<button type="submit" class="btn btn-sm btn-success" value="Login">Login</button>
+	<hr>
+	<p><strong>Hint:</strong> Run "mc_resetadmin" from a shell to reset the password.</p>
 </form>
 </div>
 </div>

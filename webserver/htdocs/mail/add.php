@@ -71,7 +71,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) &&
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" name="trigger_mailbox_action" value="adddomain" class="btn btn-success btn-sm">Submit</button>
+							<button type="submit" name="trigger_mailbox_action" value="adddomain" class="btn btn-success">Submit</button>
 						</div>
 					</div>
 				</form>
@@ -102,7 +102,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) &&
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" name="trigger_mailbox_action" value="addalias" class="btn btn-success btn-sm">Submit</button>
+							<button type="submit" name="trigger_mailbox_action" value="addalias" class="btn btn-success ">Submit</button>
 						</div>
 					</div>
 				</form>
@@ -147,7 +147,7 @@ while ($row = mysqli_fetch_array($result)) {
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" name="trigger_mailbox_action" value="addaliasdomain" class="btn btn-success btn-sm">Submit</button>
+							<button type="submit" name="trigger_mailbox_action" value="addaliasdomain" class="btn btn-success ">Submit</button>
 						</div>
 					</div>
 				</form>
@@ -221,7 +221,7 @@ while ($row = mysqli_fetch_array($result)) {
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" name="trigger_mailbox_action" value="addmailbox" class="btn btn-success btn-sm">Submit</button>
+							<button type="submit" name="trigger_mailbox_action" value="addmailbox" class="btn btn-success ">Submit</button>
 						</div>
 					</div>
 				</form>
@@ -264,7 +264,7 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 				</div>
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
-						<button type="submit" name="trigger_mailbox_action" value="adddav" class="btn btn-success btn-sm">Submit</button>
+						<button type="submit" name="trigger_mailbox_action" value="adddav" class="btn btn-success ">Submit</button>
 					</div>
 				</div>
 			</form>

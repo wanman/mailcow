@@ -4,13 +4,12 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.3.0/js/ripples.min.js.map"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.3.0/js/material.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.3.0/js/material.min.js.map"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.proto.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.7.4/js/bootstrap-select.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.7.4/css/bootstrap-select.js.map"></script>
 
 <script>
 $(document).ready(function() {
-	$.material.init();
-	$('select').chosen();
+	$('select').selectpicker();
 });
 var toValidate = $('#imap_host, #imap_username, #imap_password'),
 valid = false;
