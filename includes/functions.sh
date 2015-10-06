@@ -326,7 +326,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chmod 755 /var/spool/
 			sed -i "/%www-data/d" /etc/sudoers 2> /dev/null
 			sed -i "/%vmail/d" /etc/sudoers 2> /dev/null
-			echo '%www-data ALL=(ALL) NOPASSWD: /usr/bin/doveadm * sync *, /usr/local/sbin/mc_pfset *, /usr/bin/doveadm quota recalc -A, /usr/sbin/dovecot reload, /usr/sbin/postfix reload, /usr/local/sbin/mc_dkim_ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_pflog_renew, /usr/local/sbin/mc_inst_cron' >> /etc/sudoers
+			echo '%www-data ALL=(ALL) NOPASSWD: /usr/bin/doveadm * sync *, /usr/local/sbin/mc_pfset *, /usr/bin/doveadm quota recalc -A, /usr/sbin/dovecot reload, /usr/sbin/postfix reload, /usr/local/sbin/mc_dkim_ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_pflog_renew, /usr/local/sbin/mc_setup_backup' >> /etc/sudoers
 			;;
 		fuglu)
 			if [[ -z $(grep fuglu /etc/passwd) ]]; then
@@ -475,7 +475,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			fi
 			mkdir /var/lib/php5/sessions 2> /dev/null
 			chown -R www-data:www-data /var/lib/php5/sessions
-			install -m 755 misc/mc_inst_cron /usr/local/sbin/mc_inst_cron
+			install -m 755 misc/mc_setup_backup /usr/local/sbin/mc_setup_backup
 			cp -R webserver/htdocs/{mail,dav,zpush} /var/www/
 			tar xf /var/www/dav/vendor.tar -C /var/www/dav/ ; rm /var/www/dav/vendor.tar
 			tar xf /var/www/zpush/vendor.tar -C /var/www/zpush/ ; rm /var/www/zpush/vendor.tar

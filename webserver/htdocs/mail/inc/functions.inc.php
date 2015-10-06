@@ -141,11 +141,11 @@ function set_mailcow_config($s, $v = "", $vext = "") {
 			}
 			file_put_contents($file, ")".PHP_EOL.'RUNTIME='.$v['runtime'].PHP_EOL, FILE_APPEND | LOCK_EX);
 			file_put_contents($file, "LOCATION=".$v['location'].PHP_EOL, FILE_APPEND | LOCK_EX);
-			exec("sudo /usr/local/sbin/mc_inst_cron", $out, $return);
+			exec("sudo /usr/local/sbin/mc_setup_backup", $out, $return);
 			if ($return != "0") {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
-					'msg' => 'Cannot setup cronjob'
+					'msg' => 'Cannot setup backup'
 				);
 				break;
 			}
