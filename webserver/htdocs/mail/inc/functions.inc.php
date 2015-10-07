@@ -915,14 +915,22 @@ function mailbox_edit_domainadmin($link, $postarray) {
 		);
 		return false;
 	}
-	array_walk($postarray['domain'], function(&$string) use ($link) {
-		$string = mysqli_real_escape_string($link, $string);
-	});
+	foreach ($postarray['domain'] as $domain) {
+		if (!is_valid_domain_name($domain)) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'Invalid domain name: '.htmlspecialchars($domain)
+			);
+			return false;
+		}
+	};
 	$username = mysqli_real_escape_string($link, $postarray['username']);
+	$password = mysqli_real_escape_string($link, $postarray['password']);
+	$password2 = mysqli_real_escape_string($link, $postarray['password2']);
 	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $username))) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'Invalid username (local part)'
+			'msg' => 'Invalid username format'
 		);
 		return false;
 	}
@@ -945,7 +953,29 @@ function mailbox_edit_domainadmin($link, $postarray) {
 			return false;
 		}
 	}
-	$mystring = "UPDATE admin SET modified=now(), active='".$active."' where username='".$username."'";
+	if (!empty($password) && !empty($password2)) {
+		if ($password != $password2) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'Password mismatch'
+			);
+			return false;
+		}
+		$prep_password = escapeshellcmd($password);
+		exec("/usr/bin/doveadm pw -s SHA512-CRYPT -p $prep_password", $hash, $return);
+		$password_sha512c = $hash[0];
+		if ($return != "0") {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'Cannot create password hash'
+			);
+			return false;
+		}
+		$mystring = "UPDATE admin SET modified=now(), active='".$active."', password='".$password_sha512c."' WHERE username='".$username."';";
+	}
+	else {
+		$mystring = "UPDATE admin SET modified=now(), active='".$active."' where username='".$username."'";
+	}
 	if (!mysqli_query($link, $mystring)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1781,7 +1811,7 @@ function add_domain_admin($link, $postarray) {
 	}
 	$_SESSION['return'] = array(
 		'type' => 'success',
-		'msg' => 'Added domain admin '.htmlspecialchars($username)
+		'msg' => 'Added domain administrator '.htmlspecialchars($username)
 	);
 }
 function delete_domain_admin($link, $postarray) {
@@ -1814,7 +1844,7 @@ function delete_domain_admin($link, $postarray) {
 	}
 	$_SESSION['return'] = array(
 		'type' => 'success',
-		'msg' => 'Deleted domain admin '.htmlspecialchars($username)
+		'msg' => 'Deleted domain administrator '.htmlspecialchars($username)
 	);
 }
 function is_valid_domain_name($domain_name) {

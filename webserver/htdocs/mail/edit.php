@@ -17,11 +17,11 @@ if (isset($_SESSION['mailcow_cc_loggedin']) &&
 		$_SESSION['mailcow_cc_role'] != "user") {
 	if (isset($_GET['alias'])) {
 		if (!filter_var($_GET["alias"], FILTER_VALIDATE_EMAIL) || empty($_GET["alias"])) {
-			echo 'Your provided alias name is invalid';
+			echo 'Incorrect form data';
 		}
 		else {
 			$alias = mysqli_real_escape_string($link, $_GET["alias"]);
-			if (mysqli_fetch_array(mysqli_query($link, "SELECT address, domain FROM alias WHERE address='$alias' AND domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role';"))) {
+			if (mysqli_num_rows(mysqli_query($link, "SELECT address, domain FROM alias WHERE address='$alias' AND domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role';")) > 0) {
 			$result = mysqli_fetch_assoc(mysqli_query($link, "SELECT active, goto FROM alias WHERE address='$alias'"));
 ?>
 				<h4>Change alias attributes for <strong><?=$alias;?></strong></h4>
@@ -50,36 +50,54 @@ if (isset($_SESSION['mailcow_cc_loggedin']) &&
 <?php
 			}
 			else {
-				echo 'Action not supported.';
+				echo 'Item not found or no permission.';
 			}
 		}
 	}
 	elseif (isset($_GET['domain_admin'])) {
 		if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $_GET["domain_admin"])) || empty($_GET["domain_admin"])) {
-			echo 'Your provided domain administrator username is invalid.';
+			echo 'Incorrect form data';
 		}
 		else {
 			$domain_admin = mysqli_real_escape_string($link, $_GET["domain_admin"]);
-			if (mysqli_fetch_array(mysqli_query($link, "SELECT username FROM domain_admins")) && $logged_in_role == "admin") {
+			if (mysqli_num_rows(mysqli_query($link, "SELECT username FROM domain_admins WHERE username='$domain_admin'")) > 0 && $logged_in_role == "admin") {
 			$result = mysqli_fetch_assoc(mysqli_query($link, "SELECT * FROM domain_admins WHERE username='$domain_admin'"));
 	?>
-				<h4>Change assigned domains for domain admin <strong><?=$domain_admin;?></strong></h4>
+				<h4>Change assigned domains for domain administrator <strong><?=$domain_admin;?></strong></h4>
 				<br />
 				<form class="form-horizontal" role="form" method="post">
 				<input type="hidden" name="username" value="<?=$domain_admin;?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="name">Target domain <small>(hold CTRL to select multiple domains)</small>:</label>
 						<div class="col-sm-10">
-							<select name="domain[]" size="5" multiple>
+							<select name="domain[]" multiple>
 <?php
-$resultselect = mysqli_query($link, "SELECT domain FROM domain");
-while ($row = mysqli_fetch_array($resultselect)):
+$result_selected = mysqli_query($link, "SELECT domain FROM domain WHERE domain IN (SELECT domain FROM domain_admins WHERE username='".$domain_admin."')");
+while ($row_selected = mysqli_fetch_array($result_selected)):
 ?>
-	<option><?=$row['domain'];?></option>
+	<option selected><?=$row_selected['domain'];?></option>
+<?php
+endwhile;
+$result_unselected = mysqli_query($link, "SELECT domain FROM domain WHERE domain NOT IN (SELECT domain FROM domain_admins WHERE username='".$domain_admin."')");
+while ($row_unselected = mysqli_fetch_array($result_unselected)):
+?>
+	<option><?=$row_unselected['domain'];?></option>
 <?php
 endwhile;
 ?>
 							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-2" for="password">Password:</label>
+						<div class="col-sm-10">
+						<input type="password" class="form-control" name="password" id="password" placeholder="Unchanged if empty">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-2" for="password2">Password (repeat):</label>
+						<div class="col-sm-10">
+						<input type="password" class="form-control" name="password2" id="password2">
 						</div>
 					</div>
 					<div class="form-group">
@@ -98,13 +116,13 @@ endwhile;
 	<?php
 			}
 			else {
-				echo 'Action not supported.';
+				echo 'Item not found or no permission.';
 			}
 		}
 	}
 	elseif (isset($_GET['domain'])) {
 		if (!is_valid_domain_name($_GET["domain"]) || empty($_GET["domain"])) {
-			echo 'Your provided domain name is invalid.';
+			echo 'Incorrect form data';
 		}
 		else {
 			$domain = mysqli_real_escape_string($link, $_GET["domain"]);
@@ -167,18 +185,18 @@ endwhile;
 	<?php
 			}
 			else {
-				echo 'Your provided domain name does not exist or cannot be edited.';
+				echo 'Item not found or no permission.';
 			}
 		}
 	}
 	elseif (isset($_GET['mailbox'])) {
 		if (!filter_var($_GET["mailbox"], FILTER_VALIDATE_EMAIL) || empty($_GET["mailbox"])) {
-			echo 'Your provided mailbox name is invalid.';
+			echo 'Incorrect form data';
 		}
 		else {
 			$mailbox = mysqli_real_escape_string($link, $_GET["mailbox"]);
-			if (mysqli_result(mysqli_query($link, "SELECT username, domain FROM mailbox WHERE username='$mailbox' AND ((domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role'))"))) {
-			$result = mysqli_fetch_assoc(mysqli_query($link, "SELECT username, name, round(sum(quota / 1048576)) as quota, active FROM mailbox WHERE username='$mailbox'"));
+			if (mysqli_num_rows(mysqli_query($link, "SELECT username, domain FROM mailbox WHERE username='".$mailbox."' AND ((domain IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'='".$logged_in_role."'))")) > 0) {
+			$result = mysqli_fetch_assoc(mysqli_query($link, "SELECT username, name, round(sum(quota / 1048576)) as quota, active FROM mailbox WHERE username='".$mailbox."'"));
 	?>
 				<h4>Change settings for mailbox <strong><?=$mailbox;?></strong></h4>
 				<form class="form-horizontal" role="form" method="post">
@@ -198,7 +216,7 @@ endwhile;
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="password">Password:</label>
 						<div class="col-sm-10">
-						<input type="password" class="form-control" name="password" id="password" placeholder="Leave empty to not change password">
+						<input type="password" class="form-control" name="password" id="password" placeholder="Unchanged if empty">
 						</div>
 					</div>
 					<div class="form-group">
@@ -223,7 +241,7 @@ endwhile;
 	<?php
 			}
 			else {
-				echo 'Your provided mailbox does not exist.';
+				echo 'Item not found or no permission.';
 			}
 		}
 	}
@@ -237,7 +255,7 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 		$_SESSION['mailcow_cc_role'] == "user") {
 	if (isset($_GET['dav'])) {
 		if (!filter_var($_GET["dav"], FILTER_VALIDATE_EMAIL) || empty($_GET["dav"])) {
-			echo 'Your provided DAV user is invalid';
+			echo 'Incorrect form data';
 		}
 		else {
 			$dav = mysqli_real_escape_string($link, $_GET["dav"]);
@@ -370,7 +388,7 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 	<?php
 			}
 			else {
-				echo 'Your provided username does not exist or cannot be edited.';
+				echo 'Item not found or no permission.';
 			}
 		}
 	}
