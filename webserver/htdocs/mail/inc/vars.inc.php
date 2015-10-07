@@ -21,7 +21,6 @@ elseif (!filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE)) {
 
 /* Postfix tables */
 $mailcow_anonymize_headers = "/etc/postfix/mailcow_anonymize_headers.pcre";
-$mailcow_sender_access = "/etc/postfix/mailcow_sender_access";
 
 /* Dovecot */
 $mailcow_public_folder= "/etc/dovecot/mailcow_public_folder.conf";
