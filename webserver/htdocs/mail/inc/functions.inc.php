@@ -1737,7 +1737,7 @@ function add_domain_admin($link, $postarray) {
 	if ($num_results != 0) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'Username '.htmlspecialchars($username).' does already exist'
+			'msg' => 'Username "'.htmlspecialchars($username).'" does already exist'
 		);
 		return false;
 	}
