@@ -412,8 +412,8 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			cp -f clamav/clamav-unofficial-sigs-cron /etc/cron.d/clamav-unofficial-sigs-cron
 			cp -f clamav/clamav-unofficial-sigs-logrotate /etc/logrotate.d/clamav-unofficial-sigs-logrotate
 			mkdir -p /var/log/clamav-unofficial-sigs 2> /dev/null
-			sed -i '/MaxFileSize/c\MaxFileSize 2048M' /etc/clamav/clamd.conf
-			sed -i '/StreamMaxLength/c\StreamMaxLength 2048M' /etc/clamav/clamd.conf
+			sed -i '/MaxFileSize/c\MaxFileSize 10M' /etc/clamav/clamd.conf
+			sed -i '/StreamMaxLength/c\StreamMaxLength 10M' /etc/clamav/clamd.conf
 			freshclam 2> /dev/null
 			;;
 		opendkim)
