@@ -14,7 +14,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 		</div>
 		<div id="collapseAdmin" class="panel-collapse collapse in">
 			<div class="panel-body">
-				<form class="form-horizontal" role="form" method="post">
+				<form class="form-horizontal" autocapitalize="none" autocorrect="off" role="form" method="post">
 				<?php
 				$result = mysqli_fetch_assoc(mysqli_query($link, "SELECT username from admin where superadmin='1' and active='1'"));
 				?>
@@ -425,7 +425,7 @@ die("Permission denied");
 <form method="post">
 	<div class="form-group">
 		<label for="login_user">Username / Email address:</label>
-		<input name="login_user" type="name" id="login_user" class="form-control" required autofocus>
+		<input name="login_user" autocorrect="off" autocapitalize="none" type="name" id="login_user" class="form-control" required autofocus>
 	</div>
 	<div class="form-group">
 		<label for="login_user">Password:</label>

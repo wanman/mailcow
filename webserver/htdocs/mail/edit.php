@@ -31,7 +31,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) &&
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="name">Destination address(es) <small>(comma-separated values)</small>:</label>
 						<div class="col-sm-10">
-							<textarea class="form-control" rows="10" name="goto"><?=$result['goto'] ?></textarea>
+							<textarea class="form-control" autocapitalize="none" autocorrect="off" rows="10" name="goto"><?=$result['goto'] ?></textarea>
 						</div>
 					</div>
 					<div class="form-group">

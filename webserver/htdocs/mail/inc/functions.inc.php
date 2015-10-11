@@ -356,7 +356,7 @@ function mailbox_add_domain($link, $postarray) {
 		);
 		return false;
 	}
-	$domain = mysqli_real_escape_string($link, strtolower(trim($postarray['domain'])));
+	$domain = idn_to_ascii(mysqli_real_escape_string($link, strtolower(trim($postarray['domain']))));
 	$description = mysqli_real_escape_string($link, $postarray['description']);
 	$aliases = mysqli_real_escape_string($link, $postarray['aliases']);
 	$mailboxes = mysqli_real_escape_string($link, $postarray['mailboxes']);
@@ -1737,7 +1737,7 @@ function add_domain_admin($link, $postarray) {
 	if ($num_results != 0) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'Username "'.htmlspecialchars($username).'" does already exist'
+			'msg' => 'Username '.htmlspecialchars($username).' does already exist'
 		);
 		return false;
 	}
@@ -1811,7 +1811,7 @@ function add_domain_admin($link, $postarray) {
 	}
 	$_SESSION['return'] = array(
 		'type' => 'success',
-		'msg' => 'Added domain administrator '.htmlspecialchars($username)
+		'msg' => 'Added domain admin '.htmlspecialchars($username)
 	);
 }
 function delete_domain_admin($link, $postarray) {
@@ -1844,10 +1844,11 @@ function delete_domain_admin($link, $postarray) {
 	}
 	$_SESSION['return'] = array(
 		'type' => 'success',
-		'msg' => 'Deleted domain administrator '.htmlspecialchars($username)
+		'msg' => 'Deleted domain admin '.htmlspecialchars($username)
 	);
 }
 function is_valid_domain_name($domain_name) {
+	$domain_name = idn_to_ascii($domain_name);
 	return (preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $domain_name)
 		   && preg_match("/^.{1,253}$/", $domain_name)
 		   && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $domain_name));

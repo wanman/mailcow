@@ -22,7 +22,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) &&
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="domain">Domain name:</label>
 						<div class="col-sm-10">
-						<input type="text" pattern="\b((?=[a-z0-9-]{1,63}\.)[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\b" class="form-control" name="domain" id="domain" placeholder="Domain to receive mail for">
+						<input type="text" autocorrect="off" autocapitalize="none" class="form-control" name="domain" id="domain" placeholder="Domain to receive mail for">
 						</div>
 					</div>
 					<div class="form-group">
@@ -84,13 +84,13 @@ if (isset($_SESSION['mailcow_cc_loggedin']) &&
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="address">Alias address(es) <small>(full email address OR @example.com for <span style='color:#ec466a'>catch-all</span>)</small> - comma separated:</label>
 						<div class="col-sm-10">
-							<textarea class="form-control" rows="5" name="address"></textarea>
+							<textarea autocorrect="off" autocapitalize="none" class="form-control" rows="5" name="address"></textarea>
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="goto" placeholder="first@example.net, second@example.net">Destination address(es) - comma separated:</label>
 						<div class="col-sm-10">
-							<textarea class="form-control" rows="5" name="goto"></textarea>
+							<textarea autocorrect="off" autocapitalize="none" class="form-control" rows="5" name="goto"></textarea>
 						</div>
 					</div>
 					<div class="form-group">
@@ -160,7 +160,7 @@ while ($row = mysqli_fetch_array($result)) {
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="local_part">Mailbox Alias (left part of mail address) <small>(alphanumeric)</small>:</label>
 						<div class="col-sm-10">
-							<input type="text" pattern="[a-zA-Z0-9.- ]+" class="form-control" name="local_part" id="local_part" required>
+							<input type="text" autocorrect="off" autocapitalize="none" pattern="[a-zA-Z0-9.- ]+" class="form-control" name="local_part" id="local_part" required>
 						</div>
 					</div>
 					<div class="form-group">
