@@ -417,8 +417,12 @@ elseif (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedi
 header('Location: user.php');
 die("Permission denied");
 } else {
+if (!function_exists('exec') || !function_exists('shell_exec')):
 ?>
-
+<div class="alert alert-danger">Please enable "exec" and "shell_exec" PHP functions.</div>
+<?php
+endif;
+?>
 <div class="panel panel-default">
 <div class="panel-heading">Login</div>
 <div class="panel-body">
