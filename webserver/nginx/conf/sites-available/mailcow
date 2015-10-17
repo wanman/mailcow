@@ -2,12 +2,14 @@
 # ! Do not remove this header !
 server {
 	listen 80;
+	listen [::]:80;
 	server_name MAILCOW_HOST.MAILCOW_DOMAIN;
 	root /var/www/mail;
 	return 301 https://$host$request_uri;
 }
 server {
         listen 443;
+	listen [::]:443;
         ssl on;
         ssl_certificate         /etc/ssl/mail/mail.crt;
         ssl_certificate_key     /etc/ssl/mail/mail.key;
@@ -46,6 +48,7 @@ server {
 }
 server {
 	listen 443;
+	listen [::]:443;
 	ssl on;
 	ssl_certificate         /etc/ssl/mail/mail.crt;
 	ssl_certificate_key     /etc/ssl/mail/mail.key;
@@ -80,6 +83,7 @@ server {
 }
 server {
 	listen 443;
+	listen [::]:443;
 	server_name MAILCOW_HOST.MAILCOW_DOMAIN;
 	ssl on;
 	ssl_certificate         /etc/ssl/mail/mail.crt;
