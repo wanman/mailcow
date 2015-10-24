@@ -470,7 +470,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				sed -i "s/\"autoconfig.MAILCOW_DOMAIN\"/\"autoconfig.${sys_domain}\"/g" /etc/apache2/sites-available/mailcow.conf
 				sed -i "s/MAILCOW_DOMAIN\"/${sys_domain}\"/g" /etc/apache2/sites-available/mailcow.conf
 				 sed -i "/date.timezone/c\php_value date.timezone ${sys_timezone}" /etc/apache2/sites-available/mailcow.conf
-				a2enmod rewrite ssl > /dev/null 2>&1
+				a2enmod rewrite ssl headers> /dev/null 2>&1
 			fi
 			mkdir /var/lib/php5/sessions 2> /dev/null
 			chown -R www-data:www-data /var/lib/php5/sessions
