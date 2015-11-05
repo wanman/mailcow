@@ -423,7 +423,8 @@ function mailbox_add_alias($link, $postarray) {
 	}
 	foreach ($address_arr as $address) {
 		$domain = substr($address, strpos($address, '@')+1);
-		if (!filter_var($address, FILTER_VALIDATE_EMAIL) && empty($domain)) {
+		$local_part = strstr($address, '@', true);
+		if ((!filter_var($address, FILTER_VALIDATE_EMAIL) === true) && !empty($local_part)) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
 				'msg' => 'Alias address format invalid'
@@ -455,7 +456,7 @@ function mailbox_add_alias($link, $postarray) {
 			return false;
 		}
 		foreach ($goto_arr as $goto) {
-			if (!filter_var($goto, FILTER_VALIDATE_EMAIL)) {
+			if (!filter_var($goto, FILTER_VALIDATE_EMAIL) === true) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
 					'msg' => 'Destination address '.htmlspecialchars($goto).' is invalid'
@@ -464,7 +465,7 @@ function mailbox_add_alias($link, $postarray) {
 			}
 		}
 		$goto = implode(",", $goto_arr);
-		if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
+		if (!filter_var($address, FILTER_VALIDATE_EMAIL) === true) {
 			$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('@$domain', '".$goto."', '".$domain."', now(), now(), '".$active."')";
 		}
 		else {
@@ -778,7 +779,7 @@ function mailbox_edit_alias($link, $postarray) {
 	}
 	$goto_arr = array_map('trim', explode(',', $postarray['goto']));
 	foreach ($goto_arr as $goto) {
-		if (!filter_var($goto, FILTER_VALIDATE_EMAIL)) {
+		if (!filter_var($goto, FILTER_VALIDATE_EMAIL) === true) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
 				'msg' => 'Destination address '.htmlspecialchars($goto).' is invalid'
@@ -788,7 +789,7 @@ function mailbox_edit_alias($link, $postarray) {
 	}
 	$goto = implode(",", $goto_arr);
 	isset($postarray['active']) ? $active = '1' : $active = '0';
-	if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
+	if (!filter_var($address, FILTER_VALIDATE_EMAIL) === true) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Invalid mail address'
@@ -1284,19 +1285,13 @@ function mailbox_delete_domain($link, $postarray) {
 }
 function mailbox_delete_alias($link, $postarray) {
 	$address = mysqli_real_escape_string($link, $postarray['address']);
+	$local_part = strstr($address, '@', true);
 	global $logged_in_role;
 	global $logged_in_as;
 	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM alias WHERE address='".$address."' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'!='".$logged_in_role."')"))) { 
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Permission denied'
-		);
-		return false;
-	}
-	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $address))) {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => 'Invalid mail address'
 		);
 		return false;
 	}

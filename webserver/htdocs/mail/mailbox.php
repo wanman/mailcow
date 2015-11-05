@@ -254,11 +254,11 @@ endforeach;
 						</td>
 						<td><?=$row['domain'];?></td>
 						<td><?=$row['active'];?></td>
-						<td><a href="delete.php?alias=<?=$row['address'];?>">delete</a> 
+						<td><a href="delete.php?alias=<?=urlencode($row['address']);?>">delete</a> 
 <?php
 if(filter_var($row['address'], FILTER_VALIDATE_EMAIL)):
 ?>
-	| <a href="edit.php?alias=<?=$row['address'];?>">edit</a>
+	| <a href="edit.php?alias=<?=urlencode($row['address']);?>">edit</a>
 <?php
 endif;
 ?>
