@@ -402,28 +402,30 @@ function mailbox_add_domain($link, $postarray) {
 	);
 }
 function mailbox_add_alias($link, $postarray) {
-	$address_arr = array_map('trim', explode(',', $postarray['address']));
-	$goto_arr = array_map('trim', explode(',', $postarray['goto']));
+	$addresses = array_map('trim', explode(',', $postarray['address']));
+	$gotos = array_map('trim', explode(',', $postarray['goto']));
 	isset($postarray['active']) ? $active = '1' : $active = '0';
 	global $logged_in_role;
 	global $logged_in_as;
-	if (empty($address_arr)) {
+	if (empty($addresses)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Alias address must not be empty'
 		);
 		return false;
 	}
-	if (empty($goto_arr)) {
+	if (empty($gotos)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Destination address must not be empty'
 		);
 		return false;
 	}
-	foreach ($address_arr as $address) {
-		$domain = substr($address, strpos($address, '@')+1);
+	foreach ($addresses as $address) {
+		// Should be faster than exploding
+		$domain = idn_to_ascii(substr(strstr($address, '@'), 1));
 		$local_part = strstr($address, '@', true);
+		$address = $local_part.'@'.$domain;
 		if ((!filter_var($address, FILTER_VALIDATE_EMAIL) === true) && !empty($local_part)) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -455,7 +457,12 @@ function mailbox_add_alias($link, $postarray) {
 			);
 			return false;
 		}
-		foreach ($goto_arr as $goto) {
+		// Passing reference to alter array
+		// This shouldn't impact perfomance too much since we usually don't paste many addresses
+		foreach ($gotos as &$goto) {
+			$goto_domain = idn_to_ascii(substr(strstr($goto, '@'), 1));
+			$goto_local_part = strstr($goto, '@', true);
+			$goto = $goto_local_part.'@'.$goto_domain;
 			if (!filter_var($goto, FILTER_VALIDATE_EMAIL) === true) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -464,9 +471,9 @@ function mailbox_add_alias($link, $postarray) {
 				return false;
 			}
 		}
-		$goto = implode(",", $goto_arr);
+		$goto = implode(",", $gotos);
 		if (!filter_var($address, FILTER_VALIDATE_EMAIL) === true) {
-			$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('@$domain', '".$goto."', '".$domain."', now(), now(), '".$active."')";
+			$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('@".$domain."', '".$goto."', '".$domain."', now(), now(), '".$active."')";
 		}
 		else {
 			$mystring = "INSERT INTO alias (address, goto, domain, created, modified, active) VALUE ('".$address."', '".$goto."', '".$domain."', now(), now(), '".$active."')";
@@ -777,8 +784,8 @@ function mailbox_edit_alias($link, $postarray) {
 		);
 		return false;
 	}
-	$goto_arr = array_map('trim', explode(',', $postarray['goto']));
-	foreach ($goto_arr as $goto) {
+	$gotos = array_map('trim', explode(',', $postarray['goto']));
+	foreach ($gotos as $goto) {
 		if (!filter_var($goto, FILTER_VALIDATE_EMAIL) === true) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -787,7 +794,7 @@ function mailbox_edit_alias($link, $postarray) {
 			return false;
 		}
 	}
-	$goto = implode(",", $goto_arr);
+	$goto = implode(",", $gotos);
 	isset($postarray['active']) ? $active = '1' : $active = '0';
 	if (!filter_var($address, FILTER_VALIDATE_EMAIL) === true) {
 		$_SESSION['return'] = array(
