@@ -146,7 +146,7 @@ CREATE TABLE IF NOT EXISTS `admin` (
   PRIMARY KEY (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE IF NOT EXISTS `lias` (
+CREATE TABLE IF NOT EXISTS `alias` (
   `address` varchar(255) NOT NULL,
   `goto` text NOT NULL,
   `domain` varchar(255) NOT NULL,
