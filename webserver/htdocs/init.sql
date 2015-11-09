@@ -146,7 +146,7 @@ CREATE TABLE IF NOT EXISTS `admin` (
   PRIMARY KEY (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE IF NOT EXISTS `alias` (
+CREATE TABLE IF NOT EXISTS `lias` (
   `address` varchar(255) NOT NULL,
   `goto` text NOT NULL,
   `domain` varchar(255) NOT NULL,
@@ -155,6 +155,11 @@ CREATE TABLE IF NOT EXISTS `alias` (
   `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`address`),
   KEY `domain` (`domain`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE IF NOT EXISTS `sender_acl` (
+  `logged_in_as` varchar(255) NOT NULL,
+  `send_as` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE IF NOT EXISTS `spamalias` (

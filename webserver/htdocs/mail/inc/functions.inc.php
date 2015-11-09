@@ -1018,6 +1018,17 @@ function mailbox_edit_mailbox($link, $postarray) {
 		);
 		return false;
 	}
+	if(isset($postarray['sender_acl'])) {
+		foreach ($postarray['sender_acl'] as $sender_acl) {
+			if (!filter_var($sender_acl, FILTER_VALIDATE_EMAIL)) {
+					$_SESSION['return'] = array(
+						'type' => 'danger',
+						'msg' => 'Invalid sender ACL: '.htmlspecialchars($sender_acl).' must be a valid email address.'
+					);
+					return false;
+			}
+		}
+	}
 	if (!is_numeric($quota_m)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1048,6 +1059,24 @@ function mailbox_edit_mailbox($link, $postarray) {
 		return false;
 	}
 	isset($postarray['active']) ? $active = '1' : $active = '0';
+	$mystring = "DELETE FROM sender_acl WHERE logged_in_as='".$username."';";
+	if (!mysqli_query($link, $mystring)) {
+	$_SESSION['return'] = array(
+		'type' => 'danger',
+		'msg' => 'MySQL Error: '.mysqli_error($link)
+	);
+	return false;
+	}
+	foreach ($postarray['sender_acl'] as $sender_acl) {
+		$mystring = "INSERT INTO sender_acl (send_as, logged_in_as) VALUES ('".$sender_acl."', '".$username."')";
+		if (!mysqli_query($link, $mystring)) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL Error: '.mysqli_error($link)
+		);
+		return false;
+		}
+	}
 	if (!empty($password) && !empty($password2)) {
 		if ($password != $password2) {
 			$_SESSION['return'] = array(
@@ -1372,6 +1401,7 @@ function mailbox_delete_mailbox($link, $postarray) {
 	$delete_user .= "DELETE FROM calendarobjects WHERE calendarid IN (SELECT id from calendars where principaluri='principals/".$username."');";
 	$delete_user .= "DELETE FROM cards WHERE addressbookid IN (SELECT id from calendars where principaluri='principals/".$username."');";
 	$delete_user .= "DELETE FROM mailbox WHERE username='".$username."';";
+	$delete_user .= "DELETE FROM sender_acl WHERE logged_in_as='".$username."';";
 	$delete_user .= "DELETE FROM users WHERE username='".$username."';";
 	$delete_user .= "DELETE FROM principals WHERE uri='principals/".$username."';";
 	$delete_user .= "DELETE FROM principals WHERE uri='principals/".$username."/calendar-proxy-read';";
@@ -1590,7 +1620,7 @@ function set_user_account($link, $postarray) {
 		}
 	}
 	if (!empty($user_real_name)) {
-		$mystring = "UPDATE mailbox SET modified=NOW(), name='".$user_real_name."'";
+		$mystring = "UPDATE mailbox SET modified=NOW(), name='".$user_real_name."' WHERE username='".$name_now."'";
 		if (!mysqli_query($link, $mystring)) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
