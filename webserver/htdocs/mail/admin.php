@@ -144,7 +144,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 <div class="panel-body">
 <form class="form-horizontal" role="form" method="post">
 	<div class="form-group">
-		<label class="control-label col-sm-4" for="location">Location <small>(will be created if missing)</small>:</label>
+		<label class="control-label col-sm-4" for="location">Location (<kbd>aA-zZ, 0-9, -, _, /</kbd>)<small>, will be created if missing</small>:</label>
 		<div class="col-sm-8">
 			<input type="text" class="form-control" name="location" id="location" value="<?=return_mailcow_config("backup_location");?>">
 		</div>

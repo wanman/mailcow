@@ -21,7 +21,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) &&
 		}
 		else {
 			$alias = mysqli_real_escape_string($link, $_GET["alias"]);
-			if (mysqli_num_rows(mysqli_query($link, "SELECT address, domain FROM alias WHERE address='$alias' AND domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role';")) > 0) {
+			if (mysqli_num_rows(mysqli_query($link, "SELECT address, domain FROM alias WHERE address='$alias' AND (domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role');")) > 0) {
 			$result = mysqli_fetch_assoc(mysqli_query($link, "SELECT active, goto FROM alias WHERE address='$alias'"));
 ?>
 				<h4>Change alias attributes for <strong><?=$alias;?></strong></h4>

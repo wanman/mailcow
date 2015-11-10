@@ -103,19 +103,19 @@ function return_mailcow_config($s) {
 			break;
 	}
 }
-function set_mailcow_config($s, $v = "", $vext = "") {
+function set_mailcow_config($s, $v = '') {
 	switch ($s) {
 		case "backup":
 			$file="/var/www/MAILBOX_BACKUP";
 			if (isset($v['use_backup']) && ($v['use_backup'] != "on" && $v['use_backup'] != "") ||
-				($v['runtime'] != "hourly" && $v['runtime'] != "daily" && $v['runtime'] != "monthly")) {
+				($v['runtime'] != "hourly" && $v['runtime'] != "daily" && $v['runtime'] != "weekly" && $v['runtime'] != "monthly")) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
-					'msg' => 'Invalid form data'
+					'msg' => 'Invalid runtime: '.htmlspecialchars($v['runtime'])
 				);
 				break;
 			}
-			if (!ctype_alnum(str_replace("/", "", $v['location']))) {
+			if (!ctype_alnum(str_replace(array('/', '-', '_'), "", $v['location']))) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
 					'msg' => 'Invalid backup location: '.htmlspecialchars($v['location'])
@@ -467,6 +467,13 @@ function mailbox_add_alias($link, $postarray) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
 					'msg' => 'Destination address '.htmlspecialchars($goto).' is invalid'
+				);
+				return false;
+			}
+			if ($goto == $address) {
+				$_SESSION['return'] = array(
+					'type' => 'danger',
+					'msg' => 'Alias address and goto address must not be identical'
 				);
 				return false;
 			}

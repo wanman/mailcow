@@ -132,8 +132,9 @@ echo "`tput setaf 2`Finished installation`tput sgr0`"
 echo "Logged credentials and further information to file `tput bold`installer.log`tput sgr0`."
 echo
 echo "Next steps:"
-echo " * Backup installer.log to a safe place and delete it here"
-echo " * Open \"https://$sys_hostname.$sys_domain\" and login to mailcow control center as $mailcow_admin_user to create a domain and a mailbox."
+echo " * Backup installer.log to a safe place and delete it from your server"
+echo " * Open \"https://$sys_hostname.$sys_domain\" and login to mailcow control center as $mailcow_admin_user to create a domain and a mailbox. Please use the full URL and not your IP address."
 echo " * Please do not use port 25 in your mail client, use port 587 instead."
 echo " * Setup SPF records!"
+echo " * You may or may not see some information about your domains DNS. SRV records are not necessarily needed. Please see the wiki for help @ https://github.com/andryyy/mailcow/wiki"
 echo
