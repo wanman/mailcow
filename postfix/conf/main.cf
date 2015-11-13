@@ -130,7 +130,7 @@ recipient_delimiter = +
 inet_interfaces = all
 
 # Specifies what protocols Postfix will use when it makes or accepts network connections, and also controls what DNS lookups Postfix will use when it makes network connections.
-inet_protocols = ipv4
+inet_protocols = all
 
 # VRFY command is not really needed anymore
 disable_vrfy_command = yes
