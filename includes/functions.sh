@@ -355,10 +355,11 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		dovecot)
 			[[ -z $(grep fs.inotify.max_user_instances /etc/sysctl.conf) ]] && echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.conf
-			sysctl -p > /dev/null
+			sysctl -p > /dev/null 2>&1
 			if [[ -f /lib/systemd/systemd ]]; then
 				systemctl disable dovecot.socket  > /dev/null 2>&1
 			fi
+			rm -rf /etc/dovecot/* 2> /dev/null
 			cp -R dovecot/conf/*.conf /etc/dovecot/
 			userdel vmail 2> /dev/null
 			groupdel vmail 2> /dev/null
