@@ -370,7 +370,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown root:root "/etc/dovecot/dovecot.conf"; chmod 644 "/etc/dovecot/dovecot.conf"
 			touch "/etc/dovecot/mailcow_public_folder.conf"; chmod 664 "/etc/dovecot/mailcow_public_folder.conf"
 			chown root:www-data "/etc/dovecot/mailcow_public_folder.conf"
-			DOVEFILES=$(find /etc/apt -maxdepth 1 -type f -printf '/etc/dovecot/%f ')
+			DOVEFILES=$(find /etc/dovecot -maxdepth 1 -type f -printf '/etc/dovecot/%f ')
 			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" ${DOVEFILES}
 			sed -i "s/MAILCOW_DOMAIN/${sys_domain}/g" ${DOVEFILES}
 			sed -i "s/my_mailcowpass/$my_mailcowpass/g" ${DOVEFILES}
