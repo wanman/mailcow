@@ -87,7 +87,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 				<h4>Add domain administrator</h4>
 				<form class="form-horizontal" role="form" method="post">
 					<div class="form-group">
-						<label class="control-label col-sm-4" for="username">Username (<kbd>aA-zZ, @,.-</kbd>):</label>
+						<label class="control-label col-sm-4" for="username">Username (<kbd>aA-zZ, @, ., -</kbd>):</label>
 						<div class="col-sm-8">
 							<input type="text" class="form-control" name="username" id="username" required>
 						</div>
