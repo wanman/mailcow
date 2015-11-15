@@ -155,6 +155,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 			<select title="Select a runtime..." style="width:50%" name="runtime">
 				<option <?php if (return_mailcow_config("backup_runtime") == "hourly") { echo "selected"; } ?>>hourly</option>
 				<option <?php if (return_mailcow_config("backup_runtime") == "daily") { echo "selected"; } ?>>daily</option>
+				<option <?php if (return_mailcow_config("backup_runtime") == "weekly") { echo "selected"; } ?>>weekly</option>
 				<option <?php if (return_mailcow_config("backup_runtime") == "monthly") { echo "selected"; } ?>>monthly</option>
 			</select>
 		</div>
