@@ -323,7 +323,11 @@ function echo_sys_info($what, $extra="") {
 			echo round(shell_exec('free | grep Mem | awk \'{print $3/$2 * 100.0}\''));
 			break;
 		case "maildisk":
-			echo preg_replace('/\D/', '', shell_exec('df -h /var/vmail/ | tail -n1 | awk {\'print $5\'}'));
+			// echo preg_replace('/\D/', '', shell_exec('df -h /var/vmail/ | tail -n1 | awk {\'print $5\'}'));
+			$df = disk_free_space("/var/vmail");
+			$dt = disk_total_space("/var/vmail");
+			$du = $dt - $df;
+			echo sprintf('%.2f',($du / $dt) * 100);
 			break;
 		case "pflog":
 			$pflog_content = file_get_contents($GLOBALS['PFLOG']);

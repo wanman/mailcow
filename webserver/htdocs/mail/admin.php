@@ -374,7 +374,7 @@ opendkim_table();
 <p>This is a very simple system information function. Please be aware that a high RAM usage is what you want on a server.</p>
 <div class="row">
 	<div class="col-md-6">
-		<h4>Disk usage (/var/vmail) - <?php echo_sys_info("maildisk");?>%</h4>
+		<h4>Disk usage (/var/vmail) - <?=formatBytes(disk_free_space('/var/vmail'))?> of <?=formatBytes(disk_total_space('/var/vmail'))?></h4>
 		<div class="progress">
 		  <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="<?php echo_sys_info("maildisk");?>"
 		  aria-valuemin="0" aria-valuemax="100" style="width:<?php echo_sys_info("maildisk");?>%">
