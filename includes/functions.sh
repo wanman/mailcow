@@ -657,6 +657,10 @@ upgradetask() {
 	my_rcuser=${readconf[5]}
 	my_rcpass=${readconf[6]}
 	my_rcdb=${readconf[7]}
+        read -p "Please enter your SQL root user password: " my_rootpw
+	while [[ $(mysql --host ${my_dbhost} -u root -p${my_rootpw} -e ""; echo $?) -ne 0 ]]; do
+		read -p "Please enter your SQL root user password: " my_rootpw
+	done
 	httpd_dav_subdomain=${readconf[8]}
 	[[ -z $my_dbhost ]] && my_dbhost="localhost"
 	my_upgradetask="yes"
