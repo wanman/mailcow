@@ -18,7 +18,7 @@ echo UPGRADE to ${mailcow_version} on $(date) >> installer.log
 echo --------------------------------- >> installer.log
 echo Fail2ban version: ${fail2ban_version} >> installer.log
 echo Roundcube version: ${roundcube_version} >> installer.log
-echo FuGlu version: ${fuglu_version}
+echo FuGlu version: ${fuglu_version} >> installer.log
 echo --------------------------------- >> installer.log
 		exit 0
 		;;
