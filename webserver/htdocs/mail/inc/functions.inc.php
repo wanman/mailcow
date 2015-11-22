@@ -374,6 +374,7 @@ function mailbox_add_domain($link, $postarray) {
 		return false;
 	}
 	isset($postarray['active']) ? $active = '1' : $active = '0';
+	isset($postarray['relay_all_recipients']) ? $relay_all_recipients = '1' : $relay_all_recipients = '0';
 	isset($postarray['backupmx']) ? $backupmx = '1' : $backupmx = '0';
 	if (!is_valid_domain_name($domain)) {
 		$_SESSION['return'] = array(
@@ -391,8 +392,8 @@ function mailbox_add_domain($link, $postarray) {
 			return false;
 		}
 	}
-	$mystring = "INSERT INTO domain (domain, description, aliases, mailboxes, maxquota, quota, transport, backupmx, created, modified, active)
-		VALUES ('".$domain."', '$description', '$aliases', '$mailboxes', '$maxquota', '$quota', 'virtual', '".$backupmx."', now(), now(), '".$active."')";
+	$mystring = "INSERT INTO domain (domain, description, aliases, mailboxes, maxquota, quota, transport, backupmx, created, modified, active, relay_all_recipients)
+		VALUES ('".$domain."', '$description', '$aliases', '$mailboxes', '$maxquota', '$quota', 'virtual', '".$backupmx."', now(), now(), '".$active."', '".$relay_all_recipients."')";
 	if (!mysqli_query($link, $mystring)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -804,6 +805,13 @@ function mailbox_edit_alias($link, $postarray) {
 			);
 			return false;
 		}
+		if ($goto == $address) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'Alias address and goto address must not be identical'
+			);
+			return false;
+		}
 	}
 	$goto = implode(",", $gotos);
 	isset($postarray['active']) ? $active = '1' : $active = '0';
@@ -905,8 +913,9 @@ function mailbox_edit_domain($link, $postarray) {
 		return false;
 	}
 	isset($postarray['active']) ? $active = '1' : $active = '0';
+	isset($postarray['relay_all_recipients']) ? $relay_all_recipients = '1' : $relay_all_recipients = '0';
 	isset($postarray['backupmx']) ? $backupmx = '1' : $backupmx = '0';
-	$mystring = "UPDATE domain SET modified=now(), backupmx='".$backupmx."', active='".$active."', quota='$quota', maxquota='$maxquota', mailboxes='$mailboxes', aliases='$aliases', description='$description' WHERE domain='".$domain."'";
+	$mystring = "UPDATE domain SET modified=now(), relay_all_recipients='".$relay_all_recipients."', backupmx='".$backupmx."', active='".$active."', quota='$quota', maxquota='$maxquota', mailboxes='$mailboxes', aliases='$aliases', description='$description' WHERE domain='".$domain."'";
 	if (!mysqli_query($link, $mystring)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
