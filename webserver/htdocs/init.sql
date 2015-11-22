@@ -189,6 +189,7 @@ CREATE TABLE IF NOT EXISTS `domain` (
   `quota` bigint(20) NOT NULL DEFAULT '0',
   `transport` varchar(255) NOT NULL,
   `backupmx` tinyint(1) NOT NULL DEFAULT '0',
+  `relay_all_recipients` tinyint(1) NOT NULL DEFAULT '0',
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `active` tinyint(1) NOT NULL DEFAULT '1',
