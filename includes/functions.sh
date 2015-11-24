@@ -474,7 +474,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				a2enmod rewrite ssl headers> /dev/null 2>&1
 			fi
 			mkdir /var/lib/php5/sessions 2> /dev/null
-			chown -R www-data:www-data /var/lib/php5/sessions
+			chown -R www-data: /var/lib/php5/sessions
 			install -m 755 misc/mc_setup_backup /usr/local/sbin/mc_setup_backup
 			cp -R webserver/htdocs/{mail,dav,zpush} /var/www/
 			tar xf /var/www/dav/vendor.tar -C /var/www/dav/ ; rm /var/www/dav/vendor.tar
@@ -491,7 +491,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
 			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
 			sed -i "s/httpd_dav_subdomain/$httpd_dav_subdomain/g" /var/www/mail/inc/vars.inc.php
-			chown -R www-data: /var/www/{.,mail,dav,MAILBOX_BACKUP} /var/lib/php5/sessions
+			chown -R www-data: /var/www/{.,mail,dav,MAILBOX_BACKUP,PFLOG} /var/lib/php5/sessions
 			mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} < webserver/htdocs/init.sql
 			if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "SHOW INDEX FROM propertystorage WHERE KEY_NAME = 'path_property';" -N -B) ]]; then
 				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "CREATE UNIQUE INDEX path_property ON propertystorage (path(600), name(100));" -N -B
@@ -546,7 +546,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				chmod +x roundcube/inst/${roundcube_version}/bin/installto.sh
 				roundcube/inst/${roundcube_version}/bin/installto.sh /var/www/mail/rc
 			fi
-			chown -R www-data: /var/www/
+			chown -R www-data: /var/www/mail/rc
 			rm -rf roundcube/inst/${roundcube_version}
 			rm -rf /var/www/mail/rc/installer/
 			;;
