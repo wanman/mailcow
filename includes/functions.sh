@@ -575,33 +575,33 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 		fail2ban)
 			if [[ ! -z $(dpkg --get-selections | grep -E "^fail2ban.*install$") ]]; then
 				echo "$(textb [INFO]) - Fail2ban was installed from repository, skipping installation..."
-				break
-			fi
-			tar xf fail2ban/inst/${fail2ban_version}.tar -C fail2ban/inst/
-			rm -rf /etc/fail2ban/ 2> /dev/null
-			(cd fail2ban/inst/${fail2ban_version} ; python setup.py -q install 2> /dev/null)
-			mkdir -p /var/run/fail2ban
-			if [[ -f /lib/systemd/systemd ]]; then
-				cp fail2ban/conf/fail2ban.service /etc/systemd/system/fail2ban.service
-				systemctl disable fail2ban
-				[[ -f /lib/systemd/system/fail2ban.service ]] && rm /lib/systemd/system/fail2ban.service
-				systemctl daemon-reload
-				systemctl enable fail2ban
 			else
-				cp fail2ban/conf/fail2ban.init /etc/init.d/fail2ban
-				chmod +x /etc/init.d/fail2ban
-				update-rc.d fail2ban defaults
+				tar xf fail2ban/inst/${fail2ban_version}.tar -C fail2ban/inst/
+				rm -rf /etc/fail2ban/ 2> /dev/null
+				(cd fail2ban/inst/${fail2ban_version} ; python setup.py -q install 2> /dev/null)
+				mkdir -p /var/run/fail2ban
+				if [[ -f /lib/systemd/systemd ]]; then
+					cp fail2ban/conf/fail2ban.service /etc/systemd/system/fail2ban.service
+					systemctl disable fail2ban
+					[[ -f /lib/systemd/system/fail2ban.service ]] && rm /lib/systemd/system/fail2ban.service
+					systemctl daemon-reload
+					systemctl enable fail2ban
+				else
+					cp fail2ban/conf/fail2ban.init /etc/init.d/fail2ban
+					chmod +x /etc/init.d/fail2ban
+					update-rc.d fail2ban defaults
+				fi
+				if [[ ! -f /var/log/mail.warn ]]; then
+					touch /var/log/mail.warn
+				fi
+				if [[ ! -f /etc/fail2ban/jail.local ]]; then
+					cp fail2ban/conf/jail.local /etc/fail2ban/jail.local
+				fi
+				cp fail2ban/conf/jail.d/*.conf /etc/fail2ban/jail.d/
+				rm -rf fail2ban/inst/${fail2ban_version}
+				[[ -z $(grep fail2ban /etc/rc.local) ]] && sed -i '/^exit 0/i\test -d /var/run/fail2ban || install -m 755 -d /var/run/fail2ban/' /etc/rc.local
+				mkdir /var/run/fail2ban/ 2> /dev/null
 			fi
-			if [[ ! -f /var/log/mail.warn ]]; then
-				touch /var/log/mail.warn
-			fi
-			if [[ ! -f /etc/fail2ban/jail.local ]]; then
-				cp fail2ban/conf/jail.local /etc/fail2ban/jail.local
-			fi
-			cp fail2ban/conf/jail.d/*.conf /etc/fail2ban/jail.d/
-			rm -rf fail2ban/inst/${fail2ban_version}
-			[[ -z $(grep fail2ban /etc/rc.local) ]] && sed -i '/^exit 0/i\test -d /var/run/fail2ban || install -m 755 -d /var/run/fail2ban/' /etc/rc.local
-			mkdir /var/run/fail2ban/ 2> /dev/null
 			;;
 		restartservices)
 			[[ -f /lib/systemd/systemd ]] && echo "$(textb [INFO]) - Restarting services, this may take a few seconds..."
