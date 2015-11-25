@@ -10,7 +10,7 @@ source includes/functions.sh
 
 while getopts uhUH:D:? par; do
 case $par in
-	h|?)
+	h|'?')
 		usage
 		exit 0
 		;;
