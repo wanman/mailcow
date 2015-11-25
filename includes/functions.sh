@@ -650,7 +650,7 @@ upgradetask() {
 		echo "$(redb [ERR]) - mailcow is not installed"
 		exit 1
 	fi
-	if [[ -z $(cat /etc/{fufix_version,mailcow_version} 2> /dev/null | grep -E "0.9|0.10|0.11|0.12|0.13") ]]; then
+	if [[ -z $(cat /etc/{fufix_version,mailcow_version} 2> /dev/null | grep -E "0.9|0.10|0.11|0.12|0.13|0.14") ]]; then
 		echo "$(redb [ERR]) - Upgrade not supported"
 		exit 1
 	fi

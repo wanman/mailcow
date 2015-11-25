@@ -36,9 +36,8 @@ Ubuntu 14.04 is fine but not recommended.
 A summary of what software is installed with which features enabled.
 
 **General setup**
-* System environment adjustments (hostname, timzone, etc.)
 * Automatically generated passwords with high complexity
-* Self-signed SSL certificate for all installed and supporting services
+* Multi-SAN self-signed SSL certificate for all installed and supporting services
 * Nginx or Apache2 installation (+PHP5-FPM)
 * MySQL or MariaDB database backend, remote database support
 * **Z-Push** integration (IMAP, CalDAV and CardDAV)
@@ -160,6 +159,17 @@ The mailcow configuration file will not be read, so there is no need to adjust i
 To start the upgrade, run the following command:
 ```
 ./install.sh -u
+```
+
+If you don't want to confirm each step of the upgrade, use `-U` instead:
+```
+./install -U
+```
+
+When autodetection of your hostname and/or domain name fails, use the `-H` parameter to overwrite the hostname and/or `-D` to overwrite the domain name:
+```
+# FQDN: mx.example.org
+./install -u -H mx -D example.org
 ```
 
 # Uninstall
