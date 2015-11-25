@@ -1,25 +1,31 @@
 #!/bin/bash
 if [ "$EUID" -ne 0 ]
-  then echo "Please run as root"
-  exit
+	then echo "Please run as root"
+	exit
 fi
 
 cat includes/banner
 source includes/versions
 source includes/functions.sh
 
-while getopts H:D: par; do
+while getopts uhUH:D:? par; do
 case $par in
-    H) sys_hostname="$OPTARG" ;;
-    D) sys_domain="$OPTARG" ;;
+	h|?)
+		usage
+		exit 0
+		;;
+	u|U)
+		[[ ${par} == "U" ]] && inst_unattended="yes"
+		is_upgradetask="yes"
+		;;
+	H) sys_hostname="$OPTARG" ;;
+	D) sys_domain="$OPTARG" ;;
 esac
 done
 
-case ${1} in
-	"-u" | "--upgrade" | "-uu" | "--upgrade-unattended" )
-		[[ ${1} == "-uu" || ${1} == "--upgrade-unattended" ]] && inst_unattended="yes"
-		upgradetask
-		echo ${mailcow_version} > /etc/mailcow_version
+if [[ ${is_upgradetask} == "yes" ]]; then
+	upgradetask
+	echo ${mailcow_version} > /etc/mailcow_version
 echo --------------------------------- >> installer.log
 echo UPGRADE to ${mailcow_version} on $(date) >> installer.log
 echo --------------------------------- >> installer.log
@@ -27,13 +33,8 @@ echo Fail2ban version: ${fail2ban_version} >> installer.log
 echo Roundcube version: ${roundcube_version} >> installer.log
 echo FuGlu version: ${fuglu_version} >> installer.log
 echo --------------------------------- >> installer.log
-		exit 0
-		;;
-	"-h" | "--help" )
-		usage
-		exit 0
-        ;;
-esac
+	exit 0
+fi
 
 source mailcow.config
 checksystem

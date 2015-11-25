@@ -7,17 +7,18 @@ pinkb() { echo $(tput bold)$(tput setaf 5)${1}$(tput sgr0); }
 usage() {
 	echo "mailcow install script command-line parameters."
 	echo $(textb "Do not append any parameters to run mailcow in default mode.")
-	echo "./install.sh [ACTION] [PARAMETERS]"
-	echo "
+ 	echo "./install.sh [ACTION] [PARAMETERS]"
+	echo '
 	ACTIONS:
-	--help | -h
+	-h | -?
 		Print this text
 
-	--upgrade | -u
+	-u
 		Upgrade mailcow to a newer version
 
-	--upgrade-unattended | -uu
+	-U
 		Upgrade mailcow to a newer version unattended
+		(still requires to enter the SQL root password)
 
 
 	PARAMETERS:
@@ -27,7 +28,11 @@ usage() {
 
 		-D example.org
 			Overwrite domain detection
-	"
+
+	EXAMPLES:
+		Upgrade using mail.example.org as FQDN:
+		./install.sh -u -H mail -D example.org
+	'
 }
 
 genpasswd() {
@@ -141,6 +146,7 @@ installtask() {
 	case $1 in
 		environment)
 			[[ -z $(grep fs.inotify.max_user_instances /etc/sysctl.conf) ]] && echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.conf
+			sysctl -p > /dev/null 2>&1
 			if [[ -f /usr/share/zoneinfo/${sys_timezone} ]] ; then
 				echo ${sys_timezone} > /etc/timezone
 				dpkg-reconfigure -f noninteractive tzdata > /dev/null 2>&1
@@ -189,7 +195,7 @@ installtask() {
 				echo "$(yellowb [WARN]) - You are running Ubuntu. The installation will not fail, though you may see a lot of output until the installation is finished."
 			fi
 			apt-get -y update >/dev/null
-			if [[ $my_dbhost == "localhost" || $my_dbhost == "127.0.0.1" ]] && [[ $my_upgradetask != "yes" ]]; then
+			if [[ $my_dbhost == "localhost" || $my_dbhost == "127.0.0.1" ]] && [[ $is_upgradetask != "yes" ]]; then
 				if [[ $my_usemariadb == "yes" ]]; then
 					database_backend="mariadb-client mariadb-server"
 				else
@@ -301,7 +307,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			rm -rf fuglu/inst/$fuglu_version
 			;;
 		dovecot)
-			sysctl -p > /dev/null 2>&1
 			if [[ -f /lib/systemd/systemd ]]; then
 				systemctl disable dovecot.socket > /dev/null 2>&1
 			fi
@@ -324,6 +329,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_mailcowuser/$my_mailcowuser/g" ${DOVEFILES}
 			sed -i "s/my_mailcowdb/$my_mailcowdb/g" ${DOVEFILES}
 			sed -i "s/my_dbhost/$my_dbhost/g" ${DOVEFILES}
+			[[ ${IPV6} != "yes" ]] && sed -i '/listen =/c\listen = *' /etc/dovecot/dovecot.conf
 			mkdir /etc/dovecot/conf.d 2> /dev/null
 			mkdir -p /var/vmail/sieve 2> /dev/null
 			mkdir -p /var/vmail/public 2> /dev/null
@@ -534,7 +540,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			mkdir -p /var/www/mail/rc
 			tar xf roundcube/inst/${roundcube_version}.tar -C roundcube/inst/
 			cp -R roundcube/inst/${roundcube_version}/* /var/www/mail/rc/
-			if [[ $my_upgradetask != "yes" ]]; then
+			if [[ $is_upgradetask != "yes" ]]; then
 				cp -R roundcube/conf/* /var/www/mail/rc/
 				sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/rc/plugins/password/config.inc.php
 				sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/rc/plugins/password/config.inc.php
@@ -674,7 +680,6 @@ upgradetask() {
 	done
 	httpd_dav_subdomain=${readconf[8]}
 	[[ -z $my_dbhost ]] && my_dbhost="localhost"
-	my_upgradetask="yes"
 	for var in httpd_platform httpd_dav_subdomain sys_hostname sys_domain sys_timezone my_dbhost my_mailcowdb my_mailcowuser my_mailcowpass my_rcuser my_rcpass my_rcdb
 	do
 		if [[ -z ${!var} ]]; then
