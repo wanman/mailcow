@@ -627,7 +627,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			for srv in _autodiscover _carddavs _caldavs _imap _imaps _submission _pop3 _pop3s
 			do
 				if [[ -z $(dig srv ${srv}._tcp.${sys_domain} @8.8.8.8 +short) ]]; then
-					echo "$(textb [INFO, non-essential]) - Cannot find SRV record \"${srv}._tcp.${sys_domain}\""
+					echo "$(textb [INFO]) - non-essential - Cannot find SRV record \"${srv}._tcp.${sys_domain}\""
 				fi
 			done
 			for a in autodiscover ${sys_hostname} ${httpd_dav_subdomain}
