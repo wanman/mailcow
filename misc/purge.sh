@@ -121,6 +121,10 @@ rm -f /var/log/mail*1
 rm -f /var/log/mail*gz
 rm -rf /opt/vfilter/
 rm -f /etc/cron.d/pfadminfetchmail
+rm -f /etc/cron.d/clamav-unofficial-sigs-cron
+rm -f /etc/cron.d/solrmaint
+rm -f /etc/cron.daily/dovemaint
+rm -f /etc/cron.daily/doverecalcq
 rm -f /etc/cron.daily/spam*
 rm -rf /etc/opendkim*
 rm -f /usr/local/bin/mc_*
