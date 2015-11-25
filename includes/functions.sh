@@ -7,7 +7,9 @@ pinkb() { echo $(tput bold)$(tput setaf 5)${1}$(tput sgr0); }
 usage() {
 	echo "mailcow install script command-line parameters."
 	echo $(textb "Do not append any parameters to run mailcow in default mode.")
+	echo "./install.sh [ACTION] [PARAMETERS]"
 	echo "
+	ACTIONS:
 	--help | -h
 		Print this text
 
@@ -16,6 +18,15 @@ usage() {
 
 	--upgrade-unattended | -uu
 		Upgrade mailcow to a newer version unattended
+
+
+	PARAMETERS:
+	Note: Only available when upgrading
+		-H hostname
+			Overwrite hostname detection
+
+		-D example.org
+			Overwrite domain detection
 	"
 }
 
@@ -38,48 +49,13 @@ returnwait() {
 		echo "$(pinkb [RUNNING]) - Task $(textb "$2") started, please wait..."
 }
 
-is_ipv6() {
-    # Thanks to https://github.com/mutax
-    INPUT="$@"
-    O=""
-    while [ "$O" != "$INPUT" ]; do
-        O="$INPUT"
-        INPUT="$( sed  's|:\([0-9a-f]\{3\}\):|:0\1:|g' <<< "$INPUT" )"
-        INPUT="$( sed  's|:\([0-9a-f]\{3\}\)$|:0\1|g'  <<< "$INPUT")"
-        INPUT="$( sed  's|^\([0-9a-f]\{3\}\):|0\1:|g'  <<< "$INPUT" )"
-        INPUT="$( sed  's|:\([0-9a-f]\{2\}\):|:00\1:|g' <<< "$INPUT")"
-        INPUT="$( sed  's|:\([0-9a-f]\{2\}\)$|:00\1|g'  <<< "$INPUT")"
-        INPUT="$( sed  's|^\([0-9a-f]\{2\}\):|00\1:|g'  <<< "$INPUT")"
-        INPUT="$( sed  's|:\([0-9a-f]\):|:000\1:|g'  <<< "$INPUT")"
-        INPUT="$( sed  's|:\([0-9a-f]\)$|:000\1|g'   <<< "$INPUT")"
-        INPUT="$( sed  's|^\([0-9a-f]\):|000\1:|g'   <<< "$INPUT")"
-    done
-
-    grep -qs "::" <<< "$INPUT"
-    if [ "$?" -eq 0 ]; then
-        GRPS="$(sed  's|[0-9a-f]||g' <<< "$INPUT" | wc -m)"
-        ((GRPS--)) # carriage return
-        ((MISSING=8-GRPS))
-        for ((i=0;i<$MISSING;i++)); do
-            ZEROES="$ZEROES:0000"
-        done
-        INPUT="$( sed  's|\(.\)::\(.\)|\1'$ZEROES':\2|g'   <<< "$INPUT")"
-        INPUT="$( sed  's|\(.\)::$|\1'$ZEROES':0000|g'   <<< "$INPUT")"
-        INPUT="$( sed  's|^::\(.\)|'$ZEROES':0000:\1|g;s|^:||g'   <<< "$INPUT")"
-    fi
-
-    if [ $(echo $INPUT | wc -m) != 40 ]; then
-        return 1
-    else
-        return 0
-    fi
-}
-
 checksystem() {
-	if [[ $(grep MemTotal /proc/meminfo | awk '{print $2}') -lt 600000 ]]; then
-		echo "$(yellowb [WARN]) - At least ~600MB of memory is highly recommended"
+	if [[ $(grep MemTotal /proc/meminfo | awk '{print $2}') -lt 800000 ]]; then
+		echo "$(yellowb [WARN]) - At least 800MB of memory is highly recommended"
 		read -p "Press ENTER to skip this warning or CTRL-C to cancel the process"
 	fi
+	[[ ! -z $(ip -6 addr | grep "scope global") ]] && IPV6="yes"
+
 }
 
 checkports() {
@@ -122,10 +98,6 @@ checkports() {
 }
 
 checkconfig() {
-	if [[ ${#cert_country} -ne 2 ]]; then
-		echo "$(redb [ERR]) - Country code must consist of exactly two characters (DE/US/UK etc.)"
-		exit 1
-	fi
 	if [[ ${httpd_platform} != "nginx" && ${httpd_platform} != "apache2" ]]; then
 		echo "$(redb [ERR]) - \"httpd_platform\" is neither nginx nor apache2"
 		exit 1
@@ -137,7 +109,7 @@ checkconfig() {
 		echo "$(redb [ERR]) - \"httpd_dav_subdomain\" must not be \"sys_hostname\""
 		exit 1
 	fi
-	for var in sys_hostname sys_domain sys_timezone my_dbhost my_mailcowdb my_mailcowuser my_mailcowpass my_rootpw my_rcuser my_rcpass my_rcdb mailcow_admin_user mailcow_admin_pass cert_country cert_state cert_city cert_org
+	for var in sys_hostname sys_domain sys_timezone my_dbhost my_mailcowdb my_mailcowuser my_mailcowpass my_rootpw my_rcuser my_rcpass my_rcdb mailcow_admin_user mailcow_admin_pass
 	do
 		if [[ -z ${!var} ]]; then
 			echo "$(redb [ERR]) - Parameter $var must not be empty."
@@ -168,35 +140,7 @@ checkconfig() {
 installtask() {
 	case $1 in
 		environment)
-			getpublicipv4=$(wget -t1 -T10 -q4O- icanhazip.com)
-			if [[ ${getpublicipv4} =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
-				cat > /etc/hosts<<'EOF'
-127.0.0.1 localhost
-::1 localhost ip6-localhost ip6-loopback
-ff02::1 ip6-allnodes
-ff02::2 ip6-allrouters
-EOF
-				echo ${getpublicipv4} ${sys_hostname}.${sys_domain} ${sys_hostname} >> /etc/hosts
-				echo ${sys_hostname}.${sys_domain} > /etc/mailname
-				getpublicipv6=$(wget -t2 -T1 -q6O- icanhazip.com)
-					if is_ipv6 $getpublicipv6; then
-						echo $getpublicipv6 ${sys_hostname}.${sys_domain} ${sys_hostname} >> /etc/hosts
-					fi
-			else
-				echo "$(redb [ERR]) - Cannot set your hostname"
-				exit 1
-			fi
-			echo "$(textb [INFO]) - Setting your hostname..."
-			if [[ -f /lib/systemd/systemd ]]; then
-				if [[ -z $(dpkg --get-selections | grep -E "^dbus.*install$") ]]; then
-					apt-get update -y > /dev/null 2>&1 && apt-get -y install dbus > /dev/null 2>&1
-				fi
-				hostnamectl set-hostname ${sys_hostname}
-			else
-				echo ${sys_hostname} > /etc/hostname
-				hostname ${sys_hostname} > /dev/null 2>&1
-				service hostname.sh start > /dev/null 2>&1
-			fi
+			[[ -z $(grep fs.inotify.max_user_instances /etc/sysctl.conf) ]] && echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.conf
 			if [[ -f /usr/share/zoneinfo/${sys_timezone} ]] ; then
 				echo ${sys_timezone} > /etc/timezone
 				dpkg-reconfigure -f noninteractive tzdata > /dev/null 2>&1
@@ -259,7 +203,8 @@ openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecod
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-gd php5-imap php-apc subversion \
 php5-intl php5-xsl libawl-php php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc ${database_backend} ${webserver_backend} mailutils pyzor razor \
 postfix postfix-mysql postfix-pcre postgrey pflogsumm spamassassin spamc sudo bzip2 curl mpack opendkim opendkim-tools unzip clamav-daemon \
-python-magic unrar-free liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl bsd-mailx > /dev/null
+python-magic unrar-free liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl bsd-mailx \
+openjdk-7-jre-headless libcurl4-openssl-dev libexpat1-dev > /dev/null
 			if [ "$?" -ne "0" ]; then
 				echo "$(redb [ERR]) - Package installation failed"
 				exit 1
@@ -272,9 +217,9 @@ python-magic unrar-free liblockfile-simple-perl libdbi-perl libmime-base64-urlsa
 			cp /etc/ssl/private/ssl-cert-snakeoil.key /etc/dovecot/private/dovecot.key
 			if [[ ! -z $(grep wheezy-backports /etc/apt/sources.list) ]]; then
 				echo "$(textb [INFO]) - Installing Dovecot from wheezy-backports..."
-DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dovecot-core dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d -t wheezy-backports >/dev/null
+DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dovecot-core dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d dovecot-solr -t wheezy-backports >/dev/null
 			else
-DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dovecot-core dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d >/dev/null
+DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dovecot-core dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d dovecot-solr >/dev/null
 			fi
 			;;
 		ssl)
@@ -282,7 +227,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			rm /etc/ssl/mail/* 2> /dev/null
 			echo "$(textb [INFO]) - Generating 2048 bit DH parameters, this may take a while, please wait..."
 			openssl dhparam -out /etc/ssl/mail/dhparams.pem 2048 2> /dev/null
-			openssl req -new -newkey rsa:4096 -sha256 -days 1095 -nodes -x509 -subj "/C=$cert_country/ST=$cert_state/L=$cert_city/O=$cert_org/CN=${sys_hostname}.${sys_domain}" -keyout /etc/ssl/mail/mail.key  -out /etc/ssl/mail/mail.crt
+			openssl req -new -newkey rsa:4096 -sha256 -days 1095 -nodes -x509 -subj "/C=ZZ/ST=mailcow/L=mailcow/O=mailcow/CN=${sys_hostname}.${sys_domain}/subjectAltName=DNS.1=${sys_hostname}.${sys_domain},DNS.2=${httpd_dav_subdomain}.${sys_domain},DNS.3=autodiscover.{sys_domain}" -keyout /etc/ssl/mail/mail.key -out /etc/ssl/mail/mail.crt
 			chmod 600 /etc/ssl/mail/mail.key
 			cp /etc/ssl/mail/mail.crt /usr/local/share/ca-certificates/
 			update-ca-certificates
@@ -344,7 +289,9 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			(cd fuglu/inst/$fuglu_version ; python setup.py -q install)
 			cp -R fuglu/conf/* /etc/fuglu/
 			if [[ -f /lib/systemd/systemd ]]; then
-				cp fuglu/inst/$fuglu_version/scripts/startscripts/debian/8/fuglu.service /lib/systemd/system/fuglu.service
+				cp fuglu/inst/$fuglu_version/scripts/startscripts/debian/8/fuglu.service /etc/systemd/system/fuglu.service
+				[[ -f /lib/systemd/system/fuglu.service ]] && rm /lib/systemd/system/fuglu.service
+				systemctl daemon-reload
 				systemctl enable fuglu
 			else
 				cp fuglu/inst/$fuglu_version/scripts/startscripts/debian/7/fuglu /etc/init.d/fuglu
@@ -354,22 +301,22 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			rm -rf fuglu/inst/$fuglu_version
 			;;
 		dovecot)
-			[[ -z $(grep fs.inotify.max_user_instances /etc/sysctl.conf) ]] && echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.conf
 			sysctl -p > /dev/null 2>&1
 			if [[ -f /lib/systemd/systemd ]]; then
-				systemctl disable dovecot.socket  > /dev/null 2>&1
+				systemctl disable dovecot.socket > /dev/null 2>&1
 			fi
-			cp -R dovecot/conf/*.conf /etc/dovecot/
-			userdel vmail 2> /dev/null
-			groupdel vmail 2> /dev/null
-			groupadd -g 5000 vmail
-			useradd -g vmail -u 5000 vmail -d /var/vmail
+			if [[ -z $(grep '/var/vmail:' /etc/passwd | grep '5000:5000') ]]; then
+				userdel vmail 2> /dev/null
+				groupdel vmail 2> /dev/null
+				groupadd -g 5000 vmail
+				useradd -g vmail -u 5000 vmail -d /var/vmail
+			fi
 			chmod 755 "/etc/dovecot/"
-			chown root:dovecot "/etc/dovecot/dovecot-dict-sql.conf"; chmod 640 "/etc/dovecot/dovecot-dict-sql.conf"
-			chown root:vmail "/etc/dovecot/dovecot-mysql.conf"; chmod 640 "/etc/dovecot/dovecot-mysql.conf"
-			chown root:root "/etc/dovecot/dovecot.conf"; chmod 644 "/etc/dovecot/dovecot.conf"
-			touch "/etc/dovecot/mailcow_public_folder.conf"; chmod 664 "/etc/dovecot/mailcow_public_folder.conf"
-			chown root:www-data "/etc/dovecot/mailcow_public_folder.conf"
+			install -o root -g dovecot -m 640 dovecot/conf/dovecot-dict-sql.conf /etc/dovecot/dovecot-dict-sql.conf
+			install -o root -g vmail -m 640 dovecot/conf/dovecot-mysql.conf /etc/dovecot/dovecot-mysql.conf
+			install -m 644 dovecot/conf/dovecot.conf /etc/dovecot/dovecot.conf
+			touch /etc/dovecot/mailcow_public_folder.conf
+			chmod 664 "/etc/dovecot/mailcow_public_folder.conf"; chown root:www-data "/etc/dovecot/mailcow_public_folder.conf"
 			DOVEFILES=$(find /etc/dovecot -maxdepth 1 -type f -printf '/etc/dovecot/%f ')
 			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" ${DOVEFILES}
 			sed -i "s/MAILCOW_DOMAIN/${sys_domain}/g" ${DOVEFILES}
@@ -383,12 +330,70 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			if [ ! -f /var/vmail/public/dovecot-acl ]; then
 				echo "anyone lrwstipekxa" > /var/vmail/public/dovecot-acl
 			fi
-			cp dovecot/conf/global.sieve /var/vmail/sieve/global.sieve
+			install -m 644 dovecot/conf/global.sieve /var/vmail/sieve/global.sieve
 			touch /var/vmail/sieve/default.sieve
 			install -m 755 misc/mc_msg_size /usr/local/sbin/mc_msg_size
 			sievec /var/vmail/sieve/global.sieve
 			chown -R vmail:vmail /var/vmail
 			install -m 755 dovecot/conf/doverecalcq /etc/cron.daily/
+			# Solr
+			if [[ -z $(curl -s --connect-timeout 3 "http://127.0.0.1:8983/solr/admin/info/system" 2> /dev/null | grep -o '[0-9.]*' | grep "^${solr_version}\$") ]]; then
+				(
+				TMPSOLR=$(mktemp -d)
+				cd $TMPSOLR
+				MIRRORS_SOLR=(http://mirror.23media.de/apache/lucene/solr/${solr_version}/solr-${solr_version}.tgz
+				http://mirror2.shellbot.com/apache/lucene/solr/${solr_version}/solr-${solr_version}.tgz
+				http://mirrors.koehn.com/apache/lucene/solr/${solr_version}/solr-${solr_version}.tgz
+				http://mirrors.sonic.net/apache/lucene/solr/${solr_version}/solr-${solr_version}.tgz
+				http://apache.mirrors.ovh.net/ftp.apache.org/dist/lucene/solr/${solr_version}/solr-${solr_version}.tgz
+				http://mirror.nohup.it/apache/lucene/solr/${solr_version}/solr-${solr_version}.tgz
+				http://ftp-stud.hs-esslingen.de/pub/Mirrors/ftp.apache.org/dist/lucene/solr/${solr_version}/solr-${solr_version}.tgz
+				http://mirror.netcologne.de/apache.org/lucene/solr/${solr_version}/solr-${solr_version}.tgz)
+				for i in "${MIRRORS_SOLR[@]}"; do
+					if curl --connect-timeout 3 --output /dev/null --silent --head --fail "$i"; then
+						SOLR_URL="$i"
+						break
+					fi
+				done
+				if [[ -z ${SOLR_URL} ]]; then
+					echo "$(redb [ERR]) - No Solr mirror was usable"
+					exit 1
+				fi
+				echo $(textb "Downloading Solr ${solr_version}...")
+				curl ${SOLR_URL} -# | tar xfz -
+				if [[ ! -d /opt/solr ]]; then
+					mkdir /opt/solr/
+				fi
+				cp -R solr-${solr_version}/* /opt/solr
+				rm -r ${TMPSOLR}
+				)
+				if [[ ! -d /var/solr ]]; then
+					mkdir /var/solr/
+				fi
+				if [[ ! -f /var/solr/solr.in.sh ]]; then
+				install -m 644 /opt/solr/bin/solr.in.sh /var/solr/solr.in.sh
+				sed -i '/SOLR_HOST/c\SOLR_HOST=127.0.0.1' /var/solr/solr.in.sh
+				sed -i '/SOLR_PORT/c\SOLR_PORT=8983' /var/solr/solr.in.sh
+				sed -i "/SOLR_TIMEZONE/c\SOLR_TIMEZONE=\"${sys_timezone}\"" /var/solr/solr.in.sh
+			fi
+			if [[ ! -f /etc/init.d/solr ]]; then
+				install -m 755 /opt/solr/bin/init.d/solr /etc/init.d/solr
+				chmod +x /etc/init.d/solr
+				update-rc.d solr defaults
+				if [[ -f /lib/systemd/systemd ]]; then
+					systemctl daemon-reload
+				fi
+			fi
+			if [[ -z $(grep solr /etc/passwd) ]]; then
+				useradd -r -d /opt/solr solr
+			fi
+			chown -R solr: /opt/solr
+			service solr restart
+			sleep 2
+			if [[ ! -d /opt/solr/server/solr/dovecot2/ ]]; then
+				sudo -u solr /opt/solr/bin/solr create -c dovecot2
+			fi
+			fi
 			;;
 		clamav)
 			usermod -a -G vmail clamav 2> /dev/null
@@ -512,7 +517,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			else
 				echo "$(textb [INFO]) - At least one administrator exists, will not create another mailcow administrator"
 			fi
-			# zpush
+			# Z-Push
 			sed -i "s#MAILCOW_TIMEZONE#${sys_timezone}#g" /var/www/zpush/config.php
 			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /var/www/zpush/backend/imap/config.php
 			sed -i "s/MAILCOW_DAV_HOST.MAILCOW_DOMAIN/${httpd_dav_subdomain}.${sys_domain}/g" /var/www/zpush/backend/caldav/config.php
@@ -566,7 +571,9 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			(cd fail2ban/inst/${fail2ban_version} ; python setup.py -q install 2> /dev/null)
 			if [[ -f /lib/systemd/systemd ]]; then
 				mkdir -p /var/run/fail2ban
-				cp fail2ban/conf/fail2ban.service /lib/systemd/system/fail2ban.service
+				cp fail2ban/conf/fail2ban.service /etc/systemd/system/fail2ban.service
+				[[ -f /lib/systemd/system/fail2ban.service ]] && rm /lib/systemd/system/fail2ban.service
+				systemctl daemon-reload
 				systemctl enable fail2ban
 			else
 				cp fail2ban/conf/fail2ban.init /etc/init.d/fail2ban
@@ -599,13 +606,13 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			done
 			;;
 		checkdns)
-			if [[ -z $(dig -x ${getpublicipv4} @8.8.8.8 | grep -i ${sys_domain}) ]]; then
-				echo "$(yellowb [WARN]) - Remember to setup a PTR record: ${getpublicipv4} does not point to ${sys_domain}" | tee -a installer.log
+			if [[ -z $(dig -x ${getpublicipv4} @8.8.8.8 | grep -i "${sys_hostname}.${sys_domain}") ]]; then
+				echo "$(yellowb [WARN]) - Remember to setup a PTR record: ${getpublicipv4} does not point to ${sys_hostname}.${sys_domain}" | tee -a installer.log
 			fi
 			for srv in _autodiscover _carddavs _caldavs _imap _imaps _submission _pop3 _pop3s
 			do
 				if [[ -z $(dig srv ${srv}._tcp.${sys_domain} @8.8.8.8 +short) ]]; then
-					echo "$(textb [INFO]) - Cannot find SRV record \"${srv}._tcp.${sys_domain}\""
+					echo "$(textb [INFO, non-essential]) - Cannot find SRV record \"${srv}._tcp.${sys_domain}\""
 				fi
 			done
 			for a in autodiscover ${sys_hostname} ${httpd_dav_subdomain}
@@ -647,8 +654,8 @@ upgradetask() {
 	if [[ -z $(which lsb_release) ]]; then
 		apt-get -y update > /dev/null ; apt-get -y install lsb-release > /dev/null 2>&1
 	fi
-	sys_hostname=$(hostname)
-	sys_domain=$(hostname -d)
+	[[ -z ${sys_hostname} ]] && sys_hostname=$(hostname -s)
+	[[ -z ${sys_domain} ]] && sys_domain=$(hostname -d)
 	sys_timezone=$(cat /etc/timezone)
 	timestamp=$(date +%Y%m%d_%H%M%S)
 	readconf=( $(php -f misc/readconf.php) )
@@ -660,6 +667,7 @@ upgradetask() {
 	my_rcuser=${readconf[5]}
 	my_rcpass=${readconf[6]}
 	my_rcdb=${readconf[7]}
+	echo "$(pinkb [NOTICE]) - mailcow needs your SQL root password to perform higher privilege level tasks"
         read -p "Please enter your SQL root user password: " my_rootpw
 	while [[ $(mysql --host ${my_dbhost} -u root -p${my_rootpw} -e ""; echo $?) -ne 0 ]]; do
 		read -p "Please enter your SQL root user password: " my_rootpw
@@ -695,6 +703,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 --------------------------------------------------------
 "
 	if [[ $inst_unattended != "yes" ]]; then
+		echo "$(pinkb [NOTICE]) - You can overwrite the detected hostname and domain by calling the installer with -H hostname and -D example.org"
 		read -p "Press ENTER to continue or CTRL-C to cancel the upgrade process"
 	fi
 	echo -en "Creating backups in ./before_upgrade_$timestamp... \t"
