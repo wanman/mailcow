@@ -296,6 +296,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			cp -R fuglu/conf/* /etc/fuglu/
 			if [[ -f /lib/systemd/systemd ]]; then
 				cp fuglu/inst/$fuglu_version/scripts/startscripts/debian/8/fuglu.service /etc/systemd/system/fuglu.service
+				systemctl disable fuglu
 				[[ -f /lib/systemd/system/fuglu.service ]] && rm /lib/systemd/system/fuglu.service
 				systemctl daemon-reload
 				systemctl enable fuglu
@@ -572,12 +573,17 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			fi
 			;;
 		fail2ban)
+			if [[ ! -z $(dpkg --get-selections | grep -E "^fail2ban.*install$") ]]; then
+				echo "$(textb [INFO]) - Fail2ban was installed from repository, skipping installation..."
+				break
+			fi
 			tar xf fail2ban/inst/${fail2ban_version}.tar -C fail2ban/inst/
 			rm -rf /etc/fail2ban/ 2> /dev/null
 			(cd fail2ban/inst/${fail2ban_version} ; python setup.py -q install 2> /dev/null)
+			mkdir -p /var/run/fail2ban
 			if [[ -f /lib/systemd/systemd ]]; then
-				mkdir -p /var/run/fail2ban
 				cp fail2ban/conf/fail2ban.service /etc/systemd/system/fail2ban.service
+				systemctl disable fail2ban
 				[[ -f /lib/systemd/system/fail2ban.service ]] && rm /lib/systemd/system/fail2ban.service
 				systemctl daemon-reload
 				systemctl enable fail2ban
