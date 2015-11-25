@@ -1115,7 +1115,8 @@ function mailbox_edit_mailbox($link, $postarray) {
 			);
 			return false;
 		}
-		$update_user = "UPDATE mailbox SET modified=now(), active='".$active."', password='".$password_sha512c."', name='".$name."', quota='".$quota_b."' WHERE username='".$username."';";
+		$update_user = "UPDATE alias SET modified=now(), active='".$active."' WHERE address='".$username."';";
+		$update_user .= "UPDATE mailbox SET modified=now(), active='".$active."', password='".$password_sha512c."', name='".$name."', quota='".$quota_b."' WHERE username='".$username."';";
 		$update_user .= "UPDATE users SET digesta1=MD5(CONCAT('".$username."', ':SabreDAV:', '".$password."')) WHERE username='".$username."';";
 		if (!mysqli_multi_query($link, $update_user)) {
 			$_SESSION['return'] = array(
@@ -1133,13 +1134,17 @@ function mailbox_edit_mailbox($link, $postarray) {
 		);
 		return true;
 	}
-	$mystring = "UPDATE mailbox SET modified=now(), active='".$active."', name='".$name."', quota='".$quota_b."' WHERE username='".$username."'";
-	if (!mysqli_query($link, $mystring)) {
+	$update_user = "UPDATE alias SET modified=now(), active='".$active."' WHERE address='".$username."';";
+	$update_user .= "UPDATE mailbox SET modified=now(), active='".$active."', name='".$name."', quota='".$quota_b."' WHERE username='".$username."'";
+	if (!mysqli_multi_query($link, $update_user)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'MySQL Error: '.mysqli_error($link)
 		);
 		return false;
+	}
+	while ($link->next_result()) {
+		if (!$link->more_results()) break;
 	}
 	$_SESSION['return'] = array(
 		'type' => 'success',
