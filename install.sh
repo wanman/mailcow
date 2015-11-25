@@ -8,6 +8,13 @@ cat includes/banner
 source includes/versions
 source includes/functions.sh
 
+while getopts H:D: par; do
+case $par in
+    H) sys_hostname="$OPTARG" ;;
+    D) sys_domain="$OPTARG" ;;
+esac
+done
+
 case ${1} in
 	"-u" | "--upgrade" | "-uu" | "--upgrade-unattended" )
 		[[ ${1} == "-uu" || ${1} == "--upgrade-unattended" ]] && inst_unattended="yes"
