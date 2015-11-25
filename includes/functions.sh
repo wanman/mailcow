@@ -342,7 +342,9 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			install -m 755 misc/mc_msg_size /usr/local/sbin/mc_msg_size
 			sievec /var/vmail/sieve/global.sieve
 			chown -R vmail:vmail /var/vmail
-			install -m 755 dovecot/conf/doverecalcq /etc/cron.daily/
+			[[ -f /etc/cron.daily/doverecalcq ]] && rm /etc/cron.daily/doverecalcq
+			install -m 755 dovecot/conf/dovemaint /etc/cron.daily/
+			install -m 644 dovecot/conf/solrmaint /etc/cron.d/
 			# Solr
 			if [[ -z $(curl -s --connect-timeout 3 "http://127.0.0.1:8983/solr/admin/info/system" 2> /dev/null | grep -o '[0-9.]*' | grep "^${solr_version}\$") ]]; then
 				(
