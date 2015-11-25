@@ -58,6 +58,7 @@ service solr stop
 service fuglu stop
 update-rc.d -f fail2ban remove
 update-rc.d -f fuglu remove
+update-rc.d -f solr remove
 systemctl disable fail2ban
 systemctl disable fuglu
 rm /etc/systemd/system/fail2ban.service
@@ -92,6 +93,7 @@ fi
 rm -rf /etc/fuglu
 rm -rf /usr/local/lib/python2.7/dist-packages/fuglu*
 rm -rf /opt/solr/
+rm -rf /var/solr/
 rm -rf /etc/ssl/mail/
 rm -rf /etc/spamassassin/
 rm -rf /etc/dovecot/
@@ -109,6 +111,7 @@ rm -rf /var/run/fetchmail
 rm -rf /usr/local/lib/python2.7/dist-packages/fail2ban-*
 rm -f /usr/local/bin/fail2ban*
 rm -f /etc/init.d/fail2ban
+rm -f /etc/init.d/solr
 rm -rf /var/run/fail2ban/
 rm -f /var/log/fail2ban.log
 cat /dev/null > /var/log/mail.warn

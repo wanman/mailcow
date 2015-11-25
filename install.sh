@@ -40,7 +40,7 @@ source mailcow.config
 checksystem
 checkports
 checkconfig
-
+echo
 echo "    $(textb "Hostname")            ${sys_hostname}
     $(textb "Domain")              ${sys_domain}
     $(textb "FQDN")                ${sys_hostname}.${sys_domain}
