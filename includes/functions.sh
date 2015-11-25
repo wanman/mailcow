@@ -613,7 +613,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			else
 				fpm=""
 			fi
-			for var in fail2ban rsyslog ${httpd_platform} ${fpm} spamassassin fuglu dovecot postfix opendkim clamav-daemon
+			for var in solr fail2ban rsyslog ${httpd_platform} ${fpm} spamassassin fuglu dovecot postfix opendkim clamav-daemon
 			do
 				service $var stop
 				sleep 1.5
