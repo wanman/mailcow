@@ -382,6 +382,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 				sed -i '/SOLR_HOST/c\SOLR_HOST=127.0.0.1' /var/solr/solr.in.sh
 				sed -i '/SOLR_PORT/c\SOLR_PORT=8983' /var/solr/solr.in.sh
 				sed -i "/SOLR_TIMEZONE/c\SOLR_TIMEZONE=\"${sys_timezone}\"" /var/solr/solr.in.sh
+				[[ -z $(grep "jetty.host=localhost" /var/solr/solr.in.sh) ]] && echo 'SOLR_OPTS="$SOLR_OPTS -Djetty.host=localhost"' >> /var/solr/solr.in.sh
 			fi
 			if [[ ! -f /etc/init.d/solr ]]; then
 				install -m 755 /opt/solr/bin/init.d/solr /etc/init.d/solr
