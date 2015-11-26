@@ -1419,7 +1419,7 @@ function mailbox_delete_mailbox($link, $postarray) {
 		return false;
 	}
 
-	$mbox_backup_cont = file_get_contents($GLOBALS['MC_MBOX_BACKUP']);
+	$mbox_backup_content = file_get_contents($GLOBALS['MC_MBOX_BACKUP']);
 	$mbox_backup_content = str_replace($username, '', $mbox_backup_content);
 	file_put_contents($GLOBALS['MC_MBOX_BACKUP'], $mbox_backup_content, LOCK_EX);
 
