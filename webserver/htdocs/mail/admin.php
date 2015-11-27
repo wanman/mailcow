@@ -406,13 +406,15 @@ opendkim_table();
 </form>
 <h4>Mailgraph</h4>
 <?php
-$imageurls = array('mailgraph.cgi?0-n', 'mailgraph.cgi?1-n', 'mailgraph.cgi?2-n', 'mailgraph.cgi?3-n');
+$imageurls = array("mailgraph.cgi?0-n", "mailgraph.cgi?1-n", "mailgraph.cgi?2-n", "mailgraph.cgi?3-n");
 foreach ($imageurls as $image) {
 	$image = 'http://localhost:81/'.$image;
 	$imageData = base64_encode(file_get_contents($image));
-	echo '<img src="data:image/png;base64,'.$imageData.'">';
+
+	echo '<img class="img-responsive" alt="'.$image.'" src="data:image/png;base64,'.$imageData.'">';
 }
 ?>
+
 </div>
 </div>
 </div>
@@ -420,18 +422,18 @@ foreach ($imageurls as $image) {
 <?php
 }
 elseif (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "domainadmin") {
-header('Location: mailbox.php');
-die("Permission denied");
+	header('Location: mailbox.php');
+	die("Permission denied");
 }
 elseif (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "user") {
-header('Location: user.php');
-die("Permission denied");
+	header('Location: user.php');
+	die("Permission denied");
 } else {
-if (!function_exists('exec') || !function_exists('shell_exec')):
+	if (!function_exists('exec') || !function_exists('shell_exec')):
 ?>
-<div class="alert alert-danger">Please enable "exec" and "shell_exec" PHP functions.</div>
+		<div class="alert alert-danger">Please enable "exec" and "shell_exec" PHP functions.</div>
 <?php
-endif;
+	endif;
 ?>
 <div class="panel panel-default">
 <div class="panel-heading">Login</div>
