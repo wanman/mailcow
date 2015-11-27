@@ -404,6 +404,15 @@ opendkim_table();
 		<button type="submit" class="btn btn-default">Renew Pflogsumm</button>
 	</div>
 </form>
+<h4>Mailgraph</h4>
+<?php
+$imageurls = array('mailgraph.cgi?0-n', 'mailgraph.cgi?1-n', 'mailgraph.cgi?2-n', 'mailgraph.cgi?3-n');
+foreach ($imageurls as $image) {
+	$image = 'http://localhost:81/'.$image;
+	$imageData = base64_encode(file_get_contents($image));
+	echo '<img src="data:image/png;base64,'.$imageData.'">';
+}
+?>
 </div>
 </div>
 </div>

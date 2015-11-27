@@ -9,6 +9,14 @@ server {
 	return 301 https://$host$request_uri;
 }
 server {
+	listen 127.0.0.1:81;
+	location ~ \.cgi$ {
+		root /usr/lib/cgi-bin;
+		include /etc/nginx/fastcgi_params;
+		fastcgi_pass unix:/var/run/fcgiwrap.socket;
+	}
+}
+server {
 	listen 443;
 	listen [::]:443;
 	ssl on;
