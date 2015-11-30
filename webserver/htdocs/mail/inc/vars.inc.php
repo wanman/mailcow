@@ -29,7 +29,7 @@ $mailcow_public_folder= "/etc/dovecot/mailcow_public_folder.conf";
 $mailcow_opendkim_dnstxt_folder = "/etc/opendkim/dnstxt";
 
 /* Data files */
-$MC_MBOX_BACKUP = "/var/mailow/mailbox_backup_env";
+$MC_MBOX_BACKUP = "/var/mailcow/mailbox_backup_env";
 $PFLOG = "/var/mailcow/log/pflogsumm.log";
 
 $MYHOSTNAME=exec("/usr/sbin/postconf -h myhostname");
