@@ -157,7 +157,7 @@ installtask() {
 				echo "$(redb [ERR]) - Cannot set your timezone: timezone is unknown"
 				exit 1
 			fi
-			mkdir -p /var/mailcow/tmp;
+			mkdir -p /var/mailcow/log;
 			;;
 		installpackages)
 			echo "$(textb [INFO]) - Installing prerequisites..."
@@ -768,7 +768,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 	returnwait "Spamassassin configuration" "Webserver configuration"
 
 	rm -rf /var/lib/php5/sessions/*
-	mkdir -p /var/mailcow/tmp
+	mkdir -p /var/mailcow/log
 	mv /var/www/MAILBOX_BACKUP /var/mailcow/mailbox_backup_env 2> /dev/null
 	mv /var/www/PFLOG /var/mailcow/log/pflogsumm.log 2> /dev/null
 
