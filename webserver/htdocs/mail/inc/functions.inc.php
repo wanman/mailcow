@@ -338,6 +338,14 @@ function echo_sys_info($what, $extra="") {
 				echo file_get_contents($GLOBALS['PFLOG']);
 			}
 			break;
+		case "mailgraph":
+			$imageurls = array("0-n", "1-n", "2-n", "3-n");
+			foreach ($imageurls as $image) {
+				$image = 'http://localhost:81/mailgraph.cgi?'.$image;
+				$imageData = base64_encode(file_get_contents($image));
+				echo '<img class="img-responsive" alt="'.$image.'" src="data:image/png;base64,'.$imageData.'" />';
+			}
+			break;
 		case "mailq":
 			echo shell_exec("mailq");
 			break;
@@ -1418,11 +1426,6 @@ function mailbox_delete_mailbox($link, $postarray) {
 		);
 		return false;
 	}
-
-	$mbox_backup_content = file_get_contents($GLOBALS['MC_MBOX_BACKUP']);
-	$mbox_backup_content = str_replace($username, '', $mbox_backup_content);
-	file_put_contents($GLOBALS['MC_MBOX_BACKUP'], $mbox_backup_content, LOCK_EX);
-
 	$delete_user = "DELETE FROM alias WHERE goto='".$username."';";
 	$delete_user .= "UPDATE alias SET goto=REPLACE(goto, ',".$username.",', ',');";
 	$delete_user .= "UPDATE alias SET goto=REPLACE(goto, ',".$username."', '');";

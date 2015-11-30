@@ -36,22 +36,21 @@ usage() {
 }
 
 genpasswd() {
-    count=0
-    while [ $count -lt 3 ]
-    do
-        pw_valid=$(tr -cd A-Za-z0-9 < /dev/urandom | fold -w24 | head -n1)
-        count=$(grep -o "[0-9]" <<< $pw_valid | wc -l)
-    done
-    echo $pw_valid
+	count=0
+	while [ $count -lt 3 ]; do
+		pw_valid=$(tr -cd A-Za-z0-9 < /dev/urandom | fold -w24 | head -n1)
+		count=$(grep -o "[0-9]" <<< $pw_valid | wc -l)
+	done
+	echo $pw_valid
 }
 
 returnwait() {
-		echo "$(greenb [OK]) - Task $(textb "$1") completed"
-		echo "----------------------------------------------"
-		if [[ $inst_unattended != "yes" ]]; then
-			read -p "$(yellowb !) Press ENTER to continue with task $(textb "$2") (CTRL-C to abort) "
-		fi
-		echo "$(pinkb [RUNNING]) - Task $(textb "$2") started, please wait..."
+	echo "$(greenb [OK]) - Task $(textb "$1") completed"
+	echo "----------------------------------------------"
+	if [[ $inst_unattended != "yes" ]]; then
+		read -p "$(yellowb !) Press ENTER to continue with task $(textb "$2") (CTRL-C to abort) "
+	fi
+	echo "$(pinkb [RUNNING]) - Task $(textb "$2") started, please wait..."
 }
 
 checksystem() {
@@ -136,7 +135,7 @@ checkconfig() {
 		set -x
 	fi
 	if [[ -z $(which rsyslogd) ]]; then
-		echo "$(redb [ERR]) - Please install rsyslogd first"
+		echo "$(redb [ERR]) - Please install rsyslogd"
 		echo
 		exit 1
 	fi
@@ -158,6 +157,7 @@ installtask() {
 				echo "$(redb [ERR]) - Cannot set your timezone: timezone is unknown"
 				exit 1
 			fi
+			mkdir -p /var/mailcow/tmp;
 			;;
 		installpackages)
 			echo "$(textb [INFO]) - Installing prerequisites..."
@@ -227,9 +227,17 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			else
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dovecot-core dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d dovecot-solr >/dev/null
 			fi
+			# Installing mailcow binaries
+			install -m 755 misc/mc_clean_spam_aliases /etc/cron.daily/mc_clean_spam_aliases
+			install -m 755 misc/mc_pfset /usr/local/sbin/mc_pfset
+			install -m 755 misc/mc_pflog_renew /usr/local/sbin/mc_pflog_renew
+			install -m 755 misc/mc_msg_size /usr/local/sbin/mc_msg_size
+			install -m 755 misc/mc_dkim_ctrl /usr/local/sbin/mc_dkim_ctrl
+			install -m 755 misc/mc_setup_backup /usr/local/sbin/mc_setup_backup
+			install -m 700 misc/mc_resetadmin /usr/local/sbin/mc_resetadmin
 			;;
 		ssl)
-            mkdir /etc/ssl/mail 2> /dev/null
+			mkdir /etc/ssl/mail 2> /dev/null
 			rm /etc/ssl/mail/* 2> /dev/null
 			echo "$(textb [INFO]) - Generating 2048 bit DH parameters, this may take a while, please wait..."
 			openssl dhparam -out /etc/ssl/mail/dhparams.pem 2048 2> /dev/null
@@ -264,9 +272,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown root:root "/etc/postfix/main.cf"; chmod 644 "/etc/postfix/main.cf"
 			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /etc/postfix/main.cf
 			sed -i "s/MAILCOW_DOMAIN/${sys_domain}/g" /etc/postfix/main.cf
-			cp misc/mc_clean_spam_aliases /etc/cron.daily/mc_clean_spam_aliases
-			cp misc/mc_pfset /usr/local/sbin/mc_pfset
-			cp misc/mc_pflog_renew /usr/local/sbin/mc_pflog_renew
 			chmod +x /usr/local/sbin/mc_pfset /usr/local/sbin/mc_pflog_renew
 			chmod 700 /etc/cron.daily/mc_clean_spam_aliases
 			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /etc/postfix/sql/* /etc/cron.daily/mc_clean_spam_aliases
@@ -339,7 +344,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			fi
 			install -m 644 dovecot/conf/global.sieve /var/vmail/sieve/global.sieve
 			touch /var/vmail/sieve/default.sieve
-			install -m 755 misc/mc_msg_size /usr/local/sbin/mc_msg_size
 			sievec /var/vmail/sieve/global.sieve
 			chown -R vmail:vmail /var/vmail
 			[[ -f /etc/cron.daily/doverecalcq ]] && rm /etc/cron.daily/doverecalcq
@@ -436,7 +440,6 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			echo 'SOCKET="inet:10040@localhost"' > /etc/default/opendkim
 			mkdir -p /etc/opendkim/{keyfiles,dnstxt} 2> /dev/null
 			touch /etc/opendkim/{KeyTable,SigningTable}
-			install -m 755 misc/mc_dkim_ctrl /usr/local/sbin/
 			install -m 644 opendkim/conf/opendkim.conf /etc/opendkim.conf
 			;;
 		spamassassin)
@@ -489,24 +492,21 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				a2enmod rewrite ssl headers cgi > /dev/null 2>&1
 			fi
 			mkdir /var/lib/php5/sessions 2> /dev/null
-			chown -R www-data: /var/lib/php5/sessions
-			install -m 755 misc/mc_setup_backup /usr/local/sbin/mc_setup_backup
 			cp -R webserver/htdocs/{mail,dav,zpush} /var/www/
 			tar xf /var/www/dav/vendor.tar -C /var/www/dav/ ; rm /var/www/dav/vendor.tar
 			tar xf /var/www/zpush/vendor.tar -C /var/www/zpush/ ; rm /var/www/zpush/vendor.tar
 			find /var/www/{dav,mail,zpush} -type d -exec chmod 755 {} \;
 			find /var/www/{dav,mail,zpush} -type f -exec chmod 644 {} \;
 			sed -i "/date_default_timezone_set/c\date_default_timezone_set('${sys_timezone}');" /var/www/dav/server.php
-			touch /var/www/MAILBOX_BACKUP
-			echo none > /var/www/PFLOG
-			cp misc/mc_resetadmin /usr/local/sbin/mc_resetadmin ; chmod 700 /usr/local/sbin/mc_resetadmin
+			touch /var/mailcow/mailbox_backup_env
+			echo none > /var/mailcow/log/pflogsumm.log
 			sed -i "s/mailcow_sub/${sys_hostname}/g" /var/www/mail/autoconfig.xml
 			sed -i "s/my_dbhost/$my_dbhost/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
 			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
 			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
 			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
 			sed -i "s/httpd_dav_subdomain/$httpd_dav_subdomain/g" /var/www/mail/inc/vars.inc.php
-			chown -R www-data: /var/www/{.,mail,dav,MAILBOX_BACKUP,PFLOG} /var/lib/php5/sessions
+			chown -R www-data: /var/www/{.,mail,dav} /var/lib/php5/sessions /var/mailcow/mailbox_backup_env
 			mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} < webserver/htdocs/init.sql
 			if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "SHOW INDEX FROM propertystorage WHERE KEY_NAME = 'path_property';" -N -B) ]]; then
 				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "CREATE UNIQUE INDEX path_property ON propertystorage (path(600), name(100));" -N -B
@@ -767,8 +767,12 @@ A backup will be stored in ./before_upgrade_$timestamp
 	installtask spamassassin
 	returnwait "Spamassassin configuration" "Webserver configuration"
 
-	installtask webserver
 	rm -rf /var/lib/php5/sessions/*
+	mkdir -p /var/mailcow/tmp
+	mv /var/www/MAILBOX_BACKUP /var/mailcow/mailbox_backup_env 2> /dev/null
+	mv /var/www/PFLOG /var/mailcow/log/pflogsumm.log 2> /dev/null
+
+	installtask webserver
 	returnwait "Webserver configuration" "Roundcube configuration"
 
 	installtask roundcube

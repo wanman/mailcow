@@ -405,16 +405,7 @@ opendkim_table();
 	</div>
 </form>
 <h4>Mailgraph</h4>
-<?php
-$imageurls = array("mailgraph.cgi?0-n", "mailgraph.cgi?1-n", "mailgraph.cgi?2-n", "mailgraph.cgi?3-n");
-foreach ($imageurls as $image) {
-	$image = 'http://localhost:81/'.$image;
-	$imageData = base64_encode(file_get_contents($image));
-
-	echo '<img class="img-responsive" alt="'.$image.'" src="data:image/png;base64,'.$imageData.'">';
-}
-?>
-
+<?php echo_sys_info("mailgraph");?>
 </div>
 </div>
 </div>
