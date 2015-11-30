@@ -55,8 +55,6 @@ returnwait "Reading configuration" "System environment"
 echo --------------------------------- > installer.log
 echo MySQL database host: ${my_dbhost}  >> installer.log
 echo --------------------------------- >> installer.log
-echo Use existing database: ${my_useexisting}  >> installer.log
-echo --------------------------------- >> installer.log
 echo MySQL mailcow database: ${my_mailcowdb} >> installer.log
 echo MySQL mailcow username: ${my_mailcowuser} >> installer.log
 echo MySQL mailcow password: ${my_mailcowpass} >> installer.log
