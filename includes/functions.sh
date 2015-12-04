@@ -210,7 +210,8 @@ php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl
 php5-intl php5-xsl libawl-php php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc ${database_backend} ${webserver_backend} mailutils pyzor razor \
 postfix postfix-mysql postfix-pcre postgrey pflogsumm spamassassin spamc sudo bzip2 curl mpack opendkim opendkim-tools unzip clamav-daemon \
 python-magic unrar-free liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl bsd-mailx \
-openjdk-7-jre-headless libcurl4-openssl-dev libexpat1-dev rrdtool mailgraph fcgiwrap spawn-fcgi > /dev/null
+openjdk-7-jre-headless libcurl4-openssl-dev libexpat1-dev rrdtool mailgraph fcgiwrap spawn-fcgi \
+solr-jetty > /dev/null
 			if [ "$?" -ne "0" ]; then
 				echo "$(redb [ERR]) - Package installation failed"
 				exit 1
@@ -350,64 +351,68 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			install -m 755 dovecot/conf/dovemaint /etc/cron.daily/
 			install -m 644 dovecot/conf/solrmaint /etc/cron.d/
 			# Solr
-			if [[ -z $(curl -s --connect-timeout 3 "http://127.0.0.1:8983/solr/admin/info/system" 2> /dev/null | grep -o '[0-9.]*' | grep "^${solr_version}\$") ]]; then
-				(
-				TMPSOLR=$(mktemp -d)
-				cd $TMPSOLR
-				MIRRORS_SOLR=(http://mirror.23media.de/apache/lucene/solr/${solr_version}/solr-${solr_version}.tgz
-				http://mirror2.shellbot.com/apache/lucene/solr/${solr_version}/solr-${solr_version}.tgz
-				http://mirrors.koehn.com/apache/lucene/solr/${solr_version}/solr-${solr_version}.tgz
-				http://mirrors.sonic.net/apache/lucene/solr/${solr_version}/solr-${solr_version}.tgz
-				http://apache.mirrors.ovh.net/ftp.apache.org/dist/lucene/solr/${solr_version}/solr-${solr_version}.tgz
-				http://mirror.nohup.it/apache/lucene/solr/${solr_version}/solr-${solr_version}.tgz
-				http://ftp-stud.hs-esslingen.de/pub/Mirrors/ftp.apache.org/dist/lucene/solr/${solr_version}/solr-${solr_version}.tgz
-				http://mirror.netcologne.de/apache.org/lucene/solr/${solr_version}/solr-${solr_version}.tgz)
-				for i in "${MIRRORS_SOLR[@]}"; do
-					if curl --connect-timeout 3 --output /dev/null --silent --head --fail "$i"; then
-						SOLR_URL="$i"
-						break
-					fi
-				done
-				if [[ -z ${SOLR_URL} ]]; then
-					echo "$(redb [ERR]) - No Solr mirror was usable"
-					exit 1
-				fi
-				echo $(textb "Downloading Solr ${solr_version}...")
-				curl ${SOLR_URL} -# | tar xfz -
-				if [[ ! -d /opt/solr ]]; then
-					mkdir /opt/solr/
-				fi
-				cp -R solr-${solr_version}/* /opt/solr
-				rm -r ${TMPSOLR}
-				)
-				if [[ ! -d /var/solr ]]; then
-					mkdir /var/solr/
-				fi
-				if [[ ! -f /var/solr/solr.in.sh ]]; then
-				install -m 644 /opt/solr/bin/solr.in.sh /var/solr/solr.in.sh
-				sed -i '/SOLR_HOST/c\SOLR_HOST=127.0.0.1' /var/solr/solr.in.sh
-				sed -i '/SOLR_PORT/c\SOLR_PORT=8983' /var/solr/solr.in.sh
-				sed -i "/SOLR_TIMEZONE/c\SOLR_TIMEZONE=\"${sys_timezone}\"" /var/solr/solr.in.sh
-				[[ -z $(grep "jetty.host=localhost" /var/solr/solr.in.sh) ]] && echo 'SOLR_OPTS="$SOLR_OPTS -Djetty.host=localhost"' >> /var/solr/solr.in.sh
-			fi
-			if [[ ! -f /etc/init.d/solr ]]; then
-				install -m 755 /opt/solr/bin/init.d/solr /etc/init.d/solr
-				chmod +x /etc/init.d/solr
-				update-rc.d solr defaults
-				if [[ -f /lib/systemd/systemd ]]; then
-					systemctl daemon-reload
-				fi
-			fi
-			if [[ -z $(grep solr /etc/passwd) ]]; then
-				useradd -r -d /opt/solr solr
-			fi
-			chown -R solr: /opt/solr
-			service solr restart
-			sleep 2
-			if [[ ! -d /opt/solr/server/solr/dovecot2/ ]]; then
-				sudo -u solr /opt/solr/bin/solr create -c dovecot2
-			fi
-			fi
+			#if [[ -z $(curl -s --connect-timeout 3 "http://127.0.0.1:8983/solr/admin/info/system" 2> /dev/null | grep -o '[0-9.]*' | grep "^${solr_version}\$") ]]; then
+			#	(
+			#	TMPSOLR=$(mktemp -d)
+			#	cd $TMPSOLR
+			#	MIRRORS_SOLR=(http://mirror.23media.de/apache/lucene/solr/${solr_version}/solr-${solr_version}.tgz
+			#	http://mirror2.shellbot.com/apache/lucene/solr/${solr_version}/solr-${solr_version}.tgz
+			#	http://mirrors.koehn.com/apache/lucene/solr/${solr_version}/solr-${solr_version}.tgz
+			#	http://mirrors.sonic.net/apache/lucene/solr/${solr_version}/solr-${solr_version}.tgz
+			#	http://apache.mirrors.ovh.net/ftp.apache.org/dist/lucene/solr/${solr_version}/solr-${solr_version}.tgz
+			#	http://mirror.nohup.it/apache/lucene/solr/${solr_version}/solr-${solr_version}.tgz
+			#	http://ftp-stud.hs-esslingen.de/pub/Mirrors/ftp.apache.org/dist/lucene/solr/${solr_version}/solr-${solr_version}.tgz
+			#	http://mirror.netcologne.de/apache.org/lucene/solr/${solr_version}/solr-${solr_version}.tgz)
+			#	for i in "${MIRRORS_SOLR[@]}"; do
+			#		if curl --connect-timeout 3 --output /dev/null --silent --head --fail "$i"; then
+			#			SOLR_URL="$i"
+			#			break
+			#		fi
+			#	done
+			#	if [[ -z ${SOLR_URL} ]]; then
+			#		echo "$(redb [ERR]) - No Solr mirror was usable"
+			#		exit 1
+			#	fi
+			#	echo $(textb "Downloading Solr ${solr_version}...")
+			#	curl ${SOLR_URL} -# | tar xfz -
+			#	if [[ ! -d /opt/solr ]]; then
+			#		mkdir /opt/solr/
+			#	fi
+			#	cp -R solr-${solr_version}/* /opt/solr
+			#	rm -r ${TMPSOLR}
+			#	)
+			#	if [[ ! -d /var/solr ]]; then
+			#		mkdir /var/solr/
+			#	fi
+			#	if [[ ! -f /var/solr/solr.in.sh ]]; then
+			#	install -m 644 /opt/solr/bin/solr.in.sh /var/solr/solr.in.sh
+			#	sed -i '/SOLR_HOST/c\SOLR_HOST=127.0.0.1' /var/solr/solr.in.sh
+			#	sed -i '/SOLR_PORT/c\SOLR_PORT=8983' /var/solr/solr.in.sh
+			#	sed -i "/SOLR_TIMEZONE/c\SOLR_TIMEZONE=\"${sys_timezone}\"" /var/solr/solr.in.sh
+			#	[[ -z $(grep "jetty.host=localhost" /var/solr/solr.in.sh) ]] && echo 'SOLR_OPTS="$SOLR_OPTS -Djetty.host=localhost"' >> /var/solr/solr.in.sh
+			#fi
+			#if [[ ! -f /etc/init.d/solr ]]; then
+			#	install -m 755 /opt/solr/bin/init.d/solr /etc/init.d/solr
+			#	chmod +x /etc/init.d/solr
+			#	update-rc.d solr defaults
+			#	if [[ -f /lib/systemd/systemd ]]; then
+			#		systemctl daemon-reload
+			#	fi
+			#fi
+			#if [[ -z $(grep solr /etc/passwd) ]]; then
+			#	useradd -r -d /opt/solr solr
+			#fi
+			#chown -R solr: /opt/solr
+			#service solr restart
+			#sleep 2
+			#if [[ ! -d /opt/solr/server/solr/dovecot2/ ]]; then
+			#	sudo -u solr /opt/solr/bin/solr create -c dovecot2
+			#fi
+			#fi
+			cp /usr/share/dovecot/solr-schema.xml /etc/solr/conf/schema.xml
+			sed -i '/NO_START/c\NO_START=0' /etc/default/jetty8
+                        sed -i '/JETTY_HOST/c\JETTY_HOST=127.0.0.1' /etc/default/jetty8
+			sed -i '/JETTY_PORT/c\JETTY_PORT=8983' /etc/default/jetty8
 			;;
 		clamav)
 			usermod -a -G vmail clamav 2> /dev/null
@@ -613,7 +618,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			else
 				fpm=""
 			fi
-			for var in solr fail2ban rsyslog ${httpd_platform} ${fpm} spamassassin fuglu dovecot postfix opendkim clamav-daemon
+			for var in jetty fail2ban rsyslog ${httpd_platform} ${fpm} spamassassin fuglu dovecot postfix opendkim clamav-daemon
 			do
 				service $var stop
 				sleep 1.5
@@ -624,12 +629,12 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			if [[ -z $(dig -x ${getpublicipv4} @8.8.8.8 | grep -i "${sys_hostname}.${sys_domain}") ]]; then
 				echo "$(yellowb [WARN]) - Remember to setup a PTR record: ${getpublicipv4} does not point to ${sys_hostname}.${sys_domain}" | tee -a installer.log
 			fi
-			for srv in _autodiscover _carddavs _caldavs _imap _imaps _submission _pop3 _pop3s
-			do
-				if [[ -z $(dig srv ${srv}._tcp.${sys_domain} @8.8.8.8 +short) ]]; then
-					echo "$(textb [INFO]) - non-essential - Cannot find SRV record \"${srv}._tcp.${sys_domain}\""
-				fi
-			done
+			#for srv in _autodiscover _carddavs _caldavs _imap _imaps _submission _pop3 _pop3s
+			#do
+			#	if [[ -z $(dig srv ${srv}._tcp.${sys_domain} @8.8.8.8 +short) ]]; then
+			#		echo "$(textb [INFO]) - non-essential - Cannot find SRV record \"${srv}._tcp.${sys_domain}\""
+			#	fi
+			#done
 			for a in autodiscover ${sys_hostname} ${httpd_dav_subdomain}
 			do
 				if [[ -z $(dig a ${a}.${sys_domain} @8.8.8.8 +short) ]]; then
