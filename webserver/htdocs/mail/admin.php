@@ -398,10 +398,12 @@ opendkim_table();
 <textarea rows="20" style="font-family:monospace;font-size:9pt;width:100%;">
 <?php echo_sys_info("pflog");?>
 </textarea>
+<p>Last refresh: <?=round(abs(date('U') - filemtime($PFLOG)) / 60,0). " minutes ago";?></p>
+
 <form method="post">
 	<div class="form-group">
 		<input type="hidden" name="pflog_renew" value="1">
-		<button type="submit" class="btn btn-default">Renew Pflogsumm</button>
+		<button type="submit" class="btn btn-default">Refresh Pflogsumm log</button>
 	</div>
 </form>
 <h4>Mailgraph</h4>
