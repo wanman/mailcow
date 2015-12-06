@@ -9,7 +9,7 @@ function check_login($link, $user, $pass) {
 	$user = strtolower(trim($user));
 	$pass = escapeshellcmd($pass);
 	$result = mysqli_query($link, "SELECT password FROM admin WHERE superadmin='1' AND username='$user'");
-	while ($row = mysqli_fetch_array($result, MYSQL_NUM)) {
+	while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
 		$row = "'".$row[0]."'";
 		exec("echo ".$pass." | doveadm pw -s SHA512-CRYPT -t ".$row, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
@@ -18,7 +18,7 @@ function check_login($link, $user, $pass) {
 		}
 	}
 	$result = mysqli_query($link, "SELECT password FROM admin WHERE superadmin='0' AND active='1' AND username='$user'");
-	while ($row = mysqli_fetch_array($result, MYSQL_NUM)) {
+	while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
 		$row = "'".$row[0]."'";
 		exec("echo ".$pass." | doveadm pw -s SHA512-CRYPT -t ".$row, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
@@ -27,7 +27,7 @@ function check_login($link, $user, $pass) {
 		}
 	}
 	$result = mysqli_query($link, "SELECT password FROM mailbox WHERE active='1' AND username='$user'");
-	while ($row = mysqli_fetch_array($result, MYSQL_NUM)) {
+	while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
 		$row = "'".$row[0]."'";
 		exec("echo ".$pass." | doveadm pw -s SHA512-CRYPT -t ".$row, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
@@ -106,7 +106,7 @@ function return_mailcow_config($s) {
 function set_mailcow_config($s, $v = '') {
 	switch ($s) {
 		case "backup":
-			$file="/var/www/MAILBOX_BACKUP";
+			$file=$GLOBALS["MC_MBOX_BACKUP"];
 			if (isset($v['use_backup']) && ($v['use_backup'] != "on" && $v['use_backup'] != "") ||
 				($v['runtime'] != "hourly" && $v['runtime'] != "daily" && $v['runtime'] != "weekly" && $v['runtime'] != "monthly")) {
 				$_SESSION['return'] = array(
