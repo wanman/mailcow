@@ -235,7 +235,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			install -m 755 misc/mc_msg_size /usr/local/sbin/mc_msg_size
 			install -m 755 misc/mc_dkim_ctrl /usr/local/sbin/mc_dkim_ctrl
 			install -m 755 misc/mc_setup_backup /usr/local/sbin/mc_setup_backup
-			install -m 700 misc/mc_resetadmin /usr/local/sbin/mc_resetadmin
+			install -m 755 misc/mc_resetadmin /usr/local/sbin/mc_resetadmin
 			;;
 		ssl)
 			mkdir /etc/ssl/mail 2> /dev/null
@@ -302,12 +302,10 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown root:root "/etc/postfix/main.cf"; chmod 644 "/etc/postfix/main.cf"
 			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /etc/postfix/main.cf
 			sed -i "s/MAILCOW_DOMAIN/${sys_domain}/g" /etc/postfix/main.cf
-			chmod +x /usr/local/sbin/mc_pfset /usr/local/sbin/mc_pflog_renew
-			chmod 700 /etc/cron.daily/mc_clean_spam_aliases
-			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /etc/postfix/sql/* /etc/cron.daily/mc_clean_spam_aliases
-			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /etc/postfix/sql/* /etc/cron.daily/mc_clean_spam_aliases
-			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /etc/postfix/sql/* /etc/cron.daily/mc_clean_spam_aliases
-			sed -i "s/my_dbhost/$my_dbhost/g" /etc/postfix/sql/* /etc/cron.daily/mc_clean_spam_aliases
+			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /etc/postfix/sql/*
+			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /etc/postfix/sql/*
+			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /etc/postfix/sql/*
+			sed -i "s/my_dbhost/$my_dbhost/g" /etc/postfix/sql/*
 			sed -i '/^POSTGREY_OPTS=/s/=.*/="--inet=127.0.0.1:10023"/' /etc/default/postgrey
 			chown www-data: /etc/postfix/mailcow_*
 			chmod 755 /var/spool/
@@ -336,8 +334,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 				systemctl daemon-reload
 				systemctl enable fuglu
 			else
-				cp fuglu/inst/$fuglu_version/scripts/startscripts/debian/7/fuglu /etc/init.d/fuglu
-				chmod +x /etc/init.d/fuglu
+				install -m 755 fuglu/inst/$fuglu_version/scripts/startscripts/debian/7/fuglu /etc/init.d/fuglu
 				update-rc.d fuglu defaults
 			fi
 			rm -rf fuglu/inst/$fuglu_version
@@ -422,7 +419,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			#fi
 			#if [[ ! -f /etc/init.d/solr ]]; then
 			#	install -m 755 /opt/solr/bin/init.d/solr /etc/init.d/solr
-			#	chmod +x /etc/init.d/solr
 			#	update-rc.d solr defaults
 			#	if [[ -f /lib/systemd/systemd ]]; then
 			#		systemctl daemon-reload
@@ -461,8 +457,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				rm /etc/apparmor.d/local/usr.sbin.clamd > /dev/null 2>&1
 				service apparmor restart > /dev/null 2>&1
 			fi
-			cp -f clamav/clamav-unofficial-sigs.sh /usr/local/bin/clamav-unofficial-sigs.sh
-			chmod +x /usr/local/bin/clamav-unofficial-sigs.sh
+			install -m 755 clamav/clamav-unofficial-sigs.sh /usr/local/bin/clamav-unofficial-sigs.sh
 			cp -f clamav/clamav-unofficial-sigs.conf /etc/clamav-unofficial-sigs.conf
 			cp -f clamav/clamav-unofficial-sigs.8 /usr/share/man/man8/clamav-unofficial-sigs.8
 			cp -f clamav/clamav-unofficial-sigs-cron /etc/cron.d/clamav-unofficial-sigs-cron
@@ -537,10 +532,10 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			touch /var/mailcow/mailbox_backup_env
 			echo none > /var/mailcow/log/pflogsumm.log
 			sed -i "s/mailcow_sub/${sys_hostname}/g" /var/www/mail/autoconfig.xml
-			sed -i "s/my_dbhost/$my_dbhost/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
-			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
-			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
-			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /usr/local/sbin/mc_resetadmin /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
+			sed -i "s/my_dbhost/$my_dbhost/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
+			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
+			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
+			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
 			sed -i "s/httpd_dav_subdomain/$httpd_dav_subdomain/g" /var/www/mail/inc/vars.inc.php
 			chown -R www-data: /var/www/{.,mail,dav} /var/lib/php5/sessions /var/mailcow/mailbox_backup_env
 			mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} < webserver/htdocs/init.sql
@@ -626,8 +621,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 					systemctl daemon-reload
 					systemctl enable fail2ban
 				else
-					cp fail2ban/conf/fail2ban.init /etc/init.d/fail2ban
-					chmod +x /etc/init.d/fail2ban
+					install -m 755 fail2ban/conf/fail2ban.init /etc/init.d/fail2ban
 					update-rc.d fail2ban defaults
 				fi
 				if [[ ! -f /var/log/mail.warn ]]; then
