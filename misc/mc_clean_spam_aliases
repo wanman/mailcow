@@ -1,4 +1,9 @@
 #!/bin/bash
 PATH=/usr/local/bin:/usr/local/sbin:/sbin:/usr/sbin:/bin:/usr/bin:/usr/bin/X11
 
-mysql --host my_dbhost -u my_mailcowuser -pmy_mailcowpass my_mailcowdb -e "DELETE FROM spamalias WHERE validity <= NOW()"
+DBHOST=$(grep database_host /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
+DBNAME=$(grep database_name /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
+DBUSER=$(grep database_user /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
+DBPASS=$(grep database_pass /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
+
+mysql --host ${DBHOST} -u ${DBUSER} -p${DBPASS} ${DBNAME} -e "DELETE FROM spamalias WHERE validity <= NOW()"
