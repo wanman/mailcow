@@ -248,8 +248,17 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 				wget https://github.com/letsencrypt/letsencrypt/archive/v${letsencrypt}.tar.gz -O - | tar xfz -
 				./letsencrypt-${letsencrypt}/letsencrypt-auto certonly --standalone -d ${sys_hostname}.${sys_domain} -d ${httpd_dav_subdomain}.${sys_domain} -d autodiscover.${sys_domain}
 				if [[ $? == "0" ]]; then
-					ln -s /etc/letsencrypt/archive/{sys_hostname}.${sys_domain}/fullchain1.pem /etc/ssl/mail/mail.crt
-					ln -s /etc/letsencrypt/archive/{sys_hostname}.${sys_domain}/privkey1.pem /etc/ssl/mail/mail.key
+					for i in $(ls /etc/letsencrypt/live); do
+						if [[ ! -z $(openssl x509 -in "/etc/letsencrypt/live/$i/fullchain.pem" -text -noout | \
+							grep -E "DNS:autodiscover.${sys_domain}" | \
+							grep -E "DNS:${sys_hostname}.${sys_domain}" | \
+							grep -E "DNS:${httpd_dav_subdomain}.${sys_domain}") ]]; then
+									LE_CERT_PATH="/etc/letsencrypt/live/$i"
+									break
+						fi
+					done
+					ln -s ${LE_CERT_PATH}/fullchain.pem /etc/ssl/mail/mail.crt
+					ln -s ${LE_CERT_PATH}/privkey.pem /etc/ssl/mail/mail.key
 				else
 					LETS_FAILED="1"
 					echo "$(yellowb [WARN]) - Let's Encrypt connection failed, falling back to self-signed certificates..."

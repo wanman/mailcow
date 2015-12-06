@@ -87,10 +87,10 @@ installtask environment
 returnwait "System environment" "Package installation"
 
 installtask installpackages
-returnwait "Package installation" "Self-signed certificate"
+returnwait "Package installation" "Certificate configuration"
 
 installtask ssl
-returnwait "Self-signed certificate" "MySQL configuration"
+returnwait "Certificate configuration" "MySQL configuration"
 
 installtask mysql
 returnwait "MySQL configuration" "Postfix configuration"
