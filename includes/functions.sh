@@ -257,8 +257,13 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 									break
 						fi
 					done
-					ln -s ${LE_CERT_PATH}/fullchain.pem /etc/ssl/mail/mail.crt
-					ln -s ${LE_CERT_PATH}/privkey.pem /etc/ssl/mail/mail.key
+					if [[ -z ${LE_CERT_PATH} ]]; then
+						LETS_FAILED="1"
+						echo "$(yellowb [WARN]) - Cannot find a proper certificate path, falling back to self-signed..."
+					else
+						ln -s ${LE_CERT_PATH}/fullchain.pem /etc/ssl/mail/mail.crt
+						ln -s ${LE_CERT_PATH}/privkey.pem /etc/ssl/mail/mail.key
+					fi
 				else
 					LETS_FAILED="1"
 					echo "$(yellowb [WARN]) - Let's Encrypt connection failed, falling back to self-signed certificates..."
