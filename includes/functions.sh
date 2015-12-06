@@ -242,7 +242,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			rm /etc/ssl/mail/* 2> /dev/null
 			echo "$(textb [INFO]) - Generating 2048 bit DH parameters, this may take a while, please wait..."
 			openssl dhparam -out /etc/ssl/mail/dhparams.pem 2048 2> /dev/null
-			if [[ ${httpd_lets_encrypt} == "yes" }}; then
+			if [[ ${httpd_lets_encrypt} == "yes" ]]; then
 				echo "$(textb [INFO]) - Requesting certificates from Let's Encrypt..."
 				service ${httpd_platform} stop 2> /dev/null
 				cd $(mktemp -d)
