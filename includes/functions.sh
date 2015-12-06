@@ -245,10 +245,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			if [[ ${httpd_lets_encrypt} == "yes" ]]; then
 				echo "$(textb [INFO]) - Requesting certificates from Let's Encrypt..."
 				service ${httpd_platform} stop 2> /dev/null
-				cd $(mktemp -d)
 				wget https://github.com/letsencrypt/letsencrypt/archive/v${letsencrypt}.tar.gz -O - | tar xfz -
-				cd letsencrypt-${letsencrypt}
-				./letsencrypt-auto certonly --standalone -d ${sys_hostname}.${sys_domain} -d ${httpd_dav_subdomain}.${sys_domain} -d autodiscover.${sys_domain}
+				./letsencrypt-${letsencrypt}/letsencrypt-auto certonly --standalone -d ${sys_hostname}.${sys_domain} -d ${httpd_dav_subdomain}.${sys_domain} -d autodiscover.${sys_domain}
 				if [[ $? == "0" ]]; then
 					ln -s /etc/letsencrypt/archive/{sys_hostname}.${sys_domain}/fullchain1.pem /etc/ssl/mail/mail.crt
 					ln -s /etc/letsencrypt/archive/{sys_hostname}.${sys_domain}/privkey1.pem /etc/ssl/mail/mail.key
@@ -256,6 +254,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 					LETS_FAILED="1"
 					echo "$(yellowb [WARN]) - Let's Encrypt connection failed, falling back to self-signed certificates..."
 				fi
+				rm -r letsencrypt-${letsencrypt}
 			elif [[ ${LETS_FAILED} == "1" ]] || [[ ${httpd_lets_encrypt} != "yes" ]]; then
 				openssl req -new -newkey rsa:4096 -sha256 -days 1095 -nodes -x509 -subj "/C=ZZ/ST=mailcow/L=mailcow/O=mailcow/CN=${sys_hostname}.${sys_domain}/subjectAltName=DNS.1=${sys_hostname}.${sys_domain},DNS.2=${httpd_dav_subdomain}.${sys_domain},DNS.3=autodiscover.{sys_domain}" -keyout /etc/ssl/mail/mail.key -out /etc/ssl/mail/mail.crt
 				chmod 600 /etc/ssl/mail/mail.key
