@@ -15,7 +15,7 @@ case $par in
 		exit 0
 		;;
 	u|U)
-		[[ ${par} == "U" ]] && inst_unattended="yes"
+		[[ ${par} == "U" ]] && inst_confirm_proceed="no"
 		is_upgradetask="yes"
 		;;
 	H) sys_hostname="$OPTARG" ;;
