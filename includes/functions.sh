@@ -17,8 +17,8 @@ usage() {
 		Upgrade mailcow to a newer version
 
 	-U
-		Upgrade mailcow to a newer version unattended
-		(still requires to enter the SQL root password)
+		Upgrade mailcow to a newer version
+		and don't ask to press any key to continue
 
 
 	PARAMETERS:
@@ -47,7 +47,7 @@ genpasswd() {
 returnwait() {
 	echo "$(greenb [OK]) - Task $(textb "$1") completed"
 	echo "----------------------------------------------"
-	if [[ $inst_unattended != "yes" ]]; then
+	if [[ ${inst_confirm_proceed} == "yes" ]]; then
 		read -p "$(yellowb !) Press ENTER to continue with task $(textb "$2") (CTRL-C to abort) "
 	fi
 	echo "$(pinkb [RUNNING]) - Task $(textb "$2") started, please wait..."
@@ -269,7 +269,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 					echo "$(yellowb [WARN]) - Let's Encrypt connection failed, falling back to self-signed certificates..."
 				fi
 				rm -r letsencrypt-${letsencrypt}
-			elif [[ ${LETS_FAILED} == "1" ]] || [[ ${httpd_lets_encrypt} != "yes" ]]; then
+			fi
+			if [[ ${LETS_FAILED} == "1" ]] || [[ ${httpd_lets_encrypt} != "yes" ]]; then
 				openssl req -new -newkey rsa:4096 -sha256 -days 1095 -nodes -x509 -subj "/C=ZZ/ST=mailcow/L=mailcow/O=mailcow/CN=${sys_hostname}.${sys_domain}/subjectAltName=DNS.1=${sys_hostname}.${sys_domain},DNS.2=${httpd_dav_subdomain}.${sys_domain},DNS.3=autodiscover.{sys_domain}" -keyout /etc/ssl/mail/mail.key -out /etc/ssl/mail/mail.crt
 				chmod 600 /etc/ssl/mail/mail.key
 				cp /etc/ssl/mail/mail.crt /usr/local/share/ca-certificates/
@@ -746,7 +747,7 @@ THIS UPGRADE WILL RESET SOME OF YOUR CONFIGURATION FILES
 A backup will be stored in ./before_upgrade_$timestamp
 --------------------------------------------------------
 "
-	if [[ $inst_unattended != "yes" ]]; then
+	if [[ ${inst_confirm_proceed} == "yes" ]]; then
 		echo "$(pinkb [NOTICE]) - You can overwrite the detected hostname and domain by calling the installer with -H hostname and -D example.org"
 		read -p "Press ENTER to continue or CTRL-C to cancel the upgrade process"
 	fi
