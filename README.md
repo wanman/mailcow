@@ -1,11 +1,5 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Please help mailcow to grow with a little donation**
-
-**Contact me for a managed installation**
-
-[![PayPal donate button](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JWBSYHF4SMC68 "Donate to this project using Paypal")
-
 ![mailcow](https://www.debinux.de/256.png)
 
 - [mailcow](#mailcow)
@@ -23,12 +17,7 @@ mailcow
 mailcow is a mail server suite based on Dovecot, Postfix and other open source software, that provides a modern Web UI for administration.
 In future versions mailcow will provide Cal- and CardDAV support.
 
-For **Debian and Debian based distributions**. 
-
-This script is permanently **tested on Debian stable (8.x)**.
-Debian Squeeze is not supported.
-
-Ubuntu 14.04 is fine but not recommended.
+mailcow supports **Debian stable (8.x)**
 
 **Please see this album on imgur.com for screenshots -> http://imgur.com/a/elHnA**
 
@@ -128,7 +117,7 @@ nano mailcow.config
 * **my_rootpw** - SQL root password is generated automatically by default. You can define a complex password here if you want to. *Set to your current root password to use an existing SQL instance*.
 * **mailcow_admin_user and mailcow_admin_pass** - mailcow administrator. Password policy: minimum length 8 chars, must contain uppercase and lowercase letters and at least 2 digits. **You can use the default values**.
 * **inst_debug** - Sets Bash mode -x
-* An unattended installation is possible, but not recommended ("inst_unattended")
+* **inst_confirm_proceed** - Skip "Press any key to continue" dialogs by setting this to "no"
 
 **Empty configuration values are invalid!**
 
