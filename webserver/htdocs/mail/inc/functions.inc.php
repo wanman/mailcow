@@ -611,13 +611,23 @@ function mailbox_add_mailbox($link, $postarray) {
 		);
 		return false;
 	}
-	$qstring = "SELECT local_part FROM mailbox WHERE local_part='$local_part' and domain='".$domain."'";
+	$qstring = "SELECT local_part FROM mailbox WHERE local_part='".$local_part."' and domain='".$domain."'";
 	$qresult = mysqli_query($link, $qstring);
 	$num_results = mysqli_num_rows($qresult);
 	if ($num_results != 0) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'Mailbox already exist'
+		);
+		return false;
+	}
+	$qstring = "SELECT address FROM alias WHERE address='".$username."'";
+	$qresult = mysqli_query($link, $qstring);
+	$num_results = mysqli_num_rows($qresult);
+	if ($num_results != 0) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => htmlspecialchars($username).' is an alias address, please delete it to continue.'
 		);
 		return false;
 	}
