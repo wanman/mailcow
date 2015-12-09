@@ -1,0 +1,74 @@
+#!/bin/bash
+
+# Postfix smtp_tls_security_level should be set to "may" to try an
+# encrypted connection.
+
+if [ "$EUID" -ne 0 ]
+	then echo "Please run as root"
+	exit 1
+fi
+
+if [[ ${1} == "reset" ]]; then
+	# Reset modified values to their defaults
+	postconf -e "$(postconf -d relayhost)"
+	postconf -e "$(postconf -d smtp_sasl_password_maps)"
+	postconf -e "$(postconf -d smtp_sasl_security_options)"
+	postconf -e "$(postconf -d smtp_sasl_auth_enable)"
+	# Also delete the plaintext password file
+	rm -f /etc/postfix/smarthost_passwd*
+	postfix reload
+	# Exit last exit code
+	exit $?
+elif [[ ${1} == "restore-string" ]]; then
+	# Get parameter value of smtp_sasl_password_maps
+	SMTPSASLPWDMAP=$(postconf -h smtp_sasl_password_maps)
+	# Replace ':' by ' ' (white space) and create array of result
+	SMTPSASLPWDMAPARR=(${SMTPSASLPWDMAP//:/ })
+	# Get parameter value of relayhost
+	RELAYHOSTCFG=$(postconf -h relayhost)
+	# Exit if empty/unset
+	[[ -z ${RELAYHOSTCFG} ]] && exit 0
+	# Replace ':' by ' ' (white space)
+	RELAYHOSTCFG=${RELAYHOSTCFG//:/ }
+	# Replace '[' by '' (empty)
+	RELAYHOSTCFG=${RELAYHOSTCFG//[/}
+	# Replace ']' by '' (empty) and create array of result
+	RELAYHOSTCFGARR=(${RELAYHOSTCFG//]/})
+	# Get 'username:password' from SASL password maps
+	# Grep relayhost without port and '[', ']' or ':' from SASL password map file without map type (e.g. 'hash:')
+	USRPWD=$(grep ${RELAYHOSTCFGARR[0]} ${SMTPSASLPWDMAPARR[1]} | awk {'print $2'})
+	# Replace ':' by ' ' and create array of result
+	USRPWDARR=(${USRPWD//:/ })
+	# Echo script name, all values in RELAYHOSTCFGARR, first and second value in USRPWDARR
+	# Why?
+	# Host and port are required, so we can print the whole array RELAYHOSTCFGARR.
+	# Password might be empty, so we print them separately.
+	echo ${0} ${RELAYHOSTCFGARR[@]} \'${USRPWDARR[0]}\' \'${USRPWDARR[1]}\'
+	exit 0
+elif [[ -z ${1} ]] || [[ -z ${2} ]]; then
+	# Exit with code 1 if host and port are missing
+	echo "Usage: ${0} relayhost port (username) (password)"
+	echo "Username and password are optional parameters."
+	exit 1
+else
+	# Try a simple connection to host:port but don't recieve any data
+	# Abort after 3 seconds
+	if ! nc -z -v -w3 ${1} ${2} 2>/dev/null; then
+		echo "Connection to relayhost ${1} failed, aborting..."
+		exit 1
+	fi
+	# Use exact hostname as relayhost, don't lookup the MX record of relayhost
+	postconf -e "relayhost = [${1}]:${2}"
+	postconf -e "smtp_sasl_password_maps = hash:/etc/postfix/smarthost_passwd"
+	# We can use anonymous and plain-text authentication, too (be warned)
+	postconf -e "smtp_sasl_security_options = "
+	postconf -e "smtp_sasl_auth_enable = yes"
+	if [[ ! -z ${3} ]]; then
+		echo ${1} ${3}:${4} > /etc/postfix/smarthost_passwd
+		postmap /etc/postfix/smarthost_passwd
+	fi
+	chown root: /etc/postfix/smarthost_passwd
+	chmod 600 /etc/postfix/smarthost_passwd
+	postfix reload
+	exit $?
+fi
