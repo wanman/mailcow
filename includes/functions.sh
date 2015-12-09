@@ -18,7 +18,7 @@ usage() {
 
 	-U
 		Upgrade mailcow to a newer version
-		and don't ask to press any key to continue
+		and do not ask to press any key to continue
 
 
 	PARAMETERS:
