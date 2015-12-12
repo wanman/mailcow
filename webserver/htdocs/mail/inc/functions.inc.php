@@ -65,31 +65,31 @@ function mysqli_result($res,$row=0,$col=0) {
 function return_mailcow_config($s) {
 	switch ($s) {
 		case "backup_location":
-			preg_match("/LOCATION=(.*)/", file_get_contents($GLOBALS['MC_MBOX_BACKUP']) , $result);
+			preg_match("/LOCATION=(.*)/", file_get_contents($GLOBALS['MC_MBOX_BACKUP_ENV']) , $result);
 			if (!empty($result[1])) { return $result[1]; } else { return "/backup/mail"; }
 			break;
 		case "backup_runtime":
-			preg_match("/RUNTIME=(.*)/", file_get_contents($GLOBALS['MC_MBOX_BACKUP']) , $result);
+			preg_match("/RUNTIME=(.*)/", file_get_contents($GLOBALS['MC_MBOX_BACKUP_ENV']) , $result);
 			if (!empty($result[1])) { return $result[1]; } else { return false; }
 			break;
 		case "backup_active":
-			preg_match("/BACKUP=(.*)/", file_get_contents($GLOBALS['MC_MBOX_BACKUP']) , $result);
+			preg_match("/BACKUP=(.*)/", file_get_contents($GLOBALS['MC_MBOX_BACKUP_ENV']) , $result);
 			if (!empty($result[1])) { return $result[1]; } else { return false; }
 			break;
 		case "anonymize":
-			$state = file_get_contents($GLOBALS["mailcow_anonymize_headers"]);
+			$state = file_get_contents($GLOBALS["MC_ANON_HEADERS"]);
 			if (!empty($state)) { return "checked"; } else { return false; }
 			break;
 		case "public_folder_status":
-			$state = file_get_contents($GLOBALS["mailcow_public_folder"]);
+			$state = file_get_contents($GLOBALS["MC_PUB_FOLDER"]);
 			if (!empty($state)) { return "checked"; } else { return false; }
 			break;
 		case "public_folder_name":
-			$state = file_get_contents($GLOBALS["mailcow_public_folder"]);
+			$state = file_get_contents($GLOBALS["MC_PUB_FOLDER"]);
 			if (!empty($state)) { return explode(";;", $state)[1]; } else { return false; }
 			break;
 		case "public_folder_pvt":
-			$state = file_get_contents($GLOBALS["mailcow_public_folder"]);
+			$state = file_get_contents($GLOBALS["MC_PUB_FOLDER"]);
 			if (!empty($state)) {
 				$PVT = explode(";;", $state)[3];
 				if ($PVT == "on") { return "checked"; } else { return false; }
@@ -106,7 +106,7 @@ function return_mailcow_config($s) {
 function set_mailcow_config($s, $v = '') {
 	switch ($s) {
 		case "backup":
-			$file=$GLOBALS["MC_MBOX_BACKUP"];
+			$file=$GLOBALS["MC_MBOX_BACKUP_ENV"];
 			if (isset($v['use_backup']) && ($v['use_backup'] != "on" && $v['use_backup'] != "") ||
 				($v['runtime'] != "hourly" && $v['runtime'] != "daily" && $v['runtime'] != "weekly" && $v['runtime'] != "monthly")) {
 				$_SESSION['return'] = array(
@@ -175,9 +175,9 @@ function set_mailcow_config($s, $v = '') {
 /^\s*X-Originating-IP/  IGNORE
 		';
 			if ($v == "on") {
-				file_put_contents($GLOBALS["mailcow_anonymize_headers"], $template);
+				file_put_contents($GLOBALS["MC_ANON_HEADERS"], $template);
 			} else {
-				file_put_contents($GLOBALS["mailcow_anonymize_headers"], "");
+				file_put_contents($GLOBALS["MC_ANON_HEADERS"], "");
 			}
 			break;
 		case "public_folder":
@@ -208,10 +208,10 @@ namespace {
   }
 }';
 			if (isset($v['use_public_folder']) && $v['use_public_folder'] == "on")	{
-				file_put_contents($GLOBALS["mailcow_public_folder"], $template);
+				file_put_contents($GLOBALS["MC_PUB_FOLDER"], $template);
 			}
 			else {
-				file_put_contents($GLOBALS["mailcow_public_folder"], "");
+				file_put_contents($GLOBALS["MC_PUB_FOLDER"], "");
 			}
 			break;
 		case "srr":
@@ -250,7 +250,7 @@ namespace {
 function opendkim_table($action = "show", $which = "") {
 	switch ($action) {
 		case "show":
-			$dnstxt_folder = scandir($GLOBALS["mailcow_opendkim_dnstxt_folder"]);
+			$dnstxt_folder = scandir($GLOBALS["MC_ODKIM_TXT"]);
 			$dnstxt_files = array_diff($dnstxt_folder, array('.', '..'));
 			foreach($dnstxt_files as $file) {
 			echo "<div class=\"row\">
@@ -261,7 +261,7 @@ function opendkim_table($action = "show", $which = "") {
 					</p>
 				</div>
 				<div class=\"col-xs-9\">
-					<pre>", file_get_contents($GLOBALS["mailcow_opendkim_dnstxt_folder"]."/".$file), "</pre>
+					<pre>", file_get_contents($GLOBALS["MC_ODKIM_TXT"]."/".$file), "</pre>
 				</div>
 				<div class=\"col-xs-1\">
 					<a href=\"?del=", $file, "\" onclick=\"return confirm('Are you sure?')\"><span class=\"glyphicon glyphicon-remove-circle\"></span></a>
@@ -631,6 +631,11 @@ function mailbox_add_mailbox($link, $postarray) {
 		);
 		return false;
 	}
+	// Dirty workaround
+	if ($GLOBALS['SOGO_VARIANT'] == "yes) {
+		default_cal = "Calendar";
+		default_card = "Address book";
+	}
 	if (empty($default_cal) || empty($default_card)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -670,7 +675,7 @@ function mailbox_add_mailbox($link, $postarray) {
 		}
 		$prep_password = escapeshellcmd($password);
 		exec("/usr/bin/doveadm pw -s ".$GLOBALS['PASS_SCHEME']." -p $prep_password", $hash, $return);
-		$password_sha512c = $hash[0];
+		$password_hashed = $hash[0];
 		if ($return != "0") {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -724,7 +729,7 @@ function mailbox_add_mailbox($link, $postarray) {
 	}
 	isset($postarray['active']) ? $active = '1' : $active = '0';
 	$create_user = "INSERT INTO mailbox (username, password, name, maildir, quota, local_part, domain, created, modified, active) 
-			VALUES ('".$username."', '".$password_sha512c."', '".$name."', '$maildir', '".$quota_b."', '$local_part', '".$domain."', now(), now(), '".$active."');";
+			VALUES ('".$username."', '".$password_hashed."', '".$name."', '$maildir', '".$quota_b."', '$local_part', '".$domain."', now(), now(), '".$active."');";
 	$create_user .= "INSERT INTO quota2 (username, bytes, messages)
 			VALUES ('".$username."', '', '');";
 	$create_user .= "INSERT INTO alias (address, goto, domain, created, modified, active)
@@ -1009,7 +1014,7 @@ function mailbox_edit_domainadmin($link, $postarray) {
 		}
 		$prep_password = escapeshellcmd($password);
 		exec("/usr/bin/doveadm pw -s ".$GLOBALS['PASS_SCHEME']." -p $prep_password", $hash, $return);
-		$password_sha512c = $hash[0];
+		$password_hashed = $hash[0];
 		if ($return != "0") {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -1017,7 +1022,7 @@ function mailbox_edit_domainadmin($link, $postarray) {
 			);
 			return false;
 		}
-		$mystring = "UPDATE admin SET modified=now(), active='".$active."', password='".$password_sha512c."' WHERE username='".$username."';";
+		$mystring = "UPDATE admin SET modified=now(), active='".$active."', password='".$password_hashed."' WHERE username='".$username."';";
 	}
 	else {
 		$mystring = "UPDATE admin SET modified=now(), active='".$active."' where username='".$username."'";
@@ -1125,7 +1130,7 @@ function mailbox_edit_mailbox($link, $postarray) {
 		}
 		$prep_password = escapeshellcmd($password);
 		exec("/usr/bin/doveadm pw -s ".$GLOBALS['PASS_SCHEME']." -p $prep_password", $hash, $return);
-		$password_sha512c = $hash[0];
+		$password_hashed = $hash[0];
 		if ($return != "0") {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -1134,7 +1139,7 @@ function mailbox_edit_mailbox($link, $postarray) {
 			return false;
 		}
 		$update_user = "UPDATE alias SET modified=now(), active='".$active."' WHERE address='".$username."';";
-		$update_user .= "UPDATE mailbox SET modified=now(), active='".$active."', password='".$password_sha512c."', name='".$name."', quota='".$quota_b."' WHERE username='".$username."';";
+		$update_user .= "UPDATE mailbox SET modified=now(), active='".$active."', password='".$password_hashed."', name='".$name."', quota='".$quota_b."' WHERE username='".$username."';";
 		$update_user .= "UPDATE users SET digesta1=MD5(CONCAT('".$username."', ':SabreDAV:', '".$password."')) WHERE username='".$username."';";
 		if (!mysqli_multi_query($link, $update_user)) {
 			$_SESSION['return'] = array(
@@ -1648,8 +1653,8 @@ function set_user_account($link, $postarray) {
 			);
 			return false;
 		}
-		$password_sha512c = $hash[0];
-		$update_user = "UPDATE mailbox SET modified=NOW(), password='".$password_sha512c."' WHERE username='".$name_now."';";
+		$password_hashed = $hash[0];
+		$update_user = "UPDATE mailbox SET modified=NOW(), password='".$password_hashed."' WHERE username='".$name_now."';";
 		$update_user .= "UPDATE users SET digesta1=MD5(CONCAT('".$name_now."', ':SabreDAV:', '".$password_new."')) WHERE username='".$name_now."';";
 		if (!mysqli_multi_query($link, $update_user)) {
 			$_SESSION['return'] = array(

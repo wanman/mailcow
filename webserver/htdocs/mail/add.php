@@ -238,7 +238,8 @@ while ($row = mysqli_fetch_array($result)) {
 elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 		isset($_SESSION['mailcow_cc_role']) &&
 		$_SESSION['mailcow_cc_loggedin'] == "yes" &&
-		$_SESSION['mailcow_cc_role'] == "user") {
+		$_SESSION['mailcow_cc_role'] == "user" &&
+		$GLOBALS['SOGO_VARIANT'] != "yes") {
 	if (isset($_GET['dav'])) {
 ?>
 			<h4>Add DAV item</h4>

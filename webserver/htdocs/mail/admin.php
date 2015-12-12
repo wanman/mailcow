@@ -167,7 +167,7 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 <?php
 $resultselect = mysqli_query($link, "SELECT username FROM mailbox");
 while ($row = mysqli_fetch_array($resultselect)) {
-	if (strpos(file_get_contents($MC_MBOX_BACKUP), $row['username'])) {
+	if (strpos(file_get_contents($MC_MBOX_BACKUP_ENV), $row['username'])) {
 		echo "<option selected>".$row['username']."</option>";
 	}
 	else {

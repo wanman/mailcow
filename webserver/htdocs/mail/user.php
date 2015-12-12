@@ -101,6 +101,9 @@ endwhile;
 </div>
 </div>
 
+<?php
+if ($SOGO_VARIANT != "yes"):
+?>
 <div class="panel panel-default">
 <div class="panel-heading">Calendars and Contacts</div>
 <div class="panel-body">
@@ -209,6 +212,9 @@ endwhile;
 </div>
 </div>
 </div>
+<?php
+endif;
+?>
 
 <div class="panel panel-default">
 <div class="panel-heading">Fetch mails</div>
