@@ -632,7 +632,7 @@ function mailbox_add_mailbox($link, $postarray) {
 		return false;
 	}
 	// Dirty workaround
-	if ($GLOBALS['SOGO_VARIANT'] == "yes) {
+	if ($GLOBALS['SOGO_VARIANT'] == "yes") {
 		$default_cal = "Calendar";
 		$default_card = "Address book";
 	}
