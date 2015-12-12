@@ -295,6 +295,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown root:postfix "/etc/postfix/sql/mysql_virtual_spamalias_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_spamalias_maps.cf"
 			chown root:postfix "/etc/postfix/sql/mysql_virtual_sender_acl.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_sender_acl.cf"
 			chown root:postfix "/etc/postfix/sql/mysql_virtual_domains_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_domains_maps.cf"
+			chown root:postfix "/etc/postfix/sql/mysql_relay_recipient_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_relay_recipient_maps.cf"
 			chown root:root "/etc/postfix/master.cf"; chmod 644 "/etc/postfix/master.cf"
 			chown root:root "/etc/postfix/main.cf"; chmod 644 "/etc/postfix/main.cf"
 			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /etc/postfix/main.cf

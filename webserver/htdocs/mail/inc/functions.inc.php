@@ -382,6 +382,7 @@ function mailbox_add_domain($link, $postarray) {
 		return false;
 	}
 	isset($postarray['active']) ? $active = '1' : $active = '0';
+	isset($postarray['relay_all_recipients']) ? $active = '1' : $active = '0';
 	isset($postarray['relay_all_recipients']) ? $relay_all_recipients = '1' : $relay_all_recipients = '0';
 	isset($postarray['backupmx']) ? $backupmx = '1' : $backupmx = '0';
 	if (!is_valid_domain_name($domain)) {
@@ -936,6 +937,7 @@ function mailbox_edit_domain($link, $postarray) {
 		return false;
 	}
 	isset($postarray['active']) ? $active = '1' : $active = '0';
+	isset($postarray['relay_all_recipients']) ? $active = '1' : $active = '0';
 	isset($postarray['relay_all_recipients']) ? $relay_all_recipients = '1' : $relay_all_recipients = '0';
 	isset($postarray['backupmx']) ? $backupmx = '1' : $backupmx = '0';
 	$mystring = "UPDATE domain SET modified=now(), relay_all_recipients='".$relay_all_recipients."', backupmx='".$backupmx."', active='".$active."', quota='$quota', maxquota='$maxquota', mailboxes='$mailboxes', aliases='$aliases', description='$description' WHERE domain='".$domain."'";
