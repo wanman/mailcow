@@ -633,8 +633,8 @@ function mailbox_add_mailbox($link, $postarray) {
 	}
 	// Dirty workaround
 	if ($GLOBALS['SOGO_VARIANT'] == "yes) {
-		default_cal = "Calendar";
-		default_card = "Address book";
+		$default_cal = "Calendar";
+		$default_card = "Address book";
 	}
 	if (empty($default_cal) || empty($default_card)) {
 		$_SESSION['return'] = array(
