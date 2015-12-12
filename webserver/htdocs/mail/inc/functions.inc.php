@@ -11,7 +11,7 @@ function check_login($link, $user, $pass) {
 	$result = mysqli_query($link, "SELECT password FROM admin WHERE superadmin='1' AND username='$user'");
 	while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
 		$row = "'".$row[0]."'";
-		exec("echo ".$pass." | doveadm pw -s SHA512-CRYPT -t ".$row, $out, $return);
+		exec("echo ".$pass." | doveadm pw -s ".$GLOBALS['PASS_SCHEME']." -t ".$row, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
 			unset($_SESSION['ldelay']);
 			return "admin";
@@ -20,7 +20,7 @@ function check_login($link, $user, $pass) {
 	$result = mysqli_query($link, "SELECT password FROM admin WHERE superadmin='0' AND active='1' AND username='$user'");
 	while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
 		$row = "'".$row[0]."'";
-		exec("echo ".$pass." | doveadm pw -s SHA512-CRYPT -t ".$row, $out, $return);
+		exec("echo ".$pass." | doveadm pw -s ".$GLOBALS['PASS_SCHEME']." -t ".$row, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
 			unset($_SESSION['ldelay']);
 			return "domainadmin";
@@ -29,7 +29,7 @@ function check_login($link, $user, $pass) {
 	$result = mysqli_query($link, "SELECT password FROM mailbox WHERE active='1' AND username='$user'");
 	while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
 		$row = "'".$row[0]."'";
-		exec("echo ".$pass." | doveadm pw -s SHA512-CRYPT -t ".$row, $out, $return);
+		exec("echo ".$pass." | doveadm pw -s ".$GLOBALS['PASS_SCHEME']." -t ".$row, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
 			unset($_SESSION['ldelay']);
 			return "user";
@@ -669,7 +669,7 @@ function mailbox_add_mailbox($link, $postarray) {
 			return false;
 		}
 		$prep_password = escapeshellcmd($password);
-		exec("/usr/bin/doveadm pw -s SHA512-CRYPT -p $prep_password", $hash, $return);
+		exec("/usr/bin/doveadm pw -s ".$GLOBALS['PASS_SCHEME']." -p $prep_password", $hash, $return);
 		$password_sha512c = $hash[0];
 		if ($return != "0") {
 			$_SESSION['return'] = array(
@@ -1008,7 +1008,7 @@ function mailbox_edit_domainadmin($link, $postarray) {
 			return false;
 		}
 		$prep_password = escapeshellcmd($password);
-		exec("/usr/bin/doveadm pw -s SHA512-CRYPT -p $prep_password", $hash, $return);
+		exec("/usr/bin/doveadm pw -s ".$GLOBALS['PASS_SCHEME']." -p $prep_password", $hash, $return);
 		$password_sha512c = $hash[0];
 		if ($return != "0") {
 			$_SESSION['return'] = array(
@@ -1124,7 +1124,7 @@ function mailbox_edit_mailbox($link, $postarray) {
 			return false;
 		}
 		$prep_password = escapeshellcmd($password);
-		exec("/usr/bin/doveadm pw -s SHA512-CRYPT -p $prep_password", $hash, $return);
+		exec("/usr/bin/doveadm pw -s ".$GLOBALS['PASS_SCHEME']." -p $prep_password", $hash, $return);
 		$password_sha512c = $hash[0];
 		if ($return != "0") {
 			$_SESSION['return'] = array(
@@ -1501,7 +1501,7 @@ function set_admin_account($link, $postarray) {
 			return false;
 		}
 		$password = escapeshellcmd($password);
-		exec("/usr/bin/doveadm pw -s SHA512-CRYPT -p $password", $hash, $return);
+		exec("/usr/bin/doveadm pw -s ".$GLOBALS['PASS_SCHEME']." -p $password", $hash, $return);
 		$password = $hash[0];
 		if ($return != "0") {
 			$_SESSION['return'] = array(
@@ -1640,7 +1640,7 @@ function set_user_account($link, $postarray) {
 			return false;
 		}
 		$prep_password = escapeshellcmd($password_new);
-		exec("/usr/bin/doveadm pw -s SHA512-CRYPT -p $prep_password", $hash, $return);
+		exec("/usr/bin/doveadm pw -s ".$GLOBALS['PASS_SCHEME']." -p $prep_password", $hash, $return);
 		if ($return != "0") {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -1832,7 +1832,7 @@ function add_domain_admin($link, $postarray) {
 			return false;
 		}
 		$password = escapeshellcmd($password);
-		exec("/usr/bin/doveadm pw -s SHA512-CRYPT -p $password", $hash, $return);
+		exec("/usr/bin/doveadm pw -s ".$GLOBALS['PASS_SCHEME']." -p $password", $hash, $return);
 		$password = $hash[0];
 		if ($return != "0") {
 			$_SESSION['return'] = array(
