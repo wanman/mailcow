@@ -1,5 +1,5 @@
 #!/bin/bash
-source $(grep MC_MBOX_BACKUP /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
+source $(grep MC_MBOX_BACKUP_ENV /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
 
 rm -f /etc/cron.{hourly,weekly,daily,monthly}/mailcow_backup
 cat > /etc/cron.$RUNTIME/mailcow_backup <<'EOF'

@@ -19,6 +19,7 @@ DBHOST=$(grep database_host /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
 DBNAME=$(grep database_name /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
 DBUSER=$(grep database_user /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
 DBPASS=$(grep database_pass /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
+PASS_SCHEME=$(grep PASS_SCHEME /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
 
 echo "---------------------------"
 echo "mailcow administrator reset"
@@ -31,7 +32,7 @@ NEWPASS=$(genpasswd)
 while true; do
 read -p "Please enter a username from above: " mailcow_admin_user
         if [[ ! -z $(mysql --host ${DBHOST} -u ${DBUSER} -p${DBPASS} ${DBNAME} -e "SELECT username FROM admin WHERE username='$mailcow_admin_user' AND superadmin='1';") ]]; then
-                mailcow_admin_pass_hashed=$(doveadm pw -s SHA512-CRYPT -p ${NEWPASS})
+                mailcow_admin_pass_hashed=$(doveadm pw -s ${PASS_SCHEME} -p ${NEWPASS})
                 mysql --host ${DBHOST} -u ${DBUSER} -p${DBPASS} ${DBNAME} -e "DELETE FROM admin WHERE username='$mailcow_admin_user';"
                 mysql --host ${DBHOST} -u ${DBUSER} -p${DBPASS} ${DBNAME} -e "INSERT INTO admin VALUES ('$mailcow_admin_user','$mailcow_admin_pass_hashed',1,now(),now(),1);"
                 echo
