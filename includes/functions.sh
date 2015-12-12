@@ -175,10 +175,6 @@ installtask() {
 				echo -e "\ndeb http://http.debian.net/debian wheezy-backports main" >> /etc/apt/sources.list
 				apt-get -y update >/dev/null
 			fi
-			if [[ ! -z $(grep -E "^deb(.*)wheezy-backports(.*)" /etc/apt/sources.list) ]]; then
-				echo "$(textb [INFO]) - Installing jq from wheezy-backports..."
-				apt-get -y update >/dev/null ; apt-get -y --force-yes install jq -t wheezy-backports >/dev/null
-			fi
 			if [[ ${httpd_platform} == "apache2" ]]; then
 				if [[ $dist_codename == "trusty" ]]; then
 					echo "$(textb [INFO]) - Adding ondrej/apache2 repository..."
@@ -204,7 +200,7 @@ installtask() {
 			else
 				database_backend=""
 			fi
-DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install zip jq dnsutils python-setuptools libmail-spf-perl libmail-dkim-perl file \
+DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install zip dnsutils python-setuptools libmail-spf-perl libmail-dkim-perl file \
 openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-gd php5-imap php-apc subversion \
 php5-intl php5-xsl libawl-php php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc ${database_backend} ${webserver_backend} mailutils pyzor razor \
@@ -566,11 +562,6 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			sed -i "s/MAILCOW_DAV_HOST.MAILCOW_DOMAIN/${httpd_dav_subdomain}.${sys_domain}/g" /var/www/zpush/backend/carddav/config.php
 			mkdir /var/{lib,log}/z-push 2>/dev/null
 			chown -R www-data: /var/{lib,log}/z-push
-			# Cleaning up old files
-			sed -i '/test -d /var/run/fetchmail/d' /etc/rc.local > /dev/null 2>&1
-			rm /etc/cron.d/pfadminfetchmail > /dev/null 2>&1
-			rm /etc/mail/postfixadmin/fetchmail.conf > /dev/null 2>&1
-			rm /usr/local/bin/fetchmail.pl > /dev/null 2>&1
 			;;
 		roundcube)
 			mkdir -p /var/www/mail/rc
