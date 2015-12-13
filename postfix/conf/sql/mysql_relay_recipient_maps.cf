@@ -4,7 +4,6 @@ password = my_mailcowpass
 hosts = my_dbhost
 dbname = my_mailcowdb
 query = SELECT DISTINCT CASE
-        WHEN '%d' IN (SELECT domain FROM domain WHERE relay_all_recipients='1' AND domain='%d' AND backupmx='1') THEN 'OK'
+        WHEN '%d' IN (SELECT domain FROM domain WHERE relay_all_recipients=1 AND domain='%d' AND backupmx=1) THEN '%s'
         ELSE (SELECT goto FROM alias WHERE address='%s' AND active='1')
-  END AS goto
-  FROM alias;
+        END AS result;
