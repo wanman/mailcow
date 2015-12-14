@@ -96,7 +96,7 @@ smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
 tls_high_cipherlist=EDH+CAMELLIA:EDH+aRSA:EECDH+aRSA+AESGCM:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH:+CAMELLIA256:+AES256:+CAMELLIA128:+AES128:+SSLv3:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!DSS:!RC4:!SEED:!ECDSA:CAMELLIA256-SHA:AES256-SHA:CAMELLIA128-SHA:AES128-SHA
 
 # Use the FQDN for the local hostname!
-myhostname = MAILCOW_HOST.MAILCOW_DOMAIN
+myhostname = sys_hostname.sys_domain
 
 # Alias maps and database for -local- delivery only
 alias_maps = hash:/etc/aliases
@@ -105,8 +105,8 @@ alias_database = hash:/etc/aliases
 # The domain name that locally-posted mail appears to come from, and that locally posted mail is delivered to.
 myorigin = /etc/mailname
 
-# The list of domains that are delivered via the -local- mail delivery transport. No external domains like "MAILCOW_DOMAIN" belong here! "MAILCOW_HOST.MAILCOW_DOMAIN" is fine.
-mydestination = MAILCOW_HOST.MAILCOW_DOMAIN, localhost.MAILCOW_DOMAIN, localhost
+# The list of domains that are delivered via the -local- mail delivery transport. No external domains like "sys_domain" belong here! "sys_hostname.sys_domain" is fine.
+mydestination = sys_hostname.sys_domain, localhost.sys_domain, localhost
 
 # We lookup MX records to send non-local mail, so this stays empty
 relayhost =
@@ -170,7 +170,7 @@ virtual_alias_maps =
    proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_domain_maps.cf,
    proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf
 
-# Specify a left-hand side of "@MAILCOW_DOMAIN" to match any user in the specified domain
+# Specify a left-hand side of "@sys_domain" to match any user in the specified domain
 virtual_mailbox_maps =
    proxy:mysql:/etc/postfix/sql/mysql_virtual_mailbox_maps.cf,
    proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_domain_mailbox_maps.cf

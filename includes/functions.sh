@@ -80,20 +80,20 @@ checkports() {
 		echo "$(textb [INFO]) - Installing prerequisites for port checks"
 		apt-get -y update > /dev/null ; apt-get -y install mysql-client > /dev/null 2>&1
 	fi
-	if [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --host ${my_dbhost} -u root -p${my_rootpw} -e ""; echo $?) -ne 0 ]]; then
+	if [[ $(nc -z ${my_dbhost} 3306; echo $?) -eq 0 ]] && [[ $(mysql --host ${my_dbhost} -u root -p${my_rootpw} -e ""; echo $?) -ne 0 ]]; then
 		echo "$(redb [ERR]) - Cannot connect to SQL database server at ${my_dbhost} with given root password"
 		exit 1
-	elif [[ $(nc -z $my_dbhost 3306; echo $?) -eq 0 ]] && [[ $(mysql --host ${my_dbhost} -u root -p${my_rootpw} -e ""; echo $?) -eq 0 ]]; then
+	elif [[ $(nc -z ${my_dbhost} 3306; echo $?) -eq 0 ]] && [[ $(mysql --host ${my_dbhost} -u root -p${my_rootpw} -e ""; echo $?) -eq 0 ]]; then
 		if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "SHOW GRANTS" | grep "WITH GRANT OPTION") ]]; then
 			echo "$(redb [ERR]) - SQL root user is missing GRANT OPTION"
 			exit 1
 		fi
 		echo "$(textb [INFO]) - Successfully connected to SQL server at ${my_dbhost}"
 		echo
-		if [[ $my_dbhost == "localhost" || $my_dbhost == "127.0.0.1" ]] && [[ -z $(mysql -V | grep -i "mariadb") && $my_usemariadb == "yes" ]]; then
+		if [[ ${my_dbhost} == "localhost" || ${my_dbhost} == "127.0.0.1" ]] && [[ -z $(mysql -V | grep -i "mariadb") && $my_usemariadb == "yes" ]]; then
 			echo "$(redb [ERR]) - Found MySQL server but \"my_usemariadb\" is \"yes\""
 			exit 1
-		elif [[ $my_dbhost == "localhost" || $my_dbhost == "127.0.0.1" ]] && [[ ! -z $(mysql -V | grep -i "mariadb") && $my_usemariadb != "yes" ]]; then
+		elif [[ ${my_dbhost} == "localhost" || ${my_dbhost} == "127.0.0.1" ]] && [[ ! -z $(mysql -V | grep -i "mariadb") && $my_usemariadb != "yes" ]]; then
 			echo "$(redb [ERR]) - Found MariaDB server but \"my_usemariadb\" is not \"yes\""
 			exit 1
 		fi
@@ -191,7 +191,7 @@ installtask() {
 				echo "$(yellowb [WARN]) - You are running Ubuntu. The installation will not fail, though you may see a lot of output until the installation is finished."
 			fi
 			apt-get -y update >/dev/null
-			if [[ $my_dbhost == "localhost" || $my_dbhost == "127.0.0.1" ]] && [[ $is_upgradetask != "yes" ]]; then
+			if [[ ${my_dbhost} == "localhost" || ${my_dbhost} == "127.0.0.1" ]] && [[ $is_upgradetask != "yes" ]]; then
 				if [[ $my_usemariadb == "yes" ]]; then
 					database_backend="mariadb-client mariadb-server"
 				else
@@ -277,39 +277,33 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			if [[ $mysql_useable -ne 1 ]]; then
 				mysql --defaults-file=/etc/mysql/debian.cnf -e "UPDATE mysql.user SET Password=PASSWORD('$my_rootpw') WHERE USER='root'; FLUSH PRIVILEGES;"
 			fi
-			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "DROP DATABASE IF EXISTS $my_mailcowdb; DROP DATABASE IF EXISTS $my_rcdb;"
-			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "CREATE DATABASE $my_mailcowdb; GRANT SELECT, UPDATE, DELETE, INSERT ON $my_mailcowdb.* TO '$my_mailcowuser'@'%' IDENTIFIED BY '$my_mailcowpass';"
+			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "DROP DATABASE IF EXISTS ${my_mailcowdb}; DROP DATABASE IF EXISTS $my_rcdb;"
+			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "CREATE DATABASE ${my_mailcowdb}; GRANT SELECT, UPDATE, DELETE, INSERT ON ${my_mailcowdb}.* TO '${my_mailcowuser}'@'%' IDENTIFIED BY '${my_mailcowpass}';"
 			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'%' IDENTIFIED BY '$my_rcpass';"
-			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "GRANT SELECT ON $my_mailcowdb.* TO 'vmail'@'%'; FLUSH PRIVILEGES;"
+			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "GRANT SELECT ON ${my_mailcowdb}.* TO 'vmail'@'%'; FLUSH PRIVILEGES;"
 			;;
 		postfix)
-			cp -R postfix/conf/* /etc/postfix/
+			mkdir -p /etc/postfix/sql
 			chown root:postfix "/etc/postfix/sql"; chmod 750 "/etc/postfix/sql"
-			chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_catchall_maps.cf"
-			chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_maps.cf"
-			chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_mailbox_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_mailbox_maps.cf"
-			chown root:postfix "/etc/postfix/sql/mysql_virtual_mailbox_limit_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_mailbox_limit_maps.cf"
-			chown root:postfix "/etc/postfix/sql/mysql_virtual_mailbox_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_mailbox_maps.cf"
-			chown root:postfix "/etc/postfix/sql/mysql_virtual_mxdomain_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_mxdomain_maps.cf"
-			chown root:postfix "/etc/postfix/sql/mysql_virtual_alias_domain_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_alias_domain_maps.cf"
-			chown root:postfix "/etc/postfix/sql/mysql_virtual_spamalias_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_spamalias_maps.cf"
-			chown root:postfix "/etc/postfix/sql/mysql_virtual_sender_acl.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_sender_acl.cf"
-			chown root:postfix "/etc/postfix/sql/mysql_virtual_domains_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_virtual_domains_maps.cf"
-			chown root:postfix "/etc/postfix/sql/mysql_relay_recipient_maps.cf"; chmod 640 "/etc/postfix/sql/mysql_relay_recipient_maps.cf"
-			chown root:root "/etc/postfix/master.cf"; chmod 644 "/etc/postfix/master.cf"
-			chown root:root "/etc/postfix/main.cf"; chmod 644 "/etc/postfix/main.cf"
-			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /etc/postfix/main.cf
-			sed -i "s/MAILCOW_DOMAIN/${sys_domain}/g" /etc/postfix/main.cf
-			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /etc/postfix/sql/*
-			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /etc/postfix/sql/*
-			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /etc/postfix/sql/*
-			sed -i "s/my_dbhost/$my_dbhost/g" /etc/postfix/sql/*
+			for file in $(ls postfix/conf/sql)
+			do
+				install -o root -g postfix -m 640 postfix/conf/sql/$file /etc/postfix/sql/$file
+			done
+			install -m 644 postfix/conf/master.cf /etc/postfix/master.cf
+			install -m 644 postfix/conf/main.cf /etc/postfix/main.cf
+			install -o www-data -g www-data -m 644 postfix/conf/mailcow_anonymize_headers.pcre /etc/postfix/mailcow_anonymize_headers.pcre
+			install -m 644 postfix/conf/postscreen_access.cidr /etc/postfix/postscreen_access.cidr
+			sed -i "s/sys_hostname.sys_domain/${sys_hostname}.${sys_domain}/g" /etc/postfix/main.cf
+			sed -i "s/sys_domain/${sys_domain}/g" /etc/postfix/main.cf
+			sed -i "s/my_mailcowpass/${my_mailcowpass}/g" /etc/postfix/sql/*
+			sed -i "s/my_mailcowuser/${my_mailcowuser}/g" /etc/postfix/sql/*
+			sed -i "s/my_mailcowdb/${my_mailcowdb}/g" /etc/postfix/sql/*
+			sed -i "s/my_dbhost/${my_dbhost}/g" /etc/postfix/sql/*
 			sed -i '/^POSTGREY_OPTS=/s/=.*/="--inet=127.0.0.1:10023"/' /etc/default/postgrey
-			chown www-data: /etc/postfix/mailcow_*
 			chmod 755 /var/spool/
 			sed -i "/%www-data/d" /etc/sudoers 2> /dev/null
 			sed -i "/%vmail/d" /etc/sudoers 2> /dev/null
-			echo '%www-data ALL=(ALL) NOPASSWD: /usr/bin/doveadm * sync *, /usr/local/sbin/mc_pfset *, /usr/bin/doveadm quota recalc -A, /usr/sbin/dovecot reload, /usr/sbin/postfix reload, /usr/local/sbin/mc_dkim_ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_pflog_renew, /usr/local/sbin/mc_setup_backup' >> /etc/sudoers
+			echo '%www-data ALL=(ALL) NOPASSWD: /usr/bin/doveadm * sync *, /usr/local/sbin/mc_pfset *, /usr/bin/doveadm quota recalc -A, /usr/sbin/dovecot reload, /usr/sbin/postfix reload, /usr/local/sbin/mc_dkim_ctrl, /usr/$
 			;;
 		fuglu)
 			if [[ -z $(grep fuglu /etc/passwd) ]]; then
@@ -356,10 +350,10 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			DOVEFILES=$(find /etc/dovecot -maxdepth 1 -type f -printf '/etc/dovecot/%f ')
 			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" ${DOVEFILES}
 			sed -i "s/MAILCOW_DOMAIN/${sys_domain}/g" ${DOVEFILES}
-			sed -i "s/my_mailcowpass/$my_mailcowpass/g" ${DOVEFILES}
-			sed -i "s/my_mailcowuser/$my_mailcowuser/g" ${DOVEFILES}
-			sed -i "s/my_mailcowdb/$my_mailcowdb/g" ${DOVEFILES}
-			sed -i "s/my_dbhost/$my_dbhost/g" ${DOVEFILES}
+			sed -i "s/my_mailcowpass/${my_mailcowpass}/g" ${DOVEFILES}
+			sed -i "s/my_mailcowuser/${my_mailcowuser}/g" ${DOVEFILES}
+			sed -i "s/my_mailcowdb/${my_mailcowdb}/g" ${DOVEFILES}
+			sed -i "s/my_dbhost/${my_dbhost}/g" ${DOVEFILES}
 			[[ ${IPV6} != "yes" ]] && sed -i '/listen =/c\listen = *' /etc/dovecot/dovecot.conf
 			mkdir /etc/dovecot/conf.d 2> /dev/null
 			mkdir -p /var/vmail/sieve 2> /dev/null
@@ -518,7 +512,6 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				ln -s /etc/apache2/sites-available/mailcow.conf /etc/apache2/sites-enabled/000-0-mailcow.conf 2>/dev/null
 				sed -i "s/\"\MAILCOW_HOST.MAILCOW_DOMAIN\"/\"${sys_hostname}.${sys_domain}\"/g" /etc/apache2/sites-available/mailcow.conf
 				sed -i "s/\"\MAILCOW_DAV_HOST.MAILCOW_DOMAIN\"/\"${httpd_dav_subdomain}.${sys_domain}\"/g" /etc/apache2/sites-available/mailcow.conf
-				sed -i "s/\"autoconfig.MAILCOW_DOMAIN\"/\"autoconfig.${sys_domain}\"/g" /etc/apache2/sites-available/mailcow.conf
 				sed -i "s/MAILCOW_DOMAIN\"/${sys_domain}\"/g" /etc/apache2/sites-available/mailcow.conf
 				sed -i "s#MAILCOW_TIMEZONE#${sys_timezone}#g" /etc/apache2/sites-available/mailcow.conf
 				a2enmod rewrite ssl headers cgi > /dev/null 2>&1
@@ -532,11 +525,10 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			sed -i "/date_default_timezone_set/c\date_default_timezone_set('${sys_timezone}');" /var/www/dav/server.php
 			touch /var/mailcow/mailbox_backup_env
 			echo none > /var/mailcow/log/pflogsumm.log
-			sed -i "s/mailcow_sub/${sys_hostname}/g" /var/www/mail/autoconfig.xml
-			sed -i "s/my_dbhost/$my_dbhost/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
-			sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
-			sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
-			sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
+			sed -i "s/my_dbhost/${my_dbhost}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
+			sed -i "s/my_mailcowpass/${my_mailcowpass}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
+			sed -i "s/my_mailcowuser/${my_mailcowuser}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
+			sed -i "s/my_mailcowdb/${my_mailcowdb}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
 			sed -i "s/httpd_dav_subdomain/$httpd_dav_subdomain/g" /var/www/mail/inc/vars.inc.php
 			chown -R www-data: /var/www/{.,mail,dav} /var/lib/php5/sessions /var/mailcow/mailbox_backup_env
 			mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} < webserver/htdocs/init.sql
@@ -573,11 +565,11 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			cp -R roundcube/inst/${roundcube_version}/* /var/www/mail/rc/
 			if [[ $is_upgradetask != "yes" ]]; then
 				cp -R roundcube/conf/* /var/www/mail/rc/
-				sed -i "s/my_mailcowuser/$my_mailcowuser/g" /var/www/mail/rc/plugins/password/config.inc.php
-				sed -i "s/my_mailcowpass/$my_mailcowpass/g" /var/www/mail/rc/plugins/password/config.inc.php
-				sed -i "s/my_mailcowdb/$my_mailcowdb/g" /var/www/mail/rc/plugins/password/config.inc.php
-				sed -i "s/my_dbhost/$my_dbhost/g" /var/www/mail/rc/plugins/password/config.inc.php
-				sed -i "s/my_dbhost/$my_dbhost/g" /var/www/mail/rc/config/config.inc.php
+				sed -i "s/my_mailcowuser/${my_mailcowuser}/g" /var/www/mail/rc/plugins/password/config.inc.php
+				sed -i "s/my_mailcowpass/${my_mailcowpass}/g" /var/www/mail/rc/plugins/password/config.inc.php
+				sed -i "s/my_mailcowdb/${my_mailcowdb}/g" /var/www/mail/rc/plugins/password/config.inc.php
+				sed -i "s/my_dbhost/${my_dbhost}/g" /var/www/mail/rc/plugins/password/config.inc.php
+				sed -i "s/my_dbhost/${my_dbhost}/g" /var/www/mail/rc/config/config.inc.php
 				sed -i "s/my_rcuser/$my_rcuser/g" /var/www/mail/rc/config/config.inc.php
 				sed -i "s/my_rcpass/$my_rcpass/g" /var/www/mail/rc/config/config.inc.php
 				sed -i "s/my_rcdb/$my_rcdb/g" /var/www/mail/rc/config/config.inc.php
@@ -714,7 +706,7 @@ upgradetask() {
 		read -p "Please enter your SQL root user password: " my_rootpw
 	done
 	httpd_dav_subdomain=${readconf[8]}
-	[[ -z $my_dbhost ]] && my_dbhost="localhost"
+	[[ -z ${my_dbhost} ]] && my_dbhost="localhost"
 	for var in httpd_platform httpd_dav_subdomain sys_hostname sys_domain sys_timezone my_dbhost my_mailcowdb my_mailcowuser my_mailcowpass my_rcuser my_rcpass my_rcdb
 	do
 		if [[ -z ${!var} ]]; then
