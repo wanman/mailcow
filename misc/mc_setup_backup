@@ -4,7 +4,7 @@ source $(grep MC_MBOX_BACKUP_ENV /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
 rm -f /etc/cron.{hourly,weekly,daily,monthly}/mailcow_backup
 cat > /etc/cron.$RUNTIME/mailcow_backup <<'EOF'
 #!/bin/bash
-source /var/www/MAILBOX_BACKUP
+source $(grep MC_MBOX_BACKUP_ENV /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
 if [[ $BACKUP != "on" ]]; then
         exit 0
 fi
