@@ -639,9 +639,6 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			done
 			;;
 		checkdns)
-			if [[ -z $(dig -x ${getpublicipv4} @8.8.8.8 | grep -i "${sys_hostname}.${sys_domain}") ]]; then
-				echo "$(yellowb [WARN]) - Remember to setup a PTR record: ${getpublicipv4} does not point to ${sys_hostname}.${sys_domain}" | tee -a installer.log
-			fi
 			#for srv in _autodiscover _carddavs _caldavs _imap _imaps _submission _pop3 _pop3s
 			#do
 			#	if [[ -z $(dig srv ${srv}._tcp.${sys_domain} @8.8.8.8 +short) ]]; then
