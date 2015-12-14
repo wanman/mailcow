@@ -638,29 +638,6 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				service $var start
 			done
 			;;
-		checkdns)
-			#for srv in _autodiscover _carddavs _caldavs _imap _imaps _submission _pop3 _pop3s
-			#do
-			#	if [[ -z $(dig srv ${srv}._tcp.${sys_domain} @8.8.8.8 +short) ]]; then
-			#		echo "$(textb [INFO]) - non-essential - Cannot find SRV record \"${srv}._tcp.${sys_domain}\""
-			#	fi
-			#done
-			for a in autodiscover ${sys_hostname} ${httpd_dav_subdomain}
-			do
-				if [[ -z $(dig a ${a}.${sys_domain} @8.8.8.8 +short) ]]; then
-					echo "$(yellowb [WARN]) - Cannot find A record \"${a}.${sys_domain}\""
-				fi
-			done
-			if [[ -z $(dig mx ${sys_domain} @8.8.8.8 +short) ]]; then
-				echo "$(yellowb [WARN]) - Remember to setup a MX record pointing to this server" | tee -a installer.log
-			fi
-			if [[ -z $(dig ${sys_domain} txt @8.8.8.8 | grep -i spf) ]]; then
-				echo "$(textb [HINT]) - You may want to setup a TXT record for SPF" | tee -a installer.log
-			fi
-			if [[ ! -z $(host dbltest.com.dbl.spamhaus.org | grep NXDOMAIN) || ! -z $(cat /etc/resolv.conf | grep -E '^nameserver 8.8.|^nameserver 208.67.2') ]]; then
-				echo "$(redb [CRIT]) - You either use OpenDNS, Google DNS or another blocked DNS provider for blacklist lookups. Consider using another DNS server for better spam detection." | tee -a installer.log
-			fi
-			;;
 	esac
 }
 upgradetask() {

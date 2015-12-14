@@ -126,10 +126,7 @@ installtask opendkim
 returnwait "OpenDKIM configuration" "Restarting services"
 
 installtask restartservices
-returnwait "Restarting services" "Checking DNS settings"
-
-installtask checkdns
-returnwait "Checking DNS settings" "Finish installation"
+returnwait "Restarting services" "Finish installation"
 
 echo ${mailcow_version} > /etc/mailcow_version
 chmod 600 installer.log
