@@ -1,3 +1,5 @@
+# Do not put customisations into this file.  It will be overwitten by upgrades.
+# Add any customisations into local.cf.include in the same directory.
 report_safe 2
 required_score 5.0
 use_bayes 1
@@ -14,3 +16,4 @@ add_header all Status _YESNO_, score=_SCORE_ required=_REQD_ tests=_TESTS_ autol
 # Don't trust any network
 clear_internal_networks
 clear_internal_networks
+include local.cf.include
