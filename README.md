@@ -21,45 +21,32 @@ mailcow supports **Debian stable (8.x)**
 **Please see this album on imgur.com for screenshots -> http://imgur.com/a/elHnA**
 
 # Introduction
-A summary of what software is installed with which features enabled.
 
 **General setup**
-* Automatically generated passwords with high complexity
 * Multi-SAN self-signed SSL certificate for all installed and supporting services
-* Nginx or Apache2 installation (+PHP5-FPM)
-* MySQL or MariaDB database backend, remote database support
-* Learn ham and spam, [Heinlein Support](https://www.heinlein-support.de/) SA rules included
+    * Let's Encrypt optional
+* Webserver installation
+    * Apache or Nginx (+PHP5-FPM)
+* SQL database backend, remote database support
+    * MySQL or MariaDB
 * Fail2ban brute force protection
-* A "mailcow control center" via browser: Add domains, mailboxes, aliases and more
-* Tagged mail like "username+tag@example.com" will be moved to folder "tag"
-* Advanced ClamAV filters (ClamAV can be turned off, quarantined items can be downloaded)
+* mailcow web UI: Add domains, mailboxes, aliases, set limits, monitor mail statistics, change mail server settings, create/delete DKIM records
 
 **Postfix**
-* Postscreen activated
-* Submission port (587/TCP), TLS-only
-* SMTPS (465/TCP)
+* Postscreen activated and configured
+* STARTTLS and SMTPS support
 * The default restrictions used are a good compromise between blocking spam and avoiding false-positives
-* Change recipient restrictions in control center
-* Blacklist senders in control center
-* Incoming and outgoing spam protection
-* VirusTotal Uploader for incoming mail
-* SSL based on BetterCrypto
-* OpenDKIM, manage signatures in control center
+* Incoming and outgoing spam and virus protection with FuGlu as pre-queue content filter; [Heinlein Support](https://www.heinlein-support.de/) spamassassin rules included; Advanced ClamAV malware filters
 
 **Dovecot**
-* Default mailboxes to subscribe to automatically (Inbox, Sent, Drafts, Trash, Junk, Archive - "SPECIAL-USE" tags)
-* Sieve/ManageSieve
+* Sieve/ManageSieve (default filter: move spam to "Junk" folder, move tagged mail to folder "tag")
 * Public folder support via control center
 * per-user ACL
 * Shared Namespace (per-user seen-flag)
-* Global sieve filter: Move mail marked as spam into "Junk"
-* (IMAP) Quotas
-* LMTP service for Postfix virtual transport
-* SSL based on BetterCrypto
+* Quotas
 
 **Roundcube**
 * ManageSieve support (w/ vacation)
-* Users can change password
 * Attachment reminder (multiple locales)
 * Zip-download marked messages
 
