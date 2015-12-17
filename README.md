@@ -22,7 +22,6 @@ mailcow supports **Debian stable (8.x)**
 
 # Introduction
 
-**General setup**
 * Multi-SAN self-signed SSL certificate for all installed and supporting services
     * Let's Encrypt optional
 * Webserver installation
@@ -30,25 +29,21 @@ mailcow supports **Debian stable (8.x)**
 * SQL database backend, remote database support
     * MySQL or MariaDB
 * Fail2ban brute force protection
-* mailcow web UI: Add domains, mailboxes, aliases, set limits, monitor mail statistics, change mail server settings, create/delete DKIM records
-
-**Postfix**
+* **mailcow web UI**
+    * Add domains, mailboxes, aliases, set limits, monitor mail statistics, change mail server settings, create/delete DKIM records, share and create calendars/address books and more...
 * Postscreen activated and configured
 * STARTTLS and SMTPS support
 * The default restrictions used are a good compromise between blocking spam and avoiding false-positives
 * Incoming and outgoing spam and virus protection with FuGlu as pre-queue content filter; [Heinlein Support](https://www.heinlein-support.de/) spamassassin rules included; Advanced ClamAV malware filters
-
-**Dovecot**
 * Sieve/ManageSieve (default filter: move spam to "Junk" folder, move tagged mail to folder "tag")
 * Public folder support via control center
 * per-user ACL
 * Shared Namespace (per-user seen-flag)
 * Quotas
-
-**Roundcube**
-* ManageSieve support (w/ vacation)
-* Attachment reminder (multiple locales)
-* Zip-download marked messages
+* Roundcube
+    * ManageSieve support (w/ vacation)
+    * Attachment reminder (multiple locales)
+    * Zip-download marked messages
 
 # Before You Begin
 - **Please remove any web- and mail services** running on your server. I recommend using a clean Debian minimal installation.
