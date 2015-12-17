@@ -29,7 +29,6 @@ if [[ ${is_upgradetask} == "yes" ]]; then
 echo --------------------------------- >> installer.log
 echo UPGRADE to ${mailcow_version} on $(date) >> installer.log
 echo --------------------------------- >> installer.log
-echo Fail2ban version: ${fail2ban_version} >> installer.log
 echo Roundcube version: ${roundcube_version} >> installer.log
 echo FuGlu version: ${fuglu_version} >> installer.log
 echo --------------------------------- >> installer.log
@@ -76,7 +75,6 @@ echo --------------------------------- >> installer.log
 echo Web root: https://${sys_hostname}.${sys_domain} >> installer.log
 echo DAV web root: https://${httpd_dav_subdomain}.${sys_domain} >> installer.log
 echo --------------------------------- >> installer.log
-echo Fail2ban version: $fail2ban_version >> installer.log
 echo Roundcube version: $roundcube_version >> installer.log
 echo FuGlu version: ${fuglu_version} >> installer.log
 echo mailcow version: ${mailcow_version} >> installer.log
@@ -113,13 +111,7 @@ installtask webserver
 returnwait "Webserver configuration" "Roundcube configuration"
 
 installtask roundcube
-returnwait "Roundcube configuration" "Rsyslogd configuration"
-
-installtask rsyslogd
-returnwait "Rsyslogd configuration" "Fail2ban configuration"
-
-installtask fail2ban
-returnwait "Fail2ban configuration" "OpenDKIM configuration"
+returnwait "Roundcube configuration" "OpenDKIM configuration"
 
 installtask opendkim
 returnwait "OpenDKIM configuration" "Restarting services"

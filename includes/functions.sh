@@ -134,11 +134,6 @@ checkconfig() {
 	if [[ $inst_debug == "yes" ]]; then
 		set -x
 	fi
-	if [[ -z $(which rsyslogd) ]]; then
-		echo "$(redb [ERR]) - Please install rsyslogd"
-		echo
-		exit 1
-	fi
 }
 
 installtask() {
@@ -571,46 +566,6 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			rm -rf roundcube/inst/${roundcube_version}
 			rm -rf /var/www/mail/rc/installer/
 			;;
-		rsyslogd)
-			if [[ -d /etc/rsyslog.d ]]; then
-				rm /etc/rsyslog.d/10-fufix > /dev/null 2>&1
-				cp rsyslog/conf/10-mailcow /etc/rsyslog.d/
-				service rsyslog restart > /dev/null 2>&1
-				postlog -p warn dummy > /dev/null 2>&1
-				postlog -p info dummy > /dev/null 2>&1
-				postlog -p err dummy > /dev/null 2>&1
-			fi
-			;;
-		fail2ban)
-			if [[ ! -z $(dpkg --get-selections | grep -E "^fail2ban.*install$") ]]; then
-				echo "$(textb [INFO]) - Fail2ban was installed from repository, skipping installation..."
-			else
-				tar xf fail2ban/inst/${fail2ban_version}.tar -C fail2ban/inst/
-				rm -rf /etc/fail2ban/ 2> /dev/null
-				(cd fail2ban/inst/${fail2ban_version} ; python setup.py -q install 2> /dev/null)
-				mkdir -p /var/run/fail2ban
-				if [[ -f /lib/systemd/systemd ]]; then
-					cp fail2ban/conf/fail2ban.service /etc/systemd/system/fail2ban.service
-					systemctl disable fail2ban
-					[[ -f /lib/systemd/system/fail2ban.service ]] && rm /lib/systemd/system/fail2ban.service
-					systemctl daemon-reload
-					systemctl enable fail2ban
-				else
-					install -m 755 fail2ban/conf/fail2ban.init /etc/init.d/fail2ban
-					update-rc.d fail2ban defaults
-				fi
-				if [[ ! -f /var/log/mail.warn ]]; then
-					touch /var/log/mail.warn
-				fi
-				if [[ ! -f /etc/fail2ban/jail.local ]]; then
-					cp fail2ban/conf/jail.local /etc/fail2ban/jail.local
-				fi
-				cp fail2ban/conf/jail.d/*.conf /etc/fail2ban/jail.d/
-				rm -rf fail2ban/inst/${fail2ban_version}
-				[[ -z $(grep fail2ban /etc/rc.local) ]] && sed -i '/^exit 0/i\test -d /var/run/fail2ban || install -m 755 -d /var/run/fail2ban/' /etc/rc.local
-				mkdir /var/run/fail2ban/ 2> /dev/null
-			fi
-			;;
 		restartservices)
 			[[ -f /lib/systemd/systemd ]] && echo "$(textb [INFO]) - Restarting services, this may take a few seconds..."
 			if [[ ${httpd_platform} == "nginx" ]]; then
@@ -618,7 +573,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			else
 				fpm=""
 			fi
-			for var in jetty8 fail2ban rsyslog ${httpd_platform} ${fpm} spamassassin fuglu dovecot postfix opendkim clamav-daemon
+			for var in jetty8 ${httpd_platform} ${fpm} spamassassin fuglu dovecot postfix opendkim clamav-daemon
 			do
 				service $var stop
 				sleep 1.5
@@ -703,7 +658,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 	cp -R /var/www/mail/ before_upgrade_$timestamp/mail_wwwroot
 	mysqldump -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} > backup_mailcow_db.sql 2>/dev/null
 	mysqldump -u ${my_rcuser} -p${my_rcpass} ${my_rcdb} > backup_roundcube_db.sql 2>/dev/null
-	cp -R /etc/{postfix,dovecot,spamassassin,fail2ban,${httpd_platform},fuglu,mysql,php5,clamav} before_upgrade_$timestamp/
+	cp -R /etc/{postfix,dovecot,spamassassin,${httpd_platform},fuglu,mysql,php5,clamav} before_upgrade_$timestamp/
 	echo -e "$(greenb "[OK]")"
 	echo -en "\nStopping services, this may take a few seconds... \t\t"
 	if [[ ${httpd_platform} == "nginx" ]]; then
@@ -711,7 +666,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 	else
 		fpm=""
 	fi
-	for var in fail2ban rsyslog ${httpd_platform} ${fpm} spamassassin fuglu dovecot postfix opendkim clamav-daemon
+	for var in ${httpd_platform} ${fpm} spamassassin fuglu dovecot postfix opendkim clamav-daemon
 	do
 		service $var stop > /dev/null 2>&1
 	done
@@ -757,18 +712,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 	returnwait "Roundcube configuration" "OpenDKIM configuration"
 
 	installtask opendkim
-	returnwait "OpenDKIM configuration" "Rsyslogd configuration"
-
-	installtask rsyslogd
-	returnwait "Rsyslogd configuration" "Fail2ban configuration"
-
-	installtask fail2ban
-	# restore user configuration (*.local)
-	cp before_upgrade_$timestamp/fail2ban/*.local /etc/fail2ban/
-	cp before_upgrade_$timestamp/fail2ban/action.d/*.local /etc/fail2ban/action.d/ 2> /dev/null
-	cp before_upgrade_$timestamp/fail2ban/filter.d/*.local /etc/fail2ban/filter.d/ 2> /dev/null
-	cp before_upgrade_$timestamp/fail2ban/jail.d/*.local /etc/fail2ban/jail.d/ 2> /dev/null
-	returnwait "Fail2ban configuration" "Restarting services"
+	returnwait "OpenDKIM configuration" "Restarting services"
 
 	installtask restartservices
 	returnwait "Restarting services" "Finish upgrade"

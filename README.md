@@ -28,7 +28,6 @@ mailcow supports **Debian stable (8.x)**
     * Apache or Nginx (+PHP5-FPM)
 * SQL database backend, remote database support
     * MySQL or MariaDB
-* Fail2ban brute force protection
 * **mailcow web UI**
     * Add domains, mailboxes, aliases, set limits, monitor mail statistics, change mail server settings, create/delete DKIM records, share and create calendars/address books and more...
 * Postscreen activated and configured
