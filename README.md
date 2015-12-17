@@ -14,7 +14,7 @@
 mailcow
 =====
 
-mailcow is a mail server suite based on Dovecot, Postfix, SabreDAV (Cal- and CardDAV) and other open source software, that provides a modern Web UI for administration.
+mailcow is a mail server suite based on Dovecot, Postfix, SabreDAV (Cal- and CardDAV) and other open source software, that provides a modern web UI for user/server administration.
 
 mailcow supports **Debian stable (8.x)**
 
