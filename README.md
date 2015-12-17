@@ -14,8 +14,7 @@
 mailcow
 =====
 
-mailcow is a mail server suite based on Dovecot, Postfix and other open source software, that provides a modern Web UI for administration.
-In future versions mailcow will provide Cal- and CardDAV support.
+mailcow is a mail server suite based on Dovecot, Postfix, SabreDAV (Cal- and CardDAV) and other open source software, that provides a modern Web UI for administration.
 
 mailcow supports **Debian stable (8.x)**
 
@@ -29,7 +28,6 @@ A summary of what software is installed with which features enabled.
 * Multi-SAN self-signed SSL certificate for all installed and supporting services
 * Nginx or Apache2 installation (+PHP5-FPM)
 * MySQL or MariaDB database backend, remote database support
-* **Z-Push** integration (IMAP, CalDAV and CardDAV)
 * Learn ham and spam, [Heinlein Support](https://www.heinlein-support.de/) SA rules included
 * Fail2ban brute force protection
 * A "mailcow control center" via browser: Add domains, mailboxes, aliases and more

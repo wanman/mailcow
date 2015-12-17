@@ -242,11 +242,11 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 				echo "$(textb [INFO]) - Requesting certificates from Let's Encrypt..."
 				service ${httpd_platform} stop 2> /dev/null
 				wget https://github.com/letsencrypt/letsencrypt/archive/v${letsencrypt}.tar.gz -O - | tar xfz -
-				./letsencrypt-${letsencrypt}/letsencrypt-auto certonly --standalone -d ${sys_hostname}.${sys_domain} -d ${httpd_dav_subdomain}.${sys_domain} -d autodiscover.${sys_domain}
-				if [[ $? == "0" ]]; then
+				./letsencrypt-${letsencrypt}/letsencrypt-auto certonly --standalone -d ${sys_hostname}.${sys_domain} -d ${httpd_dav_subdomain}.${sys_domain}
+				echo "$(textb [INFO]) - Searching for useable certificate..."
+				if [[ -d /etc/letsencrypt/live ]]; then
 					for i in $(ls /etc/letsencrypt/live); do
 						if [[ ! -z $(openssl x509 -in "/etc/letsencrypt/live/$i/fullchain.pem" -text -noout | \
-							grep -E "DNS:autodiscover.${sys_domain}" | \
 							grep -E "DNS:${sys_hostname}.${sys_domain}" | \
 							grep -E "DNS:${httpd_dav_subdomain}.${sys_domain}") ]]; then
 									LE_CERT_PATH="/etc/letsencrypt/live/$i"
@@ -259,10 +259,11 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 					else
 						ln -s ${LE_CERT_PATH}/fullchain.pem /etc/ssl/mail/mail.crt
 						ln -s ${LE_CERT_PATH}/privkey.pem /etc/ssl/mail/mail.key
+						echo "$(textb [INFO]) - Found useable certificates"
 					fi
 				else
 					LETS_FAILED="1"
-					echo "$(yellowb [WARN]) - Let's Encrypt connection failed, falling back to self-signed certificates..."
+					echo "$(yellowb [WARN]) - Let's Encrypt request failed, falling back to self-signed certificates..."
 				fi
 				rm -r letsencrypt-${letsencrypt}
 			fi
@@ -517,29 +518,22 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				a2enmod rewrite ssl headers cgi > /dev/null 2>&1
 			fi
 			mkdir /var/lib/php5/sessions 2> /dev/null
-			cp -R webserver/htdocs/{mail,dav,zpush} /var/www/
+			cp -R webserver/htdocs/{mail,dav} /var/www/
 			tar xf /var/www/dav/vendor.tar -C /var/www/dav/ ; rm /var/www/dav/vendor.tar
-			tar xf /var/www/zpush/vendor.tar -C /var/www/zpush/ ; rm /var/www/zpush/vendor.tar
-			find /var/www/{dav,mail,zpush} -type d -exec chmod 755 {} \;
-			find /var/www/{dav,mail,zpush} -type f -exec chmod 644 {} \;
+			find /var/www/{dav,mail} -type d -exec chmod 755 {} \;
+			find /var/www/{dav,mail} -type f -exec chmod 644 {} \;
 			sed -i "/date_default_timezone_set/c\date_default_timezone_set('${sys_timezone}');" /var/www/dav/server.php
 			touch /var/mailcow/mailbox_backup_env
 			echo none > /var/mailcow/log/pflogsumm.log
-			sed -i "s/my_dbhost/${my_dbhost}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
-			sed -i "s/my_mailcowpass/${my_mailcowpass}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
-			sed -i "s/my_mailcowuser/${my_mailcowuser}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
-			sed -i "s/my_mailcowdb/${my_mailcowdb}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php /var/www/zpush/config.php /var/www/zpush/backend/imap/config.php
+			sed -i "s/my_dbhost/${my_dbhost}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
+			sed -i "s/my_mailcowpass/${my_mailcowpass}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
+			sed -i "s/my_mailcowuser/${my_mailcowuser}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
+			sed -i "s/my_mailcowdb/${my_mailcowdb}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
 			sed -i "s/httpd_dav_subdomain/$httpd_dav_subdomain/g" /var/www/mail/inc/vars.inc.php
 			chown -R www-data: /var/www/{.,mail,dav} /var/lib/php5/sessions /var/mailcow/mailbox_backup_env
 			mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} < webserver/htdocs/init.sql
 			if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "SHOW INDEX FROM propertystorage WHERE KEY_NAME = 'path_property';" -N -B) ]]; then
 				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "CREATE UNIQUE INDEX path_property ON propertystorage (path(600), name(100));" -N -B
-			fi
-			if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "SHOW INDEX FROM zpush_states WHERE KEY_NAME = 'idx_zpush_states_unique';" -N -B) ]]; then
-				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "CREATE unique index idx_zpush_states_unique on zpush_states (device_id, uuid, state_type, counter);" -N -B
-			fi
-			if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "SHOW INDEX FROM zpush_preauth_users WHERE KEY_NAME = 'index_zpush_preauth_users_on_username_and_device_id';" -N -B) ]]; then
-				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "CREATE unique index index_zpush_preauth_users_on_username_and_device_id on zpush_preauth_users (username, device_id);" -N -B
 			fi
 			if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "SHOW COLUMNS FROM domain LIKE 'relay_all_recipients';" -N -B) ]]; then
 				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "ALTER TABLE domain ADD relay_all_recipients tinyint(1) NOT NULL DEFAULT '0';" -N -B
@@ -551,13 +545,6 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			else
 				echo "$(textb [INFO]) - At least one administrator exists, will not create another mailcow administrator"
 			fi
-			# Z-Push
-			sed -i "s#MAILCOW_TIMEZONE#${sys_timezone}#g" /var/www/zpush/config.php
-			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /var/www/zpush/backend/imap/config.php
-			sed -i "s/MAILCOW_DAV_HOST.MAILCOW_DOMAIN/${httpd_dav_subdomain}.${sys_domain}/g" /var/www/zpush/backend/caldav/config.php
-			sed -i "s/MAILCOW_DAV_HOST.MAILCOW_DOMAIN/${httpd_dav_subdomain}.${sys_domain}/g" /var/www/zpush/backend/carddav/config.php
-			mkdir /var/{lib,log}/z-push 2>/dev/null
-			chown -R www-data: /var/{lib,log}/z-push
 			;;
 		roundcube)
 			mkdir -p /var/www/mail/rc
@@ -700,7 +687,6 @@ $(textb "Roundcube MySQL")        ${my_rcuser}:${my_rcpass}@${my_dbhost}/${my_rc
 $(textb "Web server")             ${httpd_platform^}
 $(textb "Web root")               https://${sys_hostname}.${sys_domain}
 $(textb "DAV web root")           https://${httpd_dav_subdomain}.${sys_domain}
-$(textb "Autodiscover (Z-Push)")  https://autodiscover.${sys_domain}
 
 --------------------------------------------------------
 THIS UPGRADE WILL RESET SOME OF YOUR CONFIGURATION FILES

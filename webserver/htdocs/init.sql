@@ -226,53 +226,6 @@ CREATE TABLE IF NOT EXISTS `quota2` (
   PRIMARY KEY (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE IF NOT EXISTS `zpush_settings` (
-  `key_name` varchar(50) NOT NULL,
-  `key_value` varchar(50) NOT NULL,
-  `created_at` datetime NOT NULL,
-  `updated_at` datetime NOT NULL,
-  PRIMARY KEY (`key_name`)
-);
-
-CREATE TABLE IF NOT EXISTS `zpush_users` (
-  `username` varchar(50) NOT NULL,
-  `device_id` varchar(50) NOT NULL,
-  `created_at` datetime NOT NULL,
-  `updated_at` datetime NOT NULL,
-  PRIMARY KEY (`username`, `device_id`)
-);
-
-CREATE TABLE IF NOT EXISTS `zpush_states` (
-  `id_state` integer auto_increment,
-  `device_id` varchar(50) NOT NULL,
-  `uuid` varchar(50),
-  `state_type` varchar(50),
-  `counter` integer,
-  `state_data` mediumblob,
-  `created_at` datetime NOT NULL,
-  `updated_at` datetime NOT NULL,
-  PRIMARY KEY (`id_state`)
-);
-
-CREATE TABLE IF NOT EXISTS `zpush_preauth_users` (
-  `id` integer auto_increment,
-  `username` varchar(50) NOT NULL,
-  `device_id` varchar(50) NOT NULL,
-  `authorized` boolean NOT NULL,
-  `created_at` datetime NOT NULL,
-  `updated_at` datetime NOT NULL,
-  PRIMARY KEY (`id`)
-);
-
-CREATE TABLE IF NOT EXISTS zpush_combined_usermap (
-  username varchar(50) NOT NULL,
-  backend varchar(32) NOT NULL,
-  mappedname varchar(200) NOT NULL,
-  created_at datetime NOT NULL,
-  updated_at datetime NOT NULL,
-  PRIMARY KEY (username, backend)
-);
-
 ALTER TABLE `quota2` ENGINE=InnoDB;
 ALTER TABLE `mailbox` ENGINE=InnoDB;
 ALTER TABLE `domain_admins` ENGINE=InnoDB;
@@ -280,4 +233,3 @@ ALTER TABLE `domain` ENGINE=InnoDB;
 ALTER TABLE `alias_domain` ENGINE=InnoDB;
 ALTER TABLE `alias` ENGINE=InnoDB;
 ALTER TABLE `admin` ENGINE=InnoDB;
-ALTER TABLE `zpush_states` ENGINE=InnoDB row_format=compressed key_block_size=16;
