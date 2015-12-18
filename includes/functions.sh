@@ -425,7 +425,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			#fi
 			update-rc.d -f solr remove > /dev/null 2>&1
 			service solr stop > /dev/null 2>&1
-			cp /usr/share/dovecot/solr-schema.xml /etc/solr/conf/schema.xml
+			[[ -f /usr/share/doc/dovecot-core/dovecot/solr-schema.xml ]] && cp /usr/share/doc/dovecot-core/dovecot/solr-schema.xml /etc/solr/conf/schema.xml
+			[[ -f /usr/share/dovecot/solr-schema.xml ]] && cp /usr/share/dovecot/solr-schema.xml /etc/solr/conf/schema.xml
 			sed -i '/NO_START/c\NO_START=0' /etc/default/${jetty_name}
                         sed -i '/JETTY_HOST/c\JETTY_HOST=127.0.0.1' /etc/default/${jetty_name}
 			sed -i '/JETTY_PORT/c\JETTY_PORT=8983' /etc/default/${jetty_name}
