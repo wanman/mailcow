@@ -154,6 +154,10 @@ installtask() {
 			fi
 			mkdir -p /var/mailcow/log;
 			echo "${sys_hostname}.${sys_domain}" > /etc/mailname
+			echo "$(textb [INFO]) - Installing prerequisites..."
+			apt-get -y update > /dev/null ; apt-get -y install lsb-release whiptail apt-utils ssl-cert > /dev/null 2>&1
+			dist_codename=$(lsb_release -cs)
+			dist_id=$(lsb_release -is)
 			;;
 		installpackages)
 			if [[ $dist_id == "Debian" ]]; then
