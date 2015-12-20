@@ -448,11 +448,11 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				service apparmor restart > /dev/null 2>&1
 			fi
 			install -m 755 clamav/clamav-unofficial-sigs.sh /usr/local/bin/clamav-unofficial-sigs.sh
-			cp -f clamav/clamav-unofficial-sigs.conf /etc/clamav-unofficial-sigs.conf
-			cp -f clamav/clamav-unofficial-sigs.8 /usr/share/man/man8/clamav-unofficial-sigs.8
-			cp -f clamav/clamav-unofficial-sigs-cron /etc/cron.d/clamav-unofficial-sigs-cron
-			cp -f clamav/clamav-unofficial-sigs-logrotate /etc/logrotate.d/clamav-unofficial-sigs-logrotate
-			mkdir -p /var/log/clamav-unofficial-sigs 2> /dev/null
+			install -m 644 clamav/clamav-unofficial-sigs.conf /etc/clamav-unofficial-sigs.conf
+			install -m 644 clamav/clamav-unofficial-sigs.8 /usr/share/man/man8/clamav-unofficial-sigs.8
+			install -m 755 clamav/clamav-unofficial-sigs-cron /etc/cron.d/clamav-unofficial-sigs-cron
+			install -m 644 clamav/clamav-unofficial-sigs-logrotate /etc/logrotate.d/clamav-unofficial-sigs-logrotate
+			[[ ! -d /var/log/clamav-unofficial-sigs ]] && mkdir /var/log/clamav-unofficial-sigs
 			sed -i '/MaxFileSize/c\MaxFileSize 10M' /etc/clamav/clamd.conf
 			sed -i '/StreamMaxLength/c\StreamMaxLength 10M' /etc/clamav/clamd.conf
 			freshclam 2> /dev/null
