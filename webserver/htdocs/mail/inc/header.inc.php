@@ -72,26 +72,26 @@ endif;
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Control center<span class="caret"></span></a>
 					<ul class="dropdown-menu" role="menu">
 <?php
-if (isset($logged_in_role)) {
-        if ($logged_in_role == 'admin') {
+if (isset($_SESSION['mailcow_cc_role'])) {
+        if ($_SESSION['mailcow_cc_role'] == 'admin') {
 ?>
-                                                <li><a href="/admin">Administration</a></li>
+                                                <li><a href="/admin.php">Administration</a></li>
 <?php
         }
-        if ($logged_in_role == 'domainadmin' || $logged_in_role == 'admin') {
+        if ($_SESSION['mailcow_cc_role'] == 'domainadmin' || $_SESSION['mailcow_cc_role'] == 'admin') {
 ?>
-                                                <li><a href="/manager">Mailboxes</a></li>
+                                                <li><a href="/mailbox.php">Mailboxes</a></li>
 <?php
         }
-        if ($logged_in_role == 'user') {
+        if ($_SESSION['mailcow_cc_role'] == 'user') {
 ?>
-                                                <li><a href="/user">User settings</a></li>
+                                                <li><a href="/user.php">User settings</a></li>
 <?php
         }
 }
 else {
 ?>
-                                                <li><a href="/login">Login</a></li>
+                                                <li><a href="/admin.php">Login</a></li>
 <?php
 }
 ?>
