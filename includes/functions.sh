@@ -234,41 +234,10 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			rm /etc/ssl/mail/* 2> /dev/null
 			echo "$(textb [INFO]) - Generating 2048 bit DH parameters, this may take a while, please wait..."
 			openssl dhparam -out /etc/ssl/mail/dhparams.pem 2048 2> /dev/null
-			if [[ ${httpd_lets_encrypt} == "yes" ]]; then
-				echo "$(textb [INFO]) - Requesting certificates from Let's Encrypt..."
-				service ${httpd_platform} stop 2> /dev/null
-				wget https://github.com/letsencrypt/letsencrypt/archive/v${letsencrypt}.tar.gz -O - | tar xfz -
-				./letsencrypt-${letsencrypt}/letsencrypt-auto certonly --standalone -d ${sys_hostname}.${sys_domain} -d ${httpd_dav_subdomain}.${sys_domain}
-				echo "$(textb [INFO]) - Searching for useable certificate..."
-				if [[ -d /etc/letsencrypt/live ]]; then
-					for i in $(ls /etc/letsencrypt/live); do
-						if [[ ! -z $(openssl x509 -in "/etc/letsencrypt/live/$i/fullchain.pem" -text -noout | \
-							grep -E "DNS:${sys_hostname}.${sys_domain}" | \
-							grep -E "DNS:${httpd_dav_subdomain}.${sys_domain}") ]]; then
-									LE_CERT_PATH="/etc/letsencrypt/live/$i"
-									break
-						fi
-					done
-					if [[ -z ${LE_CERT_PATH} ]]; then
-						LETS_FAILED="1"
-						echo "$(yellowb [WARN]) - Cannot find a proper certificate path, falling back to self-signed..."
-					else
-						ln -s ${LE_CERT_PATH}/fullchain.pem /etc/ssl/mail/mail.crt
-						ln -s ${LE_CERT_PATH}/privkey.pem /etc/ssl/mail/mail.key
-						echo "$(textb [INFO]) - Found useable certificates"
-					fi
-				else
-					LETS_FAILED="1"
-					echo "$(yellowb [WARN]) - Let's Encrypt request failed, falling back to self-signed certificates..."
-				fi
-				rm -r letsencrypt-${letsencrypt}
-			fi
-			if [[ ${LETS_FAILED} == "1" ]] || [[ ${httpd_lets_encrypt} != "yes" ]]; then
-				openssl req -new -newkey rsa:4096 -sha256 -days 1095 -nodes -x509 -subj "/C=ZZ/ST=mailcow/L=mailcow/O=mailcow/CN=${sys_hostname}.${sys_domain}/subjectAltName=DNS.1=${sys_hostname}.${sys_domain},DNS.2=${httpd_dav_subdomain}.${sys_domain},DNS.3=autodiscover.{sys_domain}" -keyout /etc/ssl/mail/mail.key -out /etc/ssl/mail/mail.crt
-				chmod 600 /etc/ssl/mail/mail.key
-				cp /etc/ssl/mail/mail.crt /usr/local/share/ca-certificates/
-				update-ca-certificates
-			fi
+			openssl req -new -newkey rsa:4096 -sha256 -days 1095 -nodes -x509 -subj "/C=ZZ/ST=mailcow/L=mailcow/O=mailcow/CN=${sys_hostname}.${sys_domain}/subjectAltName=DNS.1=${sys_hostname}.${sys_domain},DNS.2=${httpd_dav_subdomain}.${sys_domain},DNS.3=autodiscover.{sys_domain}" -keyout /etc/ssl/mail/mail.key -out /etc/ssl/mail/mail.crt
+			chmod 600 /etc/ssl/mail/mail.key
+			cp /etc/ssl/mail/mail.crt /usr/local/share/ca-certificates/
+			update-ca-certificates
 			;;
 		mysql)
 			if [[ $mysql_useable -ne 1 ]]; then

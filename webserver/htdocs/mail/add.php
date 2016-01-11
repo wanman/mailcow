@@ -204,9 +204,6 @@ while ($row = mysqli_fetch_array($result)) {
 						<input type="password" class="form-control" name="password2" id="password2" placeholder="">
 						</div>
 					</div>
-<?php
-if ($GLOBALS['SOGO_VARIANT'] != "yes"):
-?>
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="default_cal">Default calendar name:</label>
 						<div class="col-sm-10">
@@ -219,9 +216,6 @@ if ($GLOBALS['SOGO_VARIANT'] != "yes"):
 						<input type="text" class="form-control" name="default_card" id="default_card" value="Address book">
 						</div>
 					</div>
-<?php
-endif;
-?>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="checkbox">
@@ -244,8 +238,7 @@ endif;
 elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 		isset($_SESSION['mailcow_cc_role']) &&
 		$_SESSION['mailcow_cc_loggedin'] == "yes" &&
-		$_SESSION['mailcow_cc_role'] == "user" &&
-		$GLOBALS['SOGO_VARIANT'] != "yes") {
+		$_SESSION['mailcow_cc_role'] == "user") {
 	if (isset($_GET['dav'])) {
 ?>
 			<h4>Add DAV item</h4>

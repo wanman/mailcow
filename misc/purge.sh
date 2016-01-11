@@ -50,7 +50,6 @@ read -p "Type \"confirm\" to continue: " confirminput
 [[ $confirminput == "confirm" ]] || exit 0
 echo "Please wait..."
 service fail2ban stop
-service rsyslog stop
 service spamassassin stop
 service dovecot stop
 service postfix stop
@@ -96,16 +95,14 @@ rm -rf /usr/local/lib/python2.7/dist-packages/fuglu*
 rm -rf /opt/solr/
 rm -rf /var/solr/
 rm -rf /etc/ssl/mail/
-rm -rf /etc/spamassassin/
 rm -rf /etc/dovecot/
 rm -rf /etc/postfix/
-rm -rf /var/{lib,log}/z-push/
 rm -rf /etc/fail2ban/
 rm -f /etc/fufix_version
 rm -f /etc/mailcow_version
 rm -f /etc/{cron.daily,cron.weekly,cron.hourly,cron.monthly}/mailcow_backup
 rm -rf /etc/mail/postfixadmin
-rm -rf /var/www/{mail,zpush,dav}
+rm -rf /var/www/{mail,dav}
 rm -f /usr/local/sbin/mc_*
 rm -f /etc/cron.daily/mc_clean_spam_aliases
 rm -rf /var/run/fetchmail

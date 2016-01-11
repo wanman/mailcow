@@ -13,7 +13,6 @@ function check_login($link, $user, $pass) {
 		$row = "'".$row[0]."'";
 		exec("echo ".$pass." | doveadm pw -s ".$GLOBALS['PASS_SCHEME']." -t ".$row, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
-			unset($_SESSION['ldelay']);
 			return "admin";
 		}
 	}
@@ -22,7 +21,6 @@ function check_login($link, $user, $pass) {
 		$row = "'".$row[0]."'";
 		exec("echo ".$pass." | doveadm pw -s ".$GLOBALS['PASS_SCHEME']." -t ".$row, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
-			unset($_SESSION['ldelay']);
 			return "domainadmin";
 		}
 	}
@@ -31,17 +29,9 @@ function check_login($link, $user, $pass) {
 		$row = "'".$row[0]."'";
 		exec("echo ".$pass." | doveadm pw -s ".$GLOBALS['PASS_SCHEME']." -t ".$row, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
-			unset($_SESSION['ldelay']);
 			return "user";
 		}
 	}
-	if (!isset($_SESSION['ldelay'])) {
-		$_SESSION['ldelay'] = "0.1";
-	}
-	else {
-		$_SESSION['ldelay'] = $_SESSION['ldelay']+0.08;
-	}
-	sleep($_SESSION['ldelay']);
 }
 function formatBytes($size, $precision = 2) {
 	$base = log($size, 1024);
@@ -447,20 +437,16 @@ function mailbox_add_alias($link, $postarray) {
 			);
 			return false;
 		}
-		if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='".$domain."'"))) {
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'Domain '.htmlspecialchars($domain).' not found'
-			);
-			return false;
-		}
-		if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='".$domain."' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'!='".$logged_in_role."')"))) {
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'Permission denied'
-			);
-			return false;
-		}
+                $qstring = "SELECT domain from domain_admins WHERE domain='".$domain."' AND username='".$logged_in_as."' OR 'admin'='".$logged_in_role."'";
+                $qresult = mysqli_query($link, $qstring);
+                $num_results = mysqli_num_rows($qresult);
+                if ($num_results == 0 || empty($num_results)) {
+                        $_SESSION['return'] = array(
+                                'type' => 'danger',
+                                'msg' => 'Access denied'
+                        );
+                        return false;
+                }
 		$qstring = "SELECT address FROM alias WHERE address='".$address."'";
 		$qresult = mysqli_query($link, $qstring);
 		$num_results = mysqli_num_rows($qresult);
@@ -631,11 +617,6 @@ function mailbox_add_mailbox($link, $postarray) {
 			'msg' => htmlspecialchars($username).' is an alias address, please delete it to continue.'
 		);
 		return false;
-	}
-	// Dirty workaround
-	if ($GLOBALS['SOGO_VARIANT'] == "yes") {
-		$default_cal = "Calendar";
-		$default_card = "Address book";
 	}
 	if (empty($default_cal) || empty($default_card)) {
 		$_SESSION['return'] = array(

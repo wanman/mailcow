@@ -67,44 +67,33 @@ endif;
 		</div>
 		<div id="navbar" class="navbar-collapse collapse">
 			<ul class="nav navbar-nav navbar-right">
-<?php
-if ($GLOBALS['SOGO_VARIANT'] == "yes"):
-?>
-				<li><a href="/SOGo">SOGo Login</a></li>
-<?php
-else:
-?>
 				<li><a href="/rc">Webmail</a></li>
-<?php
-endif;
-?>
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Control center<span class="caret"></span></a>
 					<ul class="dropdown-menu" role="menu">
 <?php
-if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes"):
+if (isset($logged_in_role)) {
+        if ($logged_in_role == 'admin') {
 ?>
+                                                <li><a href="/admin">Administration</a></li>
 <?php
-switch ($logged_in_role) {
-	case "admin":
+        }
+        if ($logged_in_role == 'domainadmin' || $logged_in_role == 'admin') {
 ?>
-						<li><a href="/admin.php">Administration</a></li>
+                                                <li><a href="/manager">Mailboxes</a></li>
 <?php
-	case "domainadmin":
+        }
+        if ($logged_in_role == 'user') {
 ?>
-						<li><a href="/mailbox.php">Mailboxes</a></li>
+                                                <li><a href="/user">User settings</a></li>
 <?php
-	break;
-	case "user":
+        }
+}
+else {
 ?>
-						<li><a href="/user.php">User settings</a></li>
+                                                <li><a href="/login">Login</a></li>
 <?php
 }
-else:
-?>
-						<li><a href="/admin.php">Login</a></li>
-<?php
-endif;
 ?>
 					</ul>
 				</li>

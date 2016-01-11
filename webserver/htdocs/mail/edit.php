@@ -291,8 +291,7 @@ endwhile;
 elseif (isset($_SESSION['mailcow_cc_loggedin']) &&
 		isset($_SESSION['mailcow_cc_role']) &&
 		$_SESSION['mailcow_cc_loggedin'] == "yes" &&
-		$_SESSION['mailcow_cc_role'] == "user" &&
-		$GLOBALS['SOGO_VARIANT'] != "yes") {
+		$_SESSION['mailcow_cc_role'] == "user") {
 	if (isset($_GET['dav'])) {
 		if (!filter_var($_GET["dav"], FILTER_VALIDATE_EMAIL) || empty($_GET["dav"])) {
 			echo 'Incorrect form data';

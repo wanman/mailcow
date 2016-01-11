@@ -15,5 +15,4 @@ $MYHOSTNAME_1 = explode(".", exec("/usr/sbin/postconf -h myhostname"))[1];
 $MYHOSTNAME_2 = explode(".", exec("/usr/sbin/postconf -h myhostname"))[2];
 $DAV_SUBDOMAIN = "dav";
 $PASS_SCHEME = "SHA512-CRYPT";
-$SOGO_VARIANT = "no"
 ?>
