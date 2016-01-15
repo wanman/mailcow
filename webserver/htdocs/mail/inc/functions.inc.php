@@ -713,7 +713,7 @@ function mailbox_add_mailbox($link, $postarray) {
 	$create_user = "INSERT INTO mailbox (username, password, name, maildir, quota, local_part, domain, created, modified, active) 
 			VALUES ('".$username."', '".$password_hashed."', '".$name."', '$maildir', '".$quota_b."', '$local_part', '".$domain."', now(), now(), '".$active."');";
 	$create_user .= "INSERT INTO quota2 (username, bytes, messages)
-			VALUES ('".$username."', '', '');";
+			VALUES ('".$username."', '0', '0');";
 	$create_user .= "INSERT INTO alias (address, goto, domain, created, modified, active)
 			VALUES ('".$username."', '".$username."', '".$domain."', now(), now(), '".$active."');";
 	$create_user .= "INSERT INTO users (username, digesta1)
