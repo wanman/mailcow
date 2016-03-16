@@ -437,16 +437,16 @@ function mailbox_add_alias($link, $postarray) {
 			);
 			return false;
 		}
-                $qstring = "SELECT domain from domain_admins WHERE domain='".$domain."' AND username='".$logged_in_as."' OR 'admin'='".$logged_in_role."'";
-                $qresult = mysqli_query($link, $qstring);
-                $num_results = mysqli_num_rows($qresult);
-                if ($num_results == 0 || empty($num_results)) {
-                        $_SESSION['return'] = array(
-                                'type' => 'danger',
-                                'msg' => 'Access denied'
-                        );
-                        return false;
-                }
+		$qstring = "SELECT `domain` FROM `domain_admins` WHERE domain='".$domain."' AND username='".$logged_in_as."' OR 'admin'='".$_SESSION['mailcow_cc_role']."'";
+		$qresult = mysqli_query($link, $qstring);
+		$num_results = mysqli_num_rows($qresult);
+		if ($num_results == 0 || empty($num_results)) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'Permission Denied'
+			);
+			return false;
+		}
 		$qstring = "SELECT address FROM alias WHERE address='".$address."'";
 		$qresult = mysqli_query($link, $qstring);
 		$num_results = mysqli_num_rows($qresult);
@@ -501,14 +501,18 @@ function mailbox_add_alias($link, $postarray) {
 function mailbox_add_alias_domain($link, $postarray) {
 	$alias_domain = mysqli_real_escape_string($link, strtolower(trim($postarray['alias_domain'])));
 	$target_domain = mysqli_real_escape_string($link, strtolower(trim($postarray['target_domain'])));
-	global $logged_in_role;
 	global $logged_in_as;
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='$target_domain' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'!='".$logged_in_role."')"))) { 
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => 'Permission denied'
-		);
-		return false;
+	foreach (array($alias_domain, $target_domain) as $domain) {
+		$qstring = "SELECT `domain` FROM `domain_admins` WHERE domain='".$domain."' AND username='".$logged_in_as."' OR 'admin'='".$_SESSION['mailcow_cc_role']."'";
+		$qresult = mysqli_query($link, $qstring);
+		$num_results = mysqli_num_rows($qresult);
+		if ($num_results == 0 || empty($num_results)) {
+			$_SESSION['return'] = array(
+	 			'type' => 'danger',
+				'msg' => 'Permission Denied'
+	                );
+			return false;
+		}
 	}
 	isset($postarray['active']) ? $active = '1' : $active = '0';
 	if (!is_valid_domain_name($alias_domain) || empty ($alias_domain)) {
@@ -589,15 +593,19 @@ function mailbox_add_mailbox($link, $postarray) {
 	$maxquota_m = $row_from_domain['maxquota'];
 	$domain_quota_m = $row_from_domain['quota'];
 
-	global $logged_in_role;
 	global $logged_in_as;
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='".$domain."' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'!='".$logged_in_role."')"))) {
+
+	$qstring = "SELECT `domain` FROM `domain_admins` WHERE (domain='".$domain."' AND active='1' AND username='".$logged_in_as."') OR 'admin'='".$_SESSION['mailcow_cc_role']."'";
+	$qresult = mysqli_query($link, $qstring);
+	$num_results = mysqli_num_rows($qresult);
+	if ($num_results == 0 || empty($num_results)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'Permission denied'
+			'msg' => 'Permission Denied'
 		);
 		return false;
 	}
+
 	$qstring = "SELECT local_part FROM mailbox WHERE local_part='".$local_part."' and domain='".$domain."'";
 	$qresult = mysqli_query($link, $qstring);
 	$num_results = mysqli_num_rows($qresult);
@@ -857,10 +865,13 @@ function mailbox_edit_domain($link, $postarray) {
 	global $logged_in_role;
 	global $logged_in_as;
 
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='".$domain."' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'!='".$logged_in_role."')"))) { 
+	$qstring = "SELECT `domain` FROM `domain_admins` WHERE (domain='".$domain."' AND active='1' AND username='".$logged_in_as."') OR 'admin'='".$_SESSION['mailcow_cc_role']."'";
+	$qresult = mysqli_query($link, $qstring);
+	$num_results = mysqli_num_rows($qresult);
+	if ($num_results == 0 || empty($num_results)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'Permission denied'
+			'msg' => 'Permission Denied'
 		);
 		return false;
 	}
@@ -1035,12 +1046,14 @@ function mailbox_edit_mailbox($link, $postarray) {
 	$row_from_domain = mysqli_fetch_assoc(mysqli_query($link, "SELECT quota, maxquota FROM domain WHERE domain='".$domain."'"));
 	$maxquota_m = $row_from_domain['maxquota'];
 	$domain_quota_m = $row_from_domain['quota'];
-	global $logged_in_role;
 	global $logged_in_as;
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM domain WHERE domain='".$domain."' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'!='".$logged_in_role."')"))) { 
+	$qstring = "SELECT `domain` FROM `domain_admins` WHERE (domain='".$domain."' AND active='1' AND username='".$logged_in_as."') OR 'admin'='".$_SESSION['mailcow_cc_role']."'";
+	$qresult = mysqli_query($link, $qstring);
+	$num_results = mysqli_num_rows($qresult);
+	if ($num_results == 0 || empty($num_results)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'Permission denied'
+			'msg' => 'Permission Denied'
 		);
 		return false;
 	}
@@ -1353,12 +1366,14 @@ function mailbox_delete_domain($link, $postarray) {
 function mailbox_delete_alias($link, $postarray) {
 	$address = mysqli_real_escape_string($link, $postarray['address']);
 	$local_part = strstr($address, '@', true);
-	global $logged_in_role;
 	global $logged_in_as;
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM alias WHERE address='".$address."' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'!='".$logged_in_role."')"))) { 
+	$qstring = "SELECT `domain` FROM `domain_admins` WHERE domain='".$domain."' AND username='".$logged_in_as."' OR 'admin'='".$_SESSION['mailcow_cc_role']."'";
+	$qresult = mysqli_query($link, $qstring);
+	$num_results = mysqli_num_rows($qresult);
+	if ($num_results == 0 || empty($num_results)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'Permission denied'
+			'msg' => 'Permission Denied'
 		);
 		return false;
 	}
@@ -1377,12 +1392,14 @@ function mailbox_delete_alias($link, $postarray) {
 }
 function mailbox_delete_alias_domain($link, $postarray) {
 	$alias_domain = mysqli_real_escape_string($link, $postarray['alias_domain']);
-	global $logged_in_role;
 	global $logged_in_as;
-	if (!mysqli_result(mysqli_query($link, "SELECT target_domain FROM alias_domain WHERE alias_domain='".$alias_domain."' AND (target_domain NOT IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'!='".$logged_in_role."')"))) { 
+	$qstring = "SELECT `domain` FROM `domain_admins` WHERE (domain='".$alias_domain."' AND active='1' AND username='".$logged_in_as."') OR 'admin'='".$_SESSION['mailcow_cc_role']."'";
+	$qresult = mysqli_query($link, $qstring);
+	$num_results = mysqli_num_rows($qresult);
+	if ($num_results == 0 || empty($num_results)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'Permission denied'
+			'msg' => 'Permission Denied'
 		);
 		return false;
 	}
@@ -1408,12 +1425,14 @@ function mailbox_delete_alias_domain($link, $postarray) {
 }
 function mailbox_delete_mailbox($link, $postarray) {
 	$username = mysqli_real_escape_string($link, $postarray['username']);
-	global $logged_in_role;
 	global $logged_in_as;
-	if (!mysqli_result(mysqli_query($link, "SELECT domain FROM mailbox WHERE username='".$username."' AND (domain NOT IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'!='".$logged_in_role."')"))) { 
+	$qstring = "SELECT `domain` FROM `mailbox` WHERE username='".$username."' AND domain IN (SELECT `domain` FROM `domain_admins` WHERE (active='1' AND username='".$logged_in_as."')) OR 'admin'='".$_SESSION['mailcow_cc_role']."'";
+	$qresult = mysqli_query($link, $qstring);
+	$num_results = mysqli_num_rows($qresult);
+	if ($num_results == 0 || empty($num_results)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'Permission denied'
+			'msg' => 'Permission Denied'
 		);
 		return false;
 	}

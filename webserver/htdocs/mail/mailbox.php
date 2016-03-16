@@ -171,7 +171,7 @@ else:
 endif;
 ?>
 
-		<td><?=$row['name'];?></td>
+		<td><?=htmlspecialchars($row['name']);?></td>
 		<td><?=$row['domain'];?></td>
 		<td>
 <?php
