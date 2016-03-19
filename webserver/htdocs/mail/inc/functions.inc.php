@@ -126,7 +126,7 @@ function set_mailcow_config($s, $v = '') {
 						);
 						break;
 					}
-					file_put_contents($file, $mbox.PHP_EOL, FILE_APPEND | LOCK_EX);
+					file_put_contents($file, escapeshellcmd($mbox).PHP_EOL, FILE_APPEND | LOCK_EX);
 				}
 			}
 			file_put_contents($file, ")".PHP_EOL.'RUNTIME='.$v['runtime'].PHP_EOL, FILE_APPEND | LOCK_EX);
