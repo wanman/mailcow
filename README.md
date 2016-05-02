@@ -95,6 +95,7 @@ nano mailcow.config
 * **my_rootpw** - SQL root password is generated automatically by default. You can define a complex password here if you want to. *Set to your current root password to use an existing SQL instance*.
 * **mailcow_admin_user and mailcow_admin_pass** - mailcow administrator. Password policy: minimum length 8 chars, must contain uppercase and lowercase letters and at least 2 digits. **You can use the default values**.
 * **inst_debug** - Sets Bash mode -x
+* **inst_keepfiles** - Do not regenerate some expensive files (crypto parameters, ClamAV files) to increase debugging speed
 * **inst_confirm_proceed** - Skip "Press any key to continue" dialogs by setting this to "no"
 
 **Empty configuration values are invalid!**

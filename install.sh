@@ -8,7 +8,7 @@ cat includes/banner
 source includes/versions
 source includes/functions.sh
 
-while getopts uhUH:D:? par; do
+while getopts kuhUH:D:? par; do
 case $par in
 	h|'?')
 		usage
@@ -20,6 +20,7 @@ case $par in
 		;;
 	H) sys_hostname="$OPTARG" ;;
 	D) sys_domain="$OPTARG" ;;
+	k) inst_keepfiles="yes" ;;
 esac
 done
 

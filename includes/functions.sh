@@ -257,7 +257,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		ssl)
 			mkdir /etc/ssl/mail 2> /dev/null
-			rm /etc/ssl/mail/* 2> /dev/null
+			[[ $inst_keepfiles == "no" ]] && rm /etc/ssl/mail/* 2> /dev/null
 			echo "$(textb [INFO]) - Generating 2048 bit DH parameters, this may take a while, please wait..."
 			openssl dhparam -out /etc/ssl/mail/dhparams.pem 2048 2> /dev/null
 			openssl req -new -newkey rsa:4096 -sha256 -days 1095 -nodes -x509 -subj "/C=ZZ/ST=mailcow/L=mailcow/O=mailcow/CN=${sys_hostname}.${sys_domain}/subjectAltName=DNS.1=${sys_hostname}.${sys_domain},DNS.2=${httpd_dav_subdomain}.${sys_domain},DNS.3=autodiscover.{sys_domain}" -keyout /etc/ssl/mail/mail.key -out /etc/ssl/mail/mail.crt
@@ -431,7 +431,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			usermod -a -G vmail clamav 2> /dev/null
 			service clamav-freshclam stop > /dev/null 2>&1
 			killall freshclam 2> /dev/null
-			rm -f /var/lib/clamav/* 2> /dev/null
+			[[ $inst_keepfiles == "no" ]] && rm -f /var/lib/clamav/* 2> /dev/null
 			sed -i '/DatabaseMirror/d' /etc/clamav/freshclam.conf
 			sed -i '/MaxFileSize/c\MaxFileSize 10240M' /etc/clamav/clamd.conf
 			sed -i '/StreamMaxLength/c\StreamMaxLength 10240M' /etc/clamav/clamd.conf
