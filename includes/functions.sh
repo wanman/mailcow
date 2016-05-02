@@ -44,13 +44,17 @@ genpasswd() {
 	echo $pw_valid
 }
 
+returnwait_task=""
 returnwait() {
-	echo "$(greenb [OK]) - Task $(textb "$1") completed"
-	echo "----------------------------------------------"
-	if [[ ${inst_confirm_proceed} == "yes" ]]; then
-		read -p "$(yellowb !) Press ENTER to continue with task $(textb "$2") (CTRL-C to abort) "
+	if [[ -n "$returnwait_task" ]]; then
+		echo "$(greenb [OK]) - Task $(textb "$returnwait_task") completed"
+		echo "----------------------------------------------"
 	fi
-	echo "$(pinkb [RUNNING]) - Task $(textb "$2") started, please wait..."
+	returnwait_task="$1"
+	if [[ ${inst_confirm_proceed} == "yes" && "$2" != "no" ]]; then
+		read -p "$(yellowb !) Press ENTER to continue with task $(textb "$returnwait_task") (CTRL-C to abort) "
+	fi
+	echo "$(pinkb [RUNNING]) - Task $(textb "$returnwait_task") started, please wait..."
 }
 
 checksystem() {
@@ -679,41 +683,42 @@ A backup will be stored in ./before_upgrade_$timestamp
 		openssl dhparam -out /etc/ssl/mail/dhparams.pem 2048 2> /dev/null
 	fi
 
-	echo "Starting task \"Package installation\"..."
+	returnwait "Package installation"
 	installtask installpackages
-	returnwait "Package installation" "Postfix configuration"
 
+	returnwait "Postfix configuration"
 	installtask postfix
-	returnwait "Postfix configuration" "Dovecot configuration"
 
+	returnwait "Dovecot configuration"
 	installtask dovecot
-	returnwait "Dovecot configuration" "FuGlu configuration"
 
+	returnwait "FuGlu configuration"
 	installtask fuglu
-	returnwait "FuGlu configuration" "ClamAV configuration"
 
+	returnwait "ClamAV configuration"
 	installtask clamav
-	returnwait "ClamAV configuration" "Spamassassin configuration"
 
+	returnwait "Spamassassin configuration"
 	installtask spamassassin
-	returnwait "Spamassassin configuration" "Webserver configuration"
 
-	rm -rf /var/lib/php5/sessions/*
+	returnwait "Webserver configuration"
+	rm -rf $phplib/sessions/*
 	mkdir -p /var/mailcow/log
 	mv /var/www/MAILBOX_BACKUP /var/mailcow/mailbox_backup_env 2> /dev/null
 	mv /var/www/PFLOG /var/mailcow/log/pflogsumm.log 2> /dev/null
 
 	installtask webserver
-	returnwait "Webserver configuration" "Roundcube configuration"
 
+	returnwait "Roundcube configuration"
 	installtask roundcube
-	returnwait "Roundcube configuration" "OpenDKIM configuration"
 
+	returnwait "OpenDKIM configuration"
 	installtask opendkim
-	returnwait "OpenDKIM configuration" "Restarting services"
 
+	returnwait "Restarting services"
 	installtask restartservices
-	returnwait "Restarting services" "Finish upgrade"
+
+	returnwait "Finish upgrade" "no"
 	echo Done.
 	echo
 	echo "\"installer.log\" file updated."

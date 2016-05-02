@@ -50,8 +50,7 @@ echo "    $(textb "Hostname")            ${sys_hostname}
     $(textb "mailcow admin user")  ${mailcow_admin_user}
 "
 
-returnwait "Reading configuration" "System environment"
-
+returnwait "System environment"
 echo --------------------------------- > installer.log
 echo MySQL database host: ${my_dbhost}  >> installer.log
 echo --------------------------------- >> installer.log
@@ -82,43 +81,44 @@ echo mailcow version: ${mailcow_version} >> installer.log
 echo --------------------------------- >> installer.log
 
 installtask environment
-returnwait "System environment" "Package installation"
 
+returnwait "Package installation"
 installtask installpackages
-returnwait "Package installation" "Certificate configuration"
 
+returnwait "Certificate configuration"
 installtask ssl
-returnwait "Certificate configuration" "MySQL configuration"
 
+returnwait "MySQL configuration"
 installtask mysql
-returnwait "MySQL configuration" "Postfix configuration"
 
+returnwait "Postfix configuration"
 installtask postfix
-returnwait "Postfix configuration" "Dovecot configuration"
 
+returnwait "Dovecot configuration"
 installtask dovecot
-returnwait "Dovecot configuration" "FuGlu configuration"
 
+returnwait "FuGlu configuration"
 installtask fuglu
-returnwait "FuGlu configuration" "ClamAV configuration"
 
+returnwait "ClamAV configuration"
 installtask clamav
-returnwait "ClamAV configuration" "Spamassassin configuration"
 
+returnwait "Spamassassin configuration"
 installtask spamassassin
-returnwait "Spamassassin configuration" "Webserver configuration"
 
+returnwait "Webserver configuration"
 installtask webserver
-returnwait "Webserver configuration" "Roundcube configuration"
 
+returnwait "Roundcube configuration"
 installtask roundcube
-returnwait "Roundcube configuration" "OpenDKIM configuration"
 
+returnwait "OpenDKIM configuration"
 installtask opendkim
-returnwait "OpenDKIM configuration" "Restarting services"
 
+returnwait "Restarting services"
 installtask restartservices
-returnwait "Restarting services" "Finish installation"
+
+returnwait "Finish installation" "no"
 
 echo ${mailcow_version} > /etc/mailcow_version
 chmod 600 installer.log
