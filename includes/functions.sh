@@ -44,13 +44,17 @@ genpasswd() {
 	echo $pw_valid
 }
 
+returnwait_task=""
 returnwait() {
-	echo "$(greenb [OK]) - Task $(textb "$1") completed"
-	echo "----------------------------------------------"
-	if [[ ${inst_confirm_proceed} == "yes" ]]; then
-		read -p "$(yellowb !) Press ENTER to continue with task $(textb "$2") (CTRL-C to abort) "
+	if [[ -n "$returnwait_task" ]]; then
+		echo "$(greenb [OK]) - Task $(textb "$returnwait_task") completed"
+		echo "----------------------------------------------"
 	fi
-	echo "$(pinkb [RUNNING]) - Task $(textb "$2") started, please wait..."
+	returnwait_task="$1"
+	if [[ ${inst_confirm_proceed} == "yes" && "$2" != "no" ]]; then
+		read -p "$(yellowb !) Press ENTER to continue with task $(textb "$returnwait_task") (CTRL-C to abort) "
+	fi
+	echo "$(pinkb [RUNNING]) - Task $(textb "$returnwait_task") started, please wait..."
 }
 
 checksystem() {
@@ -163,10 +167,15 @@ installtask() {
 			if [[ $dist_id == "Debian" ]]; then
 				if [[ $dist_codename == "jessie" ]]; then
 					if [[ ${httpd_platform} == "apache2" ]]; then
-						webserver_backend="apache2 apache2-utils libapache2-mod-php5"
+						webserver_backend="apache2 apache2-utils libapache2-mod-php5 php-apc"
 					else
-						webserver_backend="nginx-extras php5-fpm"
+						webserver_backend="nginx-extras php5-fpm php-apc"
 					fi
+					php="php5"
+					phpconf="/etc/php5"
+					phplib="$phplib/"
+					sqlite="sqlite"
+					openjdk="openjdk-7"
 					jetty_name="jetty8"
 				else
 					echo "$(redb [ERR]) - Your Debian distribution is currently not supported"
@@ -179,11 +188,32 @@ installtask() {
 						echo "deb http://ppa.launchpad.net/ondrej/apache2/ubuntu trusty main" > /etc/apt/sources.list.d/ondrej.list
 						apt-key adv --keyserver keyserver.ubuntu.com --recv E5267A6C > /dev/null 2>&1
 						apt-get -y update >/dev/null
+						webserver_backend="apache2 apache2-utils libapache2-mod-php5 php-apc"
+					else
+						webserver_backend="nginx-extras php5-fpm php-apc"
+					fi
+					php="php5"
+					phpconf="/etc/php5"
+					phplib="$phplib/"
+					sqlite="sqlite"
+					openjdk="openjdk-7"
+					jetty_name="jetty"
+				elif [[ $dist_codename == "xenial" ]]; then
+					if [[ ${httpd_platform} == "apache2" ]]; then
+						echo "$(textb [INFO]) - Adding ondrej/apache2 repository..."
+						echo "deb http://ppa.launchpad.net/ondrej/apache2/ubuntu trusty main" > /etc/apt/sources.list.d/ondrej.list
+						apt-key adv --keyserver keyserver.ubuntu.com --recv E5267A6C > /dev/null 2>&1
+						apt-get -y update >/dev/null
 						webserver_backend="apache2 apache2-utils libapache2-mod-php5"
 					else
-						webserver_backend="nginx-extras php5-fpm"
+						webserver_backend="nginx-extras php-fpm"
 					fi
-					jetty_name="jetty"
+					php="php"
+					phpconf="/etc/php/7.0"
+					phplib="/var/lib/php"
+					sqlite="sqlite3"
+					openjdk="openjdk-9"
+					jetty_name="jetty8"
 				else
 					echo "$(redb [ERR]) - Your Ubuntu distribution is currently not supported"
 					exit 1
@@ -204,11 +234,11 @@ installtask() {
 			fi
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install zip dnsutils python-setuptools libmail-spf-perl libmail-dkim-perl file \
 openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
-php-net-socket php-net-url php-pear php-soap php5 php5-cli php5-common php5-curl php5-gd php5-imap php-apc subversion \
-php5-intl php5-xsl libawl-php php5-mcrypt php5-mysql php5-sqlite libawl-php php5-xmlrpc ${database_backend} ${webserver_backend} mailutils pyzor razor \
+php-net-socket php-net-url php-pear php-soap $php $php-cli $php-common $php-curl $php-gd $php-imap subversion \
+$php-intl $php-xsl libawl-php $php-mcrypt $php-mysql $php-$sqlite libawl-php $php-xmlrpc ${database_backend} ${webserver_backend} mailutils pyzor razor \
 postfix postfix-mysql postfix-pcre postgrey pflogsumm spamassassin spamc sudo bzip2 curl mpack opendkim opendkim-tools unzip clamav-daemon \
 python-magic unrar-free liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl bsd-mailx \
-openjdk-7-jre-headless libcurl4-openssl-dev libexpat1-dev rrdtool mailgraph fcgiwrap spawn-fcgi \
+$openjdk-jre-headless libcurl4-openssl-dev libexpat1-dev rrdtool mailgraph fcgiwrap spawn-fcgi \
 solr-jetty > /dev/null
 			if [ "$?" -ne "0" ]; then
 				echo "$(redb [ERR]) - Package installation failed"
@@ -231,7 +261,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		ssl)
 			mkdir /etc/ssl/mail 2> /dev/null
-			rm /etc/ssl/mail/* 2> /dev/null
+			[[ $inst_keepfiles == "no" ]] && rm /etc/ssl/mail/* 2> /dev/null
 			echo "$(textb [INFO]) - Generating 2048 bit DH parameters, this may take a while, please wait..."
 			openssl dhparam -out /etc/ssl/mail/dhparams.pem 2048 2> /dev/null
 			openssl req -new -newkey rsa:4096 -sha256 -days 1095 -nodes -x509 -subj "/C=ZZ/ST=mailcow/L=mailcow/O=mailcow/CN=${sys_hostname}.${sys_domain}/subjectAltName=DNS.1=${sys_hostname}.${sys_domain},DNS.2=${httpd_dav_subdomain}.${sys_domain},DNS.3=autodiscover.{sys_domain}" -keyout /etc/ssl/mail/mail.key -out /etc/ssl/mail/mail.crt
@@ -405,7 +435,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			usermod -a -G vmail clamav 2> /dev/null
 			service clamav-freshclam stop > /dev/null 2>&1
 			killall freshclam 2> /dev/null
-			rm -f /var/lib/clamav/* 2> /dev/null
+			[[ $inst_keepfiles == "no" ]] && rm -f /var/lib/clamav/* 2> /dev/null
 			sed -i '/DatabaseMirror/d' /etc/clamav/freshclam.conf
 			sed -i '/MaxFileSize/c\MaxFileSize 10240M' /etc/clamav/clamd.conf
 			sed -i '/StreamMaxLength/c\StreamMaxLength 10240M' /etc/clamav/clamd.conf
@@ -461,12 +491,12 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			mkdir -p /var/www/ 2> /dev/null
 			if [[ ${httpd_platform} == "nginx" ]]; then
 				# Some systems miss the default php5-fpm listener, reinstall it now
-				apt-get -o Dpkg::Options::="--force-confmiss" install -y --reinstall php5-fpm > /dev/null
+				apt-get -o Dpkg::Options::="--force-confmiss" install -y --reinstall $php-fpm > /dev/null
 				rm /etc/nginx/sites-enabled/{000-0-mailcow*,000-0-fufix} 2>/dev/null
 				cp webserver/nginx/conf/sites-available/mailcow /etc/nginx/sites-available/
-				cp webserver/php5-fpm/conf/pool/mail.conf /etc/php5/fpm/pool.d/mail.conf
-				cp webserver/php5-fpm/conf/php-fpm.conf /etc/php5/fpm/php-fpm.conf
-				sed -i "/date.timezone/c\php_admin_value[date.timezone] = ${sys_timezone}" /etc/php5/fpm/pool.d/mail.conf
+				cp webserver/php5-fpm/conf/pool/mail.conf $phpconf/fpm/pool.d/mail.conf
+				cp webserver/php5-fpm/conf/php-fpm.conf $phpconf/fpm/php-fpm.conf
+				sed -i "/date.timezone/c\php_admin_value[date.timezone] = ${sys_timezone}" $phpconf/fpm/pool.d/mail.conf
 				ln -s /etc/nginx/sites-available/mailcow /etc/nginx/sites-enabled/000-0-mailcow 2>/dev/null
 				[[ ! -z $(grep "server_names_hash_bucket_size" /etc/nginx/nginx.conf) ]] && \
 					sed -i "/server_names_hash_bucket_size/c\ \ \ \ \ \ \ \ server_names_hash_bucket_size 64;" /etc/nginx/nginx.conf || \
@@ -484,7 +514,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				sed -i "s#MAILCOW_TIMEZONE#${sys_timezone}#g" /etc/apache2/sites-available/mailcow.conf
 				a2enmod rewrite ssl headers cgi > /dev/null 2>&1
 			fi
-			mkdir /var/lib/php5/sessions 2> /dev/null
+			mkdir $phplib/sessions 2> /dev/null
 			cp -R webserver/htdocs/{mail,dav} /var/www/
 			tar xf /var/www/dav/vendor.tar -C /var/www/dav/ ; rm /var/www/dav/vendor.tar
 			find /var/www/{dav,mail} -type d -exec chmod 755 {} \;
@@ -497,7 +527,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			sed -i "s/my_mailcowuser/${my_mailcowuser}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
 			sed -i "s/my_mailcowdb/${my_mailcowdb}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
 			sed -i "s/httpd_dav_subdomain/$httpd_dav_subdomain/g" /var/www/mail/inc/vars.inc.php
-			chown -R www-data: /var/www/{.,mail,dav} /var/lib/php5/sessions /var/mailcow/mailbox_backup_env
+			chown -R www-data: /var/www/{.,mail,dav} $phplib/sessions /var/mailcow/mailbox_backup_env
 			mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} < webserver/htdocs/init.sql
 			if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "SHOW INDEX FROM propertystorage WHERE KEY_NAME = 'path_property';" -N -B) ]]; then
 				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "CREATE UNIQUE INDEX path_property ON propertystorage (path(600), name(100));" -N -B
@@ -653,41 +683,42 @@ A backup will be stored in ./before_upgrade_$timestamp
 		openssl dhparam -out /etc/ssl/mail/dhparams.pem 2048 2> /dev/null
 	fi
 
-	echo "Starting task \"Package installation\"..."
+	returnwait "Package installation"
 	installtask installpackages
-	returnwait "Package installation" "Postfix configuration"
 
+	returnwait "Postfix configuration"
 	installtask postfix
-	returnwait "Postfix configuration" "Dovecot configuration"
 
+	returnwait "Dovecot configuration"
 	installtask dovecot
-	returnwait "Dovecot configuration" "FuGlu configuration"
 
+	returnwait "FuGlu configuration"
 	installtask fuglu
-	returnwait "FuGlu configuration" "ClamAV configuration"
 
+	returnwait "ClamAV configuration"
 	installtask clamav
-	returnwait "ClamAV configuration" "Spamassassin configuration"
 
+	returnwait "Spamassassin configuration"
 	installtask spamassassin
-	returnwait "Spamassassin configuration" "Webserver configuration"
 
-	rm -rf /var/lib/php5/sessions/*
+	returnwait "Webserver configuration"
+	rm -rf $phplib/sessions/*
 	mkdir -p /var/mailcow/log
 	mv /var/www/MAILBOX_BACKUP /var/mailcow/mailbox_backup_env 2> /dev/null
 	mv /var/www/PFLOG /var/mailcow/log/pflogsumm.log 2> /dev/null
 
 	installtask webserver
-	returnwait "Webserver configuration" "Roundcube configuration"
 
+	returnwait "Roundcube configuration"
 	installtask roundcube
-	returnwait "Roundcube configuration" "OpenDKIM configuration"
 
+	returnwait "OpenDKIM configuration"
 	installtask opendkim
-	returnwait "OpenDKIM configuration" "Restarting services"
 
+	returnwait "Restarting services"
 	installtask restartservices
-	returnwait "Restarting services" "Finish upgrade"
+
+	returnwait "Finish upgrade" "no"
 	echo Done.
 	echo
 	echo "\"installer.log\" file updated."
