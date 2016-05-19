@@ -32,9 +32,6 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 	if (isset($_POST["trigger_set_admin"])) {
 		set_admin_account($link, $_POST);
 	}
-	if (isset($_POST["trigger_backup"])) {
-		set_mailcow_config("backup", $_POST);
-	}
 	if (isset($_POST["trigger_public_folder"])) {
 		set_mailcow_config("public_folder", $_POST);
 		dovecot_reload();
@@ -77,16 +74,6 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 	if (isset($_POST["trigger_set_time_limited_aliases"])) {
 		set_time_limited_aliases($link, $_POST);
 	}
-	if (isset($_POST["trigger_mailbox_action"])) {
-		switch ($_POST["trigger_mailbox_action"]) {
-			case "editdav":
-				mailbox_edit_dav($link, $_POST);
-			break;
-			case "adddav":
-				mailbox_add_dav($link, $_POST);
-			break;
-		}
-	}
 }
 if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && ($_SESSION['mailcow_cc_role'] == "domainadmin" || $_SESSION['mailcow_cc_role'] == "admin")) {
 	if (isset($_POST["trigger_mailbox_action"])) {
@@ -126,9 +113,6 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 			break;
 			case "deletemailbox":
 				mailbox_delete_mailbox($link, $_POST);
-			break;
-			case "editdav":
-				mailbox_edit_dav($link, $_POST);
 			break;
 		}
 	}

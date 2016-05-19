@@ -54,18 +54,6 @@ function mysqli_result($res,$row=0,$col=0) {
 }
 function return_mailcow_config($s) {
 	switch ($s) {
-		case "backup_location":
-			preg_match("/LOCATION=(.*)/", file_get_contents($GLOBALS['MC_MBOX_BACKUP_ENV']) , $result);
-			if (!empty($result[1])) { return $result[1]; } else { return "/backup/mail"; }
-			break;
-		case "backup_runtime":
-			preg_match("/RUNTIME=(.*)/", file_get_contents($GLOBALS['MC_MBOX_BACKUP_ENV']) , $result);
-			if (!empty($result[1])) { return $result[1]; } else { return false; }
-			break;
-		case "backup_active":
-			preg_match("/BACKUP=(.*)/", file_get_contents($GLOBALS['MC_MBOX_BACKUP_ENV']) , $result);
-			if (!empty($result[1])) { return $result[1]; } else { return false; }
-			break;
 		case "anonymize":
 			$state = file_get_contents($GLOBALS["MC_ANON_HEADERS"]);
 			if (!empty($state)) { return "checked"; } else { return false; }
@@ -724,18 +712,6 @@ function mailbox_add_mailbox($link, $postarray) {
 			VALUES ('".$username."', '0', '0');";
 	$create_user .= "INSERT INTO alias (address, goto, domain, created, modified, active)
 			VALUES ('".$username."', '".$username."', '".$domain."', now(), now(), '".$active."');";
-	$create_user .= "INSERT INTO users (username, digesta1)
-			VALUES('".$username."', MD5(CONCAT('".$username."', ':SabreDAV:', '".$password."')));";
-	$create_user .= "INSERT INTO principals (uri,email,displayname)
-			VALUES ('principals/$username', '".$username."', '".$name."');";
-	$create_user .= "INSERT INTO principals (uri,email,displayname)
-			VALUES ('principals/$username/calendar-proxy-read', null, null);";
-	$create_user .= "INSERT INTO principals (uri,email,displayname)
-			VALUES ('principals/$username/calendar-proxy-write', null, null);";
-	$create_user .= "INSERT INTO addressbooks (principaluri, displayname, uri, description, synctoken)
-			VALUES ('principals/$username','$default_card','default','','1');";
-	$create_user .= "INSERT INTO calendars (principaluri, displayname, uri, description, components, transparent) 
-			VALUES ('principals/$username','$default_cal','default','','VEVENT,VTODO', '0');";
 	if (!mysqli_multi_query($link, $create_user)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -749,45 +725,6 @@ function mailbox_add_mailbox($link, $postarray) {
 	$_SESSION['return'] = array(
 		'type' => 'success',
 		'msg' => 'Added mailbox '.htmlspecialchars($username)
-	);
-}
-function mailbox_add_dav($link, $postarray) {
-	$displayname = mysqli_real_escape_string($link, $postarray['displayname']);
-	$davtype = mysqli_real_escape_string($link, $postarray['davtype']);
-	global $logged_in_role;
-	global $logged_in_as;
-	if (!filter_var($logged_in_as, FILTER_VALIDATE_EMAIL) || $logged_in_role != "user") {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => 'Permission denied'
-		);
-		return false;
-	}
-	if (empty($displayname)) {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => 'Display name cannot be empty'
-		);
-		return false;
-	}
-	if ($davtype == "addressbook") {
-		$create_davitem = "INSERT INTO addressbooks (principaluri, displayname, uri, description, synctoken)
-				VALUES ('principals/$logged_in_as', '$displayname', UUID(), '', '1')";
-	}
-	elseif ($davtype == "calendar") {
-		$create_davitem .= "INSERT INTO calendars (principaluri, displayname, uri, description, components, transparent) 
-				VALUES ('principals/$logged_in_as', '$displayname', UUID(), '', 'VEVENT,VTODO' , '0')";	
-	}
-	if (!mysqli_query($link, $create_davitem)) {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => 'MySQL Error: '.mysqli_error($link)
-		);
-		return false;
-	}
-	$_SESSION['return'] = array(
-		'type' => 'success',
-		'msg' => 'Added DAV item'
 	);
 }
 function mailbox_edit_alias($link, $postarray) {
@@ -1136,7 +1073,6 @@ function mailbox_edit_mailbox($link, $postarray) {
 		}
 		$update_user = "UPDATE alias SET modified=now(), active='".$active."' WHERE address='".$username."';";
 		$update_user .= "UPDATE mailbox SET modified=now(), active='".$active."', password='".$password_hashed."', name='".$name."', quota='".$quota_b."' WHERE username='".$username."';";
-		$update_user .= "UPDATE users SET digesta1=MD5(CONCAT('".$username."', ':SabreDAV:', '".$password."')) WHERE username='".$username."';";
 		if (!mysqli_multi_query($link, $update_user)) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -1168,151 +1104,6 @@ function mailbox_edit_mailbox($link, $postarray) {
 	$_SESSION['return'] = array(
 		'type' => 'success',
 		'msg' => 'Saved changes to mailbox '.htmlspecialchars($username)
-	);
-}
-function mailbox_edit_dav($link, $postarray) {
-	global $logged_in_role;
-	global $logged_in_as;
-	/* Handle address book input */
-	foreach (array_flip($postarray['adb_displayname']) as $adb_id) {
-		// Check address book access
-		if (!mysqli_result(mysqli_query($link, "SELECT * FROM calendars, addressbooks
-			WHERE calendars.principaluri='principals/$logged_in_as' 
-			AND addressbooks.principaluri='principals/$logged_in_as'
-			AND addressbooks.id='$adb_id'")) && $logged_in_role == "user") { 
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'Permission denied'
-			);
-			return false;
-		}
-		// Set display name for current address book, if not empty
-		$adb_displayname =  mysqli_real_escape_string($link, $postarray['adb_displayname'][$adb_id]);
-		if (empty($adb_displayname)) {
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'Display name cannot be empty'
-			);
-			return false;
-		}
-		if (!mysqli_query($link, "UPDATE addressbooks SET displayname='$adb_displayname' WHERE id='$adb_id'")) {
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'MySQL Error: '.mysqli_error($link)
-			);
-			return false;
-		}
-	}
-	/* Handle calendar input */
-	/* Clean calendar principal_ids */
-	$clean_cal = "DELETE FROM groupmembers WHERE principal_id
-		IN (SELECT id FROM principals
-			WHERE uri='principals/$logged_in_as/calendar-proxy-read'
-			OR uri='principals/$logged_in_as/calendar-proxy-write')";
-	if (!mysqli_query($link, $clean_cal)) { 
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => 'MySQL Error: '.mysqli_error($link)
-		);
-		return false;
-	}
-	foreach (array_flip($postarray['cal_displayname']) as $cal_id) {
-		/* Check cal access */
-		if (!mysqli_result(mysqli_query($link, "SELECT * FROM calendars, addressbooks
-			WHERE calendars.principaluri='principals/$logged_in_as' 
-			AND addressbooks.principaluri='principals/$logged_in_as'
-			AND calendars.id='$cal_id'")) && $logged_in_role == "user") { 
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'Permission denied'
-			);
-			return false;
-		}
-		/* Set display name for current cal, if not empty */
-		$cal_displayname =  mysqli_real_escape_string($link, $postarray['cal_displayname'][$cal_id]);
-		if (empty($cal_displayname)) {
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'Display name cannot be empty'
-			);
-			return false;
-		}
-		if (!mysqli_query($link, "UPDATE calendars SET displayname='$cal_displayname' WHERE id='$cal_id'")) {
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'MySQL Error: '.mysqli_error($link)
-			);
-			return false;
-		}
-	}
-	/* Setup read-only cal shares */
-	if(isset($postarray['cal_ro_share'])) {
-		/* No need to set read-only, when read/write is enabled */
-		if(isset($postarray['cal_rw_share'])) {
-			$postarray['cal_ro_share'] = array_diff($postarray['cal_ro_share'], $postarray['cal_rw_share']);
-		}
-		foreach ($postarray['cal_ro_share'] as $share_with) {
-			$share_with = mysqli_real_escape_string($link, $share_with);
-			$update_string = "INSERT INTO groupmembers (principal_id, member_id)
-				VALUES (
-					(SELECT id FROM principals WHERE uri='principals/".$logged_in_as."/calendar-proxy-read'),
-					(SELECT id FROM principals WHERE email='".$share_with."')
-				)";
-			if (!mysqli_query($link, $update_string)) { 
-				$_SESSION['return'] = array(
-					'type' => 'danger',
-					'msg' => 'MySQL Error: '.mysqli_error($link)
-				);
-				return false;
-			}
-		}
-	}
-	/* Setup read/write cal shares */
-	if(isset($postarray['cal_rw_share'])) {
-		foreach ($postarray['cal_rw_share'] as $share_with) {
-			$share_with = mysqli_real_escape_string($link, $share_with);
-			$update_string = "INSERT INTO groupmembers (principal_id, member_id)
-				VALUES (
-					(SELECT id FROM principals WHERE uri='principals/".$logged_in_as."/calendar-proxy-write'),
-					(SELECT id FROM principals WHERE email='".$share_with."')
-				)";
-			if (!mysqli_query($link, $update_string)) {
-				$_SESSION['return'] = array(
-					'type' => 'danger',
-					'msg' => 'MySQL Error: '.mysqli_error($link)
-				);
-				return false;
-			}
-		}
-	}
-	/* Delete marked DAV items */
-	if(isset($postarray['adb_delete'])) {
-		foreach ($postarray['adb_delete'] as $adb_delete_id) {
-			$update_string = "DELETE FROM addressbooks WHERE ID='".$adb_delete_id."' AND uri!='default'";
-			if (!mysqli_query($link, $update_string)) { 
-				$_SESSION['return'] = array(
-					'type' => 'danger',
-					'msg' => 'MySQL Error: '.mysqli_error($link)
-				);
-				return false;
-			}
-		}
-	}
-	if(isset($postarray['cal_delete'])) {
-		foreach ($postarray['cal_delete'] as $cal_delete_id) {
-			$update_string = "DELETE FROM calendars WHERE ID='".$cal_delete_id."' AND uri!='default'";
-			if (!mysqli_query($link, $update_string)) { 
-				$_SESSION['return'] = array(
-					'type' => 'danger',
-					'msg' => 'MySQL Error: '.mysqli_error($link)
-				);
-				return false;
-			}
-		}
-	}
-	$_SESSION['return'] = array(
-		'type' => 'success',
-		'msg' => 'Changes saved successfully'
 	);
 }
 function mailbox_delete_domain($link, $postarray) {
@@ -1448,16 +1239,8 @@ function mailbox_delete_mailbox($link, $postarray) {
 	$delete_user .= "UPDATE alias SET goto=REPLACE(goto, ',".$username."', '');";
 	$delete_user .= "UPDATE alias SET goto=REPLACE(goto, '".$username.",', '');";
 	$delete_user .= "DELETE FROM quota2 WHERE username='".$username."';";
-	$delete_user .= "DELETE FROM calendarobjects WHERE calendarid IN (SELECT id from calendars where principaluri='principals/".$username."');";
-	$delete_user .= "DELETE FROM cards WHERE addressbookid IN (SELECT id from calendars where principaluri='principals/".$username."');";
 	$delete_user .= "DELETE FROM mailbox WHERE username='".$username."';";
 	$delete_user .= "DELETE FROM sender_acl WHERE logged_in_as='".$username."';";
-	$delete_user .= "DELETE FROM users WHERE username='".$username."';";
-	$delete_user .= "DELETE FROM principals WHERE uri='principals/".$username."';";
-	$delete_user .= "DELETE FROM principals WHERE uri='principals/".$username."/calendar-proxy-read';";
-	$delete_user .= "DELETE FROM principals WHERE uri='principals/".$username."/calendar-proxy-write';";
-	$delete_user .= "DELETE FROM addressbooks WHERE principaluri='principals/".$username."';";
-	$delete_user .= "DELETE FROM calendars WHERE principaluri='principals/".$username."';";
 	if (!mysqli_multi_query($link, $delete_user)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1657,7 +1440,6 @@ function set_user_account($link, $postarray) {
 		}
 		$password_hashed = $hash[0];
 		$update_user = "UPDATE mailbox SET modified=NOW(), password='".$password_hashed."' WHERE username='".$name_now."';";
-		$update_user .= "UPDATE users SET digesta1=MD5(CONCAT('".$name_now."', ':SabreDAV:', '".$password_new."')) WHERE username='".$name_now."';";
 		if (!mysqli_multi_query($link, $update_user)) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',

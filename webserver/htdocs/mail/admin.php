@@ -138,65 +138,6 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 
 <h4><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Configuration</h4>
 <div class="panel-group" id="accordion_config">
-<div class="panel panel-default">
-<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseBackup"><a style="cursor:pointer;" class="accordion-toggle">Backup mail</a></div>
-<div id="collapseBackup" class="panel-collapse collapse in">
-<div class="panel-body">
-<form class="form-horizontal" role="form" method="post">
-	<div class="form-group">
-		<label class="control-label col-sm-4" for="location">Location (<kbd>aA-zZ, 0-9, -, _, /</kbd>)<small>, will be created if missing</small>:</label>
-		<div class="col-sm-8">
-			<input type="text" class="form-control" name="location" id="location" value="<?=return_mailcow_config("backup_location");?>">
-		</div>
-	</div>
-	<div class="form-group">
-		<label class="control-label col-sm-4" for="runtime">Runtime:</label>
-		<div class="col-sm-8">
-			<select title="Select a runtime..." style="width:50%" name="runtime">
-				<option <?php if (return_mailcow_config("backup_runtime") == "hourly") { echo "selected"; } ?>>hourly</option>
-				<option <?php if (return_mailcow_config("backup_runtime") == "daily") { echo "selected"; } ?>>daily</option>
-				<option <?php if (return_mailcow_config("backup_runtime") == "weekly") { echo "selected"; } ?>>weekly</option>
-				<option <?php if (return_mailcow_config("backup_runtime") == "monthly") { echo "selected"; } ?>>monthly</option>
-			</select>
-		</div>
-	</div>
-	<div class="form-group">
-		<label class="control-label col-sm-4" for="mailboxes[]">Select mailbox(es):</label>
-		<div class="col-sm-8">
-			<select data-placeholder="Search users..." style="width:100%" name="mailboxes[]" multiple>
-<?php
-$resultselect = mysqli_query($link, "SELECT username FROM mailbox");
-while ($row = mysqli_fetch_array($resultselect)) {
-	if (strpos(file_get_contents($MC_MBOX_BACKUP_ENV), $row['username'])) {
-		echo "<option selected>".$row['username']."</option>";
-	}
-	else {
-		echo "<option>".$row['username']."</option>";
-	}
-}
-?>
-			</select>
-		</div>
-	</div>
-	<div class="clearfix"></div>
-	<div class="form-group">
-		<div class="col-sm-offset-4 col-sm-8">
-			<div class="checkbox">
-			<label><input type="checkbox" name="use_backup" <?php if (return_mailcow_config("backup_active") == "on") { echo "checked"; } ?>> Use backup function</label>
-			</div>
-		</div>
-	</div>
-	<div class="clearfix"></div>
-	<div class="form-group">
-	<input type="hidden" name="trigger_backup">
-		<div class="col-sm-8">
-			<button type="submit" class="btn btn-default">Save changes</button>
-		</div>
-	</div>
-</form>
-</div>
-</div>
-</div>
 
 <div class="panel panel-default">
 <div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseSrr"><a style="cursor:pointer;" class="accordion-toggle">Postfix restrictions</a></div>

@@ -24,22 +24,25 @@ PASS_SCHEME=$(grep PASS_SCHEME /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
 echo "---------------------------"
 echo "mailcow administrator reset"
 echo "---------------------------"
-echo -n "Resetable administrator usernames: "
-admins_array=($(mysql --host ${DBHOST} -u ${DBUSER} -p${DBPASS} ${DBNAME} -e "SELECT username FROM admin;" -N -B))
-echo $(yellowb ${admins_array[*]})
+echo -n "Found admin: "
+ADMIN_NAME=$(mysql --host ${DBHOST} -u ${DBUSER} -p${DBPASS} ${DBNAME} -e "SELECT username FROM admin WHERE superadmin='1';" -N -B)
+echo $(yellowb ${ADMIN_NAME})
 echo "---------------------------"
 NEWPASS=$(genpasswd)
 while true; do
-read -p "Please enter a username from above: " mailcow_admin_user
-        if [[ ! -z $(mysql --host ${DBHOST} -u ${DBUSER} -p${DBPASS} ${DBNAME} -e "SELECT username FROM admin WHERE username='$mailcow_admin_user' AND superadmin='1';") ]]; then
-                mailcow_admin_pass_hashed=$(doveadm pw -s ${PASS_SCHEME} -p ${NEWPASS})
-                mysql --host ${DBHOST} -u ${DBUSER} -p${DBPASS} ${DBNAME} -e "DELETE FROM admin WHERE username='$mailcow_admin_user';"
-                mysql --host ${DBHOST} -u ${DBUSER} -p${DBPASS} ${DBNAME} -e "INSERT INTO admin VALUES ('$mailcow_admin_user','$mailcow_admin_pass_hashed',1,now(),now(),1);"
+read -p "Reset password? (y/n) " confirm
+        if [[ $confirm == "y" ]]; then
+                ADMIN_NEWPW_HASH=$(doveadm pw -s ${PASS_SCHEME} -p ${NEWPASS})
+                mysql --host ${DBHOST} -u ${DBUSER} -p${DBPASS} ${DBNAME} -e "DELETE FROM admin WHERE username='${ADMIN_NAME}';"
+                mysql --host ${DBHOST} -u ${DBUSER} -p${DBPASS} ${DBNAME} -e "INSERT INTO admin VALUES ('${ADMIN_NAME}','${ADMIN_NEWPW_HASH}',1,now(),now(),1);"
                 echo
                 echo $(greenb "New password: ${NEWPASS}")
                 echo
                 exit 0
+        elif [[ $confirm == "n" ]]; then
+                exit 0
         else
-                echo $(redb "Invalid administrator username")
+                echo $(redb "Invalid choice")
         fi
 done
+

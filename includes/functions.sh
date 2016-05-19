@@ -50,7 +50,7 @@ returnwait() {
 		echo "$(greenb [OK]) - Task $(textb "$returnwait_task") completed"
 		echo "----------------------------------------------"
 	fi
-	returnwait_task="$1"
+	returnwait_task="${1}"
 	if [[ ${inst_confirm_proceed} == "yes" && "$2" != "no" ]]; then
 		read -p "$(yellowb !) Press ENTER to continue with task $(textb "$returnwait_task") (CTRL-C to abort) "
 	fi
@@ -94,10 +94,10 @@ checkports() {
 		fi
 		echo "$(textb [INFO]) - Successfully connected to SQL server at ${my_dbhost}"
 		echo
-		if [[ ${my_dbhost} == "localhost" || ${my_dbhost} == "127.0.0.1" ]] && [[ -z $(mysql -V | grep -i "mariadb") && $my_usemariadb == "yes" ]]; then
+		if [[ ${my_dbhost} == "localhost" || ${my_dbhost} == "127.0.0.1" ]] && [[ -z $(mysql -V | grep -i "mariadb") && ${my_usemariadb} == "yes" ]]; then
 			echo "$(redb [ERR]) - Found MySQL server but \"my_usemariadb\" is \"yes\""
 			exit 1
-		elif [[ ${my_dbhost} == "localhost" || ${my_dbhost} == "127.0.0.1" ]] && [[ ! -z $(mysql -V | grep -i "mariadb") && $my_usemariadb != "yes" ]]; then
+		elif [[ ${my_dbhost} == "localhost" || ${my_dbhost} == "127.0.0.1" ]] && [[ ! -z $(mysql -V | grep -i "mariadb") && ${my_usemariadb} != "yes" ]]; then
 			echo "$(redb [ERR]) - Found MariaDB server but \"my_usemariadb\" is not \"yes\""
 			exit 1
 		fi
@@ -173,7 +173,7 @@ installtask() {
 					fi
 					php="php5"
 					phpconf="/etc/php5"
-					phplib="$phplib/"
+					phplib="/var/lib/php5"
 					sqlite="sqlite"
 					openjdk="openjdk-7"
 					jetty_name="jetty8"
@@ -194,7 +194,7 @@ installtask() {
 					fi
 					php="php5"
 					phpconf="/etc/php5"
-					phplib="$phplib/"
+					phplib="/var/lib/php5"
 					sqlite="sqlite"
 					openjdk="openjdk-7"
 					jetty_name="jetty"
@@ -224,7 +224,7 @@ installtask() {
 			echo "$(textb [INFO]) - Installing packages unattended, please stand by, errors will be reported."
 			apt-get -y update >/dev/null
 			if [[ ${my_dbhost} == "localhost" || ${my_dbhost} == "127.0.0.1" ]] && [[ $is_upgradetask != "yes" ]]; then
-				if [[ $my_usemariadb == "yes" ]]; then
+				if [[ ${my_usemariadb} == "yes" ]]; then
 					database_backend="mariadb-client mariadb-server"
 				else
 					database_backend="mysql-client mysql-server"
@@ -234,11 +234,11 @@ installtask() {
 			fi
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install zip dnsutils python-setuptools libmail-spf-perl libmail-dkim-perl file \
 openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
-php-net-socket php-net-url php-pear php-soap $php $php-cli $php-common $php-curl $php-gd $php-imap subversion \
-$php-intl $php-xsl libawl-php $php-mcrypt $php-mysql $php-$sqlite libawl-php $php-xmlrpc ${database_backend} ${webserver_backend} mailutils pyzor razor \
+php-net-socket php-net-url php-pear php-soap ${php} ${php}-cli ${php}-common ${php}-curl ${php}-gd ${php}-imap subversion \
+${php}-intl ${php}-xsl libawl-php ${php}-mcrypt ${php}-mysql ${php}-${sqlite} libawl-php ${php}-xmlrpc ${database_backend} ${webserver_backend} mailutils pyzor razor \
 postfix postfix-mysql postfix-pcre postgrey pflogsumm spamassassin spamc sudo bzip2 curl mpack opendkim opendkim-tools unzip clamav-daemon \
 python-magic unrar-free liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl bsd-mailx \
-$openjdk-jre-headless libcurl4-openssl-dev libexpat1-dev rrdtool mailgraph fcgiwrap spawn-fcgi \
+${openjdk}-jre-headless libcurl4-openssl-dev libexpat1-dev rrdtool mailgraph fcgiwrap spawn-fcgi \
 solr-jetty > /dev/null
 			if [ "$?" -ne "0" ]; then
 				echo "$(redb [ERR]) - Package installation failed"
@@ -256,7 +256,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			install -m 755 misc/mc_pflog_renew /usr/local/sbin/mc_pflog_renew
 			install -m 755 misc/mc_msg_size /usr/local/sbin/mc_msg_size
 			install -m 755 misc/mc_dkim_ctrl /usr/local/sbin/mc_dkim_ctrl
-			install -m 755 misc/mc_setup_backup /usr/local/sbin/mc_setup_backup
 			install -m 755 misc/mc_resetadmin /usr/local/sbin/mc_resetadmin
 			;;
 		ssl)
@@ -299,7 +298,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chmod 755 /var/spool/
 			sed -i "/%www-data/d" /etc/sudoers 2> /dev/null
 			sed -i "/%vmail/d" /etc/sudoers 2> /dev/null
-			echo '%www-data ALL=(ALL) NOPASSWD: /usr/bin/doveadm * sync *, /usr/local/sbin/mc_pfset *, /usr/bin/doveadm quota recalc -A, /usr/sbin/dovecot reload, /usr/sbin/postfix reload, /usr/local/sbin/mc_dkim_ctrl, /usr/local/sbin/mc_dkim_ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_pflog_renew, /usr/local/sbin/mc_setup_backup' >> /etc/sudoers.d/mailcow
+			echo '%www-data ALL=(ALL) NOPASSWD: /usr/bin/doveadm * sync *, /usr/local/sbin/mc_pfset *, /usr/bin/doveadm quota recalc -A, /usr/sbin/dovecot reload, /usr/sbin/postfix reload, /usr/local/sbin/mc_dkim_ctrl, /usr/local/sbin/mc_dkim_ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_pflog_renew' >> /etc/sudoers.d/mailcow
 			chmod 440 /etc/sudoers.d/mailcow
 			;;
 		fuglu)
@@ -491,12 +490,12 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			mkdir -p /var/www/ 2> /dev/null
 			if [[ ${httpd_platform} == "nginx" ]]; then
 				# Some systems miss the default php5-fpm listener, reinstall it now
-				apt-get -o Dpkg::Options::="--force-confmiss" install -y --reinstall $php-fpm > /dev/null
+				apt-get -o Dpkg::Options::="--force-confmiss" install -y --reinstall ${php}-fpm > /dev/null
 				rm /etc/nginx/sites-enabled/{000-0-mailcow*,000-0-fufix} 2>/dev/null
 				cp webserver/nginx/conf/sites-available/mailcow /etc/nginx/sites-available/
-				cp webserver/php5-fpm/conf/pool/mail.conf $phpconf/fpm/pool.d/mail.conf
-				cp webserver/php5-fpm/conf/php-fpm.conf $phpconf/fpm/php-fpm.conf
-				sed -i "/date.timezone/c\php_admin_value[date.timezone] = ${sys_timezone}" $phpconf/fpm/pool.d/mail.conf
+				cp webserver/php5-fpm/conf/pool/mail.conf ${phpconf}/fpm/pool.d/mail.conf
+				cp webserver/php5-fpm/conf/php-fpm.conf ${phpconf}/fpm/php-fpm.conf
+				sed -i "/date.timezone/c\php_admin_value[date.timezone] = ${sys_timezone}" ${phpconf}/fpm/pool.d/mail.conf
 				ln -s /etc/nginx/sites-available/mailcow /etc/nginx/sites-enabled/000-0-mailcow 2>/dev/null
 				[[ ! -z $(grep "server_names_hash_bucket_size" /etc/nginx/nginx.conf) ]] && \
 					sed -i "/server_names_hash_bucket_size/c\ \ \ \ \ \ \ \ server_names_hash_bucket_size 64;" /etc/nginx/nginx.conf || \
@@ -514,20 +513,19 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				sed -i "s#MAILCOW_TIMEZONE#${sys_timezone}#g" /etc/apache2/sites-available/mailcow.conf
 				a2enmod rewrite ssl headers cgi > /dev/null 2>&1
 			fi
-			mkdir $phplib/sessions 2> /dev/null
+			mkdir ${phplib}/sessions 2> /dev/null
 			cp -R webserver/htdocs/{mail,dav} /var/www/
 			tar xf /var/www/dav/vendor.tar -C /var/www/dav/ ; rm /var/www/dav/vendor.tar
 			find /var/www/{dav,mail} -type d -exec chmod 755 {} \;
 			find /var/www/{dav,mail} -type f -exec chmod 644 {} \;
 			sed -i "/date_default_timezone_set/c\date_default_timezone_set('${sys_timezone}');" /var/www/dav/server.php
-			touch /var/mailcow/mailbox_backup_env
 			echo none > /var/mailcow/log/pflogsumm.log
 			sed -i "s/my_dbhost/${my_dbhost}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
 			sed -i "s/my_mailcowpass/${my_mailcowpass}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
 			sed -i "s/my_mailcowuser/${my_mailcowuser}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
 			sed -i "s/my_mailcowdb/${my_mailcowdb}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
 			sed -i "s/httpd_dav_subdomain/$httpd_dav_subdomain/g" /var/www/mail/inc/vars.inc.php
-			chown -R www-data: /var/www/{.,mail,dav} $phplib/sessions /var/mailcow/mailbox_backup_env
+			chown -R www-data: /var/www/{.,mail,dav} ${phplib}/sessions
 			mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} < webserver/htdocs/init.sql
 			if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "SHOW INDEX FROM propertystorage WHERE KEY_NAME = 'path_property';" -N -B) ]]; then
 				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "CREATE UNIQUE INDEX path_property ON propertystorage (path(600), name(100));" -N -B
@@ -702,9 +700,8 @@ A backup will be stored in ./before_upgrade_$timestamp
 	installtask spamassassin
 
 	returnwait "Webserver configuration"
-	rm -rf $phplib/sessions/*
+	rm -rf ${phplib}/sessions/*
 	mkdir -p /var/mailcow/log
-	mv /var/www/MAILBOX_BACKUP /var/mailcow/mailbox_backup_env 2> /dev/null
 	mv /var/www/PFLOG /var/mailcow/log/pflogsumm.log 2> /dev/null
 
 	installtask webserver

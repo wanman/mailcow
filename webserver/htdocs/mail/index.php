@@ -61,8 +61,6 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 	</p>
 	<h4>Microsoft ActiveSync</h4>
 	<p>ActiveSync support is enabled.</p>
-	<h4>Cal- and CardDAV</h4>
-	<p><a href="user.php" style="text-decoration:underline">Navigate to your personal settings</a> and copy the full path of your desired calendar or address book.</p>
 	<h4>Health check (© MXToolBox)</h4>
 	<p>"The Domain Health Check will execute hundreds of domain/email/network performance tests to make sure all of your systems are online and performing optimally. The report will then return results for your domain and highlight critical problem areas for your domain that need to be resolved."</p>
 	<a class="btn btn-default" href="http://mxtoolbox.com/SuperTool.aspx?action=smtp:<?php echo $MYHOSTNAME ?>" target="_blank">Run &raquo;</a>
