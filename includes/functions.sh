@@ -113,10 +113,6 @@ checkconfig() {
 		echo "$(redb [ERR]) - Unable to install Apache 2.4, please use Nginx or upgrade your distribution"
 		exit 1
 	fi
-	if [[ ${httpd_dav_subdomain} == ${sys_hostname} ]]; then
-		echo "$(redb [ERR]) - \"httpd_dav_subdomain\" must not be \"sys_hostname\""
-		exit 1
-	fi
 	for var in sys_hostname sys_domain sys_timezone my_dbhost my_mailcowdb my_mailcowuser my_mailcowpass my_rootpw my_rcuser my_rcpass my_rcdb mailcow_admin_user mailcow_admin_pass
 	do
 		if [[ -z ${!var} ]]; then
@@ -263,7 +259,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			[[ $inst_keepfiles == "no" ]] && rm /etc/ssl/mail/* 2> /dev/null
 			echo "$(textb [INFO]) - Generating 2048 bit DH parameters, this may take a while, please wait..."
 			openssl dhparam -out /etc/ssl/mail/dhparams.pem 2048 2> /dev/null
-			openssl req -new -newkey rsa:4096 -sha256 -days 1095 -nodes -x509 -subj "/C=ZZ/ST=mailcow/L=mailcow/O=mailcow/CN=${sys_hostname}.${sys_domain}/subjectAltName=DNS.1=${sys_hostname}.${sys_domain},DNS.2=${httpd_dav_subdomain}.${sys_domain},DNS.3=autodiscover.{sys_domain}" -keyout /etc/ssl/mail/mail.key -out /etc/ssl/mail/mail.crt
+			openssl req -new -newkey rsa:4096 -sha256 -days 1095 -nodes -x509 -subj "/C=ZZ/ST=mailcow/L=mailcow/O=mailcow/CN=${sys_hostname}.${sys_domain}/subjectAltName=DNS.1=${sys_hostname}.${sys_domain},DNS.2=autodiscover.{sys_domain}" -keyout /etc/ssl/mail/mail.key -out /etc/ssl/mail/mail.crt
 			chmod 600 /etc/ssl/mail/mail.key
 			cp /etc/ssl/mail/mail.crt /usr/local/share/ca-certificates/
 			update-ca-certificates
@@ -501,31 +497,26 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 					sed -i "/server_names_hash_bucket_size/c\ \ \ \ \ \ \ \ server_names_hash_bucket_size 64;" /etc/nginx/nginx.conf || \
 					sed -i "/http {/a\ \ \ \ \ \ \ \ server_names_hash_bucket_size 64;" /etc/nginx/nginx.conf
 				sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN;/${sys_hostname}.${sys_domain};/g" /etc/nginx/sites-available/mailcow
-				sed -i "s/MAILCOW_DAV_HOST.MAILCOW_DOMAIN;/${httpd_dav_subdomain}.${sys_domain};/g" /etc/nginx/sites-available/mailcow
 				sed -i "s/MAILCOW_DOMAIN;/${sys_domain};/g" /etc/nginx/sites-available/mailcow
 			elif [[ ${httpd_platform} == "apache2" ]]; then
 				rm /etc/apache2/sites-enabled/{mailcow*,000-0-mailcow,000-0-fufix,000-0-mailcow.conf} 2>/dev/null
 				cp webserver/apache2/conf/sites-available/mailcow.conf /etc/apache2/sites-available/
 				ln -s /etc/apache2/sites-available/mailcow.conf /etc/apache2/sites-enabled/000-0-mailcow.conf 2>/dev/null
 				sed -i "s/\"\MAILCOW_HOST.MAILCOW_DOMAIN\"/\"${sys_hostname}.${sys_domain}\"/g" /etc/apache2/sites-available/mailcow.conf
-				sed -i "s/\"\MAILCOW_DAV_HOST.MAILCOW_DOMAIN\"/\"${httpd_dav_subdomain}.${sys_domain}\"/g" /etc/apache2/sites-available/mailcow.conf
 				sed -i "s/MAILCOW_DOMAIN\"/${sys_domain}\"/g" /etc/apache2/sites-available/mailcow.conf
 				sed -i "s#MAILCOW_TIMEZONE#${sys_timezone}#g" /etc/apache2/sites-available/mailcow.conf
 				a2enmod rewrite ssl headers cgi > /dev/null 2>&1
 			fi
 			mkdir ${phplib}/sessions 2> /dev/null
-			cp -R webserver/htdocs/{mail,dav} /var/www/
-			tar xf /var/www/dav/vendor.tar -C /var/www/dav/ ; rm /var/www/dav/vendor.tar
-			find /var/www/{dav,mail} -type d -exec chmod 755 {} \;
-			find /var/www/{dav,mail} -type f -exec chmod 644 {} \;
-			sed -i "/date_default_timezone_set/c\date_default_timezone_set('${sys_timezone}');" /var/www/dav/server.php
+			cp -R webserver/htdocs/mail /var/www/
+			find /var/www/mail -type d -exec chmod 755 {} \;
+			find /var/www/mail -type f -exec chmod 644 {} \;
 			echo none > /var/mailcow/log/pflogsumm.log
-			sed -i "s/my_dbhost/${my_dbhost}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
-			sed -i "s/my_mailcowpass/${my_mailcowpass}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
-			sed -i "s/my_mailcowuser/${my_mailcowuser}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
-			sed -i "s/my_mailcowdb/${my_mailcowdb}/g" /var/www/mail/inc/vars.inc.php /var/www/dav/server.php
-			sed -i "s/httpd_dav_subdomain/$httpd_dav_subdomain/g" /var/www/mail/inc/vars.inc.php
-			chown -R www-data: /var/www/{.,mail,dav} ${phplib}/sessions
+			sed -i "s/my_dbhost/${my_dbhost}/g" /var/www/mail/inc/vars.inc.php
+			sed -i "s/my_mailcowpass/${my_mailcowpass}/g" /var/www/mail/inc/vars.inc.php
+			sed -i "s/my_mailcowuser/${my_mailcowuser}/g" /var/www/mail/inc/vars.inc.php
+			sed -i "s/my_mailcowdb/${my_mailcowdb}/g" /var/www/mail/inc/vars.inc.php
+			chown -R www-data: /var/www/{.,mail} ${phplib}/sessions
 			mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} < webserver/htdocs/init.sql
 			if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "SHOW INDEX FROM propertystorage WHERE KEY_NAME = 'path_property';" -N -B) ]]; then
 				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "CREATE UNIQUE INDEX path_property ON propertystorage (path(600), name(100));" -N -B
@@ -621,9 +612,8 @@ upgradetask() {
 	while [[ $(mysql --host ${my_dbhost} -u root -p${my_rootpw} -e ""; echo $?) -ne 0 ]]; do
 		read -p "Please enter your SQL root user password: " my_rootpw
 	done
-	httpd_dav_subdomain=${readconf[8]}
 	[[ -z ${my_dbhost} ]] && my_dbhost="localhost"
-	for var in httpd_platform httpd_dav_subdomain sys_hostname sys_domain sys_timezone my_dbhost my_mailcowdb my_mailcowuser my_mailcowpass my_rcuser my_rcpass my_rcdb
+	for var in httpd_platform sys_hostname sys_domain sys_timezone my_dbhost my_mailcowdb my_mailcowuser my_mailcowpass my_rcuser my_rcpass my_rcdb
 	do
 		if [[ -z ${!var} ]]; then
 			echo "$(redb [ERR]) - Could not gather required information: \"${var}\" empty, upgrade failed..."
@@ -641,7 +631,6 @@ $(textb "mailcow MySQL")          ${my_mailcowuser}:${my_mailcowpass}@${my_dbhos
 $(textb "Roundcube MySQL")        ${my_rcuser}:${my_rcpass}@${my_dbhost}/${my_rcdb}
 $(textb "Web server")             ${httpd_platform^}
 $(textb "Web root")               https://${sys_hostname}.${sys_domain}
-$(textb "DAV web root")           https://${httpd_dav_subdomain}.${sys_domain}
 
 --------------------------------------------------------
 THIS UPGRADE WILL RESET SOME OF YOUR CONFIGURATION FILES
