@@ -29,7 +29,7 @@ mailcow supports **Debian stable (8.x)**
 * SQL database backend, remote database support
     * MySQL or MariaDB
 * **mailcow web UI**
-    * Add domains, mailboxes, aliases, set limits, monitor mail statistics, change mail server settings, create/delete DKIM records, share and create calendars/address books and more...
+    * Add domains, mailboxes, aliases, set limits, monitor mail statistics, change mail server settings, create/delete DKIM records and more...
 * Postscreen activated and configured
 * STARTTLS and SMTPS support
 * The default restrictions used are a good compromise between blocking spam and avoiding false-positives

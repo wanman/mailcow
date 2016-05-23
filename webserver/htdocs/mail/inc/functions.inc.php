@@ -564,8 +564,6 @@ function mailbox_add_mailbox($link, $postarray) {
 	$domain = mysqli_real_escape_string($link, strtolower(trim($postarray['domain'])));
 	$local_part = mysqli_real_escape_string($link, strtolower(trim($postarray['local_part'])));
 	$name = mysqli_real_escape_string($link, $postarray['name']);
-	$default_cal = mysqli_real_escape_string($link, $postarray['default_cal']);
-	$default_card = mysqli_real_escape_string($link, $postarray['default_card']);
 	$quota_m = mysqli_real_escape_string($link, $postarray['quota']);
 
 	$quota_b = $quota_m*1048576;
@@ -614,14 +612,6 @@ function mailbox_add_mailbox($link, $postarray) {
 		);
 		return false;
 	}
-	if (empty($default_cal) || empty($default_card)) {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => 'Calendar and address book cannot be empty'
-		);
-		return false;
-	}
-
 	if (!is_valid_domain_name($domain) || empty ($domain)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',

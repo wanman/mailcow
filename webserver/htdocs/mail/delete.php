@@ -132,7 +132,7 @@ if (isset($_SESSION['mailcow_cc_loggedin']) &&
 			$mailbox = mysqli_real_escape_string($link, $_GET["mailbox"]);
 			if (mysqli_result(mysqli_query($link, "SELECT address, domain FROM alias WHERE address='$mailbox' AND (domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role')"))) {
 				echo '<div class="alert alert-danger" role="alert"><strong>Warning:</strong> You are about to delete a mailbox!</div>';
-				echo "<p>The mailbox user <strong>$mailbox</strong> + its address books and calendars will be deleted.</p>";
+				echo "<p>The mailbox user <strong>$mailbox</strong> will be deleted.</p>";
 				echo "<p>The user will also be removed from the alias addresses listed below (if any).</p>";
 				echo "<ul>";
 				$result = mysqli_query($link, "SELECT address FROM alias WHERE goto='$mailbox' and address!='$mailbox'");
