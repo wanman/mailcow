@@ -81,7 +81,7 @@ checksystem() {
 }
 
 checkports() {
-	if [ -z $(which mysql) || -z $(which dig) || -z $(which nc) ]; then
+	if [[ -z $(which mysql) ]] || [[ -z $(which dig) ]] || [[ -z $(which nc) ]]; then
 		echo "$(textb [INFO]) - Installing prerequisites for DNS and port checks"
 		apt-get -y update > /dev/null ; apt-get -y install curl nc dnsutils mysql-client > /dev/null 2>&1
 	fi
