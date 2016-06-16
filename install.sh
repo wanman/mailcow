@@ -21,6 +21,7 @@ case $par in
 	H) sys_hostname="$OPTARG" ;;
 	D) sys_domain="$OPTARG" ;;
 	k) inst_keepfiles="yes" ;;
+	s) retry-lets-encrypt="yes" ;;
 esac
 done
 
@@ -37,6 +38,19 @@ echo --------------------------------- >> installer.log
 fi
 
 source mailcow.config
+
+if [[ ${retry-lets-encrypt} == "yes" ]]; then
+        upgradetask
+        echo ${mailcow_version} > /etc/mailcow_version
+echo --------------------------------- >> installer.log
+echo UPGRADE to ${mailcow_version} on $(date) >> installer.log
+echo --------------------------------- >> installer.log
+echo Roundcube version: ${roundcube_version} >> installer.log
+echo FuGlu version: ${fuglu_version} >> installer.log
+echo --------------------------------- >> installer.log
+        exit 0
+fi
+
 checksystem
 checkports
 checkconfig

@@ -34,6 +34,7 @@ usage() {
 		Upgrade mailcow to a newer version
 		and do not ask to press any key to continue
 
+	-s	Retry to obtain Let's Encrypt certificates
 
 	PARAMETERS:
 	Note: Only available when upgrading
@@ -275,23 +276,36 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			update-ca-certificates
 			;;
 		ssl_le)
-			curled_ip=$(curl -4s ifconfig.co)
+			curled_ip="$(curl -4s ifconfig.co)"
 			for ip in  $(dig ${sys_hostname}.${sys_domain} a +short)
 			do
-				if [[ ${ip} -eq ${curled_ip} ]]; then
+				if [[ "${ip}" == "${curled_ip}" ]]; then
 					ip_useable=1
 				fi
 			done
 			if [[ ${ip_useable} -ne 1 ]]; then
 				echo "$(redb [ERR]) - Cannot validate IP address against DNS"
+				echo "You can retry to obtain Let's Encrypt certificates after fixing this error by running ./install.sh -s"
 			else
 				mkdir -p /opt/letsencrypt-sh/
-				tar xf letsencrypt-sh/inst/${letsencrypt_sh_version}.tar -C /opt/letsencrypt-sh/ 2> /dev/null
+				mkdir -p "/var/www/mail/.well-known/acme-challenge"
+				tar xf letsencrypt-sh/inst/${letsencrypt_sh_version}.tar -C letsencrypt-sh/inst/ 2> /dev/null
+				cp -R letsencrypt-sh/inst/${letsencrypt_sh_version}/* /opt/letsencrypt-sh/
 				install -m 644 letsencrypt-sh/conf/config.sh /opt/letsencrypt-sh/config.sh
-				install -m 644 letsencrypt-sh/conf/domains.txt /opt/letsencrypt-sh/domains.txt
+				install -m 644 letsencrypt-sh/conf/domains.txt /etc/ssl/mail/domains.txt
 				sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /opt/letsencrypt-sh/domains.txt
-				sed -i "s/MAILCOW_DOMAIN/${sys_domain}/g" /opt/letsencrypt-sh/domains.txt /opt/letsencrypt-sh/config.sh
+				# Set postmaster as certificate owner
+				sed -i "s/MAILCOW_DOMAIN/${sys_domain}/g" /opt/letsencrypt-sh/config.sh
 				install -m 755 letsencrypt-sh/conf/le-renew /etc/cron.weekly/le-renew
+				rm -rf letsencrypt-sh/inst/${letsencrypt_sh_version}
+				/etc/cron.weekly/le-renew
+				if [[ $? -eq 0 ]]; then
+					mv /etc/ssl/mail/mail.key /etc/ssl/mail/mail.key_self-signed
+					mv /etc/ssl/mail/mail.crt /etc/ssl/mail/mail.crt_self-signed
+					ln -s /etc/ssl/mail/certs/demo.mailcow.de/fullchain.pem /etc/ssl/mail/mail.crt
+					ln -s /etc/ssl/mail/certs/demo.mailcow.de/privkey.pem /etc/ssl/mail/mail.key
+				fi
+				service ${httpd_platform} restart
 			fi
 			;;
 		mysql)

@@ -1,5 +1,4 @@
 #!/bin/bash
-
 CA="https://acme-v01.api.letsencrypt.org/directory"
 CHALLENGETYPE="http-01"
 BASEDIR="/etc/ssl/mail"
