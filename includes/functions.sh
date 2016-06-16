@@ -1,8 +1,22 @@
-textb() { echo $(tput bold)${1}$(tput sgr0); }
-greenb() { echo $(tput bold)$(tput setaf 2)${1}$(tput sgr0); }
-redb() { echo $(tput bold)$(tput setaf 1)${1}$(tput sgr0); }
-yellowb() { echo $(tput bold)$(tput setaf 3)${1}$(tput sgr0); }
-pinkb() { echo $(tput bold)$(tput setaf 5)${1}$(tput sgr0); }
+textb() {
+	echo $(tput bold)${1}$(tput sgr0);
+}
+
+greenb() {
+	echo $(tput bold)$(tput setaf 2)${1}$(tput sgr0);
+}
+
+redb() {
+	echo $(tput bold)$(tput setaf 1)${1}$(tput sgr0);
+}
+
+yellowb() {
+	echo $(tput bold)$(tput setaf 3)${1}$(tput sgr0);
+}
+
+pinkb() {
+	echo $(tput bold)$(tput setaf 5)${1}$(tput sgr0);
+}
 
 usage() {
 	echo "mailcow install script command-line parameters."
@@ -46,15 +60,15 @@ genpasswd() {
 
 returnwait_task=""
 returnwait() {
-	if [[ -n "$returnwait_task" ]]; then
-		echo "$(greenb [OK]) - Task $(textb "$returnwait_task") completed"
+	if [[ ! -z "${returnwait_task}" ]]; then
+		echo "$(greenb [OK]) - Task $(textb "${returnwait_task}") completed"
 		echo "----------------------------------------------"
 	fi
 	returnwait_task="${1}"
 	if [[ ${inst_confirm_proceed} == "yes" && "$2" != "no" ]]; then
-		read -p "$(yellowb !) Press ENTER to continue with task $(textb "$returnwait_task") (CTRL-C to abort) "
+		read -p "$(yellowb !) Press ENTER to continue with task $(textb "${returnwait_task}") (CTRL-C to abort) "
 	fi
-	echo "$(pinkb [RUNNING]) - Task $(textb "$returnwait_task") started, please wait..."
+	echo "$(pinkb [RUNNING]) - Task $(textb "${returnwait_task}") started, please wait..."
 }
 
 checksystem() {
@@ -67,9 +81,9 @@ checksystem() {
 }
 
 checkports() {
-	if [[ -z $(which nc) ]]; then
-		echo "$(redb [ERR]) - Please install $(textb netcat) before running this script"
-		exit 1
+	if [[ -z $(which mysql) || -z $(which dig) || -z $(which nc)]];then
+		echo "$(textb [INFO]) - Installing prerequisites for DNS and port checks"
+		apt-get -y update > /dev/null ; apt-get -y install curl nc dnsutils mysql-client > /dev/null 2>&1
 	fi
 	for port in 25 143 465 587 993 995 8983
 	do
@@ -79,11 +93,7 @@ checkports() {
 			blocked_port=1
 		fi
 	done
-	[[ $blocked_port -eq 1 ]] && exit 1
-	if [[ -z $(which mysql) ]];then
-		echo "$(textb [INFO]) - Installing prerequisites for port checks"
-		apt-get -y update > /dev/null ; apt-get -y install mysql-client > /dev/null 2>&1
-	fi
+	[[ ${blocked_port} -eq 1 ]] && exit 1
 	if [[ $(nc -z ${my_dbhost} 3306; echo $?) -eq 0 ]] && [[ $(mysql --host ${my_dbhost} -u root -p${my_rootpw} -e ""; echo $?) -ne 0 ]]; then
 		echo "$(redb [ERR]) - Cannot connect to SQL database server at ${my_dbhost} with given root password"
 		exit 1
@@ -163,16 +173,16 @@ installtask() {
 			if [[ $dist_id == "Debian" ]]; then
 				if [[ $dist_codename == "jessie" ]]; then
 					if [[ ${httpd_platform} == "apache2" ]]; then
-						webserver_backend="apache2 apache2-utils libapache2-mod-php5 php-apc"
+						WEBSERVER_BACKEND="apache2 apache2-utils libapache2-mod-php5 php-apc"
 					else
-						webserver_backend="nginx-extras php5-fpm php-apc"
+						WEBSERVER_BACKEND="nginx-extras php5-fpm php-apc"
 					fi
-					php="php5"
-					phpconf="/etc/php5"
-					phplib="/var/lib/php5"
-					sqlite="sqlite"
-					openjdk="openjdk-7"
-					jetty_name="jetty8"
+					PHP="php5"
+					PHPCONF="/etc/php5"
+					PHPLIB="/var/lib/php5"
+					SQLITE="sqlite"
+					OPENJDK="openjdk-7"
+					JETTY_NAME="jetty8"
 				else
 					echo "$(redb [ERR]) - Your Debian distribution is currently not supported"
 					exit 1
@@ -184,32 +194,32 @@ installtask() {
 						echo "deb http://ppa.launchpad.net/ondrej/apache2/ubuntu trusty main" > /etc/apt/sources.list.d/ondrej.list
 						apt-key adv --keyserver keyserver.ubuntu.com --recv E5267A6C > /dev/null 2>&1
 						apt-get -y update >/dev/null
-						webserver_backend="apache2 apache2-utils libapache2-mod-php5 php-apc"
+						WEBSERVER_BACKEND="apache2 apache2-utils libapache2-mod-php5 php-apc"
 					else
-						webserver_backend="nginx-extras php5-fpm php-apc"
+						WEBSERVER_BACKEND="nginx-extras php5-fpm php-apc"
 					fi
-					php="php5"
-					phpconf="/etc/php5"
-					phplib="/var/lib/php5"
-					sqlite="sqlite"
-					openjdk="openjdk-7"
-					jetty_name="jetty"
+					PHP="php5"
+					PHPCONF="/etc/php5"
+					PHPLIB="/var/lib/php5"
+					SQLITE="sqlite"
+					OPENJDK="openjdk-7"
+					JETTY_NAME="jetty"
 				elif [[ $dist_codename == "xenial" ]]; then
 					if [[ ${httpd_platform} == "apache2" ]]; then
 						echo "$(textb [INFO]) - Adding ondrej/apache2 repository..."
 						echo "deb http://ppa.launchpad.net/ondrej/apache2/ubuntu trusty main" > /etc/apt/sources.list.d/ondrej.list
 						apt-key adv --keyserver keyserver.ubuntu.com --recv E5267A6C > /dev/null 2>&1
 						apt-get -y update >/dev/null
-						webserver_backend="apache2 apache2-utils libapache2-mod-php5"
+						WEBSERVER_BACKEND="apache2 apache2-utils libapache2-mod-php5"
 					else
-						webserver_backend="nginx-extras php-fpm"
+						WEBSERVER_BACKEND="nginx-extras php-fpm"
 					fi
-					php="php"
-					phpconf="/etc/php/7.0"
-					phplib="/var/lib/php"
-					sqlite="sqlite3"
-					openjdk="openjdk-9"
-					jetty_name="jetty8"
+					PHP="php"
+					PHPCONF="/etc/php/7.0"
+					PHPLIB="/var/lib/php"
+					SQLITE="sqlite3"
+					OPENJDK="openjdk-9"
+					JETTY_NAME="jetty8"
 				else
 					echo "$(redb [ERR]) - Your Ubuntu distribution is currently not supported"
 					exit 1
@@ -221,20 +231,20 @@ installtask() {
 			apt-get -y update >/dev/null
 			if [[ ${my_dbhost} == "localhost" || ${my_dbhost} == "127.0.0.1" ]] && [[ $is_upgradetask != "yes" ]]; then
 				if [[ ${my_usemariadb} == "yes" ]]; then
-					database_backend="mariadb-client mariadb-server"
+					DATABASE_BACKEND="mariadb-client mariadb-server"
 				else
-					database_backend="mysql-client mysql-server"
+					DATABASE_BACKEND="mysql-client mysql-server"
 				fi
 			else
-				database_backend=""
+				DATABASE_BACKEND=""
 			fi
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install zip dnsutils python-setuptools libmail-spf-perl libmail-dkim-perl file \
 openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
-php-net-socket php-net-url php-pear php-soap ${php} ${php}-cli ${php}-common ${php}-curl ${php}-gd ${php}-imap subversion \
-${php}-intl ${php}-xsl libawl-php ${php}-mcrypt ${php}-mysql ${php}-${sqlite} libawl-php ${php}-xmlrpc ${database_backend} ${webserver_backend} mailutils pyzor razor \
+php-net-socket php-net-url php-pear php-soap ${PHP} ${PHP}-cli ${PHP}-common ${PHP}-curl ${PHP}-gd ${PHP}-imap subversion \
+${PHP}-intl ${PHP}-xsl libawl-php ${PHP}-mcrypt ${PHP}-mysql ${PHP}-${SQLITE} libawl-php ${PHP}-xmlrpc ${DATABASE_BACKEND} ${WEBSERVER_BACKEND} mailutils pyzor razor \
 postfix postfix-mysql postfix-pcre postgrey pflogsumm spamassassin spamc sudo bzip2 curl mpack opendkim opendkim-tools unzip clamav-daemon \
 python-magic unrar-free liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl bsd-mailx \
-${openjdk}-jre-headless libcurl4-openssl-dev libexpat1-dev rrdtool mailgraph fcgiwrap spawn-fcgi \
+$OPENJDK}-jre-headless libcurl4-openssl-dev libexpat1-dev rrdtool mailgraph fcgiwrap spawn-fcgi \
 solr-jetty > /dev/null
 			if [ "$?" -ne "0" ]; then
 				echo "$(redb [ERR]) - Package installation failed"
@@ -264,8 +274,28 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			cp /etc/ssl/mail/mail.crt /usr/local/share/ca-certificates/
 			update-ca-certificates
 			;;
+		ssl_le)
+			curled_ip=$(curl -4s ifconfig.co)
+			for ip in  $(dig ${sys_hostname}.${sys_domain} a +short)
+			do
+				if [[ ${ip} -eq ${curled_ip} ]]; then
+					ip_useable=1
+				fi
+			done
+			if [[ ${ip_useable} -ne 1 ]]; then
+				echo "$(redb [ERR]) - Cannot validate IP address against DNS"
+			else
+				mkdir -p /opt/letsencrypt-sh/
+				tar xf letsencrypt-sh/inst/${letsencrypt-sh_version}.tar -C /opt/letsencrypt-sh/ 2> /dev/null
+				install -m 644 letsencrypt-sh/conf/config.sh /opt/letsencrypt-sh/config.sh
+				install -m 644 letsencrypt-sh/conf/domains.txt /opt/letsencrypt-sh/domains.txt
+				sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /opt/letsencrypt-sh/domains.txt
+				sed -i "s/MAILCOW_DOMAIN/${sys_domain}/g" /opt/letsencrypt-sh/domains.txt /opt/letsencrypt-sh/config.sh
+				install -m 755 letsencrypt-sh/conf/le-renew /etc/cron.weekly/le-renew
+			fi
+			;;
 		mysql)
-			if [[ $mysql_useable -ne 1 ]]; then
+			if [[ ${mysql_useable} -ne 1 ]]; then
 				mysql --defaults-file=/etc/mysql/debian.cnf -e "UPDATE mysql.user SET Password=PASSWORD('$my_rootpw') WHERE USER='root'; FLUSH PRIVILEGES;"
 			fi
 			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "DROP DATABASE IF EXISTS ${my_mailcowdb}; DROP DATABASE IF EXISTS $my_rcdb;"
@@ -278,12 +308,13 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			chown root:postfix "/etc/postfix/sql"; chmod 750 "/etc/postfix/sql"
 			for file in $(ls postfix/conf/sql)
 			do
-				install -o root -g postfix -m 640 postfix/conf/sql/$file /etc/postfix/sql/$file
+				install -o root -g postfix -m 640 postfix/conf/sql/${file} /etc/postfix/sql/${file}
 			done
 			install -m 644 postfix/conf/master.cf /etc/postfix/master.cf
 			install -m 644 postfix/conf/main.cf /etc/postfix/main.cf
 			install -o www-data -g www-data -m 644 postfix/conf/mailcow_anonymize_headers.pcre /etc/postfix/mailcow_anonymize_headers.pcre
-			install -m 644 postfix/conf/postscreen_access.cidr /etc/postfix/postscreen_access.cidr
+                        install -m 644 postfix/conf/postscreen_access.cidr /etc/postfix/postscreen_access.cidr
+			install -m 644 postfix/conf/smtp_dsn_filter.pcre /etc/postfix/smtp_dsn_filter.pcre
 			sed -i "s/sys_hostname.sys_domain/${sys_hostname}.${sys_domain}/g" /etc/postfix/main.cf
 			sed -i "s/sys_domain/${sys_domain}/g" /etc/postfix/main.cf
 			sed -i "s/my_mailcowpass/${my_mailcowpass}/g" /etc/postfix/sql/*
@@ -308,20 +339,20 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			rm /tmp/fuglu_control.sock 2> /dev/null
 			mkdir /var/log/fuglu 2> /dev/null
 			chown fuglu:fuglu /var/log/fuglu
-			tar xf fuglu/inst/$fuglu_version.tar -C fuglu/inst/ 2> /dev/null
-			(cd fuglu/inst/$fuglu_version ; python setup.py -q install)
+			tar xf fuglu/inst/${fuglu_version}.tar -C fuglu/inst/ 2> /dev/null
+			(cd fuglu/inst/${fuglu_version} ; python setup.py -q install)
 			cp -R fuglu/conf/* /etc/fuglu/
 			if [[ -f /lib/systemd/systemd ]]; then
-				cp fuglu/inst/$fuglu_version/scripts/startscripts/debian/8/fuglu.service /etc/systemd/system/fuglu.service
+				cp fuglu/inst/${fuglu_version}/scripts/startscripts/debian/8/fuglu.service /etc/systemd/system/fuglu.service
 				systemctl disable fuglu
 				[[ -f /lib/systemd/system/fuglu.service ]] && rm /lib/systemd/system/fuglu.service
 				systemctl daemon-reload
 				systemctl enable fuglu
 			else
-				install -m 755 fuglu/inst/$fuglu_version/scripts/startscripts/debian/7/fuglu /etc/init.d/fuglu
+				install -m 755 fuglu/inst/${fuglu_version}/scripts/startscripts/debian/7/fuglu /etc/init.d/fuglu
 				update-rc.d fuglu defaults
 			fi
-			rm -rf fuglu/inst/$fuglu_version
+			rm -rf fuglu/inst/${fuglu_version}
 			;;
 		dovecot)
 			if [[ -f /lib/systemd/systemd ]]; then
@@ -422,9 +453,9 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			service solr stop > /dev/null 2>&1
 			[[ -f /usr/share/doc/dovecot-core/dovecot/solr-schema.xml ]] && cp /usr/share/doc/dovecot-core/dovecot/solr-schema.xml /etc/solr/conf/schema.xml
 			[[ -f /usr/share/dovecot/solr-schema.xml ]] && cp /usr/share/dovecot/solr-schema.xml /etc/solr/conf/schema.xml
-			sed -i '/NO_START/c\NO_START=0' /etc/default/${jetty_name}
-                        sed -i '/JETTY_HOST/c\JETTY_HOST=127.0.0.1' /etc/default/${jetty_name}
-			sed -i '/JETTY_PORT/c\JETTY_PORT=8983' /etc/default/${jetty_name}
+			sed -i '/NO_START/c\NO_START=0' /etc/default/${JETTY_NAME}
+                        sed -i '/JETTY_HOST/c\JETTY_HOST=127.0.0.1' /etc/default/${JETTY_NAME}
+			sed -i '/JETTY_PORT/c\JETTY_PORT=8983' /etc/default/${JETTY_NAME}
 			;;
 		clamav)
 			usermod -a -G vmail clamav 2> /dev/null
@@ -486,12 +517,12 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			mkdir -p /var/www/ 2> /dev/null
 			if [[ ${httpd_platform} == "nginx" ]]; then
 				# Some systems miss the default php5-fpm listener, reinstall it now
-				apt-get -o Dpkg::Options::="--force-confmiss" install -y --reinstall ${php}-fpm > /dev/null
+				apt-get -o Dpkg::Options::="--force-confmiss" install -y --reinstall ${PHP}-fpm > /dev/null
 				rm /etc/nginx/sites-enabled/{000-0-mailcow*,000-0-fufix} 2>/dev/null
 				cp webserver/nginx/conf/sites-available/mailcow /etc/nginx/sites-available/
-				cp webserver/php5-fpm/conf/pool/mail.conf ${phpconf}/fpm/pool.d/mail.conf
-				cp webserver/php5-fpm/conf/php-fpm.conf ${phpconf}/fpm/php-fpm.conf
-				sed -i "/date.timezone/c\php_admin_value[date.timezone] = ${sys_timezone}" ${phpconf}/fpm/pool.d/mail.conf
+				cp webserver/php5-fpm/conf/pool/mail.conf ${PHPCONF}/fpm/pool.d/mail.conf
+				cp webserver/php5-fpm/conf/php-fpm.conf ${PHPCONF}/fpm/php-fpm.conf
+				sed -i "/date.timezone/c\php_admin_value[date.timezone] = ${sys_timezone}" ${PHPCONF}/fpm/pool.d/mail.conf
 				ln -s /etc/nginx/sites-available/mailcow /etc/nginx/sites-enabled/000-0-mailcow 2>/dev/null
 				[[ ! -z $(grep "server_names_hash_bucket_size" /etc/nginx/nginx.conf) ]] && \
 					sed -i "/server_names_hash_bucket_size/c\ \ \ \ \ \ \ \ server_names_hash_bucket_size 64;" /etc/nginx/nginx.conf || \
@@ -507,7 +538,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				sed -i "s#MAILCOW_TIMEZONE#${sys_timezone}#g" /etc/apache2/sites-available/mailcow.conf
 				a2enmod rewrite ssl headers cgi > /dev/null 2>&1
 			fi
-			mkdir ${phplib}/sessions 2> /dev/null
+			mkdir ${PHPLIB}/sessions 2> /dev/null
 			cp -R webserver/htdocs/mail /var/www/
 			find /var/www/mail -type d -exec chmod 755 {} \;
 			find /var/www/mail -type f -exec chmod 644 {} \;
@@ -516,7 +547,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			sed -i "s/my_mailcowpass/${my_mailcowpass}/g" /var/www/mail/inc/vars.inc.php
 			sed -i "s/my_mailcowuser/${my_mailcowuser}/g" /var/www/mail/inc/vars.inc.php
 			sed -i "s/my_mailcowdb/${my_mailcowdb}/g" /var/www/mail/inc/vars.inc.php
-			chown -R www-data: /var/www/{.,mail} ${phplib}/sessions
+			chown -R www-data: /var/www/{.,mail} ${PHPLIB}/sessions
 			mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} < webserver/htdocs/init.sql
 			if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "SHOW COLUMNS FROM domain LIKE 'relay_all_recipients';" -N -B) ]]; then
 				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "ALTER TABLE domain ADD relay_all_recipients tinyint(1) NOT NULL DEFAULT '0';" -N -B
@@ -561,7 +592,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			else
 				fpm=""
 			fi
-			for var in ${jetty_name} ${httpd_platform} ${fpm} spamassassin fuglu dovecot postfix opendkim clamav-daemon mailgraph
+			for var in ${JETTY_NAME} ${httpd_platform} ${fpm} spamassassin fuglu dovecot postfix opendkim clamav-daemon mailgraph
 			do
 				service $var stop
 				sleep 1.5
@@ -686,7 +717,7 @@ A backup will be stored in ./before_upgrade_$timestamp
 	installtask spamassassin
 
 	returnwait "Webserver configuration"
-	rm -rf ${phplib}/sessions/*
+	rm -rf ${PHPLIB}/sessions/*
 	mkdir -p /var/mailcow/log
 	mv /var/www/PFLOG /var/mailcow/log/pflogsumm.log 2> /dev/null
 

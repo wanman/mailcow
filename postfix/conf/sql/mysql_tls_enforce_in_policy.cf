@@ -1,0 +1,6 @@
+# mysql_tls_enforce_in_policy.cf
+user = my_mailcowuser
+password = my_mailcowpass
+hosts = my_dbhost
+dbname = my_mailcowdb
+query           = SELECT IF( EXISTS( SELECT username FROM mailbox WHERE username='%s' AND active='1' AND tls_enforce_in='1'), 'reject_plaintext_session', 'DUNNO') AS 'tls_enforce_in';

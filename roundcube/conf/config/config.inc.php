@@ -14,7 +14,6 @@ $config['plugins'] = array(
 	'zipdownload',
 	'acl',
 	'managesieve',
-	'password',
 	'attachment_reminder',
 	'new_user_dialog',
 );

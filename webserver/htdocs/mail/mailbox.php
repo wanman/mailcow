@@ -1,19 +1,40 @@
 <?php
-require_once("inc/header.inc.php");
-if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && ($_SESSION['mailcow_cc_role'] == "admin" || $_SESSION['mailcow_cc_role'] == "domainadmin")) {
-$_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
+require_once "inc/header.inc.php";
+
+if ($_SESSION['mailcow_cc_role'] == "admin" || $_SESSION['mailcow_cc_role'] == "domainadmin") {
+$_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 ?>
 <div class="container">
 	<div class="row">
 		<div class="col-md-12">
+		<?php
+		$hasDomainQuery = mysqli_query($link,
+			"SELECT `domain` FROM `domain_admins` 
+				WHERE (
+					username='".$_SESSION['mailcow_cc_username']."'
+					AND active='1'
+				)
+				OR 'admin'='".$_SESSION['mailcow_cc_role']."';");
+		if (mysqli_num_rows($hasDomainQuery) == "0"):
+		?>
+			<div class="alert alert-danger"><?=sprintf($lang['mailbox']['customer_has_no_domain'], $_SESSION['mailcow_cc_username']);?></div>
+		<?php
+		endif;
+		?>
 			<div class="panel panel-default">
 				<div class="panel-heading">
-				<h3 class="panel-title">Domains</h3>
+				<h3 class="panel-title"><?=$lang['mailbox']['domains'];?> <span class="badge" id="numRowsDomain"></span></h3>
 				<div class="pull-right">
-					<span class="clickable filter" data-toggle="tooltip" title="Toggle table filter" data-container="body">
+					<span class="clickable filter" data-toggle="tooltip" title="<?=$lang['mailbox']['filter_table'];?>" data-container="body">
 						<i class="glyphicon glyphicon-filter"></i>
 					</span>
-					<a href="add.php?domain"><span class="glyphicon glyphicon-plus"></span></a>
+				<?php
+				if ($_SESSION['mailcow_cc_role'] == "admin"):
+				?>
+					<a href="/add.php?domain"><span class="glyphicon glyphicon-plus"></span></a>
+				<?php
+				endif;
+				?>
 				</div>
 				</div>
 				<div class="panel-body">
@@ -23,53 +44,78 @@ $_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
 				<table class="table table-striped" id="domaintable">
 					<thead>
 						<tr>
-							<th>Domain</th>
-							<th>Aliases</th>
-							<th>Mailboxes</th>
-							<th>Max. quota per mailbox</th>
-							<th>Domain Quota</th>
-							<th>Backup MX</th>
-							<th>Active</th>
-							<th>Action</th>
+							<th><?=$lang['mailbox']['domain'];?></th>
+							<th><?=$lang['mailbox']['aliases'];?></th>
+							<th><?=$lang['mailbox']['mailboxes'];?></th>
+							<th><?=$lang['mailbox']['mailbox_quota'];?></th>
+							<th><?=$lang['mailbox']['domain_quota'];?></th>
+							<?php
+							if ($_SESSION['mailcow_cc_role'] == "admin"):
+							?>
+								<th><?=$lang['mailbox']['backup_mx'];?></th>
+							<?php
+							endif;
+							?>
+							<th><?=$lang['mailbox']['active'];?></th>
+							<th><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
-<?php
-$result = mysqli_query($link, "SELECT domain, aliases, mailboxes, maxquota, quota, CASE backupmx WHEN 1 THEN 'Yes' ELSE 'No' END AS backupmx, CASE active WHEN 1 THEN 'Yes' ELSE 'No' END AS active FROM 
-domain WHERE 
-domain IN (SELECT domain from domain_admins WHERE username='$logged_in_as') OR 'admin'='$logged_in_role'");
-while ($row = mysqli_fetch_array($result)):
-?>
+					<?php
+					$result = mysqli_query($link,
+						"SELECT 
+							`domain`,
+							`aliases`,
+							`mailboxes`, 
+							`maxquota` * 1048576 AS `maxquota`,
+							`quota` * 1048576 AS `quota`,
+							CASE `backupmx` WHEN 1 THEN '".$lang['mailbox']['yes']."' ELSE '".$lang['mailbox']['no']."' END AS `backupmx`,
+							CASE `active` WHEN 1 THEN '".$lang['mailbox']['yes']."' ELSE '".$lang['mailbox']['no']."' END AS `active`
+								FROM domain WHERE
+									domain IN (
+										SELECT domain FROM domain_admins WHERE username='".$_SESSION['mailcow_cc_username']."' AND active='1'
+									)
+									OR 'admin'='".$_SESSION['mailcow_cc_role']."'");
+					while ($row = mysqli_fetch_array($result)):
+					$AliasData		= mysqli_fetch_assoc(mysqli_query($link,
+						"SELECT COUNT(*) as count FROM `alias`
+							WHERE `domain`='".$row['domain']."'
+							AND `address` NOT IN (
+								SELECT `username` FROM `mailbox`)"));
+					$MailboxData	= mysqli_fetch_assoc(mysqli_query($link,
+						"SELECT 
+							COUNT(*) AS count,
+							COALESCE(SUM(`quota`)) AS quota
+								FROM `mailbox`
+									WHERE `domain`='".$row['domain']."'"));
+					?>
 						<tr>
-							<td>
-<?php
-$getpostmaster = mysqli_query($link, "SELECT alias.active as aactive, mailbox.active as mactive, username, address FROM alias, mailbox WHERE 
-(username='postmaster@".$row['domain']."' OR address='postmaster@".$row['domain']."' OR address='@".$row['domain']."')");
-$postmasterstatus = mysqli_fetch_assoc($getpostmaster);
-if ($row['backupmx'] == "No" && !isset($postmasterstatus['address']) || ($postmasterstatus['aactive'] == "0" || $postmasterstatus['mactive'] == "0")):
-?>
-							<span data-toggle="tooltip" title="Postmaster missing/invalid - Please create an alias or a mailbox for the postmaster user."><i class="glyphicon glyphicon-exclamation-sign"></i> <?=$row['domain'];?></span>
-<?php
-else:
-?>
-
-							<?=$row['domain'];?>
-<?php
-endif;
-?>
-							</td>
-							<td><?= mysqli_result(mysqli_query($link, "SELECT count(*) FROM alias WHERE domain='".$row['domain']."' and address NOT IN (SELECT username FROM mailbox)"));?> of <?=$row['aliases'];?></td>
-							<td><?= mysqli_result(mysqli_query($link, "SELECT count(*) FROM mailbox WHERE domain='".$row['domain']."'"));?> of <?=$row['mailboxes'];?></td>
-							<td><?=$row['maxquota'];?>M</td>
-							<td><?= mysqli_result(mysqli_query($link, "SELECT coalesce(round(sum(quota)/1048576), 0) FROM mailbox WHERE domain='".$row['domain']."'"));?>M of <?=$row['quota'];?>M</td>
-							<td><?=$row['backupmx'];?></td>
+							<td><?=$row['domain'];?></td>
+							<td><?=$AliasData['count'];?> / <?=$row['aliases'];?></td>
+							<td><?=$MailboxData['count'];?> / <?=$row['mailboxes'];?></td>
+							<td><?=formatBytes($row['maxquota'], 2);?></td>
+							<td><?=formatBytes($MailboxData['quota'], 2);?> / <?=formatBytes($row['quota']);?></td>
+							<?php
+							if ($_SESSION['mailcow_cc_role'] == "admin"):
+							?>
+								<td><?=$row['backupmx'];?></td>
+							<?php
+							endif;
+							?>
 							<td><?=$row['active'];?></td>
-							<td><a href="delete.php?domain=<?=urlencode($row['domain']);?>">delete</a> | 
-							<a href="edit.php?domain=<?=urlencode($row['domain']);?>">edit</a></td>
-<?php
-endwhile;
-?>
-	</tr>
+							<?php
+							if ($_SESSION['mailcow_cc_role'] == "admin"):
+							?>
+								<td><?=(in_array($row['domain'], $_SESSION['mailcowDomainArray'])) ? $lang['mailbox']['remove'].' (API)' : '<a href="/delete.php?domain='.$row['domain'].'">'.$lang['mailbox']['remove'].'</a>' ;?> | <a href="/edit.php?domain<?=$row['domain'];?>"><?=$lang['mailbox']['edit'];?></a></td>
+							<?php
+							else:
+							?>
+								<td><a href="/edit.php?domain=<?=$row['domain'];?>"><?=$lang['mailbox']['view'];?></a></td>
+							<?php
+							endif;
+							endwhile;
+							?>
+						</tr>
 					</tbody>
 				</table>
 				</div>
@@ -80,12 +126,12 @@ endwhile;
 		<div class="col-md-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title">Domain Aliases</h3>
+					<h3 class="panel-title"><?=$lang['mailbox']['domain_aliases'];?> <span class="badge" id="numRowsDomainAlias"></span></h3>
 					<div class="pull-right">
-						<span class="clickable filter" data-toggle="tooltip" title="Toggle table filter" data-container="body">
+						<span class="clickable filter" data-toggle="tooltip" title="<?=$lang['mailbox']['filter_table'];?>" data-container="body">
 							<i class="glyphicon glyphicon-filter"></i>
 						</span>
-						<a href="add.php?alias_domain"><span class="glyphicon glyphicon-plus"></span></a>
+						<a href="/add.php?aliasdomain"><span class="glyphicon glyphicon-plus"></span></a>
 					</div>
 				</div>
 				<div class="panel-body">
@@ -95,27 +141,37 @@ endwhile;
 				<table class="table table-striped" id="domainaliastable">
 					<thead>
 						<tr>
-							<th>Alias domain</th>
-							<th>Target domain</th>
-							<th>Active</th>
-							<th>Action</th>
+							<th><?=$lang['mailbox']['alias'];?></th>
+							<th><?=$lang['mailbox']['target_domain'];?></th>
+							<th><?=$lang['mailbox']['active'];?></th>
+							<th><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
-<?php
-$result = mysqli_query($link, "SELECT alias_domain, target_domain, CASE active WHEN 1 THEN 'Yes' ELSE 'No' END AS active FROM 
-alias_domain WHERE 
-target_domain IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'='".$logged_in_role."'");
-while ($row = mysqli_fetch_array($result)):
-?>
-	<tr><td><?=$row['alias_domain'];?>
-	</td><td><?=$row['target_domain'];?>
-	</td><td><?=$row['active'];?>
-	</td><td><a href="delete.php?alias_domain=<?=urlencode($row['alias_domain']);?>">delete</a>
-	</td></tr>
-<?php
-endwhile;
-?>
+					<?php
+					$result = mysqli_query($link, "
+						SELECT 
+							`alias_domain`,
+							`target_domain`,
+							CASE `active` WHEN 1 THEN '".$lang['mailbox']['yes']."' ELSE '".$lang['mailbox']['no']."' END AS `active`
+								FROM `alias_domain`
+									WHERE `target_domain` IN (
+										SELECT `domain` FROM `domain_admins`
+											WHERE `username`='".$_SESSION['mailcow_cc_username']."' 
+											AND `active`='1'
+									)
+									OR 'admin'='".$_SESSION['mailcow_cc_role']."'");
+					while ($row = mysqli_fetch_array($result)):
+					?>
+						<tr>
+							<td><?=$row['alias_domain'];?></td>
+							<td><?=$row['target_domain'];?></td>
+							<td><?=$row['active'];?></td>
+							<td><a href="/delete.php?aliasdomain=<?=$row['alias_domain'];?>"><?=$lang['mailbox']['remove'];?></a></td>
+						</tr>
+					<?php
+					endwhile;
+					?>
 					</tbody>
 				</table>
 				</div>
@@ -126,12 +182,12 @@ endwhile;
 		<div class="col-md-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title">Mailboxes</h3>
+					<h3 class="panel-title"><?=$lang['mailbox']['mailboxes'];?> <span class="badge" id="numRowsMailbox"></span></h3>
 					<div class="pull-right">
-						<span class="clickable filter" data-toggle="tooltip" title="Toggle table filter" data-container="body">
+						<span class="clickable filter" data-toggle="tooltip" title="<?=$lang['mailbox']['filter_table'];?>" data-container="body">
 							<i class="glyphicon glyphicon-filter"></i>
 						</span>
-						<a href="add.php?mailbox"><span class="glyphicon glyphicon-plus"></span></a>
+						<a href="/add.php?mailbox"><span class="glyphicon glyphicon-plus"></span></a>
 					</div>
 				</div>
 				<div class="panel-body">
@@ -141,57 +197,80 @@ endwhile;
 				<table class="table table-striped" id="mailboxtable">
 					<thead>
 						<tr>
-							<th>Username</th>
-							<th>Name</th>
-							<th>Domain</th>
-							<th>Quota</th>
-							<th>In use</th>
-							<th>Msg #</th>
-							<th>Active</th>
-							<th>Action</th>
+							<th><?=$lang['mailbox']['username'];?></th>
+							<th><?=$lang['mailbox']['fname'];?></th>
+							<th><?=$lang['mailbox']['domain'];?></th>
+							<th><?=$lang['mailbox']['quota'];?></th>
+							<th><?=$lang['mailbox']['in_use'];?></th>
+							<th><?=$lang['mailbox']['msg_num'];?></th>
+							<th><?=$lang['mailbox']['active'];?></th>
+							<th><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
-<?php
-$result = mysqli_query($link, "SELECT domain.backupmx, mailbox.username, mailbox.name, CASE mailbox.active WHEN 1 THEN 'Yes' ELSE 'No' END AS active, mailbox.domain, mailbox.quota, quota2.bytes, quota2.messages 
-FROM mailbox, quota2, domain WHERE (mailbox.username = quota2.username) AND (domain.domain = mailbox.domain) AND 
-(mailbox.domain IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'='".$logged_in_role."')");
-while ($row = mysqli_fetch_array($result)):
-?>
-	<tr>
-<?php
-if ($row['backupmx'] == "0"):
-?>
-		<td><?=$row['username'];?></td>
-<?php
-else:
-?>
-		<td><span data-toggle="tooltip" title="Relayed address on backup mx domain"><i class="glyphicon glyphicon-forward"></i> <?=$row['username'];?></span></td>
-<?php
-endif;
-?>
-
-		<td><?=htmlspecialchars($row['name']);?></td>
-		<td><?=$row['domain'];?></td>
-		<td>
-<?php
-if ((formatBytes($row['quota'], 2)) == "0" ) {
-	echo "&#8734;";
-}
-else {
-	echo formatBytes($row['quota'], 2);
-}
-?>
-		</td>
-			<td><?= formatBytes($row['bytes'], 2);?></td>
-			<td><?=$row['messages'];?></td>
-			<td><?=$row['active'];?></td>
-			<td><a href="delete.php?mailbox=<?=urlencode($row['username']);?>">delete</a> | 
-			<a href="edit.php?mailbox=<?=urlencode($row['username']);?>">edit</a></td>
-		</tr>
-<?php
-endwhile;
-?>
+						<?php
+						$result = mysqli_query($link, "SELECT
+							`domain`.`backupmx`,
+							`mailbox`.`username`,
+							`mailbox`.`name`,
+							CASE `mailbox`.`active` WHEN 1 THEN '".$lang['mailbox']['yes']."' ELSE '".$lang['mailbox']['no']."' END AS `active`,
+							`mailbox`.`domain`,
+							`mailbox`.`quota`,
+							`quota2`.`bytes`,
+							`quota2`.`messages`
+								FROM mailbox, quota2, domain
+									WHERE (`mailbox`.`username` = `quota2`.`username`)
+									AND (`domain`.`domain` = `mailbox`.`domain`)
+									AND (`mailbox`.`domain` IN (
+										SELECT `domain` FROM `domain_admins`
+											WHERE `username`='".$_SESSION['mailcow_cc_username']."'
+												AND `active`='1'
+											)
+											OR 'admin'='".$_SESSION['mailcow_cc_role']."')");
+						while ($row = mysqli_fetch_array($result)):
+						?>
+						<tr>
+							<?php
+							if ($row['backupmx'] == "0"):
+							?>
+								<td><?=$row['username'];?></td>
+							<?php
+							else:
+							?>
+								<td><span data-toggle="tooltip" title="Relayed"><i class="glyphicon glyphicon-forward"></i> <?=$row['username'];?></span></td>
+							<?php
+							endif;
+							?>
+							<td><?=utf8_encode($row['name']);?></td>
+							<td><?=$row['domain'];?></td>
+							<td><?=formatBytes($row['bytes'], 2);?> / <?=formatBytes($row['quota'], 2);?></td>
+							<td style="min-width:120px;">
+								<?php
+								$percentInUse = round(($row['bytes'] / $row['quota']) * 100);
+								if ($percentInUse >= 90) {
+									$pbar = "progress-bar-danger";
+								}
+								elseif ($percentInUse >= 75) {
+									$pbar = "progress-bar-warning";
+								}
+								else {
+									$pbar = "progress-bar-success";
+								}
+								?>
+								<div class="progress">
+									<div class="progress-bar <?=$pbar;?>" role="progressbar" aria-valuenow="<?=$percentInUse;?>" aria-valuemin="0" aria-valuemax="100" style="min-width:2em;width: <?=$percentInUse;?>%;">
+										<?=$percentInUse;?>%
+									</div>
+								</div>
+							</td>
+							<td><?=$row['messages'];?></td>
+							<td><?=$row['active'];?></td>
+							<td><a href="/delete.php?mailbox=<?=$row['username'];?>"><?=$lang['mailbox']['remove'];?></a> | 
+							<a href="/edit?mailbox=<?=$row['username'];?>"><?=$lang['mailbox']['edit'];?></a></td>
+						</tr>
+						<?php
+						endwhile;
+						?>
 					</tbody>
 				</table>
 				</div>
@@ -202,12 +281,12 @@ endwhile;
 		<div class="col-md-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title">Aliases</h3>
+					<h3 class="panel-title"><?=$lang['mailbox']['aliases'];?> <span class="badge" id="numRowsAlias"></span></h3>
 					<div class="pull-right">
-						<span class="clickable filter" data-toggle="tooltip" title="Toggle table filter" data-container="body">
+						<span class="clickable filter" data-toggle="tooltip" title="<?=$lang['mailbox']['filter_table'];?>" data-container="body">
 							<i class="glyphicon glyphicon-filter"></i>
 						</span>
-						<a href="add.php?alias"><span class="glyphicon glyphicon-plus"></span></a>
+						<a href="/add.php?alias"><span class="glyphicon glyphicon-plus"></span></a>
 					</div>
 				</div>
 				<div class="panel-body">
@@ -217,56 +296,64 @@ endwhile;
 				<table class="table table-striped" id="aliastable">
 					<thead>
 						<tr>
-							<th>Alias address</th>
-							<th>Destination</th>
-							<th>Domain</th>
-							<th>Active</th>
-							<th>Action</th>
+							<th><?=$lang['mailbox']['alias'];?></th>
+							<th><?=$lang['mailbox']['target_address'];?></th>
+							<th><?=$lang['mailbox']['domain'];?></th>
+							<th><?=$lang['mailbox']['active'];?></th>
+							<th><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
-<?php
-$result = mysqli_query($link, "SELECT address, goto, domain, CASE active WHEN 1 THEN 'Yes' ELSE 'No' END AS active FROM alias WHERE 
-(address NOT IN (SELECT username FROM mailbox) AND address!=goto) AND 
-(domain IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 
-'admin'='".$logged_in_role."')");
-while ($row = mysqli_fetch_array($result)):
-?>
-					<tr>
-						<td>
-<?php		
-if(!filter_var($row['address'], FILTER_VALIDATE_EMAIL)) {
-	echo "<b style='color:#ec466a'>Catch-all</b> for ".$row['address'];
-}
-else {
-	echo $row['address'];
-}
-?>
-						</td>
-						<td>
-<?php
-foreach(explode(",", $row['goto']) as $goto):
-?>
-			<?=$goto;?><br />
-<?php
-endforeach;
-?>
-						</td>
-						<td><?=$row['domain'];?></td>
-						<td><?=$row['active'];?></td>
-						<td><a href="delete.php?alias=<?=urlencode($row['address']);?>">delete</a> 
-<?php
-if(filter_var($row['address'], FILTER_VALIDATE_EMAIL)):
-?>
-	| <a href="edit.php?alias=<?=urlencode($row['address']);?>">edit</a>
-<?php
-endif;
-?>
-						</td>
-					</tr>
-<?php
-endwhile;
-?>
+					<?php
+					$result = mysqli_query($link, "
+						SELECT
+							`address`,
+							`goto`,
+							`domain`,
+							CASE `active` WHEN 1 THEN '".$lang['mailbox']['yes']."' ELSE '".$lang['mailbox']['no']."' END AS `active`
+								FROM alias
+									WHERE (
+										address NOT IN (
+											SELECT username FROM mailbox
+										)
+										AND address!=goto
+									) AND (domain IN (
+										SELECT `domain` FROM `domain_admins`
+											WHERE username='".$_SESSION['mailcow_cc_username']."' 
+											AND active='1'
+										)
+										OR 'admin'='".$_SESSION['mailcow_cc_role']."')");
+					while ($row = mysqli_fetch_array($result)):
+					?>
+						<tr>
+							<td>
+							<?php
+							if(!filter_var($row['address'], FILTER_VALIDATE_EMAIL)):
+							?>
+								<span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span> Catch-all @<?=$row['domain'];?>
+							<?php
+							else:
+								echo $row['address'];
+							endif;
+							?>
+							</td>
+							<td>
+							<?php
+							foreach(explode(",", $row['goto']) as $goto) {
+								echo nl2br($goto.PHP_EOL);
+							}
+							?>
+							</td>
+							<td><?=$row['domain'];?></td>
+							<td><?=$row['active'];?></td>
+							<td>
+								<a href="/delete.php?alias=<?=$row['address'];?>"><?=$lang['mailbox']['remove'];?></a> 
+								| <a href="/edit.php?alias=<?=$row['address'];?>"><?=$lang['mailbox']['edit'];?></a>
+							</td>
+						</tr>
+					<?php
+					endwhile;
+					?>
 					</tbody>
 				</table>
 				</div>
@@ -277,7 +364,7 @@ endwhile;
 <?php
 }
 else {
-	header('Location: admin.php');
+	header('Location: /');
 }
 require_once("inc/footer.inc.php");
 ?>

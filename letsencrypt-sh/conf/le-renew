@@ -1,0 +1,4 @@
+#!/bin/bash
+# Don't run it silent
+/opt/letsencrypt-sh/letsencrypt.sh --cron
+

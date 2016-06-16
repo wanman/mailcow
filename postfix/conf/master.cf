@@ -42,6 +42,14 @@ flush     unix  n       -       -       1000?   0       flush
 proxymap  unix  -       -       n       -       -       proxymap
 proxywrite unix -       -       n       -       1       proxymap
 smtp      unix  -       -       -       -       -       smtp
+  -o syslog_name=default-smtp
+smtp_enforced_tls      unix  -       -       -       -       -       smtp
+  -o syslog_name=enforced-tls-smtp
+  # This will not work on Postfix <=3.1 but is okay to reside here on
+  # unsupported versions (will print a warning though)
+  # Furthermore we cannot mark missing TLS support as hard-fail, mails will stay in our queue
+  -o smtp_delivery_status_filter=pcre:/etc/postfix/smtp_dsn_filter.pcre
+  -o smtp_tls_security_level=encrypt
 relay     unix  -       -       -       -       -       smtp
 showq     unix  n       -       -       -       -       showq
 error     unix  -       -       -       -       -       error

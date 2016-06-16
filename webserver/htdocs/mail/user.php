@@ -1,76 +1,91 @@
 <?php
 require_once("inc/header.inc.php");
-if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "user") {
-$_SESSION['return_to'] = basename($_SERVER['PHP_SELF']);
-$user_details = mysqli_query($link, "SELECT name, username FROM mailbox WHERE username='".$logged_in_as."'");
+$_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
+if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user') {
 ?>
-
-
 <div class="container">
+<h3><?=$lang['user']['mailbox_settings'];?></h3>
 <div class="panel panel-default">
-<div class="panel-heading">Change user details</div>
+<div class="panel-heading">
+	<a data-toggle="collapse" href="#collapseUserDetails"><?=$lang['user']['mailbox_details'];?></a>
+</div>
+<div id="collapseUserDetails" class="panel-collapse collapse">
 <div class="panel-body">
-<form class="form-horizontal" role="form" method="post">
-	<input type="hidden" name="user_now" value="<?=$logged_in_as;?>">
-	<div class="form-group">
-		<label class="control-label col-sm-3" for="user_old_pass">Display name:</label>
-		<div class="col-sm-5">
-		<input type="text" class="form-control" name="user_real_name" id="user_real_name" value="<?=htmlspecialchars(mysqli_fetch_assoc($user_details)['name']);?>" required>
-		</div>
-	</div>
+<form class="form-horizontal" role="form" method="post" autocomplete="off">
+	<p><?=$lang['user']['user_change_fn'];?></p>
 	<hr>
 	<div class="form-group">
-		<label class="control-label col-sm-3" for="user_old_pass">Current password:</label>
-		<div class="col-sm-5">
-		<input type="password" class="form-control" name="user_old_pass" id="user_old_pass" required>
+		<div class="col-sm-offset-3 col-sm-10">
+			<div class="checkbox">
+				<label><input type="checkbox" name="togglePwNew" id="togglePwNew"> <?=$lang['user']['change_password'];?></label>
+			</div>
 		</div>
 	</div>
-	<div class="form-group">
-		<label class="control-label col-sm-3" for="user_new_pass"><small>New password:</small></label>
-		<div class="col-sm-5">
-		<input type="password" class="form-control" name="user_new_pass" id="user_new_pass" placeholder="Unchanged if empty">
+	<div class="passFields">
+		<div class="form-group">
+			<label class="control-label col-sm-3" for="user_new_pass"><?=$lang['user']['new_password'];?></label>
+			<div class="col-sm-5">
+			<input type="password" class="form-control" pattern="(?=.*[A-Za-z])(?=.*[0-9])\w{6,}" name="user_new_pass" id="user_new_pass" autocomplete="off" disabled="disabled">
+			</div>
 		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-3" for="user_new_pass2"><?=$lang['user']['new_password_repeat'];?></label>
+			<div class="col-sm-5">
+			<input type="password" class="form-control" pattern="(?=.*[A-Za-z])(?=.*[0-9])\w{6,}" name="user_new_pass2" id="user_new_pass2" disabled="disabled" autocomplete="off">
+			<p class="help-block"><?=$lang['user']['new_password_description'];?></p>
+			</div>
+		</div>
+		<hr>
 	</div>
 	<div class="form-group">
-		<label class="control-label col-sm-3" for="user_new_pass2"><small>Repeat new password:</small></label>
+		<label class="control-label col-sm-3" for="user_old_pass"><?=$lang['user']['password_now'];?></label>
 		<div class="col-sm-5">
-		<input type="password" class="form-control" name="user_new_pass2" id="user_new_pass2">
+		<input type="password" class="form-control" name="user_old_pass" id="user_old_pass" autocomplete="off" required>
 		</div>
 	</div>
 	<div class="form-group">
 		<div class="col-sm-offset-3 col-sm-9">
-			<button type="submit" name="trigger_set_user_account" class="btn btn-default">Change user details</button>
+			<button type="submit" name="trigger_set_user_account" class="btn btn-success btn-default"><?=$lang['user']['save_changes'];?></button>
 		</div>
 	</div>
 </form>
 </div>
 </div>
-
-<ul><b>Did you know?</b> You can tag your mail address like "<?=explode('@', $logged_in_as)[0];?><b>+Private</b>@<?=explode('@', $logged_in_as)[1];?>" to automatically create a subfolder named "Private" in your inbox.</ul>
-<br />
+</div>
 
 <div class="panel panel-default">
-<div class="panel-heading">Generate time-limited aliases</div>
+<div class="panel-heading">
+	<a data-toggle="collapse" href="#collapseSpamAlias"><?=$lang['user']['spam_aliases'];?></a>
+</div>
+<div id="collapseSpamAlias" class="panel-collapse collapse">
 <div class="panel-body">
 <form class="form-horizontal" role="form" method="post">
 <div class="table-responsive">
 <table class="table table-striped" id="timelimitedaliases">
 	<thead>
 	<tr>
-		<th>Alias</th>
-		<th>Valid until</th>
-		<th>Time left (HH:MM:SS)</th>
+		<th><?=$lang['user']['alias'];?></th>
+		<th><?=$lang['user']['alias_valid_until'];?></th>
+		<th><?=$lang['user']['alias_time_left'];?></th>
 	</tr>
 	</thead>
 	<tbody>
 <?php
-$result = mysqli_query($link, "SELECT address, goto, TIMEDIFF(validity, NOW()) as timeleft, validity FROM spamalias WHERE goto='".$logged_in_as."' AND validity >= NOW() ORDER BY timeleft ASC");
+$result = mysqli_query($link, "SELECT address, 
+	goto,
+	UNIX_TIMESTAMP(validity) as validity,
+	TIMEDIFF(validity, NOW()) as timeleft
+	FROM spamalias WHERE goto='".$username."' AND validity >= NOW() ORDER BY timeleft ASC");
 while ($row = mysqli_fetch_array($result)):
 ?>
 		<tr>
 		<td><?=$row['address'];?></td>
-		<td><?=$row['validity'];?></td>
-		<td><?=$row['timeleft'];?></td>
+		<td><?=date($lang['user']['alias_full_date'], $row['validity']);?></td>
+		<td><?php
+		echo explode(':', $row['timeleft'])[0]."h, ";
+		echo explode(':', $row['timeleft'])[1]."m, ";
+		echo explode(':', $row['timeleft'])[2]."s";
+		?></td>
 		</tr>
 <?php
 endwhile;
@@ -80,76 +95,180 @@ endwhile;
 </div>
 <div class="form-group">
 	<div class="col-sm-9">
-		<label for="validity">Validity</label>
-		<select name="validity" size="1">
-			<option value="1">1 hour</option>
-			<option value="6">6 hours</option>
-			<option value="24">1 day</option>
-			<option value="168">1 week</option>
-			<option value="672">4 weeks</option>
+		<select id="validity" name="validity" title="<?=$lang['user']['alias_select_validity'];?>">
+			<option value="1">1 <?=$lang['user']['hour'];?></option>
+			<option value="6">6 <?=$lang['user']['hours'];?></option>
+			<option value="24">1 <?=$lang['user']['day'];?></option>
+			<option value="168">1 <?=$lang['user']['week'];?></option>
+			<option value="672">4 <?=$lang['user']['weeks'];?></option>
 		</select>
+		<button type="submit" id="trigger_set_time_limited_aliases" name="trigger_set_time_limited_aliases" value="generate" class="btn btn-success"><?=$lang['user']['alias_create_random'];?></button>
 	</div>
 </div>
 <div class="form-group">
 	<div class="col-sm-12">
-		<button type="submit" name="trigger_set_time_limited_aliases" value="generate" class="btn btn-success">Generate random alias</button>
-		<button type="submit" name="trigger_set_time_limited_aliases" value="delete" class="btn btn-danger">Delete all aliases</button>
-		<button type="submit" name="trigger_set_time_limited_aliases" value="extend" class="btn btn-default">Add 1 hour to all aliases</button>
+		<button style="border-color:#f5f5f5;background:none;color:red" type="submit" name="trigger_set_time_limited_aliases" value="delete" class="btn btn-sm">
+			<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> <?=$lang['user']['alias_remove_all'];?>
+		</button>
+		<button style="border-color:#f5f5f5;background:none;color:grey" type="submit" name="trigger_set_time_limited_aliases" value="extend" class="btn btn-sm">
+			<span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span> <?=$lang['user']['alias_extend_all'];?>
+		</button>
 	</div>
 </div>
 </form>
+</div>
 </div>
 </div>
 
 <div class="panel panel-default">
-<div class="panel-heading">Fetch mails</div>
+<div class="panel-heading">
+	<a data-toggle="collapse" href="#collapseSpamFilter"><?=$lang['user']['spamfilter'];?></a>
+</div>
+<div id="collapseSpamFilter" class="panel-collapse collapse">
 <div class="panel-body">
-<p>This is <b>not a recurring task</b>. This feature will perform a one-way synchronisation and leave the remote server as it is, no mails will be deleted on either sides.</p>
-<p>The first synchronisation may take a while.</p>
-<form class="form-horizontal" role="form" method="post">
-	<div class="form-group">
-		<label class="control-label col-sm-2" for="imap_host">IMAP host with port:</label>
-		<div class="col-sm-10">
-		<input type="text" class="form-control" name="imap_host" id="imap_host" placeholder="remote.example.com:993" required>
+	<div class="col-sm-offset-2 col-sm-10">
+		<legend><?=$lang['user']['spamfilter_behavior'];?></legend>
+	</div>
+	<form class="form-horizontal" role="form" method="post">
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-10">
+				<input name="score" id="score" type="text" /><br /><br />
+				<ul>
+					<li><?=$lang['user']['spamfilter_green'];?></li>
+					<li><?=$lang['user']['spamfilter_yellow'];?></li>
+					<li><?=$lang['user']['spamfilter_red'];?></li>
+				</ul>
+				<p><i><?=$lang['user']['spamfilter_default_score'];?> 5:15</i></p>
+				<p><?=$lang['user']['spamfilter_hint'];?></p>
+			</div>
+		</div>		
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-10">
+				<button type="submit" id="trigger_set_spam_score" name="trigger_set_spam_score" class="btn btn-success"><?=$lang['user']['save_changes'];?></button>
+			</div>
+		</div>
+	</form>
+	<div class="col-sm-offset-2 col-sm-10">
+		<div class="row">
+			<div class="col-sm-6">
+				<legend><span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> <?=$lang['user']['spamfilter_wl'];?></legend>
+				<p><?=$lang['user']['spamfilter_wl_desc'];?></p>
+				<div class="row">
+					<div class="col-sm-6"><b><?=$lang['user']['spamfilter_table_rule'];?></b></div>
+					<div class="col-sm-6"><b><?=$lang['user']['spamfilter_table_action'];?></b></div>
+				</div>
+				<div class="row"><div class="col-sm-12"><hr></div></div>
+				<?php
+				$getWhitelistQuery = "SELECT `value`, `prefid` FROM `userpref` WHERE `preference`='whitelist_from' AND `username`='".$username."';";
+				if ($getWhitelistResult = mysqli_query($link, $getWhitelistQuery)) {
+					if (mysqli_num_rows($getWhitelistResult) == "0"):
+					?>
+						<div class="row">
+							<div class="col-sm-12"><i><?=$lang['user']['spamfilter_table_empty'];?></i></div>
+						</div>
+					<?php
+					endif;
+					while ($whitelistRow = mysqli_fetch_assoc($getWhitelistResult)):
+				?>
+				<div class="row">
+					<form class="form-inline" method="post">
+					<div class="col-sm-6"><?=$whitelistRow['value'];?></div>
+					<div class="col-sm-6">
+						<input type="hidden" name="wlid" value="<?=$whitelistRow['prefid'];?>">
+						<button type="submit" id="trigger_delete_whitelist" name="trigger_delete_whitelist" style="margin-bottom:1px;" class="btn btn-xs btn-danger"><?=$lang['user']['spamfilter_table_remove'];?></button>
+					</div>
+					</form>
+				</div>
+				<?php
+					endwhile;
+				}
+				?>
+				<div class="row"><div class="col-sm-12"><hr></div></div>
+				<form class="form-inline" method="post">
+					<div class="form-group">
+						<input type="text" class="form-control" name="whitelist_from" id="whitelist_from" placeholder="*@example.org">
+					</div>
+					<button type="submit" id="trigger_set_whitelist" name="trigger_set_whitelist" class="btn btn-primary"> + </button>
+				</form>
+			</div>
+			<div class="col-sm-6">
+				<legend><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> <?=$lang['user']['spamfilter_bl'];?></legend>
+				<p><?=$lang['user']['spamfilter_bl_desc'];?></p>
+				<div class="row">
+					<div class="col-sm-6"><b><?=$lang['user']['spamfilter_table_rule'];?></b></div>
+					<div class="col-sm-6"><b><?=$lang['user']['spamfilter_table_action'];?></b></div>
+				</div>
+				<div class="row"><div class="col-sm-12"><hr></div></div>
+				<?php
+				$getBlacklistQuery = "SELECT `value`, `prefid` FROM `userpref` WHERE `preference`='blacklist_from' AND `username`='".$username."';";
+				if ($getBlacklistResult = mysqli_query($link, $getBlacklistQuery)) {
+					if (mysqli_num_rows($getBlacklistResult) == "0"):
+					?>
+						<div class="row">
+							<div class="col-sm-12"><i><?=$lang['user']['spamfilter_table_empty'];?></i></div>
+						</div>
+					<?php
+					endif;
+					while ($blacklistRow = mysqli_fetch_assoc($getBlacklistResult)):
+				?>
+				<div class="row">
+					<form class="form-inline" method="post">
+					<div class="col-sm-6"><?=$blacklistRow['value'];?></div>
+					<div class="col-sm-6">
+						<input type="hidden" name="wlid" value="<?=$blacklistRow['prefid'];?>">
+						<button type="submit" id="trigger_delete_blacklist" name="trigger_delete_blacklist" style="margin-bottom:1px;" class="btn btn-xs btn-danger"><?=$lang['user']['spamfilter_table_remove'];?></button>
+					</div>
+					</form>
+				</div>
+				<?php
+					endwhile;
+				}
+				?>
+				<div class="row"><div class="col-sm-12"><hr></div></div>
+				<form class="form-inline" method="post">
+					<div class="form-group">
+						<input type="text" class="form-control" name="blacklist_from" id="blacklist_from" placeholder="*@example.org">
+					</div>
+					<button type="submit" id="trigger_set_blacklist" name="trigger_set_blacklist" class="btn btn-primary"> + </button>
+				</form>
+			</div>
 		</div>
 	</div>
-	<div class="form-group">
-		<label class="control-label col-sm-2" for="imap_username">IMAP username:</label>
-		<div class="col-sm-10">
-		<input type="text" class="form-control" name="imap_username" id="imap_username" required>
-		</div>
-	</div>
-	<div class="form-group">
-		<label class="control-label col-sm-2" for="imap_password">IMAP password:</label>
-		<div class="col-sm-10">
-		<input type="password" class="form-control" name="imap_password" id="imap_password" required>
-		</div>
-	</div>
-	<div class="form-group">
-		<label class="control-label col-sm-2" for="imap_exclude">Exclude folders:</label>
-		<div class="col-sm-10">
-		<input type="text" class="form-control" name="imap_exclude" id="imap_exclude" placeholder="Folder1, Folder2, Folder3">
-		</div>
-	</div>
-	<div class="form-group">
+</div>
+</div>
+</div>
+
+<div class="panel panel-default">
+<div class="panel-heading">
+	<a data-toggle="collapse" href="#collapseTlsPolicy"><?=$lang['user']['tls_policy'];?></a>
+</div>
+<div id="collapseTlsPolicy" class="panel-collapse collapse">
+<div class="panel-body">
+	<form class="form-horizontal" role="form" method="post">
 		<div class="col-sm-offset-2 col-sm-10">
-			<div class="radio">
-				<label><input type="radio" name="imap_enc" value="/ssl" checked>SSL</label>
+			<p class="help-block"><?=$lang['user']['tls_policy_warning'];?></p>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-5">
+				<div class="checkbox">
+					<legend><span class="glyphicon glyphicon-download" aria-hidden="true"></span> <?=$lang['user']['tls_enforce_in'];?></legend>
+					<input type="checkbox" id="tls_in" name="tls_in" <?=($get_tls_policy['tls_enforce_in'] == "1") ? "checked" : null;?> data-on-text="<?=$lang['user']['on'];?>" data-off-text="<?=$lang['user']['off'];?>">
+				</div>
 			</div>
-			<div class="radio">
-				<label><input type="radio" name="imap_enc" value="/tls" >STARTTLS</label>
-			</div>
-			<div class="radio">
-				<label><input type="radio" name="imap_enc" value="none">None (this will try STARTTLS)</label>
+			<div class="col-sm-5">
+				<div class="checkbox">
+					<legend><span class="glyphicon glyphicon-upload" aria-hidden="true"></span> <?=$lang['user']['tls_enforce_out'];?></legend>
+					<input type="checkbox" id="tls_out" name="tls_out" <?=($get_tls_policy['tls_enforce_out'] == "1") ? "checked" : null;?> data-on-text="<?=$lang['user']['on'];?>" data-off-text="<?=$lang['user']['off'];?>">
+				</div>
 			</div>
 		</div>
-	</div>
-	<div class="form-group">
-		<div class="col-sm-offset-2 col-sm-10">
-			<button type="submit" id="trigger_set_fetch_mail" name="trigger_set_fetch_mail" class="btn btn-success" disabled>Sync now</button>
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-10">
+				<button type="submit" id="trigger_set_tls_policy" name="trigger_set_tls_policy" class="btn btn-default"><?=$lang['user']['save_changes'];?></button>
+			</div>
 		</div>
-	</div>
-</form>
+	</form>
+</div>
 </div>
 </div>
 
@@ -157,7 +276,7 @@ endwhile;
 <?php
 }
 else {
-	header('Location: admin.php');
+	header('Location: /');
 }
 require_once("inc/footer.inc.php");
 ?>

@@ -118,6 +118,11 @@ installtask opendkim
 returnwait "Restarting services"
 installtask restartservices
 
+if [[ ${use_lets_encrypt} == "yes" ]]; then
+	returnwait "Obtain Let's Encrypt signed certificates"
+	installtask ssl_le
+fi
+
 returnwait "Finish installation" "no"
 
 echo ${mailcow_version} > /etc/mailcow_version

@@ -252,3 +252,6 @@ postscreen_cache_map = proxy:btree:$data_directory/postscreen_cache
 # We need milter support for OpenDKIM
 milter_protocol = 6
 milter_default_action = accept
+
+# Hard-fail missing TLS when enabled for a user
+plaintext_reject_code = 550

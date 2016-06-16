@@ -1,0 +1,6 @@
+# mysql_tls_enforce_out_policy.cf
+user = my_mailcowuser
+password = my_mailcowpass
+hosts = my_dbhost
+dbname = my_mailcowdb
+query = SELECT IF( EXISTS( SELECT username FROM mailbox WHERE username='%s' AND active='1' AND tls_enforce_out='1'), 'smtp_enforced_tls:', 'DUNNO') AS 'tls_enforce_out';

@@ -6,76 +6,72 @@ require_once("inc/header.inc.php");
 		<div class="col-md-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title">Edit</h3>
+					<h3 class="panel-title"><?=$lang['add']['object'];?></h3>
 				</div>
 				<div class="panel-body">
 <?php
-require_once "inc/triggers.inc.php";
-if (isset($_SESSION['mailcow_cc_loggedin']) &&
-		isset($_SESSION['mailcow_cc_role']) &&
-		$_SESSION['mailcow_cc_loggedin'] == "yes" &&
-		$_SESSION['mailcow_cc_role'] != "user") {
-	if (isset($_GET['domain'])) {
+if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "admin"  || $_SESSION['mailcow_cc_role'] == "domainadmin")) {
+	if (isset($_GET['domain']) && $_SESSION['mailcow_cc_role'] == "admin") {
 ?>
-				<h4>Add domain</h4>
+				<h4><?=$lang['add']['domain'];?></h4>
 				<form class="form-horizontal" role="form" method="post">
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="domain">Domain name:</label>
+						<label class="control-label col-sm-2" for="domain"><?=$lang['add']['domain'];?>:</label>
 						<div class="col-sm-10">
-						<input type="text" autocorrect="off" autocapitalize="none" class="form-control" name="domain" id="domain" placeholder="Domain to receive mail for">
+						<input type="text" autocorrect="off" autocapitalize="none" class="form-control" name="domain" id="domain">
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="description">Description:</label>
+						<label class="control-label col-sm-2" for="description"><?=$lang['add']['description'];?></label>
 						<div class="col-sm-10">
-						<input type="text" class="form-control" name="description" id="description" placeholder="Description">
+						<input type="text" class="form-control" name="description" id="description">
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="aliases">Max. aliases:</label>
+						<label class="control-label col-sm-2" for="aliases"><?=$lang['add']['max_aliases'];?></label>
 						<div class="col-sm-10">
-						<input type="number" class="form-control" name="aliases" id="aliases" value="200">
+						<input type="number" class="form-control" name="aliases" id="aliases" value="400">
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="mailboxes">Max. mailboxes:</label>
+						<label class="control-label col-sm-2" for="mailboxes"><?=$lang['add']['max_mailboxes'];?></label>
 						<div class="col-sm-10">
-						<input type="number" class="form-control" name="mailboxes" id="mailboxes" value="50">
+						<input type="number" class="form-control" name="mailboxes" id="mailboxes" value="10">
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="maxquota">Max. size per mailbox (MB):</label>
+						<label class="control-label col-sm-2" for="maxquota"><?=$lang['add']['mailbox_quota_m'];?></label>
 						<div class="col-sm-10">
-						<input type="number" class="form-control" name="maxquota" id="maxquota" value="4096">
+						<input type="number" class="form-control" name="maxquota" id="maxquota" value="3072">
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="quota">Domain quota:</label>
+						<label class="control-label col-sm-2" for="quota"><?=$lang['add']['domain_quota_m'];?></label>
 						<div class="col-sm-10">
-						<input type="number" class="form-control" name="quota" id="quota" value="10240">
+						<input type="number" class="form-control" name="quota" id="quota" value="15360">
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2">Backup MX options:</label>
+						<label class="control-label col-sm-2"><?=$lang['add']['backup_mx_options'];?></label>
 						<div class="col-sm-10">
 							<div class="checkbox">
-							<label><input type="checkbox" name="backupmx" <?php if (isset($result['backupmx']) && $result['backupmx']=="1") { echo "checked"; }; ?>> Relay domain</label>
+							<label><input type="checkbox" name="backupmx"> <?=$lang['add']['relay_domain'];?></label>
 							<br />
-							<label><input type="checkbox" name="relay_all_recipients" <?php if (isset($result['relay_all_recipients']) && $result['relay_all_recipients']=="1") { echo "checked"; }; ?>> Relay all recipient addresses</label>
-							<p><small>If you choose not to relay all recipient addresses, a mailbox must be created for each recipient on this server.</small></p>
+							<label><input type="checkbox" name="relay_all_recipients"> <?=$lang['add']['relay_all'];?></label>
+							<p><?=$lang['add']['relay_all_info'];?></p>
 							</div>
 						</div>
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="checkbox">
-							<label><input type="checkbox" name="active" checked> Active</label>
+							<label><input type="checkbox" name="active" checked> <?=$lang['add']['active'];?></label>
 							</div>
 						</div>
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" name="trigger_mailbox_action" value="adddomain" class="btn btn-success">Submit</button>
+							<button type="submit" name="trigger_mailbox_action" value="adddomain" class="btn btn-success"><?=$lang['add']['save'];?></button>
 						</div>
 					</div>
 				</form>
@@ -83,123 +79,147 @@ if (isset($_SESSION['mailcow_cc_loggedin']) &&
 	}
 	elseif (isset($_GET['alias'])) {
 ?>
-				<h4>Add alias</h4>
+				<h4><?=$lang['add']['alias'];?></h4>
+				<p><?=$lang['add']['alias_spf_fail'];?></p>
 				<form class="form-horizontal" role="form" method="post">
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="address">Alias address(es) <small>(full email address OR @example.com for <span style='color:#ec466a'>catch-all</span>)</small> - comma separated:</label>
+						<label class="control-label col-sm-2" for="address"><?=$lang['add']['alias_address'];?></label>
 						<div class="col-sm-10">
 							<textarea autocorrect="off" autocapitalize="none" class="form-control" rows="5" name="address"></textarea>
+							<p><?=$lang['add']['alias_address_info'];?></p>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="goto" placeholder="first@example.net, second@example.net">Destination address(es) - comma separated:</label>
+						<label class="control-label col-sm-2" for="goto"><?=$lang['add']['target_address'];?></label>
 						<div class="col-sm-10">
 							<textarea autocorrect="off" autocapitalize="none" class="form-control" rows="5" name="goto"></textarea>
+							<p><?=$lang['add']['target_address_info'];?></p>
 						</div>
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="checkbox">
-							<label><input type="checkbox" name="active" checked> Active</label>
+							<label><input type="checkbox" name="active" checked> <?=$lang['add']['active'];?></label>
 							</div>
 						</div>
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" name="trigger_mailbox_action" value="addalias" class="btn btn-success ">Submit</button>
+							<button type="submit" name="trigger_mailbox_action" value="addalias" class="btn btn-success "><?=$lang['add']['save'];?></button>
 						</div>
 					</div>
 				</form>
-<?php
+	<?php
 	}
-	elseif (isset($_GET['alias_domain'])) {
-?>
-				<h4>Add domain alias</h4>
+	elseif (isset($_GET['aliasdomain'])) {
+	?>
+				<h4><?=$lang['add']['alias_domain'];?></h4>
 				<form class="form-horizontal" role="form" method="post">
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="alias_domain">Alias domain:</label>
+						<label class="control-label col-sm-2" for="alias_domain"><?=$lang['add']['alias_domain'];?>:</label>
 						<div class="col-sm-10">
-							<select name="alias_domain" size="1">
-<?php
-$result = mysqli_query($link, "SELECT domain FROM domain WHERE domain IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'='".$logged_in_role."'");
-while ($row = mysqli_fetch_array($result)) {
-	echo "<option>".$row['domain']."</option>";
-}
-?>
+							<select name="alias_domain" title="<?=$lang['add']['select'];?>" size="1">
+								<?php
+								$result = mysqli_query($link, "SELECT `domain` FROM `domain`
+										WHERE `domain` IN (
+												SELECT `domain` FROM `domain_admins`
+														WHERE `username`='".$_SESSION['mailcow_cc_username']."'
+														AND active='1'
+												)
+										OR 'admin'='".$_SESSION['mailcow_cc_role']."'")
+										OR die(mysqli_error($link));
+								while ($row = mysqli_fetch_array($result)) {
+										echo "<option>".$row['domain']."</option>";
+								}
+								?>
 							</select>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="name">Target domain:</label>
+						<label class="control-label col-sm-2" for="name"><?=$lang['add']['target_domain'];?></label>
 						<div class="col-sm-10">
-							<select name="target_domain" size="1">
-<?php
-$result = mysqli_query($link, "SELECT domain FROM domain WHERE domain IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'='".$logged_in_role."'");
-while ($row = mysqli_fetch_array($result)) {
-	echo "<option>".$row['domain']."</option>";
-}
-?>
+							<select name="target_domain" title="<?=$lang['add']['select'];?>">
+								<?php
+								$result = mysqli_query($link, "SELECT `domain` FROM `domain`
+										WHERE `domain` IN (
+												SELECT `domain` FROM `domain_admins`
+														WHERE `username`='".$_SESSION['mailcow_cc_username']."'
+														AND active='1'
+												)
+										OR 'admin'='".$_SESSION['mailcow_cc_role']."'")
+										OR die(mysqli_error($link));
+								while ($row = mysqli_fetch_array($result)) {
+										echo "<option>".$row['domain']."</option>";
+								}
+								?>
 							</select>
 						</div>
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="checkbox">
-							<label><input type="checkbox" name="active" checked> Active</label>
+							<label><input type="checkbox" name="active" checked> <?=$lang['add']['active'];?></label>
 							</div>
 						</div>
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" name="trigger_mailbox_action" value="addaliasdomain" class="btn btn-success ">Submit</button>
+							<button type="submit" name="trigger_mailbox_action" value="addaliasdomain" class="btn btn-success "><?=$lang['add']['save'];?></button>
 						</div>
 					</div>
 				</form>
-<?php
+	<?php
 	}
 	elseif (isset($_GET['mailbox'])) {
 	?>
-				<h4>Add a mailbox</h4>
+				<h4><?=$lang['add']['mailbox'];?></h4>
 				<form class="form-horizontal" role="form" method="post">
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="local_part">Mailbox Alias (left part of mail address) <small>(alphanumeric)</small>:</label>
+						<label class="control-label col-sm-2" for="local_part"><?=$lang['add']['mailbox_username'];?></label>
 						<div class="col-sm-10">
 							<input type="text" autocorrect="off" autocapitalize="none" pattern="[a-zA-Z0-9.- ]+" class="form-control" name="local_part" id="local_part" required>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="name">Select domain:</label>
+						<label class="control-label col-sm-2" for="name"><?=$lang['add']['domain'];?>:</label>
 						<div class="col-sm-10">
-							<select name="domain" size="1">
-<?php
-$result = mysqli_query($link, "SELECT domain FROM domain WHERE domain IN (SELECT domain from domain_admins WHERE username='".$logged_in_as."') OR 'admin'='".$logged_in_role."'");
-while ($row = mysqli_fetch_array($result)) {
-	echo "<option>".$row['domain']."</option>";
-}
-?>
+							<select name="domain" title="<?=$lang['add']['select'];?>">
+							<?php
+							$result = mysqli_query($link, "SELECT `domain` FROM `domain`
+								WHERE `domain` IN (
+									SELECT `domain` FROM `domain_admins`
+										WHERE `username`='".$_SESSION['mailcow_cc_username']."'
+										AND active='1'
+								)
+								OR 'admin'='".$_SESSION['mailcow_cc_role']."'")
+								OR die(mysqli_error($link));
+							while ($row = mysqli_fetch_array($result)) {
+								echo "<option>".$row['domain']."</option>";
+							}
+							?>
 							</select>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="name">Name:</label>
+						<label class="control-label col-sm-2" for="name"><?=$lang['add']['full_name'];?></label>
 						<div class="col-sm-10">
 						<input type="text" class="form-control" name="name" id="name">
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="quota">Quota (MB), 0 = unlimited:</label>
+						<label class="control-label col-sm-2" for="quota"><?=$lang['add']['quota_mb'];?></label>
 						<div class="col-sm-10">
 						<input type="number" class="form-control" name="quota" id="quota" value="1024">
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="password">Password:</label>
+						<label class="control-label col-sm-2" for="password"><?=$lang['add']['password'];?></label>
 						<div class="col-sm-10">
 						<input type="password" class="form-control" name="password" id="password" placeholder="">
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="password2">Password (repeat):</label>
+						<label class="control-label col-sm-2" for="password2"><?=$lang['add']['password_repeat'];?></label>
 						<div class="col-sm-10">
 						<input type="password" class="form-control" name="password2" id="password2" placeholder="">
 						</div>
@@ -207,31 +227,35 @@ while ($row = mysqli_fetch_array($result)) {
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="checkbox">
-							<label><input type="checkbox" name="active" checked> Active</label>
+							<label><input type="checkbox" name="active" checked> <?=$lang['add']['active'];?></label>
 							</div>
 						</div>
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" name="trigger_mailbox_action" value="addmailbox" class="btn btn-success ">Submit</button>
+							<button type="submit" name="trigger_mailbox_action" value="addmailbox" class="btn btn-success "><?=$lang['add']['save'];?></button>
 						</div>
 					</div>
 				</form>
-<?php
+	<?php
 	}
 	else {
-		echo '<div class="alert alert-danger" role="alert"><strong>Error:</strong> No valid action specified.</div>';
+	?>
+				<div class="alert alert-info" role="alert"><?=$lang['info']['no_action'];?></div>
+	<?php
 	}
 }
 else {
-	echo '<div class="alert alert-danger" role="alert">Permission denied</div>';
+?>
+				<div class="alert alert-danger" role="alert"><?=$lang['danger']['access_denied'];?></div>
+<?php
 }
 ?>
 				</div>
 			</div>
 		</div>
 	</div>
-<a href="<?=$_SESSION['return_to'];?>">&#8592; go back</a>
+<a href="<?=$_SESSION['return_to'];?>">&#8592; <?=$lang['add']['previous'];?></a>
 </div> <!-- /container -->
 <?php
 require_once("inc/footer.inc.php");

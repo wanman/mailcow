@@ -2,8 +2,8 @@ CREATE TABLE IF NOT EXISTS `admin` (
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `superadmin` tinyint(1) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
-  `modified` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
+  `created` datetime NOT NULL DEFAULT '2016-01-01 00:00:00',
+  `modified` datetime NOT NULL DEFAULT '2016-01-01 00:00:00',
   `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS `alias` (
   `address` varchar(255) NOT NULL,
   `goto` text NOT NULL,
   `domain` varchar(255) NOT NULL,
-  `created` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
-  `modified` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
+  `created` datetime NOT NULL DEFAULT '2016-01-01 00:00:00',
+  `modified` datetime NOT NULL DEFAULT '2016-01-01 00:00:00',
   `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`address`),
   KEY `domain` (`domain`)
@@ -34,8 +34,8 @@ CREATE TABLE IF NOT EXISTS `spamalias` (
 CREATE TABLE IF NOT EXISTS `alias_domain` (
   `alias_domain` varchar(255) NOT NULL,
   `target_domain` varchar(255) NOT NULL,
-  `created` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
-  `modified` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
+  `created` datetime NOT NULL DEFAULT '2016-01-01 00:00:00',
+  `modified` datetime NOT NULL DEFAULT '2016-01-01 00:00:00',
   `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`alias_domain`),
   KEY `active` (`active`),
@@ -52,8 +52,8 @@ CREATE TABLE IF NOT EXISTS `domain` (
   `transport` varchar(255) NOT NULL,
   `backupmx` tinyint(1) NOT NULL DEFAULT '0',
   `relay_all_recipients` tinyint(1) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
-  `modified` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
+  `created` datetime NOT NULL DEFAULT '2016-01-01 00:00:00',
+  `modified` datetime NOT NULL DEFAULT '2016-01-01 00:00:00',
   `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`domain`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `domain` (
 CREATE TABLE IF NOT EXISTS `domain_admins` (
   `username` varchar(255) NOT NULL,
   `domain` varchar(255) NOT NULL,
-  `created` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
+  `created` datetime NOT NULL DEFAULT '2016-01-01 00:00:00',
   `active` tinyint(1) NOT NULL DEFAULT '1',
   KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -74,8 +74,10 @@ CREATE TABLE IF NOT EXISTS `mailbox` (
   `quota` bigint(20) NOT NULL DEFAULT '0',
   `local_part` varchar(255) NOT NULL,
   `domain` varchar(255) NOT NULL,
-  `created` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
-  `modified` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
+  `created` datetime NOT NULL DEFAULT '2016-01-01 00:00:00',
+  `modified` datetime NOT NULL DEFAULT '2016-01-01 00:00:00',
+  `tls_enforce_in` tinyint(1) NOT NULL DEFAULT '1',
+  `tls_enforce_out` tinyint(1) NOT NULL DEFAULT '1',
   `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`username`),
   KEY `domain` (`domain`)
@@ -87,6 +89,23 @@ CREATE TABLE IF NOT EXISTS `quota2` (
   `messages` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE IF NOT EXISTS `fugluconfig` (
+  `scope` varchar(255) NOT NULL,
+  `section` varchar(255) NOT NULL,
+  `option` varchar(255) NOT NULL,
+  `value` varchar(255) NOT NULL,
+  PRIMARY KEY (`scope`,`section`,`option`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE IF NOT EXISTS `userpref` (
+  `username` varchar(100) NOT NULL DEFAULT '',
+  `preference` varchar(50) NOT NULL DEFAULT '',
+  `value` varchar(100) NOT NULL DEFAULT '',
+  `prefid` int(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`prefid`),
+  KEY `username` (`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=latin1;
 
 ALTER TABLE `quota2` ENGINE=InnoDB;
 ALTER TABLE `mailbox` ENGINE=InnoDB;

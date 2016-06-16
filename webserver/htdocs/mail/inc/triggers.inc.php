@@ -3,19 +3,16 @@ if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
 	$login_user = strtolower(trim($_POST["login_user"]));
 	$as = check_login($link, $login_user, $_POST["pass_user"]);
 	if ($as == "admin") {
-		$_SESSION['mailcow_cc_loggedin'] = "yes";
 		$_SESSION['mailcow_cc_username'] = $login_user;
 		$_SESSION['mailcow_cc_role'] = "admin";
 		header("Location: /admin.php");
 	}
 	elseif ($as == "domainadmin") {
-		$_SESSION['mailcow_cc_loggedin'] = "yes";
 		$_SESSION['mailcow_cc_username'] = $login_user;
 		$_SESSION['mailcow_cc_role'] = "domainadmin";
 		header("Location: /mailbox.php");
 	}
 	elseif ($as == "user") {
-		$_SESSION['mailcow_cc_loggedin'] = "yes";
 		$_SESSION['mailcow_cc_username'] = $login_user;
 		$_SESSION['mailcow_cc_role'] = "user";
 		header("Location: /user.php");
@@ -23,12 +20,11 @@ if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
 	else {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'Login failed'
+			'msg' => 'Anmeldung fehlgeschlagen'
 		);
-		return false;
 	}
 }
-if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "admin") {
+if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "admin") {
 	if (isset($_POST["trigger_set_admin"])) {
 		set_admin_account($link, $_POST);
 	}
@@ -64,18 +60,33 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 		delete_domain_admin($link, $_POST);
 	}
 }
-if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && $_SESSION['mailcow_cc_role'] == "user") {
+if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "user") {
 	if (isset($_POST["trigger_set_user_account"])) {
 		set_user_account($link, $_POST);
 	}
-	if (isset($_POST["trigger_set_fetch_mail"])) {
-		set_fetch_mail($link, $_POST);
+	if (isset($_POST["trigger_set_spam_score"])) {
+		set_spam_score($link, $_POST);
+	}
+	if (isset($_POST["trigger_set_whitelist"])) {
+		set_whitelist($link, $_POST);
+	}
+	if (isset($_POST["trigger_delete_whitelist"])) {
+		delete_whitelist($link, $_POST);
+	}
+	if (isset($_POST["trigger_set_blacklist"])) {
+		set_blacklist($link, $_POST);
+	}
+	if (isset($_POST["trigger_delete_blacklist"])) {
+		delete_blacklist($link, $_POST);
+	}
+	if (isset($_POST["trigger_set_tls_policy"])) {
+		set_tls_policy($link, $_POST);
 	}
 	if (isset($_POST["trigger_set_time_limited_aliases"])) {
 		set_time_limited_aliases($link, $_POST);
 	}
 }
-if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] == "yes" && ($_SESSION['mailcow_cc_role'] == "domainadmin" || $_SESSION['mailcow_cc_role'] == "admin")) {
+if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "admin" || $_SESSION['mailcow_cc_role'] == "domainadmin")) {
 	if (isset($_POST["trigger_mailbox_action"])) {
 		switch ($_POST["trigger_mailbox_action"]) {
 			case "adddomain":
@@ -116,12 +127,5 @@ if (isset($_SESSION['mailcow_cc_loggedin']) && $_SESSION['mailcow_cc_loggedin'] 
 			break;
 		}
 	}
-}
-if (isset($_POST["logout"])) {
-	session_unset();
-	session_destroy();
-	session_write_close();
-	setcookie(session_name(),'',0,'/');
-	return false;
 }
 ?>

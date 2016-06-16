@@ -12,6 +12,12 @@ fi
 
 CONF_HTTPD_APACHE=$(grep -lir "mailcow site configuration" /etc/apache2/sites-available/)
 CONF_HTTPD_NGINX=$(grep -lir "mailcow site configuration" /etc/nginx/sites-available/)
+DIST_CODENAME=$(lsb_release -cs)
+if [[ $DIST_CODENAME == "xenial" ]]; then
+	PHPCONF="/etc/php5"
+else
+	PHPCONF="/etc/php/7.0"
+fi
 
 if [[ ! -z ${CONF_HTTPD_APACHE} ]]; then
         sed -i "/upload_max_filesize/c\php_admin_value upload_max_filesize ${1}M" ${CONF_HTTPD_APACHE}
@@ -21,8 +27,8 @@ if [[ ! -z ${CONF_HTTPD_APACHE} ]]; then
         postfix reload
         service apache2 reload
 elif [[ ! -z ${CONF_HTTPD_NGINX} ]]; then
-	sed -i "/upload_max_filesize/c\php_admin_value[upload_max_filesize] = ${1}M" /etc/php5/fpm/pool.d/mail.conf
-	sed -i "/post_max_size/c\php_admin_value[post_max_size] = $(expr $1 + 1)M" /etc/php5/fpm/pool.d/mail.conf
+	sed -i "/upload_max_filesize/c\php_admin_value[upload_max_filesize] = ${1}M" ${PHPCONF}/fpm/pool.d/mail.conf
+	sed -i "/post_max_size/c\php_admin_value[post_max_size] = $(expr $1 + 1)M" ${PHPCONF}/fpm/pool.d/mail.conf
 	sed -i "s/client_max_body_size.*/client_max_body_size ${1}m;/g" ${CONF_HTTPD_NGINX}
 	sed -i "s/message_size_limit.*/message_size_limit = $(( $1 * 1048576 ))/g" /etc/postfix/main.cf
 	echo "Reloading services..."
