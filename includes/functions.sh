@@ -566,10 +566,6 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			cp -R roundcube/inst/${roundcube_version}/* /var/www/mail/rc/
 			if [[ $is_upgradetask != "yes" ]]; then
 				cp -R roundcube/conf/* /var/www/mail/rc/
-				sed -i "s/my_mailcowuser/${my_mailcowuser}/g" /var/www/mail/rc/plugins/password/config.inc.php
-				sed -i "s/my_mailcowpass/${my_mailcowpass}/g" /var/www/mail/rc/plugins/password/config.inc.php
-				sed -i "s/my_mailcowdb/${my_mailcowdb}/g" /var/www/mail/rc/plugins/password/config.inc.php
-				sed -i "s/my_dbhost/${my_dbhost}/g" /var/www/mail/rc/plugins/password/config.inc.php
 				sed -i "s/my_dbhost/${my_dbhost}/g" /var/www/mail/rc/config/config.inc.php
 				sed -i "s/my_rcuser/$my_rcuser/g" /var/www/mail/rc/config/config.inc.php
 				sed -i "s/my_rcpass/$my_rcpass/g" /var/www/mail/rc/config/config.inc.php
