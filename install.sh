@@ -8,7 +8,7 @@ cat includes/banner
 source includes/versions
 source includes/functions.sh
 
-while getopts kuhUH:D:? par; do
+while getopts skuhUH:D:? par; do
 case $par in
 	h|'?')
 		usage

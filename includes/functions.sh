@@ -34,7 +34,7 @@ usage() {
 		Upgrade mailcow to a newer version
 		and do not ask to press any key to continue
 
-	-s	Retry to obtain Let's Encrypt certificates
+	-s	Retry to obtain Lets Encrypt certificates
 
 	PARAMETERS:
 	Note: Only available when upgrading
