@@ -7,6 +7,7 @@ if (isset($_POST["logout"])) {
 	setcookie(session_name(),'',0,'/');
 }
 
+require_once 'inc/vars.inc.php';
 $link = mysqli_connect($database_host, $database_user, $database_pass, $database_name);
 if (!$link) {
 	die("Connection error: " . mysqli_connect_error());
@@ -63,7 +64,7 @@ require_once 'inc/triggers.inc.php';
 }
 </style>
 <?php
-if (preg_match("/mailbox/i", $_SERVER['REQUEST_URI'])):
+if (preg_match("/mailbox.php/i", $_SERVER['REQUEST_URI'])):
 ?>
 <style>
 .panel-heading div {

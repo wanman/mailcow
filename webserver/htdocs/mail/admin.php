@@ -87,8 +87,8 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 								<td><?=$row['username'];?></td>
 								<td><?=$row['domain'];?></td>
 								<td><?=$row['active'];?></td>
-								<td><a href="/delete/domainadmin/<?=$row['username'];?>"><?=$lang['admin']['remove'];?></a> |
-									<a href="/edit/domainadmin/<?=$row['username'];?>"><?=$lang['admin']['edit'];?></a></td>
+								<td><a href="delete.php?domainadmin=<?=$row['username'];?>"><?=$lang['admin']['remove'];?></a> |
+									<a href="edit.php?domainadmin=<?=$row['username'];?>"><?=$lang['admin']['edit'];?></a></td>
 								</td>
 							</tr>
 							<?php
@@ -162,51 +162,51 @@ $srr_values = return_mailcow_config("srr");
 ?>
 <form class="form-horizontal" role="form" method="post">
 	<div class="form-group">
-		<label class="control-label col-sm-4" for="location">Recipient restrictions</label>
+		<label class="control-label col-sm-4" for="location"><?=$lang['admin']['rr'];?></label>
 		<div class="col-sm-8">
 			<div class="checkbox">
-			<label><input type="checkbox" name="reject_invalid_helo_hostname" <?php if (preg_match('/reject_invalid_helo_hostname/', $srr_values)) { echo "checked"; } ?>> Reject invalid HELO hostnames <b>(reject_invalid_helo_hostname)</b></label>
+			<label><input type="checkbox" name="reject_invalid_helo_hostname" <?php if (preg_match('/reject_invalid_helo_hostname/', $srr_values)) { echo "checked"; } ?>> <?=$lang['admin']['reject_invalid_helo_hostname'];?></b></label>
 			</div>
 		</div>
 	</div>
 	<div class="form-group">
 		<div class="col-sm-offset-4 col-sm-8">
 			<div class="checkbox">
-			<label><input type="checkbox" name="reject_unknown_helo_hostname" <?php if (preg_match('/reject_unknown_helo_hostname/', $srr_values)) { echo "checked"; } ?>> Reject unknown HELO hostname (no MX- or A-Record) <b>(reject_unknown_helo_hostname)</b></label>
+			<label><input type="checkbox" name="reject_unknown_helo_hostname" <?php if (preg_match('/reject_unknown_helo_hostname/', $srr_values)) { echo "checked"; } ?>> <?=$lang['admin']['reject_unknown_helo_hostname'];?></label>
 			</div>
 		</div>
 	</div>
 	<div class="form-group">
 		<div class="col-sm-offset-4 col-sm-8">
 			<div class="checkbox">
-			<label><input type="checkbox" name="reject_unknown_reverse_client_hostname" <?php if (preg_match('/reject_unknown_reverse_client_hostname/', $srr_values)) { echo "checked"; } ?>> Reject when the client IP address has no address -> name mapping (missing/invalid PTR check) <b>(reject_unknown_reverse_client_hostname)</b></label>
+			<label><input type="checkbox" name="reject_unknown_reverse_client_hostname" <?php if (preg_match('/reject_unknown_reverse_client_hostname/', $srr_values)) { echo "checked"; } ?>> <?=$lang['admin']['reject_unknown_reverse_client_hostname'];?></label>
 			</div>
 		</div>
 	</div>
 	<div class="form-group">
 		<div class="col-sm-offset-4 col-sm-8">
 			<div class="checkbox">
-			<label><input type="checkbox" name="reject_unknown_client_hostname" <?php if (preg_match('/reject_unknown_client_hostname/', $srr_values)) { echo "checked"; } ?>> Reject when the client IP address has no address -> name mapping and/or returned name does not match the IP (exact PTR match check) <b>(reject_unknown_client_hostname)</b></label>
+			<label><input type="checkbox" name="reject_unknown_client_hostname" <?php if (preg_match('/reject_unknown_client_hostname/', $srr_values)) { echo "checked"; } ?>> <?=$lang['admin']['reject_unknown_client_hostname'];?></label>
 			</div>
 		</div>
 	</div>
 	<div class="form-group">
 		<div class="col-sm-offset-4 col-sm-8">
 			<div class="checkbox">
-			<label><input type="checkbox" name="reject_non_fqdn_helo_hostname" <?php if (preg_match('/reject_non_fqdn_helo_hostname/', $srr_values)) { echo "checked"; } ?>> Reject when HELO hostname is not a FQDN <b>(reject_non_fqdn_helo_hostname)</b></label>
+			<label><input type="checkbox" name="reject_non_fqdn_helo_hostname" <?php if (preg_match('/reject_non_fqdn_helo_hostname/', $srr_values)) { echo "checked"; } ?>> <?=$lang['admin']['reject_non_fqdn_helo_hostname'];?></label>
 			</div>
 		</div>
 	</div>
 	<div class="form-group">
 		<div class="col-sm-offset-4 col-sm-8">
 			<div class="checkbox">
-			<label><input type="checkbox" name="z1_greylisting" <?php if (preg_match('/z1_greylisting/', $srr_values)) { echo "checked"; } ?>> Use greylisting for unauthenticated, unknown and not whitelisted senders</label>
+			<label><input type="checkbox" name="z1_greylisting" <?php if (preg_match('/z1_greylisting/', $srr_values)) { echo "checked"; } ?>> <?=$lang['admin']['z1_greylisting'];?></label>
 			</div>
 		</div>
 	</div>
 	<div class="form-group">
 		<div class="col-sm-8">
-			<button type="submit" name="srr" class="btn btn-default">Save changes</button>
+			<button type="submit" name="srr" class="btn btn-default"><?=$lang['admin']['save'];?></button>
 		</div>
 	</div>
 </form>
@@ -216,13 +216,13 @@ $srr_values = return_mailcow_config("srr");
 
 
 <div class="panel panel-default">
-<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapsePubFolders"><a style="cursor:pointer;" class="accordion-toggle">Public folders</a></div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapsePubFolders"><a style="cursor:pointer;" class="accordion-toggle"><?=$lang['admin']['public_folders'];?></a></div>
 <div id="collapsePubFolders" class="panel-collapse collapse">
 <div class="panel-body">
-<p>A namespace "Public" is created. Belows public folder name indicates the name of the first auto-created mailbox within this namespace.</p>
+<p><?=$lang['admin']['public_folders_text'];?></p>
 <form class="form-horizontal" role="form" method="post">
 	<div class="form-group">
-		<label class="control-label col-sm-4" for="location">Folder name <small>(alphanumeric)</small>:</label>
+		<label class="control-label col-sm-4" for="location"><?=$lang['admin']['public_folder_name'];?>:</label>
 		<div class="col-sm-8">
 		<input type="text" class="form-control" name="public_folder_name" id="public_folder_name" value="<?=return_mailcow_config("public_folder_name");?>">
 		</div>
@@ -230,23 +230,23 @@ $srr_values = return_mailcow_config("srr");
 	<div class="form-group">
 		<div class="col-sm-offset-4 col-sm-8">
 			<div class="checkbox">
-			<label><input type="checkbox" name="use_public_folder" <?=return_mailcow_config("public_folder_status");?>> Enable public folder</label>
+			<label><input type="checkbox" name="use_public_folder" <?=return_mailcow_config("public_folder_status");?>> <?=$lang['admin']['public_folder_enable'];?></label>
 			</div>
-			<small>Toggling this option does not delete mail in any public folder.</small>
+			<small><?=$lang['admin']['public_folder_enable_text'];?></small>
 		</div>
 	</div>
 	<div class="form-group">
 		<div class="col-sm-offset-4 col-sm-8">
 			<div class="checkbox">
-			<label><input type="checkbox" name="public_folder_pvt" <?=return_mailcow_config("public_folder_pvt");?>> Enable per-user seen flag</label>
+			<label><input type="checkbox" name="public_folder_pvt" <?=return_mailcow_config("public_folder_pvt");?>> <?=$lang['admin']['public_folder_pusf'];?></label>
 			</div>
-			<small>A "per-user seen flag"-enabled system will not mark a mail as read for User B, when User A has seen it, but User B did not.</small>
+			<small><?=$lang['admin']['public_folder_pusf_text'];?></small>
 		</div>
 	</div>
 	<div class="form-group">
 	<input type="hidden" name="trigger_public_folder">
 		<div class="col-sm-8">
-			<button type="submit" class="btn btn-default">Save changes</button>
+			<button type="submit" class="btn btn-default"><?=$lang['admin']['save'];?></button>
 		</div>
 	</div>
 </form>
@@ -255,21 +255,21 @@ $srr_values = return_mailcow_config("srr");
 </div>
 
 <div class="panel panel-default">
-<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapsePrivacy"><a style="cursor:pointer;" class="accordion-toggle">Privacy</a></div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapsePrivacy"><a style="cursor:pointer;" class="accordion-toggle"><?=$lang['admin']['privacy'];?></a></div>
 <div id="collapsePrivacy" class="panel-collapse collapse">
 <div class="panel-body">
-<p>This option enables a PCRE table to remove "User-Agent", "X-Enigmail", "X-Mailer", "X-Originating-IP" and replaces "Received: from" headers with localhost/127.0.0.1.</p>
+<p><?=$lang['admin']['privacy_text'];?></p>
 <form class="form-horizontal" role="form" method="post">
 	<div class="form-group">
 		<div class="col-sm-8">
 			<div class="checkbox">
-				<label><input name="anonymize" type="checkbox" <?=return_mailcow_config("anonymize");?>> Anonymize outgoing mail</label>
+				<label><input name="anonymize" type="checkbox" <?=return_mailcow_config("anonymize");?>> <?=$lang['admin']['privacy_anon_mail'];?></label>
 			</div>
 		</div>
 	</div>
 	<div class="form-group">
 		<div class="col-sm-8">
-			<button type="submit" name="trigger_anonymize" class="btn btn-default">Apply</button>
+			<button type="submit" name="trigger_anonymize" class="btn btn-default"><?=$lang['admin']['save'];?></button>
 		</div>
 	</div>
 </form>
@@ -278,41 +278,63 @@ $srr_values = return_mailcow_config("srr");
 </div>
 
 <div class="panel panel-default">
-<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseDKIM"><a style="cursor:pointer;" class="accordion-toggle">DKIM signing</a></div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseDKIM">
+<span style="cursor:pointer;" class="accordion-toggle"><?=$lang['admin']['dkim_keys'];?></span>
+</div>
 <div id="collapseDKIM" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Default behaviour is to sign with relaxed header and body canonicalization algorithm.</p>
-<h4>Active keys</h4>
-<?php
-opendkim_table();
-?>
-<h4>Add new key</h4>
-<form class="form-inline" role="form" method="post">
-	<div class="form-group">
-		<label for="dkim_domain">Domain</label>
-		<input class="form-control" id="dkim_domain" name="dkim_domain" placeholder="example.org">
-	</div>
-	<div class="form-group">
-		<label for="dkim_selector">Selector</label>
-		<input class="form-control" id="dkim_selector" name="dkim_selector" placeholder="default">
-	</div>
-	<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Add</button>
-</form>
+	<?php
+	$dnstxt_folder	= scandir($GLOBALS["MC_ODKIM_TXT"]);
+	$dnstxt_files	= array_diff($dnstxt_folder, array('.', '..'));
+	foreach($dnstxt_files as $file) {
+		$str = file_get_contents($GLOBALS["MC_ODKIM_TXT"]."/".$file);
+		$str = preg_replace('/\r|\t|\n/', '', $str);
+		preg_match('/\(.*\)/im', $str, $matches);
+		if(isset($matches[0])) {
+			$str = str_replace(array(' ', '"', '(', ')'), '', $matches[0]);
+		}
+	?>
+		<div class="row">
+			<div class="col-xs-2">
+				<p>Domain: <strong><?=explode("_", $file)[1];?></strong> (default._domainkey)</p>
+			</div>
+			<div class="col-xs-9">
+				<pre><?=$str;?></pre>
+			</div>
+			<div class="col-xs-1">
+				<a href="?del=<?=explode("_", $file)[1];?>" onclick="return confirm('<?=sprintf($lang['dkim']['confirm']);?>')"><span class="glyphicon glyphicon-remove-circle"></span></a>
+			</div>
+		</div>
+	<?php
+	}
+	?>
+	<legend><?=$lang['admin']['dkim_add_key'];?></legend>
+	<form class="form-inline" role="form" method="post">
+		<div class="form-group">
+			<label for="dkim_domain">Domain</label>
+			<input class="form-control" id="dkim_domain" name="dkim_domain" placeholder="example.org">
+		</div>
+		<div class="form-group">
+			<label for="dkim_selector">Selector</label>
+			<input class="form-control" id="dkim_selector" name="dkim_selector" value="default">
+		</div>
+		<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> <?=$lang['admin']['add'];?></button>
+	</form>
 </div>
 </div>
 </div>
 
 <div class="panel panel-default">
-<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseMsgSize"><a style="cursor:pointer;" class="accordion-toggle">Message size</a></div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseMsgSize"><a style="cursor:pointer;" class="accordion-toggle"><?=$lang['admin']['msg_size'];?></a></div>
 <div id="collapseMsgSize" class="panel-collapse collapse">
 <div class="panel-body">
 <form class="form-inline" method="post">
-	<p>Current message size limitation: <strong><?=return_mailcow_config("maxmsgsize");?>MB</strong></p>
-	<p>This changes your webservers and Postfix configuration. Services will be reloaded.</p>
+	<p><?=$lang['admin']['msg_size_limit'];?>: <strong><?=return_mailcow_config("maxmsgsize");?>MB</strong></p>
+	<p><?=$lang['admin']['msg_size_limit_details'];?></p>
 	<div class="form-group">
 		<input type="number" class="form-control" id="maxmsgsize" name="maxmsgsize" placeholder="in MB" min="1" max="250">
 	</div>
-	<button type="submit" class="btn btn-default">Set</button>
+	<button type="submit" class="btn btn-default"><?=$lang['admin']['save'];?></button>
 </form>
 </div>
 </div>

@@ -83,7 +83,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				<form class="form-horizontal" role="form" method="post">
 				<input type="hidden" name="username" value="<?=$domain_admin;?>">
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="name"><?=$lang['edit']['target_domain'];?></label>
+						<label class="control-label col-sm-2" for="name"><?=$lang['edit']['domains'];?></label>
 						<div class="col-sm-10">
 							<select name="domain[]" multiple>
 							<?php
