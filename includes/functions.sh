@@ -293,7 +293,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 				cp -R letsencrypt-sh/inst/${letsencrypt_sh_version}/* /opt/letsencrypt-sh/
 				install -m 644 letsencrypt-sh/conf/config.sh /opt/letsencrypt-sh/config.sh
 				install -m 644 letsencrypt-sh/conf/domains.txt /etc/ssl/mail/domains.txt
-				sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /opt/letsencrypt-sh/domains.txt
+				sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /etc/ssl/mail/domains.txt
 				# Set postmaster as certificate owner
 				sed -i "s/MAILCOW_DOMAIN/${sys_domain}/g" /opt/letsencrypt-sh/config.sh
 				install -m 755 letsencrypt-sh/conf/le-renew /etc/cron.weekly/le-renew
@@ -302,8 +302,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 				if [[ $? -eq 0 ]]; then
 					mv /etc/ssl/mail/mail.key /etc/ssl/mail/mail.key_self-signed
 					mv /etc/ssl/mail/mail.crt /etc/ssl/mail/mail.crt_self-signed
-					ln -s /etc/ssl/mail/certs/demo.mailcow.de/fullchain.pem /etc/ssl/mail/mail.crt
-					ln -s /etc/ssl/mail/certs/demo.mailcow.de/privkey.pem /etc/ssl/mail/mail.key
+					ln -s /etc/ssl/mail/certs/${sys_hostname}.${sys_domain}/fullchain.pem /etc/ssl/mail/mail.crt
+					ln -s /etc/ssl/mail/certs/${sys_hostname}.${sys_domain}/privkey.pem /etc/ssl/mail/mail.key
 				fi
 				service ${httpd_platform} restart
 			fi
