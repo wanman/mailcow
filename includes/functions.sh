@@ -81,7 +81,7 @@ checksystem() {
 }
 
 checkports() {
-	if [[ -z $(which mysql) || -z $(which dig) || -z $(which nc)]];then
+	if [ -z $(which mysql) || -z $(which dig) || -z $(which nc) ]; then
 		echo "$(textb [INFO]) - Installing prerequisites for DNS and port checks"
 		apt-get -y update > /dev/null ; apt-get -y install curl nc dnsutils mysql-client > /dev/null 2>&1
 	fi
@@ -286,7 +286,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 				echo "$(redb [ERR]) - Cannot validate IP address against DNS"
 			else
 				mkdir -p /opt/letsencrypt-sh/
-				tar xf letsencrypt-sh/inst/${letsencrypt-sh_version}.tar -C /opt/letsencrypt-sh/ 2> /dev/null
+				tar xf letsencrypt-sh/inst/${letsencrypt_sh_version}.tar -C /opt/letsencrypt-sh/ 2> /dev/null
 				install -m 644 letsencrypt-sh/conf/config.sh /opt/letsencrypt-sh/config.sh
 				install -m 644 letsencrypt-sh/conf/domains.txt /opt/letsencrypt-sh/domains.txt
 				sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /opt/letsencrypt-sh/domains.txt

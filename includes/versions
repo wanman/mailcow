@@ -1,4 +1,4 @@
 roundcube_version="1.2.0"
 fuglu_version="0.6.6"
 mailcow_version="0.14"
-letsencrypt-sh_version="0.2.0"
+letsencrypt_sh_version="0.2.0"
