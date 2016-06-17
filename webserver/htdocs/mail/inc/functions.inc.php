@@ -637,7 +637,7 @@ function mailbox_add_mailbox($link, $postarray) {
 		);
 		return false;
 	}
-	if (empty($local_part)) {
+	if (empty($postarray['local_part'])) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['mailbox_invalid'])
