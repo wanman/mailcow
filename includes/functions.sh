@@ -171,16 +171,22 @@ installtask() {
 			dist_id=$(lsb_release -is)
 			;;
 		installpackages)
+			if [[ ! -z $(apt-cache search --names-only '^php5-cli$') ]]; then
+				PHP="php5"
+				PHPCONF="/etc/php5"
+				PHPLIB="/var/lib/php5"
+			else
+				PHP="php"
+				PHPCONF="/etc/php/7.0"
+				PHPLIB="/var/lib/php"
+			fi
 			if [[ $dist_id == "Debian" ]]; then
 				if [[ $dist_codename == "jessie" ]]; then
 					if [[ ${httpd_platform} == "apache2" ]]; then
-						WEBSERVER_BACKEND="apache2 apache2-utils libapache2-mod-php5 php-apc"
+						WEBSERVER_BACKEND="apache2 apache2-utils libapache2-mod-${PHP}"
 					else
-						WEBSERVER_BACKEND="nginx-extras php5-fpm php-apc"
+						WEBSERVER_BACKEND="nginx-extras ${PHP}-fpm"
 					fi
-					PHP="php5"
-					PHPCONF="/etc/php5"
-					PHPLIB="/var/lib/php5"
 					SQLITE="sqlite"
 					OPENJDK="openjdk-7"
 					JETTY_NAME="jetty8"
@@ -195,29 +201,19 @@ installtask() {
 						echo "deb http://ppa.launchpad.net/ondrej/apache2/ubuntu trusty main" > /etc/apt/sources.list.d/ondrej.list
 						apt-key adv --keyserver keyserver.ubuntu.com --recv E5267A6C > /dev/null 2>&1
 						apt-get -y update >/dev/null
-						WEBSERVER_BACKEND="apache2 apache2-utils libapache2-mod-php5 php-apc"
+						WEBSERVER_BACKEND="apache2 apache2-utils libapache2-mod-${PHP}"
 					else
-						WEBSERVER_BACKEND="nginx-extras php5-fpm php-apc"
+						WEBSERVER_BACKEND="nginx-extras ${PHP}-fpm"
 					fi
-					PHP="php5"
-					PHPCONF="/etc/php5"
-					PHPLIB="/var/lib/php5"
 					SQLITE="sqlite"
 					OPENJDK="openjdk-7"
 					JETTY_NAME="jetty"
 				elif [[ $dist_codename == "xenial" ]]; then
 					if [[ ${httpd_platform} == "apache2" ]]; then
-						echo "$(textb [INFO]) - Adding ondrej/apache2 repository..."
-						echo "deb http://ppa.launchpad.net/ondrej/apache2/ubuntu trusty main" > /etc/apt/sources.list.d/ondrej.list
-						apt-key adv --keyserver keyserver.ubuntu.com --recv E5267A6C > /dev/null 2>&1
-						apt-get -y update >/dev/null
-						WEBSERVER_BACKEND="apache2 apache2-utils libapache2-mod-php5"
+						WEBSERVER_BACKEND="apache2 apache2-utils libapache2-mod-${PHP}"
 					else
-						WEBSERVER_BACKEND="nginx-extras php-fpm"
+						WEBSERVER_BACKEND="nginx-extras ${PHP}-fpm"
 					fi
-					PHP="php"
-					PHPCONF="/etc/php/7.0"
-					PHPLIB="/var/lib/php"
 					SQLITE="sqlite3"
 					OPENJDK="openjdk-9"
 					JETTY_NAME="jetty8"
@@ -530,7 +526,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 		webserver)
 			mkdir -p /var/www/ 2> /dev/null
 			if [[ ${httpd_platform} == "nginx" ]]; then
-				# Some systems miss the default php5-fpm listener, reinstall it now
+				# Some systems miss the default php fpm listener, reinstall it now
 				apt-get -o Dpkg::Options::="--force-confmiss" install -y --reinstall ${PHP}-fpm > /dev/null
 				rm /etc/nginx/sites-enabled/{000-0-mailcow*,000-0-fufix} 2>/dev/null
 				cp webserver/nginx/conf/sites-available/mailcow /etc/nginx/sites-available/
@@ -598,11 +594,11 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 		restartservices)
 			[[ -f /lib/systemd/systemd ]] && echo "$(textb [INFO]) - Restarting services, this may take a few seconds..."
 			if [[ ${httpd_platform} == "nginx" ]]; then
-				fpm="php5-fpm"
+				FPM="${PHP}-fpm"
 			else
-				fpm=""
+				FPM=""
 			fi
-			for var in ${JETTY_NAME} ${httpd_platform} ${fpm} spamassassin fuglu dovecot postfix opendkim clamav-daemon mailgraph
+			for var in ${JETTY_NAME} ${httpd_platform} ${FPM} spamassassin fuglu dovecot postfix opendkim clamav-daemon mailgraph
 			do
 				service $var stop
 				sleep 1.5
@@ -685,15 +681,15 @@ A backup will be stored in ./before_upgrade_$timestamp
 	cp -R /var/www/mail/ before_upgrade_$timestamp/mail_wwwroot
 	mysqldump -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} > backup_mailcow_db.sql 2>/dev/null
 	mysqldump -u ${my_rcuser} -p${my_rcpass} ${my_rcdb} > backup_roundcube_db.sql 2>/dev/null
-	cp -R /etc/{postfix,dovecot,spamassassin,${httpd_platform},fuglu,mysql,php5,clamav} before_upgrade_$timestamp/
+	cp -R /etc/{postfix,dovecot,spamassassin,${httpd_platform},fuglu,mysql,${PHP},clamav} before_upgrade_$timestamp/
 	echo -e "$(greenb "[OK]")"
 	echo -en "\nStopping services, this may take a few seconds... \t\t"
 	if [[ ${httpd_platform} == "nginx" ]]; then
-		fpm="php5-fpm"
+		FPM="${PHP}-fpm"
 	else
-		fpm=""
+		FPM=""
 	fi
-	for var in ${httpd_platform} ${fpm} spamassassin fuglu dovecot postfix opendkim clamav-daemon mailgraph
+	for var in ${httpd_platform} ${FPM} spamassassin fuglu dovecot postfix opendkim clamav-daemon mailgraph
 	do
 		service $var stop > /dev/null 2>&1
 	done
