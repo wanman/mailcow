@@ -167,10 +167,10 @@ installtask() {
 			echo "${sys_hostname}.${sys_domain}" > /etc/mailname
 			echo "$(textb [INFO]) - Installing prerequisites..."
 			apt-get -y update > /dev/null ; apt-get -y install lsb-release whiptail apt-utils ssl-cert > /dev/null 2>&1
-			dist_codename=$(lsb_release -cs)
-			dist_id=$(lsb_release -is)
 			;;
 		installpackages)
+			dist_codename=$(lsb_release -cs)
+			dist_id=$(lsb_release -is)
 			if [[ ! -z $(apt-cache search --names-only '^php5-cli$') ]]; then
 				PHP="php5"
 				PHPCONF="/etc/php5"
@@ -222,6 +222,8 @@ installtask() {
 					exit 1
 				fi
 				echo "$(yellowb [WARN]) - You are running Ubuntu. The installation will not fail, though you may see a lot of output until the installation is finished."
+			else
+				echo "$(redb [ERR]) - Your distribution is currently not supported"
 			fi
 			/usr/sbin/make-ssl-cert generate-default-snakeoil --force-overwrite
 			echo "$(textb [INFO]) - Installing packages unattended, please stand by, errors will be reported."
@@ -669,19 +671,19 @@ $(textb "Web root")               https://${sys_hostname}.${sys_domain}
 --------------------------------------------------------
 THIS UPGRADE WILL RESET SOME OF YOUR CONFIGURATION FILES
 --------------------------------------------------------
-A backup will be stored in ./before_upgrade_$timestamp
+A backup will be stored in ./before_upgrade_${timestamp}
 --------------------------------------------------------
 "
 	if [[ ${inst_confirm_proceed} == "yes" ]]; then
 		echo "$(pinkb [NOTICE]) - You can overwrite the detected hostname and domain by calling the installer with -H hostname and -D example.org"
 		read -p "Press ENTER to continue or CTRL-C to cancel the upgrade process"
 	fi
-	echo -en "Creating backups in ./before_upgrade_$timestamp... \t"
-	mkdir before_upgrade_$timestamp
-	cp -R /var/www/mail/ before_upgrade_$timestamp/mail_wwwroot
+	echo -en "Creating backups in ./before_upgrade_${timestamp}... \t"
+	mkdir before_upgrade_${timestamp}
+	cp -R /var/www/mail/ before_upgrade_${timestamp}/mail_wwwroot
 	mysqldump -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} > backup_mailcow_db.sql 2>/dev/null
 	mysqldump -u ${my_rcuser} -p${my_rcpass} ${my_rcdb} > backup_roundcube_db.sql 2>/dev/null
-	cp -R /etc/{postfix,dovecot,spamassassin,${httpd_platform},fuglu,mysql,${PHP},clamav} before_upgrade_$timestamp/
+	cp -R /etc/{postfix,dovecot,spamassassin,${httpd_platform},fuglu,mysql,${PHP},clamav} before_upgrade_${timestamp}/ 
 	echo -e "$(greenb "[OK]")"
 	echo -en "\nStopping services, this may take a few seconds... \t\t"
 	if [[ ${httpd_platform} == "nginx" ]]; then
