@@ -1,15 +1,18 @@
 <?php
-function ssha256($password, $salt = "random") {
-	if ($salt == "random") {
-		$salt_str = bin2hex(openssl_random_pseudo_bytes(8));
+function sha512c($password) {
+	$password = escapeshellarg($password);
+	exec('/usr/bin/doveadm pw -s SHA512-CRYPT -p '.$prep_password, $hash, $return);
+	if ($return != "0") {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'Cannot create password hash'
+		);
+		return false;
 	}
-	else {
-		$salt_str = $salt;
-	}
-	return "{SSHA256}".base64_encode(hash('sha256', $password.$salt_str, true).$salt_str);
+	return $hash[0];
 }
 function hasDomainAccess($link, $username, $role, $domain) {
-	if (!filter_var($username, FILTER_VALIDATE_EMAIL) && !ctype_alnum(str_replace(array('@', '.', '-'), '', $username))) {
+	if (!filter_var($username, FILTER_VALIDATE_EMAIL) && !ctype_alnum(str_replace(array('_', '.', '-'), '', $username))) {
 		return false;
 	}
 	if (!is_valid_domain_name($domain)) {
@@ -30,7 +33,7 @@ function hasDomainAccess($link, $username, $role, $domain) {
 	return false;	
 }
 function check_login($link, $user, $pass) {
-	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $user))) {
+	if (!filter_var($user, FILTER_VALIDATE_EMAIL) && !ctype_alnum(str_replace(array('_', '.', '-'), '', $user))) {
 		return false;
 	}
 	if (!strpos(shell_exec("file --mime-encoding /usr/bin/doveadm"), "binary")) {
@@ -43,7 +46,7 @@ function check_login($link, $user, $pass) {
 		AND `username`='".$user."'");
 	while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
 		$row = "'".$row[0]."'";
-		exec("echo ".$pass." | doveadm pw -s ".$GLOBALS['PASS_SCHEME']." -t ".$row, $out, $return);
+		exec("echo ".$pass." | doveadm pw -s SHA512-CRYPT -t ".$row, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
 			unset($_SESSION['ldelay']);
 			return "admin";
@@ -55,7 +58,7 @@ function check_login($link, $user, $pass) {
 		AND `username`='".$user."'");
 	while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
 		$row = "'".$row[0]."'";
-		exec("echo ".$pass." | doveadm pw -s ".$GLOBALS['PASS_SCHEME']." -t ".$row, $out, $return);
+		exec("echo ".$pass." | doveadm pw -s SHA512-CRYPT -t ".$row, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
 			unset($_SESSION['ldelay']);
 			return "domainadmin";
@@ -66,7 +69,7 @@ function check_login($link, $user, $pass) {
 		AND `username`='".$user."'");
 	while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
 		$row = "'".$row[0]."'";
-		exec("echo ".$pass." | doveadm pw -s ".$GLOBALS['PASS_SCHEME']." -t ".$row, $out, $return);
+		exec("echo ".$pass." | doveadm pw -s SHA512-CRYPT -t ".$row, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
 			unset($_SESSION['ldelay']);
 			return "user";
@@ -106,21 +109,24 @@ function return_mailcow_config($s) {
 	switch ($s) {
 		case "anonymize":
 			$state = file_get_contents($GLOBALS["MC_ANON_HEADERS"]);
-			return !empty($state) ? "checked" : false;
+			return !empty($state) ? "checked" : null;
 			break;
 		case "public_folder_status":
 			$state = file_get_contents($GLOBALS["MC_PUB_FOLDER"]);
-			return !empty($state) ? "checked" : false;
+			return !empty($state) ? "checked" : null;
 			break;
 		case "public_folder_name":
 			$state = file_get_contents($GLOBALS["MC_PUB_FOLDER"]);
-			return !empty($state) ? "checked" : false;
+			if (!empty($state)) {
+				$name = explode(";;", $state)[1];
+				return (!empty($name)) ? $name : null;
+			}
 			break;
 		case "public_folder_pvt":
 			$state = file_get_contents($GLOBALS["MC_PUB_FOLDER"]);
 			if (!empty($state)) {
 				$PVT = explode(";;", $state)[3];
-				return ($PVT == "on") ? "checked" : false;
+				return ($PVT == "on") ? "checked" : null;
 			}
 			break;
 		case "srr":
@@ -142,11 +148,12 @@ function set_mailcow_config($s, $v = '') {
 				);
 				break;
 			}
-			exec('sudo /usr/local/sbin/mc_msg_size '.$v, $out, $return);
+			$v = escapeshellarg($new_size);
+			exec('sudo /usr/local/sbin/mc_msg_size '.$new_size, $out, $return);
 			if ($return != "0") {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
-					'msg' => 'Cannot locate mailcow site configuration'
+					'msg' => $lang['admin']['site_not_found']
 				);
 				break;
 			}
@@ -218,7 +225,7 @@ namespace {
 			if ($return != "0") {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
-					'msg' => 'Cannot set restrictions'
+					'msg' => $lang['admin']['set_rr_failed']
 				);
 				break;
 			}
@@ -227,7 +234,7 @@ namespace {
 	if (!isset($_SESSION['return'])) {
 		$_SESSION['return'] = array(
 			'type' => 'success',
-			'msg' => 'Changes saved successfully '
+			'msg' => $lang['success']['set_rr']
 		);
 	}
 }
@@ -235,16 +242,16 @@ function opendkim_table($action, $which = "") {
 	global $lang;
 	switch ($action) {
 		case "delete":
-			if(!ctype_alnum(str_replace(array("_", "-", "."), "", $which))) {
+			if (!ctype_alnum($selector) || !is_valid_domain_name($domain)) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
-					'msg' => sprintf($lang['danger']['dkim_not_found'])
+					'msg' => sprintf($lang['danger']['dkim_domain_or_sel_invalid'])
 				);
 				break;
 			}
-			$selector	= explode("_", $which)[0];
-			$domain		= explode("_", $which)[1];
-			exec('sudo /usr/local/sbin/mc_dkim_ctrl del '.$selector.' '.$domain, $return, $ec);
+			$selector	= escapeshellarg(explode("_", $which)[0]);
+			$domain		= escapeshellarg(explode("_", $which)[1]);
+			exec('sudo /usr/local/sbin/mc_dkim_ctrl del '.$selector.' '.$domain, $out, $return);
 			if ($return != "0") {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -258,16 +265,16 @@ function opendkim_table($action, $which = "") {
 			);
 			break;
 		case "add":
-			$selector = explode("_", $which)[0];
-			$domain = explode("_", $which)[1];
-			if(!ctype_alnum($selector) || !ctype_alnum(str_replace(array("-", "."), "", $domain))) {
+			if (!ctype_alnum($selector) || !is_valid_domain_name($domain)) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
 					'msg' => sprintf($lang['danger']['dkim_domain_or_sel_invalid'])
 				);
 				break;
 			}
-			exec('sudo /usr/local/sbin/mc_dkim_ctrl add '.$selector.' '.$domain, $return, $ec);
+			$selector	= escapeshellarg(explode("_", $which)[0]);
+			$domain		= escapeshellarg(explode("_", $which)[1]);
+			exec('sudo /usr/local/sbin/mc_dkim_ctrl add '.$selector.' '.$domain, $out, $return);
 			if ($return != "0") {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -688,7 +695,7 @@ function mailbox_add_mailbox($link, $postarray) {
 		return false;
 	}
 
-	if (!ctype_alnum(str_replace(array('.', '_', '-'), '', $local_part)) || empty ($local_part)) {
+	if (!filter_var($username, FILTER_VALIDATE_EMAIL) || empty ($local_part)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['mailbox_invalid'])
@@ -712,7 +719,7 @@ function mailbox_add_mailbox($link, $postarray) {
 			);
 			return false;
 		}
-		$password_hashed = ssha256($password);
+		$password_hashed = sha512c($password);
 	}
 	else {
 		$_SESSION['return'] = array(
@@ -977,7 +984,7 @@ function mailbox_edit_domainadmin($link, $postarray) {
 			return false;
 		}
 	};
-	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $username))) {
+	if (!ctype_alnum(str_replace(array('_', '.', '-'), '', $username))) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['username_invalid'])
@@ -1011,7 +1018,7 @@ function mailbox_edit_domainadmin($link, $postarray) {
 			);
 			return false;
 		}
-		$password_hashed = ssha256($password);
+		$password_hashed = sha512c($password);
 		$UpdateAdminData = "UPDATE admin SET modified=now(), active='".$active."', password='".$password_hashed."' WHERE username='".$username."';";
 	}
 	else {
@@ -1071,7 +1078,7 @@ function mailbox_edit_mailbox($link, $postarray) {
 		);
 		return false;
 	}
-	if (!ctype_alnum(str_replace(array('@', '.', '-', '_'), '', $username))) {
+	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['username_invalid'])
@@ -1134,7 +1141,7 @@ function mailbox_edit_mailbox($link, $postarray) {
 			);
 			return false;
 		}
-		$password_hashed = ssha256($password);
+		$password_hashed = sha512c($password);
 		$UpdateMailboxArray = array(
 			"UPDATE `alias` SET
 				`modified`=NOW(),
@@ -1238,14 +1245,6 @@ function mailbox_delete_domain($link, $domain) {
 			);
 			return false;
 		}
-	}
-	exec('sudo /usr/local/sbin/mc_dkim_ctrl del default '.$domain, $return, $ec);
-	if ($ec != "0") {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => sprintf($lang['danger']['exit_code_not_null'], $ec)
-		);
-		return false;
 	}
 	$_SESSION['return'] = array(
 		'type' => 'success',
@@ -1379,14 +1378,14 @@ function set_admin_account($link, $postarray) {
 	$password		= mysqli_real_escape_string($link, $postarray['admin_pass']);
 	$password2		= mysqli_real_escape_string($link, $postarray['admin_pass2']);
 
-	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $name)) || empty ($name)) {
+	if (!ctype_alnum(str_replace(array('_', '.', '-'), '', $name)) || empty ($name)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['username_invalid'])
 		);
 		return false;
 	}
-	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $name_now)) || empty ($name_now)) {
+	if (!ctype_alnum(str_replace(array('_', '.', '-'), '', $name_now)) || empty ($name_now)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['username_invalid'])
@@ -1401,7 +1400,7 @@ function set_admin_account($link, $postarray) {
 			);
 			return false;
 		}
-		$password_hashed = ssha256($password);
+		$password_hashed = sha512c($password);
 		$UpdateAdmin = "UPDATE `admin` SET 
 			`modified`=NOW(),
 			`password`='".$password_hashed."',
@@ -1598,7 +1597,7 @@ function set_user_account($link, $postarray) {
 					);
 					return false;
 			}
-			$password_hashed = ssha256($password_new);
+			$password_hashed = sha512c($password_new);
 			$UpdateMailboxQuery = "UPDATE mailbox SET modified=NOW(), password='".$password_hashed."' WHERE username='".$username."';";
 			if (!mysqli_query($link, $UpdateMailboxQuery)) {
 				$_SESSION['return'] = array(
@@ -1628,7 +1627,7 @@ function add_domain_admin($link, $postarray) {
 		);
 		return false;
 	}
-	if (!ctype_alnum(str_replace(array('.', '-'), '', $username)) || empty ($username)) {
+	if (!ctype_alnum(str_replace(array('_', '.', '-'), '', $username)) || empty ($username)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['username_invalid'])
@@ -1663,7 +1662,7 @@ function add_domain_admin($link, $postarray) {
 			);
 			return false;
 		}
-		$password_hashed = ssha256($password);
+		$password_hashed = sha512c($password);
 		$DeleteArray = array(
 			"DELETE FROM `domain_admins`
 				WHERE `username`='".$username."'",
@@ -1730,7 +1729,7 @@ function delete_domain_admin($link, $postarray) {
 		return false;
 	}
 	$username = mysqli_real_escape_string($link, $postarray['username']);
-	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $username))) {
+	if (!ctype_alnum(str_replace(array('_', '.', '-'), '', $username))) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['username_invalid'])
@@ -1759,10 +1758,10 @@ function delete_domain_admin($link, $postarray) {
 }
 function get_spam_score($link, $username) {
 	$default		= "5, 15";
-	$username		= mysqli_real_escape_string($link, $username);
-	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $username))) {
+	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		return $default;
 	}
+	$username		= mysqli_real_escape_string($link, $username);
 	$SelectQuery = "SELECT * FROM `userpref`, `fugluconfig`
 		WHERE `username`='".$username."'
 		AND `scope`='".$username."'";
@@ -1786,15 +1785,16 @@ function get_spam_score($link, $username) {
 }
 function set_whitelist($link, $postarray) {
 	global $lang;
-	$username		= mysqli_real_escape_string($link, $_SESSION['mailcow_cc_username']);
 	$whitelist_from	= mysqli_real_escape_string($link, $postarray['whitelist_from']);
-	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $username))) {
+	$username	= $_SESSION['mailcow_cc_username'];
+	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['username_invalid'])
 		);
 		return false;
 	}
+	$username = mysqli_real_escape_string($link, $username);
 	if (!ctype_alnum(str_replace(array('@', '.', '-', '*'), '', $whitelist_from))) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1818,15 +1818,16 @@ function set_whitelist($link, $postarray) {
 }
 function delete_whitelist($link, $postarray) {
 	global $lang;
-	$username	= mysqli_real_escape_string($link, $_SESSION['mailcow_cc_username']);
+	$username	= $_SESSION['mailcow_cc_username'];
 	$prefid		= mysqli_real_escape_string($link, $postarray['wlid']);
-	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $username))) {
+	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['username_invalid'])
 		);
 		return false;
 	}
+	$username	= mysqli_real_escape_string($link, $username);
 	if (!is_numeric($prefid)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1849,15 +1850,16 @@ function delete_whitelist($link, $postarray) {
 }
 function set_blacklist($link, $postarray) {
 	global $lang;
-	$username		= mysqli_real_escape_string($link, $_SESSION['mailcow_cc_username']);
+	$username		= $_SESSION['mailcow_cc_username'];
 	$blacklist_from	= mysqli_real_escape_string($link, $postarray['blacklist_from']);
-	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $username))) {
+	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['username_invalid'])
 		);
 		return false;
 	}
+	$username	= mysqli_real_escape_string($link, $username);
 	if (!ctype_alnum(str_replace(array('@', '.', '-', '*'), '', $blacklist_from))) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1881,15 +1883,16 @@ function set_blacklist($link, $postarray) {
 }
 function delete_blacklist($link, $postarray) {
 	global $lang;
-	$username	= mysqli_real_escape_string($link, $_SESSION['mailcow_cc_username']);
+	$username	= $_SESSION['mailcow_cc_username'];
 	$prefid		= mysqli_real_escape_string($link, $postarray['wlid']);
-	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $username))) {
+	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['username_invalid'])
 		);
 		return false;
 	}
+	$username	= mysqli_real_escape_string($link, $username);
 	if (!is_numeric($prefid)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1912,16 +1915,17 @@ function delete_blacklist($link, $postarray) {
 }
 function set_spam_score($link, $postarray) {
 	global $lang;
-	$username		= mysqli_real_escape_string($link, $_SESSION['mailcow_cc_username']);
+	$username		= $_SESSION['mailcow_cc_username'];
 	$lowspamlevel	= explode(',', mysqli_real_escape_string($link, $postarray['score']))[0];
 	$highspamlevel	= explode(',', mysqli_real_escape_string($link, $postarray['score']))[1];
-	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $username))) {
+	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['username_invalid'])
 		);
 		return false;
 	}
+	$username		= mysqli_real_escape_string($link, $username);
 	if (!is_numeric($lowspamlevel) || !is_numeric($highspamlevel)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1973,31 +1977,21 @@ function set_tls_policy($link, $postarray) {
 	global $lang;
 	isset($postarray['tls_in']) ? $tls_in = '1' : $tls_in = '0';
 	isset($postarray['tls_out']) ? $tls_out = '1' : $tls_out = '0';
-	if (isset($_SESSION['hybrid_user']) && $_SESSION['hybrid_user'] == "yes") {
-		$username	= $_SESSION['hybrid_user_mailbox'];
-	}
-	else {
-		$username	= $_SESSION['mailcow_cc_username'];
-	}
-	$username		= mysqli_real_escape_string($link, $username);
-	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $username))) {
+	$username		= $_SESSION['mailcow_cc_username'];
+	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['username_invalid'])
 		);
 		return false;
 	}
+	$username		= mysqli_real_escape_string($link, $username);
 	$UpdateTlsPolicyQuery = "UPDATE `mailbox` SET tls_enforce_out='".$tls_out."', tls_enforce_in='".$tls_in."' WHERE `username`='".$username."'";
 	if (!mysqli_query($link, $UpdateTlsPolicyQuery)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => 'MySQL Fehler: '.mysqli_error($link)
 		);
-		mail_utf8($GLOBALS['ADMIN_EMAIL'],
-			"hosted.mailcow.de",
-			"noreply@hosted.mailcow.de",
-			"mailcow - MySQL Fehler",
-			mysqli_error($link));
 		return false;
 	}
 	$_SESSION['return'] = array(
@@ -2007,7 +2001,7 @@ function set_tls_policy($link, $postarray) {
 }
 function get_tls_policy($link, $username) {
 	global $lang;
-	if (!ctype_alnum(str_replace(array('@', '.', '-'), '', $username))) {
+	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['username_invalid'])

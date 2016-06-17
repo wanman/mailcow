@@ -57,9 +57,7 @@ elseif (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "
 						endif;
 						?>
 					<legend>mailcow Apps</legend>
-					<div class="btn-group btn-group-justified" role="group" aria-label="...">
-						<a href="/rc/" role="button" class="btn btn-lg btn-default"><?=$lang['start']['start_rc'];?></a>
-					</div>
+					<a href="/rc/" role="button" class="btn btn-lg btn-default"><?=$lang['start']['start_rc'];?></a>
 				</div>
 			</div>
 		</div>
@@ -74,8 +72,6 @@ elseif (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "
 						<p><?=$lang['start']['mailcow_panel_detail'];?></p>
 						<p><span style="border-bottom: 1px dotted #999">mailcow Apps</span></p>
 						<p><?=$lang['start']['mailcow_apps_detail'];?></p>
-						<hr>
-						<p><?=$lang['start']['kb_hint'];?></p>
 					</div>
 				</div>
 			</div>

@@ -24,7 +24,7 @@ if (isset($_GET['lang'])) {
 	}
 }
 if (!isset($_SESSION['mailcow_locale'])) {
-	$_SESSION['mailcow_locale'] = 'en';
+	$_SESSION['mailcow_locale'] = $DEFAULT_LANG;
 }
 require_once 'lang/lang.en.php';
 include 'lang/lang.'.$_SESSION['mailcow_locale'].'.php';

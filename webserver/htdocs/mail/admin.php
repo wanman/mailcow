@@ -302,7 +302,7 @@ $srr_values = return_mailcow_config("srr");
 				<pre><?=$str;?></pre>
 			</div>
 			<div class="col-xs-1">
-				<a href="?del=<?=explode("_", $file)[1];?>" onclick="return confirm('<?=sprintf($lang['dkim']['confirm']);?>')"><span class="glyphicon glyphicon-remove-circle"></span></a>
+				<a href="?del=<?=$file;?>" onclick="return confirm('<?=sprintf($lang['dkim']['confirm']);?>')"><span class="glyphicon glyphicon-remove-circle"></span></a>
 			</div>
 		</div>
 	<?php
