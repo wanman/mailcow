@@ -83,7 +83,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 		}
 		// DELETE DOMAIN ADMIN
 		elseif (isset($_GET["domainadmin"]) &&
-			ctype_alnum(str_replace(array('@', '.', '-'), '', $_GET["domainadmin"])) &&
+			ctype_alnum(str_replace(array('_', '.', '-'), '', $_GET["domainadmin"])) &&
 			!empty($_GET["domainadmin"]) &&
 			$_SESSION['mailcow_cc_role'] == "admin") {
 				$domain_admin = mysqli_real_escape_string($link, $_GET["domainadmin"]);

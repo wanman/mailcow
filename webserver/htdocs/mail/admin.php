@@ -24,7 +24,8 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="admin_user"><?=$lang['admin']['admin'];?>:</label>
 						<div class="col-sm-10">
-						<input type="text" class="form-control" name="admin_user" id="admin_user" value="<?=$adminData['username'];?>" required>
+							<input type="text" class="form-control" name="admin_user" id="admin_user" value="<?=$adminData['username'];?>" required>
+							&rdsh; <kbd>a-z A-Z - _ .</kbd>
 						</div>
 					</div>
 					<div class="form-group">
@@ -102,9 +103,10 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 				<legend><?=$lang['admin']['add_domain_admin'];?></legend>
 				<form class="form-horizontal" role="form" method="post">
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="username"><?=$lang['admin']['username'];?> <kbd>[a-zA-Z,._]</kbd>:</label>
+						<label class="control-label col-sm-2" for="username"><?=$lang['admin']['username'];?>:</label>
 						<div class="col-sm-10">
 							<input type="text" class="form-control" name="username" id="username" required>
+							&rdsh; <kbd>a-z A-Z - _ .</kbd>
 						</div>
 					</div>
 					<div class="form-group">
@@ -154,7 +156,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 <h4><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> <?=$lang['admin']['configuration'];?></h4>
 <div class="panel-group" id="accordion_config">
 <div class="panel panel-default">
-<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseSrr"><a style="cursor:pointer;" class="accordion-toggle">Postfix restrictions</a></div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseSrr"><a style="cursor:pointer;" class="accordion-toggle">Postfix Restrictions</a></div>
 <div id="collapseSrr" class="panel-collapse collapse">
 <div class="panel-body">
 <?php

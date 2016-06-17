@@ -242,6 +242,8 @@ function opendkim_table($action, $which = "") {
 	global $lang;
 	switch ($action) {
 		case "delete":
+			$selector	= explode("_", $which)[0];
+			$domain		= explode("_", $which)[1];
 			if (!ctype_alnum($selector) || !is_valid_domain_name($domain)) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -249,8 +251,8 @@ function opendkim_table($action, $which = "") {
 				);
 				break;
 			}
-			$selector	= escapeshellarg(explode("_", $which)[0]);
-			$domain		= escapeshellarg(explode("_", $which)[1]);
+			$selector	= escapeshellarg($selector);
+			$domain		= escapeshellarg($domain);
 			exec('sudo /usr/local/sbin/mc_dkim_ctrl del '.$selector.' '.$domain, $out, $return);
 			if ($return != "0") {
 				$_SESSION['return'] = array(
@@ -265,6 +267,8 @@ function opendkim_table($action, $which = "") {
 			);
 			break;
 		case "add":
+			$selector	= explode("_", $which)[0];
+			$domain		= explode("_", $which)[1];
 			if (!ctype_alnum($selector) || !is_valid_domain_name($domain)) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -272,8 +276,8 @@ function opendkim_table($action, $which = "") {
 				);
 				break;
 			}
-			$selector	= escapeshellarg(explode("_", $which)[0]);
-			$domain		= escapeshellarg(explode("_", $which)[1]);
+			$selector	= escapeshellarg($selector);
+			$domain		= escapeshellarg($domain);
 			exec('sudo /usr/local/sbin/mc_dkim_ctrl add '.$selector.' '.$domain, $out, $return);
 			if ($return != "0") {
 				$_SESSION['return'] = array(

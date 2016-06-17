@@ -12,23 +12,23 @@ require_once("inc/header.inc.php");
 <?php
 if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "admin"  || $_SESSION['mailcow_cc_role'] == "domainadmin")) {
 		if (isset($_GET['alias']) &&
-			ctype_alnum(str_replace(array('@', '.', '-'), '', $_GET["alias"])) &&
+			filter_var($_GET["alias"], FILTER_VALIDATE_EMAIL) &&
 			!empty($_GET["alias"])) {
 				$alias = mysqli_real_escape_string($link, $_GET["alias"]);
 				$domain = substr(strrchr($alias, "@"), 1);
-				$qstring = "SELECT * FROM alias
-					WHERE address='".$alias."' 
-					AND goto!='".$alias."'
+				$qstring = "SELECT * FROM `alias`
+					WHERE `address`='".$alias."' 
+					AND `goto`!='".$alias."'
 					AND (
-						domain IN (
-							SELECT domain FROM domain_admins
-								WHERE active='1'
-								AND username='".$_SESSION['mailcow_cc_username']."'
+						`domain` IN (
+							SELECT `domain` FROM `domain_admins`
+								WHERE `active`='1'
+								AND `username`='".$_SESSION['mailcow_cc_username']."'
 						)
 						OR 'admin'='".$_SESSION['mailcow_cc_role']."'
 					)";
 				$qresult = mysqli_query($link, $qstring)
-					OR die('<div class="alert alert-danger" role="alert">'.mysqli_error($link).'</div>');
+					OR die(mysqli_error($link));
 				$num_results = mysqli_num_rows($qresult);
 				$result = mysqli_fetch_assoc($qresult);
 				if ($num_results != 0 && !empty($num_results)) {
@@ -65,7 +65,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				}
 		}
 		elseif (isset($_GET['domainadmin']) && 
-			ctype_alnum(str_replace(array('@', '.', '-'), '', $_GET["domainadmin"])) &&
+			ctype_alnum(str_replace(array('_', '.', '-'), '', $_GET["domainadmin"])) &&
 			!empty($_GET["domainadmin"]) &&
 			$_GET["domainadmin"] != 'admin' &&
 			$_SESSION['mailcow_cc_role'] == "admin") {
@@ -90,7 +90,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							$result_selected = mysqli_query($link, "SELECT `domain` FROM `domain`
 								WHERE `domain` IN (
 									SELECT `domain` FROM `domain_admins`
-										WHERE username='".$domain_admin."')")
+										WHERE `username`='".$domain_admin."')")
 								OR die(mysqli_error($link));
 							while ($row_selected = mysqli_fetch_array($result_selected)):
 							?>
@@ -100,7 +100,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							$result_unselected = mysqli_query($link, "SELECT `domain` FROM `domain`
 								WHERE `domain` NOT IN (
 									SELECT `domain` FROM `domain_admins`
-										WHERE username='".$domain_admin."')")
+										WHERE `username`='".$domain_admin."')")
 								OR die(mysqli_error($link));
 							while ($row_unselected = mysqli_fetch_array($result_unselected)):
 							?>
@@ -148,12 +148,12 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 		is_valid_domain_name($_GET["domain"]) &&
 		!empty($_GET["domain"])) {
 			$domain = mysqli_real_escape_string($link, $_GET["domain"]);
-			$qstring = "SELECT * FROM `domain` WHERE domain='".$domain."' 
+			$qstring = "SELECT * FROM `domain` WHERE `domain`='".$domain."' 
 				AND (
 					`domain` IN (
 						SELECT `domain` from `domain_admins`
-							WHERE active='1'
-							AND username='".$_SESSION['mailcow_cc_username']."'
+							WHERE `active`='1'
+							AND `username`='".$_SESSION['mailcow_cc_username']."'
 					) 
 					OR 'admin'='".$_SESSION['mailcow_cc_role']."'
 				)";
@@ -230,7 +230,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				$dnstxt_folder = scandir($GLOBALS["MC_ODKIM_TXT"]);
 				$dnstxt_files = array_diff($dnstxt_folder, array('.', '..'));
 				foreach($dnstxt_files as $file) {
-					if(explode("_", $file)[1] == "$domain") {
+					if(explode("_", $file)[1] == $domain) {
 						$str = file_get_contents($GLOBALS["MC_ODKIM_TXT"]."/".$file);
 						$str = preg_replace('/\r|\t|\n/', '', $str);
 						preg_match('/\(.*\)/im', $str, $matches);
@@ -268,18 +268,18 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			$mailbox = mysqli_real_escape_string($link, $_GET["mailbox"]);
 			$domain = substr(strrchr($mailbox, "@"), 1);
 			$qstring = "SELECT
-				username,
-				domain,
-				name,
+				`username`,
+				`domain`,
+				`name`,
 				round(sum(quota / 1048576)) as quota,
-				active
-					FROM mailbox
-						WHERE username='".$mailbox."'
+				`active`
+					FROM `mailbox`
+						WHERE `username`='".$mailbox."'
 						AND (
-							domain IN (
-								SELECT domain FROM domain_admins
-									WHERE active='1'
-									AND username='".$_SESSION['mailcow_cc_username']."'
+							`domain` IN (
+								SELECT `domain` FROM `domain_admins`
+									WHERE `active`='1'
+									AND `username`='".$_SESSION['mailcow_cc_username']."'
 							)
 							OR 'admin'='".$_SESSION['mailcow_cc_role']."'
 						)";
@@ -309,7 +309,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 						<div class="col-sm-10">
 							<select title="Durchsuchen..." style="width:100%" name="sender_acl[]" size="10" multiple>
 							<?php
-							$result_goto_from_alias = mysqli_query($link, "SELECT address FROM alias WHERE goto='".$mailbox."'")
+							$result_goto_from_alias = mysqli_query($link, "SELECT `address` FROM `alias` WHERE `goto`='".$mailbox."'")
 								OR die(mysqli_error($link));
 							while ($row_goto_from_alias = mysqli_fetch_array($result_goto_from_alias)):
 							?>
@@ -344,8 +344,8 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							<?php
 							endwhile;
 
-							$result_unselected_sender_acl = mysqli_query($link, "SELECT address FROM alias
-								WHERE goto!='".$mailbox."'
+							$result_unselected_sender_acl = mysqli_query($link, "SELECT `address` FROM `alias`
+								WHERE `goto`!='".$mailbox."'
 									AND `domain`='".$result['domain']."'
 									AND `address` NOT IN (
 										SELECT `send_as` FROM `sender_acl` 

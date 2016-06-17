@@ -284,7 +284,7 @@ $lang['login']['confirm'] = "Confirm";
 $lang['login']['otp'] = "One-time password";
 $lang['login']['trash_login'] = "Trash login";
 
-$lang['admin']['rr'] = 'Postifx Recipient restrictions';
+$lang['admin']['rr'] = 'Postifx Recipient Restrictions';
 $lang['admin']['reject_invalid_helo_hostname'] = 'Reject invalid HELO hostnames <b>(reject_invalid_helo_hostname)</b>';
 $lang['admin']['reject_unknown_helo_hostname'] = 'Reject unknown HELO hostname (no MX- or A-Record) <b>(reject_unknown_helo_hostname)</b>';
 $lang['admin']['reject_unknown_reverse_client_hostname'] = 'Reject when the client IP address has no address -> name mapping (missing/invalid PTR check) <b>(reject_unknown_reverse_client_hostname)</b>';

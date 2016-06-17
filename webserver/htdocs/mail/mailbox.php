@@ -106,11 +106,11 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<?php
 							if ($_SESSION['mailcow_cc_role'] == "admin"):
 							?>
-								<td><a href="/delete.php?domain=<?=$row['domain'];?>"><?=$lang['mailbox']['remove'];?></a> | <a href="/edit.php?domain=<?=$row['domain'];?>"><?=$lang['mailbox']['edit'];?></a></td>
+								<td><a href="/delete.php?domain=<?=urlencode($row['domain']);?>"><?=$lang['mailbox']['remove'];?></a> | <a href="/edit.php?domain=<?=urlencode($row['domain']);?>"><?=$lang['mailbox']['edit'];?></a></td>
 							<?php
 							else:
 							?>
-								<td><a href="/edit.php?domain=<?=$row['domain'];?>"><?=$lang['mailbox']['view'];?></a></td>
+								<td><a href="/edit.php?domain=<?=urlencode($row['domain']);?>"><?=$lang['mailbox']['view'];?></a></td>
 							<?php
 							endif;
 							endwhile;
@@ -265,8 +265,8 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							</td>
 							<td><?=$row['messages'];?></td>
 							<td><?=$row['active'];?></td>
-							<td><a href="/delete.php?mailbox=<?=$row['username'];?>"><?=$lang['mailbox']['remove'];?></a> | 
-							<a href="/edit.php?mailbox=<?=$row['username'];?>"><?=$lang['mailbox']['edit'];?></a></td>
+							<td><a href="/delete.php?mailbox=<?=urlencode($row['username']);?>"><?=$lang['mailbox']['remove'];?></a> | 
+							<a href="/edit.php?mailbox=<?=urlencode($row['username']);?>"><?=$lang['mailbox']['edit'];?></a></td>
 						</tr>
 						<?php
 						endwhile;
@@ -347,8 +347,8 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<td><?=$row['domain'];?></td>
 							<td><?=$row['active'];?></td>
 							<td>
-								<a href="/delete.php?alias=<?=$row['address'];?>"><?=$lang['mailbox']['remove'];?></a> 
-								| <a href="/edit.php?alias=<?=$row['address'];?>"><?=$lang['mailbox']['edit'];?></a>
+								<a href="/delete.php?alias=<?=urlencode($row['address']);?>"><?=$lang['mailbox']['remove'];?></a> 
+								| <a href="/edit.php?alias=<?=urlencode($row['address']);?>"><?=$lang['mailbox']['edit'];?></a>
 							</td>
 						</tr>
 					<?php

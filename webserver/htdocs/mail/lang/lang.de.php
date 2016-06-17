@@ -284,7 +284,7 @@ $lang['login']['confirm'] = "Bestätigen";
 $lang['login']['otp'] = "Einmalpasswort";
 $lang['login']['trash_login'] = "Login verwerfen";
 
-$lang['admin']['rr'] = 'Postifx Recipient restrictions';
+$lang['admin']['rr'] = 'Postifx Recipient Restrictions';
 $lang['admin']['reject_invalid_helo_hostname'] = 'Ungültige HELO Hostnamen ablehnen <b>(reject_invalid_helo_hostname)</b>';
 $lang['admin']['reject_unknown_helo_hostname'] = 'Unbekannte HELO Hostnamen ablehnen (fehlende MX- oder A-Records) <b>(reject_unknown_helo_hostname)</b>';
 $lang['admin']['reject_unknown_reverse_client_hostname'] = 'Ablehnen, wenn Reverse-DNS Eintrag fehlt oder falsch ist <b>(reject_unknown_reverse_client_hostname)</b>';
