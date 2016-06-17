@@ -2,6 +2,8 @@
 require_once("inc/header.inc.php");
 $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user') {
+	$username = $_SESSION['mailcow_cc_username'];
+	$get_tls_policy = get_tls_policy($link, $_SESSION['mailcow_cc_username']);
 ?>
 <div class="container">
 <h3><?=$lang['user']['mailbox_settings'];?></h3>

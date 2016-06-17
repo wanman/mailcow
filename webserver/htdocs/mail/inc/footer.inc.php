@@ -7,6 +7,9 @@
 <script>
 $(document).ready(function() {
 	$('select').selectpicker();
+	$.fn.bootstrapSwitch.defaults.onColor = 'success';
+	$("[name='tls_out']").bootstrapSwitch();
+	$("[name='tls_in']").bootstrapSwitch();
 	var rowCountDomainAlias = $('#domainaliastable >tbody >tr').length;
 	var rowCountDomain = $('#domaintable >tbody >tr').length;
 	var rowCountMailbox = $('#mailboxtable >tbody >tr').length;
@@ -66,7 +69,7 @@ $(document).ready(function() {
 		}
 	});
 	<?php
-	if (isset($username)):
+	if (isset($_SESSION['mailcow_cc_role'])):
 	?>
 	$("#score").slider({ id: "slider1", min: 1, max: 30, step: 0.5, range: true, value: [<?=get_spam_score($link, $username);?>] });
 

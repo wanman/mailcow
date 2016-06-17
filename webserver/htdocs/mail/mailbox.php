@@ -266,7 +266,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<td><?=$row['messages'];?></td>
 							<td><?=$row['active'];?></td>
 							<td><a href="/delete.php?mailbox=<?=$row['username'];?>"><?=$lang['mailbox']['remove'];?></a> | 
-							<a href="/edit?mailbox=<?=$row['username'];?>"><?=$lang['mailbox']['edit'];?></a></td>
+							<a href="/edit.php?mailbox=<?=$row['username'];?>"><?=$lang['mailbox']['edit'];?></a></td>
 						</tr>
 						<?php
 						endwhile;

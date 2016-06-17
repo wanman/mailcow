@@ -1,7 +1,7 @@
 <?php
 function sha512c($password) {
 	$password = escapeshellarg($password);
-	exec('/usr/bin/doveadm pw -s SHA512-CRYPT -p '.$prep_password, $hash, $return);
+	exec('/usr/bin/doveadm pw -s SHA512-CRYPT -p '.$password, $hash, $return);
 	if ($return != "0") {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1466,15 +1466,15 @@ function set_time_limited_aliases($link, $postarray) {
 				);
 				return false;
 			}
-			$random_names = file("/var/mailcow/random_names.txt"); 
-			$random_names_line = trim($random_names[rand(0, count($random_names) - 1)]);
+			$letters = 'abcefghijklmnopqrstuvwxyz1234567890';
+			$random_name = substr(str_shuffle($letters), 0, 16);
 			$SelectArray = array(
 				"SELECT `username` FROM `mailbox`
-					WHERE `username`='".$random_names_line.$domain."'",
+					WHERE `username`='".$random_name.$domain."'",
 				"SELECT `address` FROM `spamalias`
-					WHERE `address`='".$random_names_line.$domain."'",
+					WHERE `address`='".$random_name.$domain."'",
 				"SELECT `address` FROM `alias`
-					WHERE `address`='".$random_names_line.$domain."'",
+					WHERE `address`='".$random_name.$domain."'",
 			);
 			foreach ($SelectArray as $SelectQuery) {
 				$SelectCount = mysqli_query($link, $SelectQuery)
@@ -1504,7 +1504,7 @@ function set_time_limited_aliases($link, $postarray) {
 			}
 			$InsertSpamalias = "INSERT INTO `spamalias`
 				(`address`, `goto`, `validity`) VALUES
-					('".$random_names_line.$domain."', '".$username."', DATE_ADD(NOW(), INTERVAL ".$postarray["validity"]." HOUR));";
+					('".$random_name.$domain."', '".$username."', DATE_ADD(NOW(), INTERVAL ".$postarray["validity"]." HOUR));";
 			if (!mysqli_query($link, $InsertSpamalias)) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -1802,6 +1802,21 @@ function set_whitelist($link, $postarray) {
 		);
 		return false;
 	}
+
+	$SelectQuery = "SELECT `username` FROM `userpref`
+			WHERE `preference`='whitelist_from'
+				AND `username`='".$username."'
+				AND `value`='".$whitelist_from."'";
+	$SelectCount = mysqli_query($link, $SelectQuery)
+		OR die(mysqli_error($link));
+	if (mysqli_num_rows($SelectCount) != 0) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => sprintf($lang['danger']['whitelist_exists'])
+		);
+		return false;
+	}
+
 	$insertWhitelist = "INSERT INTO `userpref` (`username`, `preference` ,`value`)
 			VALUES ('".$username."', 'whitelist_from', '".$whitelist_from."')";
 	if (!mysqli_query($link, $insertWhitelist)) {
@@ -1867,6 +1882,21 @@ function set_blacklist($link, $postarray) {
 		);
 		return false;
 	}
+
+	$SelectQuery = "SELECT `username` FROM `userpref`
+			WHERE `preference`='blacklist_from'
+				AND `username`='".$username."'
+				AND `value`='".$blacklist_from."'";
+	$SelectCount = mysqli_query($link, $SelectQuery)
+		OR die(mysqli_error($link));
+	if (mysqli_num_rows($SelectCount) != 0) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => sprintf($lang['danger']['blacklist_exists'])
+		);
+		return false;
+	}
+
 	$insertBlacklist = "INSERT INTO `userpref` (`username`, `preference` ,`value`)
 			VALUES ('".$username."', 'blacklist_from', '".$blacklist_from."')";
 	if (!mysqli_query($link, $insertBlacklist)) {

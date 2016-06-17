@@ -21,7 +21,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			?>
 				<div class="alert alert-warning" role="alert"><?=$lang['delete']['remove_domain_warning'];?></div>
 				<p><?=$lang['delete']['remove_domain_details'];?></p>
-				<form class="form-horizontal" role="form" method="post" action="/manager">
+				<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
 				<input type="hidden" name="domain" value="<?php echo $domain ?>">
 					<div class="form-group">
 						<div class="col-sm-offset-1 col-sm-10">
@@ -40,7 +40,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				?>
 					<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_alias_warning'], $_GET["alias"]);?></div>
 					<p><?=$lang['delete']['remove_alias_details'];?></p>
-					<form class="form-horizontal" role="form" method="post" action="/manager">
+					<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
 					<input type="hidden" name="address" value="<?php echo $_GET["alias"] ?>">
 						<div class="form-group">
 							<div class="col-sm-offset-1 col-sm-10">
@@ -65,7 +65,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				if (hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $alias_domain)) {
 				?>
 					<div class="alert alert-warning" role="alert"><?=$lang['delete']['remove_domainalias_warning'];?></div>
-					<form class="form-horizontal" role="form" method="post" action="/manager">
+					<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
 					<input type="hidden" name="alias_domain" value="<?php echo $alias_domain ?>">
 						<div class="form-group">
 							<div class="col-sm-offset-1 col-sm-10">
@@ -109,7 +109,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				?>
 					<div class="alert alert-warning" role="alert"><?=$lang['delete']['remove_mailbox_warning'];?></div>
 					<p><?=$lang['delete']['remove_mailbox_details'];?></p>
-					<form class="form-horizontal" role="form" method="post" action="/manager">
+					<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
 					<input type="hidden" name="username" value="<?=$mailbox;?>">
 						<div class="form-group">
 							<div class="col-sm-offset-1 col-sm-10">
