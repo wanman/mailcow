@@ -15,9 +15,14 @@ function hasDomainAccess($link, $username, $role, $domain) {
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL) && !ctype_alnum(str_replace(array('_', '.', '-'), '', $username))) {
 		return false;
 	}
+
 	if (!is_valid_domain_name($domain)) {
 		return false;
 	}
+
+	$username	= mysqli_real_escape_string($link, $username);
+	$domain		= mysqli_real_escape_string($link, $domain);
+
 	$qstring = "SELECT `domain` FROM `domain_admins`
 		WHERE (
 			`active`='1'
@@ -455,6 +460,8 @@ function mailbox_add_alias($link, $postarray) {
 			return false;
 		}
 
+		$address = mysqli_real_escape_string($link, $address);
+
 		$qstring = "SELECT `address` FROM `alias`
 			WHERE `address`='".$address."'";
 		$qresult = mysqli_query($link, $qstring);
@@ -502,6 +509,7 @@ function mailbox_add_alias($link, $postarray) {
 				);
 				return false;
 			}
+			$goto = mysqli_real_escape_string($link, $goto);
 		}
 		$gotos = array_filter($gotos);
 		$goto = implode(",", $gotos);
@@ -530,8 +538,6 @@ function mailbox_add_alias($link, $postarray) {
 }
 function mailbox_add_alias_domain($link, $postarray) {
 	global $lang;
-	$alias_domain	= mysqli_real_escape_string($link, strtolower(trim($postarray['alias_domain'])));
-	$target_domain	= mysqli_real_escape_string($link, strtolower(trim($postarray['target_domain'])));
 	isset($postarray['active']) ? $active = '1' : $active = '0';
 
 	if (!is_valid_domain_name($alias_domain)) {
@@ -567,7 +573,10 @@ function mailbox_add_alias_domain($link, $postarray) {
 		);
 		return false;
 	}
-	
+
+	$alias_domain	= mysqli_real_escape_string($link, strtolower(trim($postarray['alias_domain'])));
+	$target_domain	= mysqli_real_escape_string($link, strtolower(trim($postarray['target_domain'])));
+
 	$qstring = "SELECT `domain` FROM `domain`
 		WHERE `domain`='".$target_domain."'";
 	$qresult = mysqli_query($link, $qstring);
@@ -620,10 +629,26 @@ function mailbox_add_alias_domain($link, $postarray) {
 }
 function mailbox_add_mailbox($link, $postarray) {
 	global $lang;
+	$username		= strtolower(trim($postarray['local_part'])).'@'.strtolower(trim($postarray['domain']));
+	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => sprintf($lang['danger']['mailbox_invalid'])
+		);
+		return false;
+	}
+	if (empty($local_part)) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => sprintf($lang['danger']['mailbox_invalid'])
+		);
+		return false;
+	}
+	$domain			= mysqli_real_escape_string($link, strtolower(trim($postarray['domain'])));
 	$password		= mysqli_real_escape_string($link, $postarray['password']);
 	$password2		= mysqli_real_escape_string($link, $postarray['password2']);
-	$domain			= mysqli_real_escape_string($link, strtolower(trim($postarray['domain'])));
 	$local_part		= mysqli_real_escape_string($link, strtolower(trim($postarray['local_part'])));
+	$username		= mysqli_real_escape_string($link, $username);
 	$name			= mysqli_real_escape_string($link, $postarray['name']);
 	$quota_m		= mysqli_real_escape_string($link, $postarray['quota']);
 
@@ -695,14 +720,6 @@ function mailbox_add_mailbox($link, $postarray) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['is_spam_alias'], htmlspecialchars($username))
-		);
-		return false;
-	}
-
-	if (!filter_var($username, FILTER_VALIDATE_EMAIL) || empty ($local_part)) {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => sprintf($lang['danger']['mailbox_invalid'])
 		);
 		return false;
 	}
