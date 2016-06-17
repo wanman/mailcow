@@ -1060,6 +1060,13 @@ function mailbox_edit_domainadmin($link, $postarray) {
 function mailbox_edit_mailbox($link, $postarray) {
 	global $lang;
 	isset($postarray['active']) ? $active = '1' : $active = '0';
+	if (!filter_var($postarray['username'], FILTER_VALIDATE_EMAIL)) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => sprintf($lang['danger']['username_invalid'])
+		);
+		return false;
+	}
 	$quota_m		= mysqli_real_escape_string($link, $postarray['quota']);
 	$quota_b		= $quota_m*1048576;
 	$username		= mysqli_real_escape_string($link, $postarray['username']);
@@ -1782,7 +1789,7 @@ function get_spam_score($link, $username) {
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		return $default;
 	}
-	$username		= mysqli_real_escape_string($link, $username);
+	$username = mysqli_real_escape_string($link, $username);
 	$SelectQuery = "SELECT * FROM `userpref`, `fugluconfig`
 		WHERE `username`='".$username."'
 		AND `scope`='".$username."'";
@@ -1806,7 +1813,6 @@ function get_spam_score($link, $username) {
 }
 function set_whitelist($link, $postarray) {
 	global $lang;
-	$whitelist_from	= mysqli_real_escape_string($link, $postarray['whitelist_from']);
 	$username	= $_SESSION['mailcow_cc_username'];
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
@@ -1815,7 +1821,8 @@ function set_whitelist($link, $postarray) {
 		);
 		return false;
 	}
-	$username = mysqli_real_escape_string($link, $username);
+	$username		= mysqli_real_escape_string($link, $username);
+	$whitelist_from	= mysqli_real_escape_string($link, $postarray['whitelist_from']);
 	if (!ctype_alnum(str_replace(array('@', '.', '-', '*'), '', $whitelist_from))) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
