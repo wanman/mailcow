@@ -540,7 +540,7 @@ function mailbox_add_alias_domain($link, $postarray) {
 	global $lang;
 	isset($postarray['active']) ? $active = '1' : $active = '0';
 
-	if (!is_valid_domain_name($alias_domain)) {
+	if (!is_valid_domain_name($postarray['alias_domain'])) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['alias_domain_invalid'])
@@ -548,7 +548,7 @@ function mailbox_add_alias_domain($link, $postarray) {
 		return false;
 	}
 
-	if (!is_valid_domain_name($target_domain)) {
+	if (!is_valid_domain_name($postarray['target_domain'])) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['target_domain_invalid'])
@@ -556,7 +556,7 @@ function mailbox_add_alias_domain($link, $postarray) {
 		return false;
 	}
 
-	foreach (array($alias_domain, $target_domain) as $domain) {
+	foreach (array($postarray['alias_domain'], $postarray['target_domain']) as $domain) {
 		if (!hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -566,7 +566,7 @@ function mailbox_add_alias_domain($link, $postarray) {
 		}
 	}
 
-	if ($alias_domain == $target_domain) {
+	if ($postarray['alias_domain'] == $postarray['target_domain']) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['aliasd_targetd_identical'])
@@ -1652,6 +1652,13 @@ function add_domain_admin($link, $postarray) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['access_denied'])
+		);
+		return false;
+	}
+	if (empty($postarray['domain'])) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => sprintf($lang['danger']['domain_invalid'])
 		);
 		return false;
 	}
