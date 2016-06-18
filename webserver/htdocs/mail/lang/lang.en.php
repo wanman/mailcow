@@ -52,6 +52,7 @@ $lang['danger']['password_mismatch'] = "Confirmation password is not identical";
 $lang['danger']['password_complexity'] = "Password does not meet requirements";
 $lang['danger']['password_empty'] = "Password must not be empty";
 $lang['danger']['mailbox_invalid'] = "Mailbox name is invalid";
+$lang['danger']['mailbox_invalid_suggest'] = 'Mailbox name is invalid, did you mean to type "%s"?';
 $lang['info']['fetchmail_planned'] = "Task to fetch emails has been planned. Please check the process at a later time.";
 $lang['danger']['fetchmail_source_empty'] = "Please define a source folder";
 $lang['danger']['fetchmail_dest_empty'] = "Please define a target folder";

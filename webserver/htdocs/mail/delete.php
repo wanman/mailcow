@@ -89,7 +89,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				$domain_admin = mysqli_real_escape_string($link, $_GET["domainadmin"]);
 				?>
 				<div class="alert alert-warning" role="alert"><?=$lang['delete']['remove_domainadmin_warning'];?></div>
-				<form class="form-horizontal" role="form" method="post">
+				<form class="form-horizontal" role="form" method="post" action="/admin.php">
 				<input type="hidden" name="username" value="<?=$domain_admin;?>">
 					<div class="form-group">
 						<div class="col-sm-offset-1 col-sm-10">

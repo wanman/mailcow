@@ -663,7 +663,6 @@ function mailbox_add_mailbox($link, $postarray) {
 
 	$quota_b		= ($quota_m * 1048576);
 	$maildir		= $domain."/".$local_part."/";
-	$username		= $local_part.'@'.$domain;
 
 	if (!is_valid_domain_name($domain)) {
 		$_SESSION['return'] = array(
@@ -766,14 +765,6 @@ function mailbox_add_mailbox($link, $postarray) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['domain_not_found'])
-		);
-		return false;
-	}
-
-	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => sprintf($lang['danger']['mailbox_invalid'])
 		);
 		return false;
 	}
@@ -1103,13 +1094,6 @@ function mailbox_edit_mailbox($link, $postarray) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['quota_not_0_not_numeric'], htmlspecialchars($quota_m))
-		);
-		return false;
-	}
-	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => sprintf($lang['danger']['username_invalid'])
 		);
 		return false;
 	}

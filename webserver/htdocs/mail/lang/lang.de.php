@@ -51,6 +51,7 @@ $lang['danger']['password_mismatch'] = "Passwort-Wiederholung stimmt nicht über
 $lang['danger']['password_complexity'] = "Passwort entspricht nicht den Vorgaben";
 $lang['danger']['password_empty'] = "Passwort darf nicht leer sein";
 $lang['danger']['mailbox_invalid'] = "Mailboxname ist ungültig";
+$lang['danger']['mailbox_invalid_suggest'] = 'Mailboxname ist ungültig, meinten Sie vielleicht "%s"?';
 $lang['info']['fetchmail_planned'] = "Aufgabe zur Mailabholung wurde geplant. Bitte prüfen Sie den Vorgangsstatus zu einem späteren Zeitpunkt noch einmal.";
 $lang['danger']['fetchmail_source_empty'] = "Bitte geben Sie einen Quell-Ordner an";
 $lang['danger']['fetchmail_dest_empty'] = "Bitte geben Sie einen Ziel-Ordner an";

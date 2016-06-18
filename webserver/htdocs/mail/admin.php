@@ -372,7 +372,7 @@ $srr_values = return_mailcow_config("srr");
 		</div>
 		<legend>Postqueue</legend>
 			<pre><?php echo sys_info("mailq");?></pre>
-		<legend>Pflogsumm</legend>
+		<legend>Pflogsumm <code>/var/log/mail.log</code></legend>
 			<textarea rows="20" style="font-family:monospace;font-size:9pt;width:100%;"><?php echo sys_info("pflog");?></textarea>
 			<p><span class="glyphicon glyphicon-time" aria-hidden="true"></span> <?=round(abs(date('U') - filemtime($PFLOG)) / 60,0). " min.";?></p>
 			<form method="post">
