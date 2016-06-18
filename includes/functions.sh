@@ -687,7 +687,9 @@ A backup will be stored in ./before_upgrade_${timestamp}
 	cp -R /var/www/mail/ before_upgrade_${timestamp}/mail_wwwroot
 	mysqldump -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} > backup_mailcow_db.sql 2>/dev/null
 	mysqldump -u ${my_rcuser} -p${my_rcpass} ${my_rcdb} > backup_roundcube_db.sql 2>/dev/null
-	cp -R /etc/{postfix,dovecot,spamassassin,${httpd_platform},fuglu,mysql,${PHP},clamav} before_upgrade_${timestamp}/ 
+	for dir in "postfix" "dovecot" "spamassassin" "${httpd_platform}" "fuglu" "mysql" "${PHP}" "clamav"; do
+		[[ -d "${dir}" ]] && cp -R "/etc/${dir}/" "before_upgrade_${timestamp}/"
+	done
 	echo -e "$(greenb "[OK]")"
 	echo -en "\nStopping services, this may take a few seconds... \t\t"
 	if [[ ${httpd_platform} == "nginx" ]]; then
