@@ -123,6 +123,10 @@ checkconfig() {
 		echo "$(redb [ERR]) - Unable to install Apache 2.4, please use Nginx or upgrade your distribution"
 		exit 1
 	fi
+	if [[ ${mailing_platform} != "sogo" && ${mailing_platform} != "roundcube" ]]; then
+		echo "$(redb [ERR]) - \"mailing_platform\" is neither sogo nor roundcube"
+		exit 1
+	fi
 	for var in sys_hostname sys_domain sys_timezone my_dbhost my_mailcowdb my_mailcowuser my_mailcowpass my_rootpw my_rcuser my_rcpass my_rcdb mailcow_admin_user mailcow_admin_pass
 	do
 		if [[ -z ${!var} ]]; then

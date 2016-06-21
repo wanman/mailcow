@@ -16,9 +16,9 @@ mailcow
 
 mailcow is a mail server suite based on Dovecot, Postfix and other open source software, that provides a modern web UI for user/server administration.
 
-mailcow supports **Debian stable (8.x)**
+mailcow supports **Debian 8 Jessie, Ubuntu LTS 14.04 Trusty and Ubuntu LTS 16.04 Xenial**
 
-**Please see this album on imgur.com for screenshots -> http://imgur.com/a/elHnA**
+Screenshots placeholder.
 
 # Introduction
 
@@ -29,7 +29,7 @@ mailcow supports **Debian stable (8.x)**
 * SQL database backend, remote database support
     * MySQL or MariaDB
 * **mailcow web UI**
-    * Add domains, mailboxes, aliases, set limits, monitor mail statistics, change mail server settings, create/delete DKIM records and more...
+    * Add domains, mailboxes, aliases, set limits, enforce TLS outgoing and incoming, monitor mail statistics, change mail server settings, create/delete DKIM records and more...
 * Postscreen activated and configured
 * STARTTLS and SMTPS support
 * The default restrictions used are a good compromise between blocking spam and avoiding false-positives
@@ -37,12 +37,17 @@ mailcow supports **Debian stable (8.x)**
 * Sieve/ManageSieve (default filter: move spam to "Junk" folder, move tagged mail to folder "tag")
 * Public folder support via control center
 * per-user ACL
-* Shared Namespace (per-user seen-flag)
+* Shared Namespace
 * Quotas
+
+Comes with...
 * Roundcube
     * ManageSieve support (w/ vacation)
     * Attachment reminder (multiple locales)
     * Zip-download marked messages
+or
+* SOGo
+    * Full groupware with ActiveSync and Card-/CalDAV support
 
 # Before You Begin
 - **Please remove any web- and mail services** running on your server. I recommend using a clean Debian minimal installation.
@@ -87,6 +92,7 @@ nano mailcow.config
 * **sys_domain** - Domain name. "$sys_hostname.$sys_domain" equals to FQDN.
 * **sys_timezone** - The timezone must be defined in a valid format (Europe/Berlin, America/New_York etc.)
 * **httpd_platform** - Select wether to use Nginx ("nginx") or Apache2 ("apache2"). Nginx is default.
+* **mailing_platform** - Can be "sogo" or "roundcube"
 * **my_dbhost** - ADVANCED: Leave as-is ("localhost") for a local database installation. Anything but "localhost" or "127.0.0.1" is recognized as a remote installation.
 * **my_usemariadb** - Use MariaDB instead of MySQL. Only valid for local databases. Installer stops when MariaDB is detected, but MySQL selected - and vice versa.
 * **my_mailcowdb, my_mailcowuser, my_mailcowpass** - SQL database name, username and password for use with Postfix. **You can use the default values.**

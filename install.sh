@@ -52,8 +52,11 @@ echo "    $(textb "Hostname")            ${sys_hostname}
     $(textb "Domain")              ${sys_domain}
     $(textb "FQDN")                ${sys_hostname}.${sys_domain}
     $(textb "Timezone")            ${sys_timezone}
-    $(textb "mailcow MySQL")       ${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}/${my_mailcowdb}
-    $(textb "Roundcube MySQL")     ${my_rcuser}:${my_rcpass}@${my_dbhost}/${my_rcdb}
+    $(textb "mailcow MySQL")       ${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}/${my_mailcowdb}"
+if [[ ${mailing_platform} == "roundcube" ]]; then
+	echo "    $(textb "Roundcube MySQL")     ${my_rcuser}:${my_rcpass}@${my_dbhost}/${my_rcdb}"
+fi
+echo "    $(textb "Roundcube MySQL")     ${my_rcuser}:${my_rcpass}@${my_dbhost}/${my_rcdb}
     $(textb "mailcow admin user")  ${mailcow_admin_user}
 "
 
@@ -65,10 +68,12 @@ echo MySQL mailcow database: ${my_mailcowdb} >> installer.log
 echo MySQL mailcow username: ${my_mailcowuser} >> installer.log
 echo MySQL mailcow password: ${my_mailcowpass} >> installer.log
 echo --------------------------------- >> installer.log
-echo MySQL Roundcube database: ${my_rcdb} >> installer.log
-echo MySQL Roundcube username: ${my_rcuser} >> installer.log
-echo MySQL Roundcube password: ${my_rcpass} >> installer.log
-echo --------------------------------- >> installer.log
+if [[ ${mailing_platform} == "roundcube" ]]; then
+	echo MySQL Roundcube database: ${my_rcdb} >> installer.log
+	echo MySQL Roundcube username: ${my_rcuser} >> installer.log
+	echo MySQL Roundcube password: ${my_rcpass} >> installer.log
+	echo --------------------------------- >> installer.log
+fi
 echo Only set when MySQL was not available >> installer.log
 echo MySQL root password: ${my_rootpw} >> installer.log
 echo --------------------------------- >> installer.log
