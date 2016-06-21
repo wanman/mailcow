@@ -641,7 +641,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install sogo sogo-activesy
 			defaults write sogod SOGoMailDomain '${sys_domain}';
 			defaults write sogod SOGoAppointmentSendEMailNotifications YES;
 			defaults write sogod SOGoSieveScriptsEnabled YES;
-			defaults write sogod SOGoSieveServer 'sieve://${sys_hostname}.${sys_domain}:4190/?tls=YES';
+			defaults write sogod SOGoSieveServer 'sieve://127.0.0.1:4190';
 			defaults write sogod SOGoVacationEnabled YES;
 			defaults write sogod SOGoDraftsFolderName Drafts;
 			defaults write sogod SOGoSentFolderName Sent;
