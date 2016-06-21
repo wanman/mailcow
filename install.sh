@@ -113,8 +113,13 @@ installtask spamassassin
 returnwait "Webserver configuration"
 installtask webserver
 
-returnwait "Roundcube configuration"
-installtask roundcube
+if [[ ${mailing_platform} == "roundcube" ]]; then
+	returnwait "Roundcube configuration"
+	installtask roundcube
+else
+	returnwait "SOGo configuration"
+	installtask sogo
+fi
 
 returnwait "OpenDKIM configuration"
 installtask opendkim

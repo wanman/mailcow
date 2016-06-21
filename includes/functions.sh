@@ -619,7 +619,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 					apt-get -y update >/dev/null
 				fi
 			fi
-			echo "$(textb [INFO]) - SOGo packages unattended, please stand by, errors will be reported."
+			echo "$(textb [INFO]) - Installing SOGo packages unattended, please stand by, errors will be reported."
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install sogo sogo-activesync libwbxml2-0 memcached
 			sudo -u sogo bash -c "
 			defaults write sogod SOGoUserSources '({type = sql;id = directory;viewURL = mysql://${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}:3306/${my_mailcowdb}/sogo_view;canAuthenticate = YES;isAddressBook = YES;displayName = \"Global Address Book\";userPasswordAlgorithm = ssha256;})'
