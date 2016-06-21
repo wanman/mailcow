@@ -57,7 +57,19 @@ elseif (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "
 						endif;
 						?>
 					<legend>mailcow Apps</legend>
+					<?php
+					$mailcow_version = file_get_contents("/etc/mailcow_version");
+					if (preg_match('/sogo/i',$mailcow_version)) {
+					?>
+					<a href="/SOGo/" role="button" class="btn btn-lg btn-default"><?=$lang['start']['start_sogo'];?></a>
+					<?php
+					}
+					else {
+					?>
 					<a href="/rc/" role="button" class="btn btn-lg btn-default"><?=$lang['start']['start_rc'];?></a>
+					<?php
+					}
+					?>
 				</div>
 			</div>
 		</div>
