@@ -596,9 +596,31 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			rm -rf /var/www/mail/rc/installer/
 			;;
                 sogo)
-                        if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "SHOW TABLES LIKE 'sogo_view'" -N -B) ]]; then
+			if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "SHOW TABLES LIKE 'sogo_view'" -N -B) ]]; then
 				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "CREATE VIEW sogo_view (c_uid, c_name, c_password, c_cn, mail, home) AS SELECT username, username, password, CONVERT(name USING latin1), username, CONCAT('/var/vmail/', maildir) FROM mailbox WHERE active=1;" -N -B
-                        fi
+			fi
+			if [[ $dist_id == "Debian" ]]; then
+				if [[ $dist_codename == "jessie" ]]; then
+					echo "$(textb [INFO]) - Adding official SOGo repository..."
+					echo "deb http://inverse.ca/debian-v3 jessie jessie" > /etc/apt/sources.list.d/sogo.list
+					apt-key adv --keyserver keys.gnupg.net --recv-key 0x810273C4 > /dev/null 2>&1
+					apt-get -y update >/dev/null
+				fi
+			elif [[ $dist_id == "Ubuntu" ]]; then
+				if [[ $dist_codename == "trusty" ]]; then
+					echo "$(textb [INFO]) - Adding official SOGo repository..."
+					echo "deb http://inverse.ca/ubuntu-v3 trusty trusty" > /etc/apt/sources.list.d/sogo.list
+					apt-key adv --keyserver keys.gnupg.net --recv-key 0x810273C4 > /dev/null 2>&1
+					apt-get -y update >/dev/null
+				elif [[ $dist_codename == "xenial" ]]; then
+					echo "$(textb [INFO]) - Adding official SOGo repository..."
+					echo "deb http://inverse.ca/ubuntu-v3 xenial xenial" > /etc/apt/sources.list.d/sogo.list
+					apt-key adv --keyserver keys.gnupg.net --recv-key 0x810273C4 > /dev/null 2>&1
+					apt-get -y update >/dev/null
+				fi
+			fi
+			echo "$(textb [INFO]) - SOGo packages unattended, please stand by, errors will be reported."
+DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install sogo sogo-activesync libwbxml2-0 memcached
 			sudo -u sogo bash -c "
 			defaults write sogod SOGoUserSources '({type = sql;id = directory;viewURL = mysql://${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}:3306/${my_mailcowdb}/sogo_view;canAuthenticate = YES;isAddressBook = YES;displayName = \"Global Address Book\";userPasswordAlgorithm = ssha256;})'
 			defaults write sogod SOGoProfileURL 'mysql://${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}:3306/${my_mailcowdb}/sogo_user_profile'
@@ -652,10 +674,11 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			fi
 			for var in ${JETTY_NAME} ${httpd_platform} ${FPM} spamassassin fuglu dovecot postfix opendkim clamav-daemon mailgraph
 			do
-				service $var stop
+				service ${var} stop
 				sleep 1.5
-				service $var start
+				service ${var} start
 			done
+			[[ ${mailing_platform} == "sogo" ]] && service sogo restart
 			;;
 	esac
 }
@@ -766,6 +789,7 @@ A backup will be stored in ./before_upgrade_${timestamp}
 	do
 		service ${var} stop > /dev/null 2>&1
 	done
+	[[ ${mailing_platform} == "sogo" ]] && service sogo stop
 	echo -e "$(greenb "[OK]")"
 	if [[ ! -z $(openssl x509 -issuer -in /etc/ssl/mail/mail.crt | grep ${sys_hostname}.${sys_domain}) ]]; then
 		echo "$(textb [INFO]) - Update CA certificate store, self-signed only..."

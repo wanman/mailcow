@@ -164,7 +164,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="local_part"><?=$lang['add']['mailbox_username'];?></label>
 						<div class="col-sm-10">
-							<input type="text" autocorrect="off" autocapitalize="none" pattern="[a-zA-Z0-9.- ]+" class="form-control" name="local_part" id="local_part" required>
+							<input type="text" autocorrect="off" autocapitalize="none" class="form-control" name="local_part" id="local_part" required>
 						</div>
 					</div>
 					<div class="form-group">
