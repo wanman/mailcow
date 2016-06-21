@@ -156,7 +156,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 <h4><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> <?=$lang['admin']['configuration'];?></h4>
 <div class="panel-group" id="accordion_config">
 <div class="panel panel-default">
-<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseSrr"><a style="cursor:pointer;" class="accordion-toggle">Postfix Restrictions</a></div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseSrr"><span style="cursor:pointer;" class="accordion-toggle">Postfix Restrictions</span></div>
 <div id="collapseSrr" class="panel-collapse collapse">
 <div class="panel-body">
 <?php
@@ -218,7 +218,7 @@ $srr_values = return_mailcow_config("srr");
 
 
 <div class="panel panel-default">
-<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapsePubFolders"><a style="cursor:pointer;" class="accordion-toggle"><?=$lang['admin']['public_folders'];?></a></div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapsePubFolders"><span style="cursor:pointer;" class="accordion-toggle"><?=$lang['admin']['public_folders'];?></span></div>
 <div id="collapsePubFolders" class="panel-collapse collapse">
 <div class="panel-body">
 <p><?=$lang['admin']['public_folders_text'];?></p>
@@ -257,7 +257,7 @@ $srr_values = return_mailcow_config("srr");
 </div>
 
 <div class="panel panel-default">
-<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapsePrivacy"><a style="cursor:pointer;" class="accordion-toggle"><?=$lang['admin']['privacy'];?></a></div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapsePrivacy"><span style="cursor:pointer;" class="accordion-toggle"><?=$lang['admin']['privacy'];?></span></div>
 <div id="collapsePrivacy" class="panel-collapse collapse">
 <div class="panel-body">
 <p><?=$lang['admin']['privacy_text'];?></p>
@@ -280,9 +280,7 @@ $srr_values = return_mailcow_config("srr");
 </div>
 
 <div class="panel panel-default">
-<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseDKIM">
-<a style="cursor:pointer;" class="accordion-toggle"><?=$lang['admin']['dkim_keys'];?></a>
-</div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseDKIM"><span style="cursor:pointer;" class="accordion-toggle"><?=$lang['admin']['dkim_keys'];?></span></div>
 <div id="collapseDKIM" class="panel-collapse collapse">
 <div class="panel-body">
 	<?php
@@ -327,7 +325,7 @@ $srr_values = return_mailcow_config("srr");
 </div>
 
 <div class="panel panel-default">
-<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseMsgSize"><a style="cursor:pointer;" class="accordion-toggle"><?=$lang['admin']['msg_size'];?></a></div>
+<div class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseMsgSize"><span style="cursor:pointer;" class="accordion-toggle"><?=$lang['admin']['msg_size'];?></span></div>
 <div id="collapseMsgSize" class="panel-collapse collapse">
 <div class="panel-body">
 <form class="form-inline" method="post">
