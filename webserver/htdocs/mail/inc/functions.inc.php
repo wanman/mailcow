@@ -1,27 +1,12 @@
 <?php
 function hash_password($password) {
-	$password = escapeshellarg($password);
+	$salt_str = bin2hex(openssl_random_pseudo_bytes(8));
 	if ($GLOBALS['HASHING'] == "SHA512-CRYPT") {
-		exec('/usr/bin/doveadm pw -s SHA512-CRYPT -p '.$password, $hash, $return);
-		if ($return != "0") {
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'Cannot create password hash'
-			);
-			return false;
-		}
+		return "{SHA512-CRYPT}".crypt($password, '$6$'.$salt_str.'$');
 	}
 	else {
-		exec('/usr/bin/doveadm pw -s SSHA256 -p '.$password, $hash, $return);
-		if ($return != "0") {
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'Cannot create password hash'
-			);
-			return false;
-		}
+		return "{SSHA256}".base64_encode(hash('sha256', $password.$salt_str, true).$salt_str);
 	}
-	return $hash[0];
 }
 function hasDomainAccess($link, $username, $role, $domain) {
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL) && !ctype_alnum(str_replace(array('_', '.', '-'), '', $username))) {
@@ -63,7 +48,7 @@ function check_login($link, $user, $pass) {
 		AND `username`='".$user."'");
 	while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
 		$row = "'".$row[0]."'";
-		exec("echo ".$pass." | doveadm pw -s ".$GLOBALS['HASHING']." -t ".$row, $out, $return);
+		exec('echo '.$pass.' | doveadm pw -s '.$GLOBALS['HASHING'].' -t '.$row, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
 			unset($_SESSION['ldelay']);
 			return "admin";
@@ -1464,8 +1449,6 @@ function set_admin_account($link, $postarray) {
 	}
 	$name			= mysqli_real_escape_string($link, $postarray['admin_user']);
 	$name_now		= mysqli_real_escape_string($link, $postarray['admin_user_now']);
-	$password		= mysqli_real_escape_string($link, $postarray['admin_pass']);
-	$password2		= mysqli_real_escape_string($link, $postarray['admin_pass2']);
 
 	if (!ctype_alnum(str_replace(array('_', '.', '-'), '', $name)) || empty ($name)) {
 		$_SESSION['return'] = array(
@@ -1481,15 +1464,16 @@ function set_admin_account($link, $postarray) {
 		);
 		return false;
 	}
-	if (!empty($password) && !empty($password2)) {
-		if ($password != $password2) {
+	if (!empty($postarray['admin_pass']) && !empty($postarray['admin_pass2'])) {
+		if ($postarray['admin_pass'] != $postarray['admin_pass2']) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
 				'msg' => sprintf($lang['danger']['password_mismatch'])
 			);
 			return false;
 		}
-		$password_hashed = hash_password($password);
+		$password_hashed = hash_password($postarray['admin_pass']);
+		$password_hashed = mysqli_real_escape_string($link, $password_hashed);
 		$UpdateAdmin = "UPDATE `admin` SET 
 			`modified`=NOW(),
 			`password`='".$password_hashed."',
@@ -1687,6 +1671,7 @@ function set_user_account($link, $postarray) {
 					return false;
 			}
 			$password_hashed = hash_password($password_new);
+			$password_hashed = mysqli_real_escape_string($link, $password_hashed);
 			$UpdateMailboxQuery = "UPDATE mailbox SET modified=NOW(), password='".$password_hashed."' WHERE username='".$username."';";
 			if (!mysqli_query($link, $UpdateMailboxQuery)) {
 				$_SESSION['return'] = array(
