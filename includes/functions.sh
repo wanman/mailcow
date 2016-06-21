@@ -532,12 +532,12 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				cp webserver/php5-fpm/conf/pool/mail.conf ${PHPCONF}/fpm/pool.d/mail.conf
 				cp webserver/php5-fpm/conf/php-fpm.conf ${PHPCONF}/fpm/php-fpm.conf
 				sed -i "/date.timezone/c\php_admin_value[date.timezone] = ${sys_timezone}" ${PHPCONF}/fpm/pool.d/mail.conf
-				ln -s /etc/nginx/sites-available/mailcow${site_config} /etc/nginx/sites-enabled/mailcow.conf 2>/dev/null
+				ln -s /etc/nginx/sites-available/mailcow.conf /etc/nginx/sites-enabled/mailcow.conf 2>/dev/null
 				[[ ! -z $(grep "server_names_hash_bucket_size" /etc/nginx/nginx.conf) ]] && \
 					sed -i "/server_names_hash_bucket_size/c\ \ \ \ \ \ \ \ server_names_hash_bucket_size 64;" /etc/nginx/nginx.conf || \
 					sed -i "/http {/a\ \ \ \ \ \ \ \ server_names_hash_bucket_size 64;" /etc/nginx/nginx.conf
-				sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN;/${sys_hostname}.${sys_domain};/g" /etc/nginx/sites-available/mailcow${site_config}
-				sed -i "s/MAILCOW_DOMAIN;/${sys_domain};/g" /etc/nginx/sites-available/mailcow${site_config}
+				sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN;/${sys_hostname}.${sys_domain};/g" /etc/nginx/sites-available/mailcow.conf
+				sed -i "s/MAILCOW_DOMAIN;/${sys_domain};/g" /etc/nginx/sites-available/mailcow.conf
 			elif [[ ${httpd_platform} == "apache2" ]]; then
 				rm /etc/apache2/sites-enabled/*mailcow* 2>/dev/null
 				cp webserver/apache2/conf/sites-available/mailcow${site_config} /etc/apache2/sites-available/mailcow.conf
