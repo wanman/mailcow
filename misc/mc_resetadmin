@@ -19,7 +19,7 @@ DBHOST=$(grep database_host /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
 DBNAME=$(grep database_name /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
 DBUSER=$(grep database_user /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
 DBPASS=$(grep database_pass /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
-PASS_SCHEME=$(grep PASS_SCHEME /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
+PASS_SCHEME=$(grep HASHING /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
 
 echo "---------------------------"
 echo "mailcow administrator reset"
