@@ -19,7 +19,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 
 			$domain = mysqli_real_escape_string($link, $_GET["domain"]);
 			?>
-				<div class="alert alert-warning" role="alert"><?=$lang['delete']['remove_domain_warning'];?></div>
+				<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_domain_warning'], htmlspecialchars($_GET["domain"]));?></div>
 				<p><?=$lang['delete']['remove_domain_details'];?></p>
 				<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
 				<input type="hidden" name="domain" value="<?php echo $domain ?>">
@@ -38,7 +38,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				$domain = substr(strrchr($_GET["alias"], "@"), 1);
 				if (hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
 				?>
-					<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_alias_warning'], $_GET["alias"]);?></div>
+					<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_alias_warning'], htmlspecialchars($_GET["alias"]));?></div>
 					<p><?=$lang['delete']['remove_alias_details'];?></p>
 					<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
 					<input type="hidden" name="address" value="<?php echo $_GET["alias"] ?>">
@@ -61,11 +61,14 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			isset($_GET["aliasdomain"]) &&
 			is_valid_domain_name($_GET["aliasdomain"]) && 
 			!empty($_GET["aliasdomain"])) {
-				$alias_domain = mysqli_real_escape_string($link, $_GET["aliasdomain"]);
-				if (hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $alias_domain)) {
+				$alias_domain = mysqli_real_escape_string($link, strtolower(trim($_GET["aliasdomain"])));
+				$DomainData = mysqli_fetch_assoc(mysqli_query($link,
+					"SELECT `target_domain` FROM `alias_domain`
+						WHERE `alias_domain`='".$alias_domain."'"));
+				if (hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $DomainData['target_domain'])) {
 				?>
-					<div class="alert alert-warning" role="alert"><?=$lang['delete']['remove_domainalias_warning'];?></div>
-					<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
+					<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_domainalias_warning'], htmlspecialchars($_GET["aliasdomain"]));?></div>
+					<form class="form-horizontal" role="form" method="post" action="/manager">
 					<input type="hidden" name="alias_domain" value="<?php echo $alias_domain ?>">
 						<div class="form-group">
 							<div class="col-sm-offset-1 col-sm-10">
@@ -88,7 +91,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			$_SESSION['mailcow_cc_role'] == "admin") {
 				$domain_admin = mysqli_real_escape_string($link, $_GET["domainadmin"]);
 				?>
-				<div class="alert alert-warning" role="alert"><?=$lang['delete']['remove_domainadmin_warning'];?></div>
+				<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_domainadmin_warning'], htmlspecialchars($_GET["domainadmin"]));?></div>
 				<form class="form-horizontal" role="form" method="post" action="/admin.php">
 				<input type="hidden" name="username" value="<?=$domain_admin;?>">
 					<div class="form-group">
@@ -107,7 +110,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				$domain = substr(strrchr($mailbox, "@"), 1);
 				if (hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
 				?>
-					<div class="alert alert-warning" role="alert"><?=$lang['delete']['remove_mailbox_warning'];?></div>
+					<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_mailbox_warning'], htmlspecialchars($_GET["mailbox"]));?></div>
 					<p><?=$lang['delete']['remove_mailbox_details'];?></p>
 					<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
 					<input type="hidden" name="username" value="<?=$mailbox;?>">

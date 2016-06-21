@@ -8,14 +8,17 @@ server {
 	root /var/www/mail;
 	return 301 https://$host$request_uri;
 }
+
 server {
 	listen 127.0.0.1:81;
+
 	location ~ \.cgi$ {
 		root /usr/lib/cgi-bin;
 		include /etc/nginx/fastcgi_params;
 		fastcgi_pass unix:/var/run/fcgiwrap.socket;
 	}
 }
+
 server {
 	listen 443;
 	listen [::]:443;
@@ -34,28 +37,35 @@ server {
 	root /var/www/mail;
 	index index.html index.htm index.php;
 	error_page 502 /redir.html;
+
 	location /redir.html {
 		return 301 /admin.php;
 	}
-	location ~ ^/(rc/logs|pfadmin/ADDITIONS)/ {
+
+	location ~ ^/(rc/logs)/ {
 		deny all;
 	}
+
 	location ~ /(\.ht) {
 		deny all;
 		return 404;
 	}
+
 	location = /favicon.ico {
 		log_not_found off;
 		access_log off;
 	}
+
 	location = /robots.txt {
 		allow all;
 		log_not_found off;
 		access_log off;
 	}
+
 	location / {
 		try_files $uri $uri/ index.php;
 	}
+
 	location ~ \.php$ {
 		include fastcgi_params;
 		fastcgi_split_path_info ^(.+\.php)(/.+)$;

@@ -167,7 +167,8 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<td><?=$row['alias_domain'];?></td>
 							<td><?=$row['target_domain'];?></td>
 							<td><?=$row['active'];?></td>
-							<td><a href="/delete.php?aliasdomain=<?=$row['alias_domain'];?>"><?=$lang['mailbox']['remove'];?></a></td>
+							<td><a href="/delete.php?aliasdomain=<?=urlencode($row['alias_domain']);?>"><?=$lang['mailbox']['remove'];?></a> |
+							<a href="/edit.php?aliasdomain=<?=urlencode($row['alias_domain']);?>"><?=$lang['mailbox']['edit'];?></a></td>
 						</tr>
 					<?php
 					endwhile;

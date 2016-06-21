@@ -116,23 +116,10 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				<h4><?=$lang['add']['alias_domain'];?></h4>
 				<form class="form-horizontal" role="form" method="post">
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="alias_domain"><?=$lang['add']['alias_domain'];?>:</label>
+						<label class="control-label col-sm-2" for="alias_domain"><?=$lang['add']['alias_domain'];?></label>
 						<div class="col-sm-10">
-							<select name="alias_domain" title="<?=$lang['add']['select'];?>" size="1">
-								<?php
-								$result = mysqli_query($link, "SELECT `domain` FROM `domain`
-										WHERE `domain` IN (
-												SELECT `domain` FROM `domain_admins`
-														WHERE `username`='".$_SESSION['mailcow_cc_username']."'
-														AND active='1'
-												)
-										OR 'admin'='".$_SESSION['mailcow_cc_role']."'")
-										OR die(mysqli_error($link));
-								while ($row = mysqli_fetch_array($result)) {
-										echo "<option>".$row['domain']."</option>";
-								}
-								?>
-							</select>
+							<textarea autocorrect="off" autocapitalize="none" class="form-control" rows="5" name="alias_domain"></textarea>
+							<p><?=$lang['add']['alias_domain_info'];?></p>
 						</div>
 					</div>
 					<div class="form-group">

@@ -8,7 +8,7 @@ cat includes/banner
 source includes/versions
 source includes/functions.sh
 
-while getopts skuhUH:D:? par; do
+while getopts suhUH:D:? par; do
 case $par in
 	h|'?')
 		usage
@@ -20,19 +20,15 @@ case $par in
 		;;
 	H) sys_hostname="$OPTARG" ;;
 	D) sys_domain="$OPTARG" ;;
-	k) inst_keepfiles="yes" ;;
 	s) retry_lets_encrypt="yes" ;;
 esac
 done
 
 if [[ ${is_upgradetask} == "yes" ]]; then
 	upgradetask
-	echo ${mailcow_version} > /etc/mailcow_version
+	echo "${mailcow_version}, ${mailing_platform}" > /etc/mailcow_version
 echo --------------------------------- >> installer.log
-echo UPGRADE to ${mailcow_version} on $(date) >> installer.log
-echo --------------------------------- >> installer.log
-echo Roundcube version: ${roundcube_version} >> installer.log
-echo FuGlu version: ${fuglu_version} >> installer.log
+echo UPGRADE to ${mailcow_version}_${mailing_platform} on $(date) >> installer.log
 echo --------------------------------- >> installer.log
 	exit 0
 fi
@@ -84,11 +80,8 @@ echo FQDN: ${sys_hostname}.${sys_domain} >> installer.log
 echo Timezone: ${sys_timezone} >> installer.log
 echo --------------------------------- >> installer.log
 echo Web root: https://${sys_hostname}.${sys_domain} >> installer.log
-echo DAV web root: https://${httpd_dav_subdomain}.${sys_domain} >> installer.log
 echo --------------------------------- >> installer.log
-echo Roundcube version: $roundcube_version >> installer.log
-echo FuGlu version: ${fuglu_version} >> installer.log
-echo mailcow version: ${mailcow_version} >> installer.log
+echo mailcow version: ${mailcow_version}_${mailing_platform} >> installer.log
 echo --------------------------------- >> installer.log
 
 installtask environment
@@ -136,7 +129,7 @@ fi
 
 returnwait "Finish installation" "no"
 
-echo ${mailcow_version} > /etc/mailcow_version
+echo ${mailcow_version}_${mailing_platform} > /etc/mailcow_version
 chmod 600 installer.log
 echo
 echo "`tput setaf 2`Finished installation`tput sgr0`"

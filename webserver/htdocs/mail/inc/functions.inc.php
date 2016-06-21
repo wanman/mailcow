@@ -1,13 +1,25 @@
 <?php
-function sha512c($password) {
+function hash_password($password) {
 	$password = escapeshellarg($password);
-	exec('/usr/bin/doveadm pw -s SHA512-CRYPT -p '.$password, $hash, $return);
-	if ($return != "0") {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => 'Cannot create password hash'
-		);
-		return false;
+	if ($GLOBALS['HASHING'] == "SHA512-CRYPT") {
+		exec('/usr/bin/doveadm pw -s SHA512-CRYPT -p '.$password, $hash, $return);
+		if ($return != "0") {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'Cannot create password hash'
+			);
+			return false;
+		}
+	}
+	else {
+		exec('/usr/bin/doveadm pw -s SSHA256 -p '.$password, $hash, $return);
+		if ($return != "0") {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'Cannot create password hash'
+			);
+			return false;
+		}
 	}
 	return $hash[0];
 }
@@ -51,7 +63,7 @@ function check_login($link, $user, $pass) {
 		AND `username`='".$user."'");
 	while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
 		$row = "'".$row[0]."'";
-		exec("echo ".$pass." | doveadm pw -s SHA512-CRYPT -t ".$row, $out, $return);
+		exec("echo ".$pass." | doveadm pw -s ".$GLOBALS['HASHING']." -t ".$row, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
 			unset($_SESSION['ldelay']);
 			return "admin";
@@ -63,7 +75,7 @@ function check_login($link, $user, $pass) {
 		AND `username`='".$user."'");
 	while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
 		$row = "'".$row[0]."'";
-		exec("echo ".$pass." | doveadm pw -s SHA512-CRYPT -t ".$row, $out, $return);
+		exec("echo ".$pass." | doveadm pw -s ".$GLOBALS['HASHING']." -t ".$row, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
 			unset($_SESSION['ldelay']);
 			return "domainadmin";
@@ -74,7 +86,7 @@ function check_login($link, $user, $pass) {
 		AND `username`='".$user."'");
 	while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
 		$row = "'".$row[0]."'";
-		exec("echo ".$pass." | doveadm pw -s SHA512-CRYPT -t ".$row, $out, $return);
+		exec("echo ".$pass." | doveadm pw -s ".$GLOBALS['HASHING']." -t ".$row, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
 			unset($_SESSION['ldelay']);
 			return "user";
@@ -556,14 +568,12 @@ function mailbox_add_alias_domain($link, $postarray) {
 		return false;
 	}
 
-	foreach (array($postarray['alias_domain'], $postarray['target_domain']) as $domain) {
-		if (!hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => sprintf($lang['danger']['access_denied'])
-			);
-			return false;
-		}
+	if (!hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $postarray['target_domain'])) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => sprintf($lang['danger']['access_denied'])
+		);
+		return false;
 	}
 
 	if ($postarray['alias_domain'] == $postarray['target_domain']) {
@@ -625,6 +635,70 @@ function mailbox_add_alias_domain($link, $postarray) {
 	$_SESSION['return'] = array(
 		'type' => 'success',
 		'msg' => sprintf($lang['success']['aliasd_added'], htmlspecialchars($alias_domain))
+	);
+}
+function mailbox_edit_alias_domain($link, $postarray) {
+	global $lang;
+	isset($postarray['active']) ? $active = '1' : $active = '0';
+	$alias_domain		= idn_to_ascii($postarray['alias_domain']);
+	$alias_domain		= mysqli_real_escape_string($link, strtolower(trim($alias_domain)));
+	$alias_domain_now	= mysqli_real_escape_string($link, strtolower(trim($postarray['alias_domain_now'])));
+	if (!is_valid_domain_name($alias_domain)) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => sprintf($lang['danger']['alias_domain_invalid'])
+		);
+		return false;
+	}
+
+	if (!is_valid_domain_name($alias_domain_now)) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => sprintf($lang['danger']['alias_domain_invalid'])
+		);
+		return false;
+	}
+
+	$DomainData = mysqli_fetch_assoc(mysqli_query($link,
+		"SELECT `target_domain` FROM `alias_domain`
+			WHERE `alias_domain`='".$alias_domain_now."'"));
+	if (!hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $DomainData['target_domain'])) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => sprintf($lang['danger']['access_denied'])
+		);
+		return false;
+	}
+
+	$qstring = "SELECT `target_domain` FROM `alias_domain`
+		WHERE `target_domain`='".$alias_domain."'";
+	$qresult = mysqli_query($link, $qstring);
+	$num_results = mysqli_num_rows($qresult);
+	if ($num_results != 0) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => sprintf($lang['danger']['aliasd_targetd_identical'])
+		);
+		return false;
+	}
+
+	$UpdateAliasDomainQuery = "UPDATE `alias_domain` SET `alias_domain`='".$alias_domain."', `active`='".$active."' WHERE `alias_domain`='".$alias_domain_now."'";
+	if (!mysqli_query($link, $UpdateAliasDomainQuery)) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL Fehler: '.mysqli_error($link)
+		);
+		mail_utf8($GLOBALS['ADMIN_EMAIL'],
+			"hosted.mailcow.de",
+			"noreply@hosted.mailcow.de",
+			"mailcow - MySQL Fehler",
+			mysqli_error($link));
+		return false;
+	}
+
+	$_SESSION['return'] = array(
+		'type' => 'success',
+		'msg' => sprintf($lang['success']['aliasd_modified'], htmlspecialchars($alias_domain))
 	);
 }
 function mailbox_add_mailbox($link, $postarray) {
@@ -739,7 +813,7 @@ function mailbox_add_mailbox($link, $postarray) {
 			);
 			return false;
 		}
-		$password_hashed = sha512c($password);
+		$password_hashed = hash_password($password);
 	}
 	else {
 		$_SESSION['return'] = array(
@@ -1030,7 +1104,7 @@ function mailbox_edit_domainadmin($link, $postarray) {
 			);
 			return false;
 		}
-		$password_hashed = sha512c($password);
+		$password_hashed = hash_password($password);
 		$UpdateAdminData = "UPDATE admin SET modified=now(), active='".$active."', password='".$password_hashed."' WHERE username='".$username."';";
 	}
 	else {
@@ -1153,7 +1227,7 @@ function mailbox_edit_mailbox($link, $postarray) {
 			);
 			return false;
 		}
-		$password_hashed = sha512c($password);
+		$password_hashed = hash_password($password);
 		$UpdateMailboxArray = array(
 			"UPDATE `alias` SET
 				`modified`=NOW(),
@@ -1293,15 +1367,18 @@ function mailbox_delete_alias($link, $postarray) {
 }
 function mailbox_delete_alias_domain($link, $postarray) {
 	global $lang;
-	$alias_domain = mysqli_real_escape_string($link, $postarray['alias_domain']);
-	if (!is_valid_domain_name($alias_domain)) {
+	if (!is_valid_domain_name($postarray['alias_domain'])) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['domain_invalid'])
 		);
 		return false;
 	}
-	if (!hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $alias_domain)) {
+	$alias_domain = mysqli_real_escape_string($link, $postarray['alias_domain']);
+	$DomainData = mysqli_fetch_assoc(mysqli_query($link,
+		"SELECT `target_domain` FROM `alias_domain`
+			WHERE `alias_domain`='".$alias_domain."'"));
+	if (!hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $DomainData['target_domain'])) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['access_denied'])
@@ -1324,9 +1401,9 @@ function mailbox_delete_alias_domain($link, $postarray) {
 }
 function mailbox_delete_mailbox($link, $postarray) {
 	global $lang;
-	$username	= mysqli_real_escape_string($link, $postarray['username']);
-	$domain		= substr(strrchr($username, "@"), 1);
-	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
+	$domain = substr(strrchr($postarray['username'], "@"), 1);
+	$username = mysqli_real_escape_string($link, $postarray['username']);
+	if (!filter_var($postarray['username'], FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['access_denied'])
@@ -1412,7 +1489,7 @@ function set_admin_account($link, $postarray) {
 			);
 			return false;
 		}
-		$password_hashed = sha512c($password);
+		$password_hashed = hash_password($password);
 		$UpdateAdmin = "UPDATE `admin` SET 
 			`modified`=NOW(),
 			`password`='".$password_hashed."',
@@ -1609,7 +1686,7 @@ function set_user_account($link, $postarray) {
 					);
 					return false;
 			}
-			$password_hashed = sha512c($password_new);
+			$password_hashed = hash_password($password_new);
 			$UpdateMailboxQuery = "UPDATE mailbox SET modified=NOW(), password='".$password_hashed."' WHERE username='".$username."';";
 			if (!mysqli_query($link, $UpdateMailboxQuery)) {
 				$_SESSION['return'] = array(
@@ -1681,7 +1758,7 @@ function add_domain_admin($link, $postarray) {
 			);
 			return false;
 		}
-		$password_hashed = sha512c($password);
+		$password_hashed = hash_password($password);
 		$DeleteArray = array(
 			"DELETE FROM `domain_admins`
 				WHERE `username`='".$username."'",

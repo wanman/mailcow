@@ -52,11 +52,11 @@ usage() {
 
 genpasswd() {
 	count=0
-	while [ $count -lt 3 ]; do
+	while [ ${count} -lt 3 ]; do
 		pw_valid=$(tr -cd A-Za-z0-9 < /dev/urandom | fold -w24 | head -n1)
-		count=$(grep -o "[0-9]" <<< $pw_valid | wc -l)
+		count=$(grep -o "[0-9]" <<< ${pw_valid} | wc -l)
 	done
-	echo $pw_valid
+	echo ${pw_valid}
 }
 
 returnwait_task=""
@@ -71,7 +71,6 @@ returnwait() {
 	fi
 	echo "$(pinkb [RUNNING]) - Task $(textb "${returnwait_task}") started, please wait..."
 }
-
 checksystem() {
 	if [[ $(grep MemTotal /proc/meminfo | awk '{print $2}') -lt 800000 ]]; then
 		echo "$(yellowb [WARN]) - At least 800MB of memory is highly recommended"
@@ -132,23 +131,23 @@ checkconfig() {
 			exit 1
 		fi
 	done
-	pass_count=$(grep -o "[0-9]" <<< $mailcow_admin_pass | wc -l)
-	pass_chars=$(echo $mailcow_admin_pass | egrep "^.{8,255}" | \
+	pass_count=$(grep -o "[0-9]" <<< ${mailcow_admin_pass} | wc -l)
+	pass_chars=$(echo ${mailcow_admin_pass} | egrep "^.{8,255}" | \
 	egrep "[ABCDEFGHIJKLMNOPQRSTUVXYZ]" | \
 	egrep "[abcdefghijklmnopqrstuvxyz"] | \
 	egrep "[0-9]")
-	if [[ $pass_count -lt 2 || -z $pass_chars ]]; then
+	if [[ ${pass_count} -lt 2 || -z ${pass_chars} ]]; then
 		echo "$(redb [ERR]) - mailcow administrator password does not meet password policy requirements (8 char., 2 num., UPPER- + lowercase)"
 		echo
 		exit 1
 	fi
-	if [[ $inst_debug == "yes" ]]; then
+	if [[ ${inst_debug} == "yes" ]]; then
 		set -x
 	fi
 }
 
 installtask() {
-	case $1 in
+	case ${1} in
 		environment)
 			[[ -z $(grep fs.inotify.max_user_instances /etc/sysctl.conf) ]] && echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.conf
 			sysctl -p > /dev/null 2>&1
@@ -167,6 +166,8 @@ installtask() {
 			echo "${sys_hostname}.${sys_domain}" > /etc/mailname
 			echo "$(textb [INFO]) - Installing prerequisites..."
 			apt-get -y update > /dev/null ; apt-get -y install lsb-release whiptail apt-utils ssl-cert > /dev/null 2>&1
+			[[ ${mailing_platform} == "roundcube" ]] && hashing_method="SHA512-CRYPT" || hashing_method="SSHA256"
+                        [[ ${mailing_platform} == "roundcube" ]] && site_config="_rc" || site_config="_sogo"
 			;;
 		installpackages)
 			dist_codename=$(lsb_release -cs)
@@ -180,22 +181,21 @@ installtask() {
 				PHPCONF="/etc/php/7.0"
 				PHPLIB="/var/lib/php"
 			fi
-			if [[ $dist_id == "Debian" ]]; then
-				if [[ $dist_codename == "jessie" ]]; then
+			if [[ ${dist_id} == "Debian" ]]; then
+				if [[ ${dist_codename} == "jessie" ]]; then
 					if [[ ${httpd_platform} == "apache2" ]]; then
 						WEBSERVER_BACKEND="apache2 apache2-utils libapache2-mod-${PHP}"
 					else
 						WEBSERVER_BACKEND="nginx-extras ${PHP}-fpm"
 					fi
-					SQLITE="sqlite"
 					OPENJDK="openjdk-7"
 					JETTY_NAME="jetty8"
 				else
 					echo "$(redb [ERR]) - Your Debian distribution is currently not supported"
 					exit 1
 				fi
-			elif [[ $dist_id == "Ubuntu" ]]; then
-				if [[ $dist_codename == "trusty" ]]; then
+			elif [[ ${dist_id} == "Ubuntu" ]]; then
+				if [[ ${dist_codename} == "trusty" ]]; then
 					if [[ ${httpd_platform} == "apache2" ]]; then
 						echo "$(textb [INFO]) - Adding ondrej/apache2 repository..."
 						echo "deb http://ppa.launchpad.net/ondrej/apache2/ubuntu trusty main" > /etc/apt/sources.list.d/ondrej.list
@@ -205,16 +205,14 @@ installtask() {
 					else
 						WEBSERVER_BACKEND="nginx-extras ${PHP}-fpm"
 					fi
-					SQLITE="sqlite"
 					OPENJDK="openjdk-7"
 					JETTY_NAME="jetty"
-				elif [[ $dist_codename == "xenial" ]]; then
+				elif [[ ${dist_codename} == "xenial" ]]; then
 					if [[ ${httpd_platform} == "apache2" ]]; then
 						WEBSERVER_BACKEND="apache2 apache2-utils libapache2-mod-${PHP}"
 					else
 						WEBSERVER_BACKEND="nginx-extras ${PHP}-fpm"
 					fi
-					SQLITE="sqlite3"
 					OPENJDK="openjdk-9"
 					JETTY_NAME="jetty8"
 				else
@@ -228,7 +226,7 @@ installtask() {
 			/usr/sbin/make-ssl-cert generate-default-snakeoil --force-overwrite
 			echo "$(textb [INFO]) - Installing packages unattended, please stand by, errors will be reported."
 			apt-get -y update >/dev/null
-			if [[ ${my_dbhost} == "localhost" || ${my_dbhost} == "127.0.0.1" ]] && [[ $is_upgradetask != "yes" ]]; then
+			if [[ ${my_dbhost} == "localhost" || ${my_dbhost} == "127.0.0.1" ]] && [[ ${is_upgradetask} != "yes" ]]; then
 				if [[ ${my_usemariadb} == "yes" ]]; then
 					DATABASE_BACKEND="mariadb-client mariadb-server"
 				else
@@ -240,7 +238,7 @@ installtask() {
 DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install zip dnsutils python-setuptools libmail-spf-perl libmail-dkim-perl file \
 openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap ${PHP} ${PHP}-cli ${PHP}-common ${PHP}-curl ${PHP}-gd ${PHP}-imap subversion \
-${PHP}-intl ${PHP}-xsl libawl-php ${PHP}-mcrypt ${PHP}-mysql ${PHP}-${SQLITE} libawl-php ${PHP}-xmlrpc ${DATABASE_BACKEND} ${WEBSERVER_BACKEND} mailutils pyzor razor \
+${PHP}-intl ${PHP}-xsl libawl-php ${PHP}-mcrypt ${PHP}-mysql libawl-php ${PHP}-xmlrpc ${DATABASE_BACKEND} ${WEBSERVER_BACKEND} mailutils pyzor razor \
 postfix postfix-mysql postfix-pcre postgrey pflogsumm spamassassin spamc sudo bzip2 curl mpack opendkim opendkim-tools unzip clamav-daemon \
 python-magic unrar-free liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl bsd-mailx \
 ${OPENJDK}-jre-headless libcurl4-openssl-dev libexpat1-dev rrdtool mailgraph fcgiwrap spawn-fcgi \
@@ -265,7 +263,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			;;
 		ssl)
 			mkdir /etc/ssl/mail 2> /dev/null
-			[[ $inst_keepfiles == "no" ]] && rm /etc/ssl/mail/* 2> /dev/null
 			echo "$(textb [INFO]) - Generating 2048 bit DH parameters, this may take a while, please wait..."
 			openssl dhparam -out /etc/ssl/mail/dhparams.pem 2048 2> /dev/null
 			openssl req -new -newkey rsa:4096 -sha256 -days 1095 -nodes -x509 -subj "/C=ZZ/ST=mailcow/L=mailcow/O=mailcow/CN=${sys_hostname}.${sys_domain}/subjectAltName=DNS.1=${sys_hostname}.${sys_domain},DNS.2=autodiscover.{sys_domain}" -keyout /etc/ssl/mail/mail.key -out /etc/ssl/mail/mail.crt
@@ -389,6 +386,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			sed -i "s/my_mailcowuser/${my_mailcowuser}/g" ${DOVEFILES}
 			sed -i "s/my_mailcowdb/${my_mailcowdb}/g" ${DOVEFILES}
 			sed -i "s/my_dbhost/${my_dbhost}/g" ${DOVEFILES}
+			sed -i "s/MAILCOW_HASHING/${hashing_method}/g" ${DOVEFILES}
 			[[ ${IPV6} != "yes" ]] && sed -i '/listen =/c\listen = *' /etc/dovecot/dovecot.conf
 			mkdir /etc/dovecot/conf.d 2> /dev/null
 			mkdir -p /var/vmail/sieve 2> /dev/null
@@ -473,7 +471,6 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			usermod -a -G vmail clamav 2> /dev/null
 			service clamav-freshclam stop > /dev/null 2>&1
 			killall freshclam 2> /dev/null
-			[[ $inst_keepfiles == "no" ]] && rm -f /var/lib/clamav/* 2> /dev/null
 			sed -i '/DatabaseMirror/d' /etc/clamav/freshclam.conf
 			sed -i '/MaxFileSize/c\MaxFileSize 10240M' /etc/clamav/clamd.conf
 			sed -i '/StreamMaxLength/c\StreamMaxLength 10240M' /etc/clamav/clamd.conf
@@ -530,20 +527,20 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			if [[ ${httpd_platform} == "nginx" ]]; then
 				# Some systems miss the default php fpm listener, reinstall it now
 				apt-get -o Dpkg::Options::="--force-confmiss" install -y --reinstall ${PHP}-fpm > /dev/null
-				rm /etc/nginx/sites-enabled/{000-0-mailcow*,000-0-fufix} 2>/dev/null
-				cp webserver/nginx/conf/sites-available/mailcow /etc/nginx/sites-available/
+				rm /etc/nginx/sites-enabled/*mailcow* 2>/dev/null
+				cp webserver/nginx/conf/sites-available/mailcow${site_config} /etc/nginx/sites-available/mailcow.conf
 				cp webserver/php5-fpm/conf/pool/mail.conf ${PHPCONF}/fpm/pool.d/mail.conf
 				cp webserver/php5-fpm/conf/php-fpm.conf ${PHPCONF}/fpm/php-fpm.conf
 				sed -i "/date.timezone/c\php_admin_value[date.timezone] = ${sys_timezone}" ${PHPCONF}/fpm/pool.d/mail.conf
-				ln -s /etc/nginx/sites-available/mailcow /etc/nginx/sites-enabled/000-0-mailcow 2>/dev/null
+				ln -s /etc/nginx/sites-available/mailcow${site_config} /etc/nginx/sites-enabled/mailcow.conf 2>/dev/null
 				[[ ! -z $(grep "server_names_hash_bucket_size" /etc/nginx/nginx.conf) ]] && \
 					sed -i "/server_names_hash_bucket_size/c\ \ \ \ \ \ \ \ server_names_hash_bucket_size 64;" /etc/nginx/nginx.conf || \
 					sed -i "/http {/a\ \ \ \ \ \ \ \ server_names_hash_bucket_size 64;" /etc/nginx/nginx.conf
-				sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN;/${sys_hostname}.${sys_domain};/g" /etc/nginx/sites-available/mailcow
-				sed -i "s/MAILCOW_DOMAIN;/${sys_domain};/g" /etc/nginx/sites-available/mailcow
+				sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN;/${sys_hostname}.${sys_domain};/g" /etc/nginx/sites-available/mailcow${site_config}
+				sed -i "s/MAILCOW_DOMAIN;/${sys_domain};/g" /etc/nginx/sites-available/mailcow${site_config}
 			elif [[ ${httpd_platform} == "apache2" ]]; then
-				rm /etc/apache2/sites-enabled/{mailcow*,000-0-mailcow,000-0-fufix,000-0-mailcow.conf} 2>/dev/null
-				cp webserver/apache2/conf/sites-available/mailcow.conf /etc/apache2/sites-available/
+				rm /etc/apache2/sites-enabled/*mailcow* 2>/dev/null
+				cp webserver/apache2/conf/sites-available/mailcow${site_config} /etc/apache2/sites-available/mailcow.conf
 				ln -s /etc/apache2/sites-available/mailcow.conf /etc/apache2/sites-enabled/000-0-mailcow.conf 2>/dev/null
 				sed -i "s/\"\MAILCOW_HOST.MAILCOW_DOMAIN\"/\"${sys_hostname}.${sys_domain}\"/g" /etc/apache2/sites-available/mailcow.conf
 				sed -i "s/MAILCOW_DOMAIN\"/${sys_domain}\"/g" /etc/apache2/sites-available/mailcow.conf
@@ -569,8 +566,8 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "ALTER TABLE mailbox ADD tls_enforce_out tinyint(1) NOT NULL DEFAULT '0';" -N -B
 			fi
 			if [[ $(mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -s -N -e "SELECT * FROM admin;" | wc -l) -lt 1 ]]; then
-				mailcow_admin_pass_hashed=$(doveadm pw -s SHA512-CRYPT -p $mailcow_admin_pass)
-				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "INSERT INTO admin VALUES ('$mailcow_admin_user','$mailcow_admin_pass_hashed', '1', NOW(), NOW(), '1');"
+				mailcow_admin_pass_hashed=$(doveadm pw -s ${hashing_method} -p ${mailcow_admin_pass})
+				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "INSERT INTO admin VALUES ('$mailcow_admin_user','${mailcow_admin_pass}_hashed', '1', NOW(), NOW(), '1');"
 				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "INSERT INTO domain_admins (username, domain, created, active) VALUES ('$mailcow_admin_user', 'ALL', NOW(), '1');"
 			else
 				echo "$(textb [INFO]) - An administrator exists, will not create another mailcow administrator"
@@ -580,7 +577,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			mkdir -p /var/www/mail/rc
 			tar xf roundcube/inst/${roundcube_version}.tar -C roundcube/inst/
 			cp -R roundcube/inst/${roundcube_version}/* /var/www/mail/rc/
-			if [[ $is_upgradetask != "yes" ]]; then
+			if [[ ${is_upgradetask} != "yes" ]]; then
 				cp -R roundcube/conf/* /var/www/mail/rc/
 				sed -i "s/my_dbhost/${my_dbhost}/g" /var/www/mail/rc/config/config.inc.php
 				sed -i "s/my_rcuser/$my_rcuser/g" /var/www/mail/rc/config/config.inc.php
@@ -596,6 +593,54 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			chown -R www-data: /var/www/mail/rc
 			rm -rf roundcube/inst/${roundcube_version}
 			rm -rf /var/www/mail/rc/installer/
+			;;
+                sogo)
+                        if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "SHOW TABLES LIKE 'sogo_view'" -N -B) ]]; then
+                                mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "CREATE VIEW sogo_view (c_uid, c_name, c_password, c_cn, mail, home) AS SELECT username, username, password, CONVERT(name USING latin1),$
+                        fi
+			sudo -u sogo bash -c "
+			defaults write sogod SOGoUserSources '({type = sql;id = directory;viewURL = mysql://${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}:3306/${my_mailcowdb}/sogo_view;canAuthenticate = YES;isAddressBook = YES;displayName = \"Global Address Book\";userPasswordAlgorithm = ssha256;})'
+			defaults write sogod SOGoProfileURL 'mysql://${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}:3306/${my_mailcowdb}/sogo_user_profile'
+			defaults write sogod OCSFolderInfoURL 'mysql://${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}:3306/${my_mailcowdb}/sogo_folder_info'
+			defaults write sogod OCSEMailAlarmsFolderURL 'mysql://${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}:3306/${my_mailcowdb}/sogo_alarms_folder'
+			defaults write sogod OCSSessionsFolderURL 'mysql://${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}:3306/${my_mailcowdb}/sogo_sessions_folder'
+			defaults write sogod SOGoEnableEMailAlarms YES
+			defaults write sogod SOGoPageTitle '${sys_hostname}.${sys_domain}';
+			defaults write sogod SOGoForwardEnabled YES;
+			defaults write sogod SOGoMailAuxiliaryUserAccountsEnabled YES;
+			defaults write sogod SOGoTimeZone '${sys_timezone}';
+			defaults write sogod SOGoMailDomain '${sys_domain}';
+			defaults write sogod SOGoAppointmentSendEMailNotifications YES;
+			defaults write sogod SOGoSieveScriptsEnabled YES;
+			defaults write sogod SOGoSieveServer 'sieve://${sys_hostname}.${sys_domain}:4190/?tls=YES';
+			defaults write sogod SOGoVacationEnabled YES;
+			defaults write sogod SOGoDraftsFolderName Drafts;
+			defaults write sogod SOGoSentFolderName Sent;
+			defaults write sogod SOGoTrashFolderName Trash;
+			defaults write sogod SOGoIMAPServer '${sys_hostname}.${sys_domain}';
+			defaults write sogod SOGoSMTPServer 127.0.0.1:588;
+			defaults write sogod SOGoMailingMechanism smtp;
+			defaults write sogod SOGoMailCustomFromEnabled YES;
+			defaults write sogod SOGoPasswordChangeEnabled NO;
+			defaults write sogod SOGoAppointmentSendEMailNotifications YES;
+			defaults write sogod SOGoACLsSendEMailNotifications YES;
+			defaults write sogod SOGoFoldersSendEMailNotifications YES;
+			defaults write sogod SOGoLanguage English;
+			defaults write sogod SOGoMemcachedHost '127.0.0.1';
+			defaults write sogod WOListenQueueSize 300;
+			defaults write sogod WOWatchDogRequestTimeout 10;
+			defaults write sogod SOGoMaximumPingInterval 354;
+			defaults write sogod SOGoMaximumSyncInterval 354;
+			defaults write sogod SOGoMaximumSyncResponseSize 4096;
+			defaults write sogod SOGoMaximumSyncWindowSize 12288;
+			defaults write sogod SOGoInternalSyncInterval 30;"
+			# ~1 for 10 users, more when AS is enabled - 384M is the absolute max. it may reach
+			PREFORK=$(( ($(free -mt | grep Total | awk '{print $2}') - 100) / 384 * 5 ))
+			sed -i "/PREFORK/c\PREFORK=${PREFORK}" /etc/default/sogo
+			sed -i '/SHOWWARNING/c\SHOWWARNING=false' /etc/tmpreaper.conf
+			sed -i '/expire-autoreply/s/^#//g' /etc/cron.d/sogo
+			sed -i '/expire-sessions/s/^#//g' /etc/cron.d/sogo
+			sed -i '/ealarms-notify/s/^#//g' /etc/cron.d/sogo
 			;;
 		restartservices)
 			[[ -f /lib/systemd/systemd ]] && echo "$(textb [INFO]) - Restarting services, this may take a few seconds..."
@@ -614,11 +659,11 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 	esac
 }
 upgradetask() {
-	if [[ ! -f /etc/mailcow_version && ! -f /etc/fufix_version ]]; then
+	if [[ ! -f /etc/mailcow_version ]]; then
 		echo "$(redb [ERR]) - mailcow is not installed"
 		exit 1
 	fi
-	if [[ -z $(cat /etc/{fufix_version,mailcow_version} 2> /dev/null | grep -E "0.9|0.10|0.11|0.12|0.13|0.14") ]]; then
+	if [[ -z $(grep -E "0.9|0.10|0.11|0.12|0.13|0.14" /etc/mailcow_version) ]]; then
 		echo "$(redb [ERR]) - Upgrade not supported"
 		exit 1
 	fi
@@ -636,6 +681,7 @@ upgradetask() {
 	fi
 	[[ -z ${sys_hostname} ]] && sys_hostname=$(hostname -s)
 	[[ -z ${sys_domain} ]] && sys_domain=$(hostname -d)
+
 	sys_timezone=$(cat /etc/timezone)
 	timestamp=$(date +%Y%m%d_%H%M%S)
 	readconf=( $(php -f misc/readconf.php) )
@@ -643,16 +689,31 @@ upgradetask() {
 	my_mailcowuser=${readconf[1]}
 	my_mailcowpass=${readconf[2]}
 	my_mailcowdb=${readconf[3]}
-	old_des_key_rc=${readconf[4]}
-	my_rcuser=${readconf[5]}
-	my_rcpass=${readconf[6]}
-	my_rcdb=${readconf[7]}
+	if [[ -z $(grep -i "sogo" /etc/mailcow_version) ]]; then
+		hashing_method="SHA512-CRYPT"
+		site_config="_rc"
+		mailing_platform="roundcube"
+		old_des_key_rc=${readconf[4]}
+		my_rcuser=${readconf[5]}
+		my_rcpass=${readconf[6]}
+		my_rcdb=${readconf[7]}
+	else
+		hashing_method="SSHA256"
+		site_config="_sogo"
+		mailing_platform="sogo"
+	fi
+	echo
 	echo "$(pinkb [NOTICE]) - mailcow needs your SQL root password to perform higher privilege level tasks"
         read -p "Please enter your SQL root user password: " my_rootpw
 	while [[ $(mysql --host ${my_dbhost} -u root -p${my_rootpw} -e ""; echo $?) -ne 0 ]]; do
 		read -p "Please enter your SQL root user password: " my_rootpw
 	done
 	[[ -z ${my_dbhost} ]] && my_dbhost="localhost"
+	if [[ ${mailing_platform} != "roundcube" ]]; then
+		my_rcuser="unset"
+		my_rcpass="unset"
+		my_rcdb="unset"
+	fi
 	for var in httpd_platform sys_hostname sys_domain sys_timezone my_dbhost my_mailcowdb my_mailcowuser my_mailcowpass my_rcuser my_rcpass my_rcdb
 	do
 		if [[ -z ${!var} ]]; then
@@ -670,14 +731,15 @@ $(textb "Timezone")               ${sys_timezone}
 $(textb "mailcow MySQL")          ${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}/${my_mailcowdb}
 $(textb "Roundcube MySQL")        ${my_rcuser}:${my_rcpass}@${my_dbhost}/${my_rcdb}
 $(textb "Web server")             ${httpd_platform^}
+$(textb "Mailing platform")       ${mailing_platform^}
 $(textb "Web root")               https://${sys_hostname}.${sys_domain}
-
 --------------------------------------------------------
 THIS UPGRADE WILL RESET SOME OF YOUR CONFIGURATION FILES
 --------------------------------------------------------
 A backup will be stored in ./before_upgrade_${timestamp}
 --------------------------------------------------------
 "
+
 	if [[ ${inst_confirm_proceed} == "yes" ]]; then
 		echo "$(pinkb [NOTICE]) - You can overwrite the detected hostname and domain by calling the installer with -H hostname and -D example.org"
 		read -p "Press ENTER to continue or CTRL-C to cancel the upgrade process"
@@ -686,7 +748,9 @@ A backup will be stored in ./before_upgrade_${timestamp}
 	mkdir before_upgrade_${timestamp}
 	cp -R /var/www/mail/ before_upgrade_${timestamp}/mail_wwwroot
 	mysqldump -u ${my_mailcowuser} -p${my_mailcowpass} ${my_mailcowdb} > backup_mailcow_db.sql 2>/dev/null
-	mysqldump -u ${my_rcuser} -p${my_rcpass} ${my_rcdb} > backup_roundcube_db.sql 2>/dev/null
+	if [[ ${mailing_platform} == "roundcube" ]]; then
+		mysqldump -u ${my_rcuser} -p${my_rcpass} ${my_rcdb} > backup_roundcube_db.sql 2>/dev/null
+	fi
 	for dir in "postfix" "dovecot" "spamassassin" "${httpd_platform}" "fuglu" "mysql" "${PHP}" "clamav"; do
 		[[ -d "${dir}" ]] && cp -R "/etc/${dir}/" "before_upgrade_${timestamp}/"
 	done
@@ -699,11 +763,11 @@ A backup will be stored in ./before_upgrade_${timestamp}
 	fi
 	for var in ${httpd_platform} ${FPM} spamassassin fuglu dovecot postfix opendkim clamav-daemon mailgraph
 	do
-		service $var stop > /dev/null 2>&1
+		service ${var} stop > /dev/null 2>&1
 	done
 	echo -e "$(greenb "[OK]")"
-	if [[ ! -z $(openssl x509 -issuer -in /etc/ssl/mail/mail.crt | grep ${sys_hostname}.${sys_domain} ) ]]; then
-		echo "$(textb [INFO]) - Update CA certificate store (self-signed only)..."
+	if [[ ! -z $(openssl x509 -issuer -in /etc/ssl/mail/mail.crt | grep ${sys_hostname}.${sys_domain}) ]]; then
+		echo "$(textb [INFO]) - Update CA certificate store, self-signed only..."
 		cp /etc/ssl/mail/mail.crt /usr/local/share/ca-certificates/
 		update-ca-certificates
 	fi
@@ -731,14 +795,17 @@ A backup will be stored in ./before_upgrade_${timestamp}
 	installtask spamassassin
 
 	returnwait "Webserver configuration"
-	rm -rf ${PHPLIB}/sessions/*
 	mkdir -p /var/mailcow/log
 	mv /var/www/PFLOG /var/mailcow/log/pflogsumm.log 2> /dev/null
-
 	installtask webserver
 
-	returnwait "Roundcube configuration"
-	installtask roundcube
+	if [[ ${mailing_platform} == "roundcube" ]]; then
+		returnwait "Roundcube configuration"
+		installtask roundcube
+	else
+		returnwait "SOGo configuration"
+		installtask sogo
+	fi
 
 	returnwait "OpenDKIM configuration"
 	installtask opendkim

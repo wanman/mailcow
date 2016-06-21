@@ -1,0 +1,99 @@
+# mailcow site configuration
+# ! Do not remove this header !
+SSLStaplingCache "shmcb:logs/stapling-cache(150000)"
+Listen 127.0.0.1:81
+<VirtualHost 127.0.0.1:81>
+        DocumentRoot /usr/lib/cgi-bin
+        <Directory /usr/lib/cgi-bin>
+                AddHandler cgi-script .cgi .pl
+                Options +ExecCGI
+        </Directory>
+</VirtualHost>
+<VirtualHost *:80>
+	ServerSignature off
+	TraceEnable off
+	AddDefaultCharset utf-8
+	ServerName "MAILCOW_HOST.MAILCOW_DOMAIN"
+	DocumentRoot /var/www/mail
+	RewriteEngine On
+	RewriteCond %{HTTPS} !=on
+	RewriteRule ^/?(.*) https://%{HTTP_HOST}/$1 [L,R,NE]
+</VirtualHost>
+<IfModule mod_ssl.c>
+	<VirtualHost *:443>
+		ServerSignature off
+		TraceEnable off
+		AddDefaultCharset utf-8
+		ServerName "MAILCOW_HOST.MAILCOW_DOMAIN"
+		DocumentRoot /var/www/mail
+		ErrorLog ${APACHE_LOG_DIR}/error.log
+		CustomLog ${APACHE_LOG_DIR}/access.log combined
+		SSLEngine on
+		SSLCertificateFile /etc/ssl/mail/mail.crt
+		SSLCertificateKeyFile /etc/ssl/mail/mail.key
+		ErrorDocument 503 /admin.php
+		ErrorDocument 500 /admin.php
+		php_admin_value upload_max_filesize 25M
+		php_admin_value post_max_size 26M
+		<FilesMatch "\.(cgi|shtml|phtml|php)$">
+			SSLOptions +StdEnvVars
+		</FilesMatch>
+		BrowserMatch "MSIE [2-6]" \
+			nokeepalive ssl-unclean-shutdown \
+			downgrade-1.0 force-response-1.0
+		BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
+		SSLProtocol All -SSLv2 -SSLv3
+        	SSLHonorCipherOrder On
+        	Header always set Strict-Transport-Security "max-age=63072000; includeSubdomains; preload"
+        	Header always set X-Content-Type-Options nosniff
+        	SSLCompression off
+        	SSLUseStapling on
+	</VirtualHost>
+</IfModule>
+Alias /SOGo.woa/WebServerResources/ \
+      /usr/lib/GNUstep/SOGo/WebServerResources/
+Alias /SOGo/WebServerResources/ \
+      /usr/lib/GNUstep/SOGo/WebServerResources/
+
+<Directory /usr/lib/GNUstep/SOGo/>
+	AllowOverride None
+	<IfVersion < 2.4>      
+		Order deny,allow
+		Allow from all
+	</IfVersion>
+	<IfVersion >= 2.4>
+		Require all granted
+	</IfVersion>
+	<IfModule expires_module>
+		ExpiresActive On
+		ExpiresDefault "access plus 1 year"
+	</IfModule>
+</Directory>
+
+ProxyRequests Off
+SetEnv proxy-nokeepalive 1
+ProxyPreserveHost On
+ProxyPass /Microsoft-Server-ActiveSync \
+ http://127.0.0.1:20000/SOGo/Microsoft-Server-ActiveSync \
+ retry=60 connectiontimeout=10 timeout=400
+
+ProxyPass /SOGo http://127.0.0.1:20000/SOGo retry=0
+
+<Proxy http://127.0.0.1:20000/SOGo>
+	<IfModule headers_module>
+		RequestHeader set "x-webobjects-server-port" "443"
+		RequestHeader set "x-webobjects-server-name" "%{HTTP_HOST}e" env=HTTP_HOST
+		RequestHeader set "x-webobjects-server-url" "https://%{HTTP_HOST}e" env=HTTP_HOST
+		RequestHeader unset "x-webobjects-remote-user"
+		RequestHeader set "x-webobjects-server-protocol" "HTTP/1.0"
+	</IfModule>
+	AddDefaultCharset UTF-8
+	Order allow,deny
+	Allow from all
+</Proxy>
+
+<IfModule rewrite_module>
+  RewriteEngine On
+  RewriteRule ^/.well-known/caldav/?$ /SOGo/dav [R=301]
+  RewriteRule ^/.well-known/carddav/?$ /SOGo/dav [R=301]
+</IfModule>

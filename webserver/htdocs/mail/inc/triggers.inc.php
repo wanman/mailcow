@@ -20,7 +20,7 @@ if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
 	else {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'Anmeldung fehlgeschlagen'
+			'msg' => $lang['danger']['login_failed']
 		);
 	}
 }
@@ -121,6 +121,9 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			break;
 			case "deletealiasdomain":
 				mailbox_delete_alias_domain($link, $_POST);
+			break;
+			case "editaliasdomain":
+				mailbox_edit_alias_domain($link, $_POST);
 			break;
 			case "deletemailbox":
 				mailbox_delete_mailbox($link, $_POST);

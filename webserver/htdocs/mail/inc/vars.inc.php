@@ -8,4 +8,6 @@ $MC_PUB_FOLDER = "/etc/dovecot/mailcow_public_folder.conf";
 $MC_ODKIM_TXT = "/etc/opendkim/dnstxt";
 $PFLOG = "/var/mailcow/log/pflogsumm.log";
 $DEFAULT_LANG = "en";
+// Do not change
+$HASHING = 'MAILCOW_HASHING';
 ?>

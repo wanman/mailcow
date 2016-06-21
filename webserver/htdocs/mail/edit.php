@@ -80,7 +80,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				?>
 				<h4><?=$lang['edit']['domain_admin'];?></h4>
 				<br />
-				<form class="form-horizontal" role="form" method="post">
+				<form class="form-horizontal" role="form" method="post" action="/admin.php">
 				<input type="hidden" name="username" value="<?=$domain_admin;?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="name"><?=$lang['edit']['domains'];?></label>
@@ -257,6 +257,55 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				<?php
 					}
 				}
+			}
+			else {
+			?>
+				<div class="alert alert-info" role="alert"><?=$lang['info']['no_action'];?></div>
+			<?php
+			}
+	}
+	elseif (isset($_GET['aliasdomain']) &&
+		is_valid_domain_name($_GET["aliasdomain"]) &&
+		!empty($_GET["aliasdomain"])) {
+			$alias_domain = mysqli_real_escape_string($link, $_GET["aliasdomain"]);
+			$qstring = "SELECT * FROM `alias_domain` WHERE `alias_domain`='".$alias_domain."' 
+				AND (
+					`target_domain` IN (
+						SELECT `domain` from `domain_admins`
+							WHERE `active`='1'
+							AND `username`='".$_SESSION['mailcow_cc_username']."'
+					) 
+					OR 'admin'='".$_SESSION['mailcow_cc_role']."'
+				)";
+			$qresult = mysqli_query($link, $qstring)
+				OR die(mysqli_error($link));
+			$num_results = mysqli_num_rows($qresult);
+			$result = mysqli_fetch_assoc($qresult);
+			if ($num_results != 0 && !empty($num_results)) {
+			?>
+				<h4><?=$lang['edit']['domain'];?></h4>
+				<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
+					<input type="hidden" name="alias_domain_now" value="<?=$alias_domain;?>">
+					<div class="form-group">
+						<label class="control-label col-sm-2" for="alias_domain"><?=$lang['edit']['alias_domain'];?></label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" name="alias_domain" id="alias_domain" value="<?=htmlspecialchars($result['alias_domain']);?>">
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<div class="checkbox">
+								<label><input type="checkbox" name="active" <?= (isset($result['active']) && $result['active']=="1") ?  "checked" : null ?>> <?=$lang['edit']['active'];?></label>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<button type="submit" name="trigger_mailbox_action" value="editaliasdomain" class="btn btn-success btn-sm"><?=$lang['edit']['save'];?></button>
+						</div>
+					</div>
+				</form>
+				<?php
 			}
 			else {
 			?>
