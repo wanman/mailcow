@@ -261,7 +261,7 @@ solr-jetty > /dev/null
 			cp /etc/ssl/private/ssl-cert-snakeoil.key /etc/dovecot/dovecot.key
 			cp /etc/ssl/certs/ssl-cert-snakeoil.pem /etc/dovecot/private/dovecot.pem
 			cp /etc/ssl/private/ssl-cert-snakeoil.key /etc/dovecot/private/dovecot.key
-DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dovecot-core dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d dovecot-solr >/dev/null
+DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d dovecot-solr >/dev/null
 			install -m 755 misc/mc_clean_spam_aliases /etc/cron.daily/mc_clean_spam_aliases
 			install -m 755 misc/mc_pfset /usr/local/sbin/mc_pfset
 			install -m 755 misc/mc_pflog_renew /usr/local/sbin/mc_pflog_renew
@@ -630,7 +630,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				fi
 			fi
 			echo "$(textb [INFO]) - Installing SOGo packages unattended, please stand by, errors will be reported."
-DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install sogo sogo-activesync libwbxml2-0 memcached > /dev/null
+DEBIAN_FRONTEND=noninteractive ${APT} -y install sogo sogo-activesync libwbxml2-0 memcached > /dev/null
 			sudo -u sogo bash -c "
 			defaults write sogod SOGoUserSources '({type = sql;id = directory;viewURL = mysql://${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}:3306/${my_mailcowdb}/sogo_view;canAuthenticate = YES;isAddressBook = YES;displayName = \"Global Address Book\";userPasswordAlgorithm = ssha256;})'
 			defaults write sogod SOGoProfileURL 'mysql://${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}:3306/${my_mailcowdb}/sogo_user_profile'
