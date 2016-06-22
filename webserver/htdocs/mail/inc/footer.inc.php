@@ -71,6 +71,9 @@ $(document).ready(function() {
 	<?php
 	if (isset($_SESSION['mailcow_cc_role'])):
 	?>
+	$('tbody').filter(function (index) { 
+		return $(this).children().length < 1; 
+	}).remove();
 	$("#score").slider({ id: "slider1", min: 1, max: 30, step: 0.5, range: true, value: [<?=get_spam_score($link, $username);?>] });
 
 	if ( !$("#togglePwNew").is(':checked') ) {
