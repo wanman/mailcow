@@ -242,7 +242,7 @@ installtask() {
 			else
 				DATABASE_BACKEND=""
 			fi
-			[[ ! -v ${APT} ]] && APT="apt-get --force-yes"
+			[[ -z ${APT} ]] && APT="apt-get --force-yes"
 DEBIAN_FRONTEND=noninteractive ${APT} -y install zip dnsutils python-setuptools libmail-spf-perl libmail-dkim-perl file \
 openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap ${PHP} ${PHP}-cli ${PHP}-common ${PHP}-curl ${PHP}-gd ${PHP}-imap subversion \
