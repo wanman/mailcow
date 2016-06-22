@@ -76,8 +76,8 @@ CREATE TABLE IF NOT EXISTS `mailbox` (
   `domain` varchar(255) NOT NULL,
   `created` datetime NOT NULL DEFAULT '2016-01-01 00:00:00',
   `modified` datetime NOT NULL DEFAULT '2016-01-01 00:00:00',
-  `tls_enforce_in` tinyint(1) NOT NULL DEFAULT '1',
-  `tls_enforce_out` tinyint(1) NOT NULL DEFAULT '1',
+  `tls_enforce_in` tinyint(1) NOT NULL DEFAULT '0',
+  `tls_enforce_out` tinyint(1) NOT NULL DEFAULT '0',
   `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`username`),
   KEY `domain` (`domain`)
