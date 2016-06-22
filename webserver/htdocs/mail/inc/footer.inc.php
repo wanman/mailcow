@@ -74,7 +74,7 @@ $(document).ready(function() {
 	$('tbody').filter(function (index) { 
 		return $(this).children().length < 1; 
 	}).remove();
-	$("#score").slider({ id: "slider1", min: 1, max: 30, step: 0.5, range: true, value: [<?=get_spam_score($link, $username);?>] });
+	$("#score").slider({ id: "slider1", min: 1, max: 30, step: 0.5, range: true, value: [<?=get_spam_score($link, $_SESSION['mailcow_cc_username']);?>] });
 
 	if ( !$("#togglePwNew").is(':checked') ) {
 		$(".passFields").hide();

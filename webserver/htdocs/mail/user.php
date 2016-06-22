@@ -7,9 +7,12 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 ?>
 <div class="container">
 <h3><?=$lang['user']['mailbox_settings'];?></h3>
+<p class="help-block"><?=$lang['user']['did_you_know'];?></p>
+
+<div class="panel-group" id="accordion_user">
 <div class="panel panel-default">
-<div class="panel-heading">
-	<a data-toggle="collapse" href="#collapseUserDetails"><?=$lang['user']['mailbox_details'];?></a>
+<div style="cursor:pointer;" class="panel-heading" data-toggle="collapse" data-parent="#accordion_user" data-target="#collapseUserDetails">
+	<span class="accordion-toggle"><?=$lang['user']['mailbox_details'];?></span>
 </div>
 <div id="collapseUserDetails" class="panel-collapse collapse">
 <div class="panel-body">
@@ -56,8 +59,8 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 </div>
 
 <div class="panel panel-default">
-<div class="panel-heading">
-	<a data-toggle="collapse" href="#collapseSpamAlias"><?=$lang['user']['spam_aliases'];?></a>
+<div style="cursor:pointer;" class="panel-heading" data-toggle="collapse" data-parent="#accordion_user" data-target="#collapseSpamAlias">
+	<span class="accordion-toggle"><?=$lang['user']['spam_aliases'];?></span>
 </div>
 <div id="collapseSpamAlias" class="panel-collapse collapse">
 <div class="panel-body">
@@ -123,8 +126,8 @@ endwhile;
 </div>
 
 <div class="panel panel-default">
-<div class="panel-heading">
-	<a data-toggle="collapse" href="#collapseSpamFilter"><?=$lang['user']['spamfilter'];?></a>
+<div style="cursor:pointer;" class="panel-heading" data-toggle="collapse" data-parent="#accordion_user" data-target="#collapseSpamFilter">
+	<span class="accordion-toggle"><?=$lang['user']['spamfilter'];?></span>
 </div>
 <div id="collapseSpamFilter" class="panel-collapse collapse">
 <div class="panel-body">
@@ -241,8 +244,8 @@ endwhile;
 </div>
 
 <div class="panel panel-default">
-<div class="panel-heading">
-	<a data-toggle="collapse" href="#collapseTlsPolicy"><?=$lang['user']['tls_policy'];?></a>
+<div style="cursor:pointer;" class="panel-heading" data-toggle="collapse" data-parent="#accordion_user" data-target="#collapseTlsPolicy">
+	<span class="accordion-toggle"><?=$lang['user']['tls_policy'];?></span>
 </div>
 <div id="collapseTlsPolicy" class="panel-collapse collapse">
 <div class="panel-body">
@@ -274,6 +277,7 @@ endwhile;
 </div>
 </div>
 
+</div> <!-- /panel-group accordion -->
 </div> <!-- /container -->
 <?php
 }

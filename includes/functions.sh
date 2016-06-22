@@ -178,10 +178,12 @@ installtask() {
 			dist_id=$(lsb_release -is)
 			if [[ ! -z $(apt-cache search --names-only '^php5-cli$') ]]; then
 				PHP="php5"
+				PHPV="5"
 				PHPCONF="/etc/php5"
 				PHPLIB="/var/lib/php5"
 			else
 				PHP="php"
+				PHPV="7"
 				PHPCONF="/etc/php/7.0"
 				PHPLIB="/var/lib/php"
 			fi
@@ -219,6 +221,7 @@ installtask() {
 					fi
 					OPENJDK="openjdk-9"
 					JETTY_NAME="jetty8"
+					APT="apt-get --allow-remove-essential"
 				else
 					echo "$(redb [ERR]) - Your Ubuntu distribution is currently not supported"
 					exit 1
@@ -239,7 +242,8 @@ installtask() {
 			else
 				DATABASE_BACKEND=""
 			fi
-DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install zip dnsutils python-setuptools libmail-spf-perl libmail-dkim-perl file \
+			[[ ! -v ${APT} ]] && APT="apt-get --force-yes"
+DEBIAN_FRONTEND=noninteractive ${APT} -y install zip dnsutils python-setuptools libmail-spf-perl libmail-dkim-perl file \
 openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap ${PHP} ${PHP}-cli ${PHP}-common ${PHP}-curl ${PHP}-gd ${PHP}-imap subversion \
 ${PHP}-intl ${PHP}-xsl libawl-php ${PHP}-mcrypt ${PHP}-mysql libawl-php ${PHP}-xmlrpc ${DATABASE_BACKEND} ${WEBSERVER_BACKEND} mailutils pyzor razor \
@@ -535,8 +539,8 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 				apt-get -o Dpkg::Options::="--force-confmiss" install -y --reinstall ${PHP}-fpm > /dev/null
 				rm /etc/nginx/sites-enabled/*mailcow* 2>/dev/null
 				cp webserver/nginx/conf/sites-available/mailcow${site_config} /etc/nginx/sites-available/mailcow.conf
-				cp webserver/php5-fpm/conf/pool/mail.conf ${PHPCONF}/fpm/pool.d/mail.conf
-				cp webserver/php5-fpm/conf/php-fpm.conf ${PHPCONF}/fpm/php-fpm.conf
+				cp webserver/php-fpm/conf/${PHPV}/pool/mail.conf ${PHPCONF}/fpm/pool.d/mail.conf
+				cp webserver/php-fpm/conf/${PHPV}/php-fpm.conf ${PHPCONF}/fpm/php-fpm.conf
 				sed -i "/date.timezone/c\php_admin_value[date.timezone] = ${sys_timezone}" ${PHPCONF}/fpm/pool.d/mail.conf
 				ln -s /etc/nginx/sites-available/mailcow.conf /etc/nginx/sites-enabled/mailcow.conf 2>/dev/null
 				[[ ! -z $(grep "server_names_hash_bucket_size" /etc/nginx/nginx.conf) ]] && \
