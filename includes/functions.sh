@@ -213,6 +213,7 @@ installtask() {
 					fi
 					OPENJDK="openjdk-7"
 					JETTY_NAME="jetty"
+					echo "$(yellowb [WARN]) - You are running Ubuntu 14.04. The installation will not fail, though you may see a lot of output until the installation is finished."
 				elif [[ ${dist_codename} == "xenial" ]]; then
 					if [[ ${httpd_platform} == "apache2" ]]; then
 						WEBSERVER_BACKEND="apache2 apache2-utils libapache2-mod-${PHP}"
@@ -226,7 +227,6 @@ installtask() {
 					echo "$(redb [ERR]) - Your Ubuntu distribution is currently not supported"
 					exit 1
 				fi
-				echo "$(yellowb [WARN]) - You are running Ubuntu. The installation will not fail, though you may see a lot of output until the installation is finished."
 			else
 				echo "$(redb [ERR]) - Your distribution is currently not supported"
 			fi
