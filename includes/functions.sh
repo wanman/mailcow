@@ -171,7 +171,7 @@ installtask() {
 			echo "$(textb [INFO]) - Installing prerequisites..."
 			apt-get -y update > /dev/null ; apt-get -y install lsb-release whiptail apt-utils ssl-cert > /dev/null 2>&1
 			[[ ${mailing_platform} == "roundcube" ]] && hashing_method="SHA512-CRYPT" || hashing_method="SSHA256"
-                        [[ ${mailing_platform} == "roundcube" ]] && site_config="_rc" || site_config="_sogo"
+			[[ ${mailing_platform} == "roundcube" ]] && site_config="_rc" || site_config="_sogo"
 			;;
 		installpackages)
 			dist_codename=$(lsb_release -cs)
@@ -328,7 +328,7 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install dovecot-common dov
 			install -m 644 postfix/conf/master.cf /etc/postfix/master.cf
 			install -m 644 postfix/conf/main.cf /etc/postfix/main.cf
 			install -o www-data -g www-data -m 644 postfix/conf/mailcow_anonymize_headers.pcre /etc/postfix/mailcow_anonymize_headers.pcre
-                        install -m 644 postfix/conf/postscreen_access.cidr /etc/postfix/postscreen_access.cidr
+			install -m 644 postfix/conf/postscreen_access.cidr /etc/postfix/postscreen_access.cidr
 			install -m 644 postfix/conf/smtp_dsn_filter.pcre /etc/postfix/smtp_dsn_filter.pcre
 			sed -i "s/sys_hostname.sys_domain/${sys_hostname}.${sys_domain}/g" /etc/postfix/main.cf
 			sed -i "s/sys_domain/${sys_domain}/g" /etc/postfix/main.cf
@@ -660,8 +660,8 @@ DEBIAN_FRONTEND=noninteractive apt-get --force-yes -y install sogo sogo-activesy
 			defaults write sogod WOWatchDogRequestTimeout 10;
 			defaults write sogod SOGoMaximumPingInterval 354;
 			defaults write sogod SOGoMaximumSyncInterval 354;
-			defaults write sogod SOGoMaximumSyncResponseSize 4096;
-			defaults write sogod SOGoMaximumSyncWindowSize 12288;
+			defaults write sogod SOGoMaximumSyncResponseSize 1024;
+			defaults write sogod SOGoMaximumSyncWindowSize 15480;
 			defaults write sogod SOGoInternalSyncInterval 30;"
 			# ~1 for 10 users, more when AS is enabled - 384M is the absolute max. it may reach
 			PREFORK=$(( ($(free -mt | grep Total | awk '{print $2}') - 100) / 384 * 5 ))
@@ -711,7 +711,6 @@ upgradetask() {
 	fi
 	[[ -z ${sys_hostname} ]] && sys_hostname=$(hostname -s)
 	[[ -z ${sys_domain} ]] && sys_domain=$(hostname -d)
-
 	sys_timezone=$(cat /etc/timezone)
 	timestamp=$(date +%Y%m%d_%H%M%S)
 	readconf=( $(php -f misc/readconf.php) )
@@ -723,27 +722,23 @@ upgradetask() {
 		hashing_method="SHA512-CRYPT"
 		site_config="_rc"
 		mailing_platform="roundcube"
-		old_des_key_rc=${readconf[4]}
-		my_rcuser=${readconf[5]}
-		my_rcpass=${readconf[6]}
-		my_rcdb=${readconf[7]}
+		my_rcuser=${readconf[4]}
+		my_rcpass=${readconf[5]}
+		my_rcdb=${readconf[6]}
 	else
 		hashing_method="SSHA256"
 		site_config="_sogo"
 		mailing_platform="sogo"
+		my_rcuser="unused"
+		my_rcpass="unused"
+		my_rcdb="unused"
 	fi
-	echo
+	[[ -z ${my_dbhost} ]] && my_dbhost="localhost"
 	echo "$(pinkb [NOTICE]) - mailcow needs your SQL root password to perform higher privilege level tasks"
         read -p "Please enter your SQL root user password: " my_rootpw
 	while [[ $(mysql --host ${my_dbhost} -u root -p${my_rootpw} -e ""; echo $?) -ne 0 ]]; do
 		read -p "Please enter your SQL root user password: " my_rootpw
 	done
-	[[ -z ${my_dbhost} ]] && my_dbhost="localhost"
-	if [[ ${mailing_platform} != "roundcube" ]]; then
-		my_rcuser="unset"
-		my_rcpass="unset"
-		my_rcdb="unset"
-	fi
 	for var in httpd_platform sys_hostname sys_domain sys_timezone my_dbhost my_mailcowdb my_mailcowuser my_mailcowpass my_rcuser my_rcpass my_rcdb
 	do
 		if [[ -z ${!var} ]]; then
@@ -771,9 +766,8 @@ THIS UPGRADE WILL RESET SOME OF YOUR CONFIGURATION FILES
 A backup will be stored in ./before_upgrade_${timestamp}
 --------------------------------------------------------
 "
-
+	echo "$(pinkb [NOTICE]) - You can overwrite the detected hostname and domain by calling the installer with -H hostname and -D example.org"
 	if [[ ${inst_confirm_proceed} == "yes" ]]; then
-		echo "$(pinkb [NOTICE]) - You can overwrite the detected hostname and domain by calling the installer with -H hostname and -D example.org"
 		read -p "Press ENTER to continue or CTRL-C to cancel the upgrade process"
 	fi
 	echo -en "Creating backups in ./before_upgrade_${timestamp}... \t"
