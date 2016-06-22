@@ -181,11 +181,13 @@ installtask() {
 				PHPV="5"
 				PHPCONF="/etc/php5"
 				PHPLIB="/var/lib/php5"
+				PHPSVC="php7.0-fpm"
 			else
 				PHP="php"
 				PHPV="7"
 				PHPCONF="/etc/php/7.0"
 				PHPLIB="/var/lib/php"
+				PHPSVC="php5-fpm"
 			fi
 			if [[ ${dist_id} == "Debian" ]]; then
 				if [[ ${dist_codename} == "jessie" ]]; then
@@ -678,7 +680,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install sogo sogo-activesync libwbxml2-
 		restartservices)
 			[[ -f /lib/systemd/systemd ]] && echo "$(textb [INFO]) - Restarting services, this may take a few seconds..."
 			if [[ ${httpd_platform} == "nginx" ]]; then
-				FPM="${PHP}-fpm"
+				FPM="${PHPSVC}"
 			else
 				FPM=""
 			fi
@@ -787,7 +789,7 @@ A backup will be stored in ./before_upgrade_${timestamp}
 	echo -e "$(greenb "[OK]")"
 	echo -en "\nStopping services, this may take a few seconds... \t\t"
 	if [[ ${httpd_platform} == "nginx" ]]; then
-		FPM="${PHP}-fpm"
+		FPM="${PHPSVC}"
 	else
 		FPM=""
 	fi
