@@ -70,17 +70,17 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 						<tbody>
 							<?php
 							$result = mysqli_query($link, "SELECT
-								username, 
-								LOWER(GROUP_CONCAT(DISTINCT domain SEPARATOR ', ')) AS domain,
-								CASE active WHEN 1 THEN '".$lang['admin']['yes']."' ELSE '".$lang['admin']['no']."' END AS active
+								`username`, 
+								ANY_VALUE(LOWER(GROUP_CONCAT(DISTINCT `domain` SEPARATOR ', '))) AS `domain`,
+								ANY_VALUE(CASE `active` WHEN 1 THEN '".$lang['admin']['yes']."' ELSE '".$lang['admin']['no']."' END) AS `active`
 									FROM `domain_admins` 
 										WHERE `username` NOT IN (
-											SELECT `username` FROM admin
+											SELECT `username` FROM `admin`
 												WHERE `superadmin`='1'
 										)
 										AND `username` IN (
 											SELECT `username` FROM `admin`
-										) GROUP BY username;")
+										) GROUP BY `username`;")
 								OR die(mysqli_error($link));
 							while ($row = mysqli_fetch_array($result)):
 							?>
