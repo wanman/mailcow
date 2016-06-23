@@ -185,13 +185,13 @@ installtask() {
 				PHPV="5"
 				PHPCONF="/etc/php5"
 				PHPLIB="/var/lib/php5"
-				PHPSVC="php7.0-fpm"
+				PHPSVC="php5-fpm"
 			else
 				PHP="php"
 				PHPV="7"
 				PHPCONF="/etc/php/7.0"
 				PHPLIB="/var/lib/php"
-				PHPSVC="php5-fpm"
+				PHPSVC="php7.0-fpm"
 			fi
 			if [[ ${dist_id} == "Debian" ]]; then
 				if [[ ${dist_codename} == "jessie" ]]; then
