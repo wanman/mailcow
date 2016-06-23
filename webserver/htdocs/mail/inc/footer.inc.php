@@ -95,8 +95,13 @@ $(document).ready(function() {
 	$('#validity').change(function(){
 		$('#trigger_set_time_limited_aliases').show(); 
 	});
-
 	<?php
+	if (isset($_SESSION['last_expanded'])):
+	?>
+	$('#<?=$_SESSION['last_expanded'];?>').collapse('show');
+	<?php
+	unset($_SESSION['last_expanded']);
+	endif;
 	endif;
 	// basename to validate against "/" without filename
 	if (preg_match('/index/i', basename($_SERVER['PHP_SELF']))):

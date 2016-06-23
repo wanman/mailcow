@@ -17,8 +17,6 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 <div id="collapseUserDetails" class="panel-collapse collapse">
 <div class="panel-body">
 <form class="form-horizontal" role="form" method="post" autocomplete="off">
-	<p><?=$lang['user']['user_change_fn'];?></p>
-	<hr>
 	<div class="form-group">
 		<div class="col-sm-offset-3 col-sm-10">
 			<div class="checkbox">

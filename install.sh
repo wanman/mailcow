@@ -9,7 +9,7 @@ source includes/versions
 source includes/functions.sh
 
 while getopts suhUH:D:? par; do
-case $par in
+case ${par} in
 	h|'?')
 		usage
 		exit 0
