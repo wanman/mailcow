@@ -71,22 +71,19 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 							<?php
 							$result = mysqli_query($link, "SELECT
 								`username`, 
-								ANY_VALUE(LOWER(GROUP_CONCAT(DISTINCT `domain` SEPARATOR ', '))) AS `domain`,
+								GROUP_CONCAT(DISTINCT `domain` SEPARATOR ', ') AS `domain`,
 								ANY_VALUE(CASE `active` WHEN 1 THEN '".$lang['admin']['yes']."' ELSE '".$lang['admin']['no']."' END) AS `active`
 									FROM `domain_admins` 
-										WHERE `username` NOT IN (
+										WHERE `username` IN (
 											SELECT `username` FROM `admin`
-												WHERE `superadmin`='1'
-										)
-										AND `username` IN (
-											SELECT `username` FROM `admin`
+												WHERE `superadmin`!='1'
 										) GROUP BY `username`;")
 								OR die(mysqli_error($link));
 							while ($row = mysqli_fetch_array($result)):
 							?>
 							<tr>
-								<td><?=$row['username'];?></td>
-								<td><?=$row['domain'];?></td>
+								<td><?=strtolower($row['username']);?></td>
+								<td><?=strtolower($row['domain']);?></td>
 								<td><?=$row['active'];?></td>
 								<td><a href="delete.php?domainadmin=<?=$row['username'];?>"><?=$lang['admin']['remove'];?></a> |
 									<a href="edit.php?domainadmin=<?=$row['username'];?>"><?=$lang['admin']['edit'];?></a></td>
@@ -228,17 +225,17 @@ $srr_values = return_mailcow_config("srr");
 <p><?=$lang['admin']['public_folders_text'];?></p>
 <form class="form-horizontal" role="form" method="post">
 	<div class="form-group">
-		<label class="control-label col-sm-4" for="location"><?=$lang['admin']['public_folder_name'];?>:</label>
-		<div class="col-sm-8">
-		<input type="text" class="form-control" name="public_folder_name" id="public_folder_name" value="<?=return_mailcow_config("public_folder_name");?>">
-		</div>
-	</div>
-	<div class="form-group">
 		<div class="col-sm-offset-4 col-sm-8">
 			<div class="checkbox">
 			<label><input type="checkbox" name="use_public_folder" <?=return_mailcow_config("public_folder_status");?>> <?=$lang['admin']['public_folder_enable'];?></label>
 			</div>
 			<small><?=$lang['admin']['public_folder_enable_text'];?></small>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="control-label col-sm-4" for="location"><?=$lang['admin']['public_folder_name'];?>:</label>
+		<div class="col-sm-8">
+		<input type="text" class="form-control" name="public_folder_name" id="public_folder_name" value="<?=return_mailcow_config("public_folder_name");?>">
 		</div>
 	</div>
 	<div class="form-group">
