@@ -56,8 +56,7 @@ echo "    $(textb "Hostname")            ${sys_hostname}
 if [[ ${mailing_platform} == "roundcube" ]]; then
 	echo "    $(textb "Roundcube MySQL")     ${my_rcuser}:${my_rcpass}@${my_dbhost}/${my_rcdb}"
 fi
-echo "    $(textb "Roundcube MySQL")     ${my_rcuser}:${my_rcpass}@${my_dbhost}/${my_rcdb}
-    $(textb "mailcow admin user")  ${mailcow_admin_user}
+echo "    $(textb "mailcow admin user")  ${mailcow_admin_user}
 "
 
 returnwait "System environment"
@@ -74,7 +73,7 @@ if [[ ${mailing_platform} == "roundcube" ]]; then
 	echo MySQL Roundcube password: ${my_rcpass} >> installer.log
 	echo --------------------------------- >> installer.log
 fi
-echo Only set when MySQL was not available >> installer.log
+echo \! Only set when MySQL was not available >> installer.log
 echo MySQL root password: ${my_rootpw} >> installer.log
 echo --------------------------------- >> installer.log
 echo mailcow administrator >> installer.log
