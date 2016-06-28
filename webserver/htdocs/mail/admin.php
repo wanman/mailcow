@@ -72,7 +72,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 							$result = mysqli_query($link, "SELECT
 								`username`, 
 								GROUP_CONCAT(DISTINCT `domain` SEPARATOR ', ') AS `domain`,
-								ANY_VALUE(CASE `active` WHEN 1 THEN '".$lang['admin']['yes']."' ELSE '".$lang['admin']['no']."' END) AS `active`
+								MAX(CASE `active` WHEN 1 THEN '".$lang['admin']['yes']."' ELSE '".$lang['admin']['no']."' END) AS `active`
 									FROM `domain_admins` 
 										WHERE `username` IN (
 											SELECT `username` FROM `admin`
