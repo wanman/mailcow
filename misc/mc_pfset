@@ -1,7 +1,7 @@
 #!/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-SRR_PFCONF=($(postconf | sed -ne 's/^smtpd_recipient_restrictions = //p' | sed 's/, / /g'))
+SRR_PFCONF=($(postconf 2> /dev/null | sed -ne 's/^smtpd_recipient_restrictions = //p' | sed 's/, / /g'))
 
 if [[ -z "$1" && -z "$2" ]]; then
         exit 1
