@@ -258,7 +258,7 @@ namespace {
 	if (!isset($_SESSION['return'])) {
 		$_SESSION['return'] = array(
 			'type' => 'success',
-			'msg' => $lang['success']['set_rr']
+			'msg' => $lang['success']['changes_general']
 		);
 	}
 }
