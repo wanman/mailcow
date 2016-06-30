@@ -13,7 +13,6 @@ endif;
 ?>
 <script>
 $(document).ready(function() {
-	$('[data-toggle="tooltip"]').tooltip();
 	$("#alert-fade").fadeTo(7000, 500).slideUp(500, function(){
 		$("#alert-fade").alert('close');
 	});
@@ -28,13 +27,43 @@ $(document).ready(function() {
 		}
 	});
 	<?php
-	if (isset($_SESSION['mailcow_cc_role'])):
+	if (preg_match("/admin.php/i", $_SERVER['REQUEST_URI'])):
 	?>
-	$('select').selectpicker();
-	$.fn.bootstrapSwitch.defaults.onColor = 'success';
-	$("[name='tls_out']").bootstrapSwitch();
-	$("[name='tls_in']").bootstrapSwitch();
-
+	$( "[id*=srr-sortable]" ).sortable({
+		items: "li:not(.list-heading)",
+		cancel: ".ui-state-disabled",
+		connectWith: "[id*=srr-sortable]",
+		dropOnEmpty: true,
+		placeholder: "ui-state-highlight"
+	});
+	$( "[id*=ssr-sortable]" ).sortable({
+		items: "li:not(.list-heading)",
+		cancel: ".ui-state-disabled",
+		connectWith: "[id*=ssr-sortable]",
+		dropOnEmpty: true,
+		placeholder: "ui-state-highlight"
+	});
+	$('#srr_form').submit(function(){
+		var srr_joined_vals = $("[id^=srr-sortable-active] li").map(function() {
+			return $(this).data("value");
+		}).get().join(', ');
+		var input = $("<input>").attr("type", "hidden").attr("name", "srr_value").val(srr_joined_vals);
+		$('#srr_form').append($(input));
+	});
+	$('#ssr_form').submit(function(){
+		var ssr_joined_vals = $("[id^=ssr-sortable-active] li").map(function() {
+			return $(this).data("value");
+		}).get().join(', ');
+		var input = $("<input>").attr("type", "hidden").attr("name", "ssr_value").val(ssr_joined_vals);
+		$('#ssr_form').append($(input));
+	});
+	<?php
+	elseif (preg_match("/mailbox.php/i", $_SERVER['REQUEST_URI'])):
+	?>
+	$('tbody').filter(function (index) { 
+		return $(this).children().length < 1; 
+	}).remove();
+	$('[data-toggle="tooltip"]').tooltip();
 	var rowCountDomainAlias = $('#domainaliastable >tbody >tr').length;
 	var rowCountDomain = $('#domaintable >tbody >tr').length;
 	var rowCountMailbox = $('#mailboxtable >tbody >tr').length;
@@ -43,7 +72,6 @@ $(document).ready(function() {
 	$("#numRowsDomain").text(rowCountDomain);
 	$("#numRowsMailbox").text(rowCountMailbox);
 	$("#numRowsAlias").text(rowCountAlias);
-
 	$.fn.extend({
 		filterTable: function(){
 			return this.each(function(){
@@ -80,39 +108,14 @@ $(document).ready(function() {
 			$panel.find('.panel-body input').focus();
 		}
 	});
-
-	$( "[id*=srr-sortable]" ).sortable({
-		items: "li:not(.list-heading)",
-		cancel: ".ui-state-disabled",
-		connectWith: "[id*=srr-sortable]",
-		dropOnEmpty: true,
-		placeholder: "ui-state-highlight"
-	});
-	$( "[id*=ssr-sortable]" ).sortable({
-		items: "li:not(.list-heading)",
-		cancel: ".ui-state-disabled",
-		connectWith: "[id*=ssr-sortable]",
-		dropOnEmpty: true,
-		placeholder: "ui-state-highlight"
-	});
-	$('#srr_form').submit(function(){
-		var srr_joined_vals = $("[id^=srr-sortable-active] li").map(function() {
-			return $(this).data("value");
-		}).get().join(', ');
-		var input = $("<input>").attr("type", "hidden").attr("name", "srr_value").val(srr_joined_vals);
-		$('#srr_form').append($(input));
-	});
-	$('#ssr_form').submit(function(){
-		var ssr_joined_vals = $("[id^=ssr-sortable-active] li").map(function() {
-			return $(this).data("value");
-		}).get().join(', ');
-		var input = $("<input>").attr("type", "hidden").attr("name", "ssr_value").val(ssr_joined_vals);
-		$('#ssr_form').append($(input));
-	});
-
-	$('tbody').filter(function (index) { 
-		return $(this).children().length < 1; 
-	}).remove();
+	<?php
+	endif;
+	if (isset($_SESSION['mailcow_cc_role'])):
+	?>
+	$('select').selectpicker();
+	$.fn.bootstrapSwitch.defaults.onColor = 'success';
+	$("[name='tls_out']").bootstrapSwitch();
+	$("[name='tls_in']").bootstrapSwitch();
 
 	$("#score").slider({ id: "slider1", min: 1, max: 30, step: 0.5, range: true, value: [<?=get_spam_score($link, $_SESSION['mailcow_cc_username']);?>] });
 
@@ -151,29 +154,6 @@ $(document).ready(function() {
 	endif;
 	?>
 });
-
-var toValidate = $('#imap_host, #imap_username, #imap_password'),
-valid = false;
-toValidate.keyup(function () {
-	if ($(this).val().length > 0) {
-		$(this).data('valid', true);
-	} else {
-		$(this).data('valid', false);
-	}
-	toValidate.each(function () {
-		if ($(this).data('valid') == true) {
-			valid = true;
-		} else {
-			valid = false;
-		}
-	});
-	if (valid === true) {
-		$('button[type=submit]').prop('disabled', false);
-	} else {
-		$('button[type=submit]').prop('disabled', true);        
-	}
-});
-
 </script>
 </body>
 </html>

@@ -1291,9 +1291,9 @@ function mailbox_edit_mailbox($link, $postarray) {
 		'msg' => sprintf($lang['success']['mailbox_modified'], $username)
 	);
 }
-function mailbox_delete_domain($link, $domain) {
+function mailbox_delete_domain($link, $postarray) {
 	global $lang;
-	$domain 	= mysqli_real_escape_string($link, strtolower(trim($domain)));
+	$domain = $postarray['domain'];
 	if ($_SESSION['mailcow_cc_role'] != "admin") {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1308,6 +1308,7 @@ function mailbox_delete_domain($link, $domain) {
 		);
 		return false;
 	}
+	$domain	= mysqli_real_escape_string($link, strtolower(trim($domain)));
 	$MailboxString = "SELECT `username` FROM `mailbox`
 		WHERE domain='".$domain."';";
 	$MailboxResult = mysqli_query($link, $MailboxString)
