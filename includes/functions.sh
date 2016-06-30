@@ -353,7 +353,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			chmod 755 /var/spool/
 			sed -i "/%www-data/d" /etc/sudoers 2> /dev/null
 			sed -i "/%vmail/d" /etc/sudoers 2> /dev/null
-			echo '%www-data ALL=(ALL) NOPASSWD: /usr/bin/doveadm * sync *, /usr/local/sbin/mc_pfset *, /usr/bin/doveadm quota recalc -A, /usr/sbin/dovecot reload, /usr/sbin/postfix reload, /usr/local/sbin/mc_dkim_ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_pflog_renew' >> /etc/sudoers.d/mailcow
+			echo '%www-data ALL=(ALL) NOPASSWD: /usr/bin/doveadm * sync *, /usr/local/sbin/mc_pfset *, /usr/bin/doveadm quota recalc -A, /usr/sbin/dovecot reload, /usr/sbin/postfix reload, /usr/local/sbin/mc_dkim_ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_pflog_renew' > /etc/sudoers.d/mailcow
 			chmod 440 /etc/sudoers.d/mailcow
 			;;
 		fuglu)
@@ -819,8 +819,12 @@ A backup will be stored in ./before_upgrade_${timestamp}
 	returnwait "Package installation"
 	installtask installpackages
 
+	PF_RR_BEFORE=$(postconf smtpd_recipient_restrictions 2> /dev/null)
+	PF_SR_BEFORE=$(postconf smtpd_sender_restrictions 2> /dev/null)
 	returnwait "Postfix configuration"
 	installtask postfix
+	postconf -e "${PF_RR_BEFORE}"
+	postconf -e "${PF_SR_BEFORE}"
 
 	returnwait "Dovecot configuration"
 	installtask dovecot
