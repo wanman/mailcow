@@ -170,7 +170,6 @@ installtask() {
 				echo "$(redb [ERR]) - Cannot set your timezone: timezone is unknown"
 				exit 1
 			fi
-			mkdir -p /var/mailcow/log;
 			echo "${sys_hostname}.${sys_domain}" > /etc/mailname
 			echo "$(textb [INFO]) - Installing prerequisites..."
 			apt-get -y update > /dev/null ; apt-get -y install lsb-release whiptail apt-utils ssl-cert > /dev/null 2>&1
@@ -269,7 +268,6 @@ solr-jetty > /dev/null
 			cp /etc/ssl/private/ssl-cert-snakeoil.key /etc/dovecot/private/dovecot.key
 DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d dovecot-solr >/dev/null
 			install -m 755 misc/mc_clean_spam_aliases /etc/cron.daily/mc_clean_spam_aliases
-			install -m 755 misc/mc_pfset /usr/local/sbin/mc_pfset
 			install -m 755 misc/mc_pflog_renew /usr/local/sbin/mc_pflog_renew
 			install -m 755 misc/mc_msg_size /usr/local/sbin/mc_msg_size
 			install -m 755 misc/mc_dkim_ctrl /usr/local/sbin/mc_dkim_ctrl
@@ -353,7 +351,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			chmod 755 /var/spool/
 			sed -i "/%www-data/d" /etc/sudoers 2> /dev/null
 			sed -i "/%vmail/d" /etc/sudoers 2> /dev/null
-			echo '%www-data ALL=(ALL) NOPASSWD: /usr/bin/doveadm * sync *, /usr/local/sbin/mc_pfset *, /usr/bin/doveadm quota recalc -A, /usr/sbin/dovecot reload, /usr/sbin/postfix reload, /usr/local/sbin/mc_dkim_ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_pflog_renew' > /etc/sudoers.d/mailcow
+			echo '%www-data ALL=(ALL) NOPASSWD: /usr/sbin/dovecot reload, /usr/sbin/postfix reload, /usr/local/sbin/mc_dkim_ctrl, /usr/local/sbin/mc_msg_size, /usr/local/sbin/mc_pflog_renew' > /etc/sudoers.d/mailcow
 			chmod 440 /etc/sudoers.d/mailcow
 			;;
 		fuglu)
@@ -570,7 +568,7 @@ DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			cp -R webserver/htdocs/mail /var/www/
 			find /var/www/mail -type d -exec chmod 755 {} \;
 			find /var/www/mail -type f -exec chmod 644 {} \;
-			echo none > /var/mailcow/log/pflogsumm.log
+			echo none > /var/log/pflogsumm.log
 			sed -i "s/my_dbhost/${my_dbhost}/g" /var/www/mail/inc/vars.inc.php
 			sed -i "s/my_mailcowpass/${my_mailcowpass}/g" /var/www/mail/inc/vars.inc.php
 			sed -i "s/my_mailcowuser/${my_mailcowuser}/g" /var/www/mail/inc/vars.inc.php
@@ -839,8 +837,7 @@ A backup will be stored in ./before_upgrade_${timestamp}
 	installtask spamassassin
 
 	returnwait "Webserver configuration"
-	mkdir -p /var/mailcow/log
-	mv /var/www/PFLOG /var/mailcow/log/pflogsumm.log 2> /dev/null
+	mv /var/www/PFLOG /var/log/pflogsumm.log 2> /dev/null
 	installtask webserver
 
 	if [[ ${mailing_platform} == "roundcube" ]]; then
