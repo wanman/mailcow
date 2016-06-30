@@ -39,8 +39,13 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "admi
 		pflog_renew();
 	}
 	if (isset($_POST["srr"])) {
-		$_SESSION['last_expanded'] = "collapseSrr";
+		$_SESSION['last_expanded'] = "collapseRestrictions";
 		set_mailcow_config("srr", $_POST);
+		postfix_reload();
+	}
+	if (isset($_POST["ssr"])) {
+		$_SESSION['last_expanded'] = "collapseRestrictions";
+		set_mailcow_config("ssr", $_POST);
 		postfix_reload();
 	}
 	if (isset($_GET["del"])) {

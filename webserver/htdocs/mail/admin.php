@@ -153,64 +153,98 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 <h4><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> <?=$lang['admin']['configuration'];?></h4>
 <div class="panel-group" id="accordion_config">
 <div class="panel panel-default">
-<div style="cursor:pointer;" class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseSrr">
-	<span class="accordion-toggle">Postfix Restrictions</span>
+<div style="cursor:pointer;" class="panel-heading" data-toggle="collapse" data-parent="#accordion_config" data-target="#collapseRestrictions">
+	<span class="accordion-toggle"><?=$lang['admin']['restrictions'];?></span>
 </div>
-<div id="collapseSrr" class="panel-collapse collapse">
+<div id="collapseRestrictions" class="panel-collapse collapse">
 <div class="panel-body">
+<p class="help-block"><?=$lang['admin']['r_info'];?></p>
 <?php
-$srr_values = return_mailcow_config("srr");
+$srr_values_active = return_mailcow_config("srr")['active'];
+$srr_values_inactive = return_mailcow_config("srr")['inactive'];
 ?>
-<form class="form-horizontal" role="form" method="post">
-	<div class="form-group">
-		<label class="control-label col-sm-4" for="location"><?=$lang['admin']['rr'];?></label>
-		<div class="col-sm-8">
-			<div class="checkbox">
-			<label><input type="checkbox" name="reject_invalid_helo_hostname" <?php if (preg_match('/reject_invalid_helo_hostname/', $srr_values)) { echo "checked"; } ?>> <?=$lang['admin']['reject_invalid_helo_hostname'];?></b></label>
+	<form class="form-horizontal" id="srr_form" role="form" method="post">
+		<div class="form-group">
+			<label class="control-label col-sm-2" for="location"><?=$lang['admin']['rr'];?></label>
+			<div class="col-sm-10">
+				<ul id="srr-sortable-active list-group">
+					<li class="ui-state-default list-group-item list-group-item-success list-heading">&lrarr; <?=$lang['admin']['r_active'];?></li>
+<?php
+foreach($srr_values_active as $srr_value) {
+	if (!in_array($srr_value, $GLOBALS['VALID_SRR']))  {
+?>
+					<li class="ui-state-default ui-state-disabled list-group-item" data-value="<?php echo $srr_value; ?>"><?php echo $srr_value; ?></li>
+<?php
+	}
+	else {
+?>
+					<li class="ui-state-default list-group-item" data-value="<?php echo $srr_value; ?>"><?php echo $srr_value; ?></li>
+<?php
+	}
+}
+?>
+				</ul>
+				<ul id="srr-sortable-inactive list-group">
+					<li class="ui-state-default list-group-item list-group-item-warning list-heading">&lrarr; <?=$lang['admin']['r_inactive'];?></li>
+<?php
+foreach($srr_values_inactive as $srr_value) {
+?>
+					<li class="ui-state-default list-group-item" data-value="<?php echo $srr_value; ?>"><?php echo $srr_value; ?></li>
+<?php
+}
+?>
+				</ul>
 			</div>
 		</div>
-	</div>
-	<div class="form-group">
-		<div class="col-sm-offset-4 col-sm-8">
-			<div class="checkbox">
-			<label><input type="checkbox" name="reject_unknown_helo_hostname" <?php if (preg_match('/reject_unknown_helo_hostname/', $srr_values)) { echo "checked"; } ?>> <?=$lang['admin']['reject_unknown_helo_hostname'];?></label>
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-10">
+				<button type="submit" name="srr" class="btn btn-default"><?=$lang['admin']['save'];?></button>
 			</div>
 		</div>
-	</div>
-	<div class="form-group">
-		<div class="col-sm-offset-4 col-sm-8">
-			<div class="checkbox">
-			<label><input type="checkbox" name="reject_unknown_reverse_client_hostname" <?php if (preg_match('/reject_unknown_reverse_client_hostname/', $srr_values)) { echo "checked"; } ?>> <?=$lang['admin']['reject_unknown_reverse_client_hostname'];?></label>
+	</form>
+<?php
+$ssr_values_active = return_mailcow_config("ssr")['active'];
+$ssr_values_inactive = return_mailcow_config("ssr")['inactive'];
+?>
+	<form class="form-horizontal" id="ssr_form" role="form" method="post">
+		<div class="form-group">
+			<label class="control-label col-sm-2" for="location"><?=$lang['admin']['sr'];?></label>
+			<div class="col-sm-10">
+				<ul id="ssr-sortable-active list-group">
+					<li class="ui-state-default list-group-item list-group-item-success list-heading">&lrarr; <?=$lang['admin']['r_active'];?></li>
+<?php
+foreach($ssr_values_active as $ssr_value) {
+	if (!in_array($ssr_value, $GLOBALS['VALID_SSR']))  {
+?>
+					<li class="ui-state-default ui-state-disabled list-group-item" data-value="<?php echo $ssr_value; ?>"><?php echo $ssr_value; ?></li>
+<?php
+	}
+	else {
+?>
+					<li class="ui-state-default list-group-item" data-value="<?php echo $ssr_value; ?>"><?php echo $ssr_value; ?></li>
+<?php
+	}
+}
+?>
+				</ul>
+				<ul id="ssr-sortable-inactive list-group">
+					<li class="ui-state-default list-group-item list-group-item-warning list-heading">&lrarr; <?=$lang['admin']['r_inactive'];?></li>
+<?php
+foreach($ssr_values_inactive as $ssr_value) {
+?>
+					<li class="ui-state-default list-group-item" data-value="<?php echo $ssr_value; ?>"><?php echo $ssr_value; ?></li>
+<?php
+}
+?>
+				</ul>
 			</div>
 		</div>
-	</div>
-	<div class="form-group">
-		<div class="col-sm-offset-4 col-sm-8">
-			<div class="checkbox">
-			<label><input type="checkbox" name="reject_unknown_client_hostname" <?php if (preg_match('/reject_unknown_client_hostname/', $srr_values)) { echo "checked"; } ?>> <?=$lang['admin']['reject_unknown_client_hostname'];?></label>
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-10">
+				<button type="submit" name="ssr" class="btn btn-default"><?=$lang['admin']['save'];?></button>
 			</div>
 		</div>
-	</div>
-	<div class="form-group">
-		<div class="col-sm-offset-4 col-sm-8">
-			<div class="checkbox">
-			<label><input type="checkbox" name="reject_non_fqdn_helo_hostname" <?php if (preg_match('/reject_non_fqdn_helo_hostname/', $srr_values)) { echo "checked"; } ?>> <?=$lang['admin']['reject_non_fqdn_helo_hostname'];?></label>
-			</div>
-		</div>
-	</div>
-	<div class="form-group">
-		<div class="col-sm-offset-4 col-sm-8">
-			<div class="checkbox">
-			<label><input type="checkbox" name="z1_greylisting" <?php if (preg_match('/z1_greylisting/', $srr_values)) { echo "checked"; } ?>> <?=$lang['admin']['z1_greylisting'];?></label>
-			</div>
-		</div>
-	</div>
-	<div class="form-group">
-		<div class="col-sm-8">
-			<button type="submit" name="srr" class="btn btn-default"><?=$lang['admin']['save'];?></button>
-		</div>
-	</div>
-</form>
+	</form>
 </div>
 </div>
 </div>

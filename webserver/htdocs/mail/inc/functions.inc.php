@@ -132,7 +132,35 @@ function return_mailcow_config($s) {
 			}
 			break;
 		case "srr":
-			return shell_exec("sudo /usr/local/sbin/mc_pfset get-srr");
+			// Clean array*, hide Postfix warnings by redirecting stderr to null
+			// *Split into array by " ", "," or "\n", trim whitespaces, remove empty values, recreate index
+			$srr_active = array_values(array_filter(array_map('trim', preg_split( "/( |,|\n)/", shell_exec("/usr/sbin/postconf -h smtpd_recipient_restrictions 2> /dev/null")))));
+			for($i = 0; $i < count($srr_active); ++$i) {
+				// Merge table value with previous element in array
+				if (preg_match('/:/', $srr_active[$i])) {
+					$table_value = $srr_active[$i];
+					$srr_active[$i-1] = $srr_active[$i-1].' '.$srr_active[$i];
+					unset($srr_active[$i]);
+				}
+			}
+			$srr['inactive'] = array_diff($GLOBALS["VALID_SRR"], $srr_active);
+			$srr['active'] = $srr_active;
+			return $srr;
+			break;
+		case "ssr":
+			// Clean array, hide Postfix warnings by redirecting stderr to null
+			$ssr_active = array_values(array_filter(array_map('trim', preg_split( "/( |,|\n)/", shell_exec("/usr/sbin/postconf -h smtpd_sender_restrictions 2> /dev/null")))));
+			for($i = 0; $i < count($ssr_active); ++$i) {
+				// Merge table value with previous element in array
+				if (preg_match('/:/', $ssr_active[$i])) {
+					$table_value = $ssr_active[$i];
+					$ssr_active[$i-1] = $ssr_active[$i-1].' '.$ssr_active[$i];
+					unset($ssr_active[$i]);
+				}
+			}
+			$ssr['inactive'] = array_diff($GLOBALS["VALID_SSR"], $ssr_active);
+			$ssr['active'] = $ssr_active;
+			return $ssr;
 			break;
 		case "maxmsgsize":
 			return shell_exec("echo $(( $(/usr/sbin/postconf -h message_size_limit) / 1048576 ))");
@@ -174,8 +202,7 @@ function set_mailcow_config($s, $v = '') {
 			}
 			break;
 		case "public_folder":
-			if (!ctype_alnum(str_replace("/", "", $v['public_folder_name'])))
-			{
+			if (!ctype_alnum(str_replace("/", "", $v['public_folder_name']))) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
 					'msg' => 'Public folder name must not be empty'
@@ -200,7 +227,7 @@ namespace {
     auto = subscribe
   }
 }';
-			if (isset($v['use_public_folder']) && $v['use_public_folder'] == "on")	{
+			if (isset($v['use_public_folder']) && $v['use_public_folder'] == "on") {
 				file_put_contents($GLOBALS["MC_PUB_FOLDER"], $template);
 			}
 			else {
@@ -208,22 +235,17 @@ namespace {
 			}
 			break;
 		case "srr":
-			$srr_parameters = "";
-			$valid_srr = array(
-				"reject_invalid_helo_hostname",
-				"reject_unknown_helo_hostname",
-				"reject_unknown_reverse_client_hostname",
-				"reject_unknown_client_hostname",
-				"reject_non_fqdn_helo_hostname",
-				"z1_greylisting"
+			exec('sudo /usr/sbin/postconf -e smtpd_recipient_restrictions='.escapeshellarg($v['srr_value']), $out, $return);
+			if ($return != "0") {
+				$_SESSION['return'] = array(
+					'type' => 'danger',
+					'msg' => $lang['admin']['set_rr_failed']
 				);
-			$srr = (array_keys($v));
-			foreach ($srr as $restriction) {
-				if (in_array($restriction, $valid_srr)) {
-					$srr_parameters .= $restriction." ";
-				}
+				break;
 			}
-			exec('sudo /usr/local/sbin/mc_pfset set-srr "'.$srr_parameters.'"', $out, $return);
+			break;
+		case "ssr":
+			exec('sudo /usr/sbin/postconf -e smtpd_sender_restrictions='.escapeshellarg($v['ssr_value']), $out, $return);
 			if ($return != "0") {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
