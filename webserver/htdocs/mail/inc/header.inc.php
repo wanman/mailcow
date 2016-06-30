@@ -53,12 +53,12 @@ require_once 'inc/triggers.inc.php';
 <link rel="shortcut icon" href="/favicon.png" type="image/png" />
 <link rel="icon" href="/favicon.png" type="image/png" />
 <style>
-ul[id*="sortable"] { list-style-type: none; margin: 0; float: left; margin-right: 10px; padding: 5px; width: 48%; cursor:move}
-ul[id$="sortable-active"] li {margin: 5px; padding: 5px; cursor:move }
-ul[id$="sortable-inactive"] li {margin: 5px; padding: 5px; cursor:move }
-.list-heading { cursor:auto }
+ul[id*="sortable"] { word-wrap: break-word; list-style-type: none; float: left; padding: 0 15px 0 0; width: 48%; cursor:move}
+ul[id$="sortable-active"] li {cursor:move; }
+ul[id$="sortable-inactive"] li {cursor:move }
+.list-heading { cursor:default !important}
 .ui-state-disabled { cursor:no-drop; color:#ccc; }
-.ui-state-highlight {border: 1px dotted #ccc !important; height: 31px !important; margin: 5px; padding: 5px; cursor:move }
+.ui-state-highlight {background: #F5F5F5 !important; height: 41px !important; cursor:move }
 #slider1 .slider-selection {
 	background: #FFD700;
 }

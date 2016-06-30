@@ -389,7 +389,7 @@ foreach($ssr_values_inactive as $ssr_value) {
 	<div style="cursor:pointer;" class="panel-heading" data-toggle="collapse" data-parent="#accordion_maint" data-target="#collapseSysinfo">
 		<span class="accordion-toggle"><?=$lang['admin']['sys_info'];?></span>
 	</div>
-	<div id="collapseSysinfo" class="panel-collapse collapse in">
+	<div id="collapseSysinfo" class="panel-collapse collapse">
 	<div class="panel-body">
 		<div class="row">
 			<div class="col-md-6">

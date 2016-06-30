@@ -87,8 +87,6 @@ elseif (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "
 					</div>
 				</div>
 			</div>
-			<hr>
-			<p><?=$lang['start']['footer'];?></p>
 		</div>
 	</div>
 </div> <!-- /container -->
