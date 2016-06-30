@@ -45,4 +45,3 @@ read -p "Reset password? (y/n) " confirm
                 echo $(redb "Invalid choice")
         fi
 done
-
