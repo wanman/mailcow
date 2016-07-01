@@ -13,8 +13,8 @@ if (!$link) {
 	die("Connection error: " . mysqli_connect_error());
 }
 
-if (isset($_GET['lang'])) {
-	switch ($_GET['lang']) {
+if (isset($_POST['lang'])) {
+	switch ($_POST['lang']) {
 		case "de":
 			$_SESSION['mailcow_locale'] = 'de';
 		break;
@@ -111,8 +111,8 @@ endif;
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="lang-sm lang-lbl" lang="<?=$_SESSION['mailcow_locale'];?>"></span><span class="caret"></span></a>
 					<ul class="dropdown-menu" role="menu">
-						<li <?=($_SESSION['mailcow_locale'] == 'de') ? 'class="active"' : ''?>> <a href="?lang=de"><span class="lang-xs lang-lbl-full" lang="de"></span></a></li>
-						<li <?=($_SESSION['mailcow_locale'] == 'en') ? 'class="active"' : ''?>> <a href="?lang=en"><span class="lang-xs lang-lbl-full" lang="en"></span></a></li>
+						<li <?=($_SESSION['mailcow_locale'] == 'de') ? 'class="active"' : ''?>> <a href="#" onClick="setLang('de')"><span class="lang-xs lang-lbl-full" lang="de"></span></a></li>
+						<li <?=($_SESSION['mailcow_locale'] == 'en') ? 'class="active"' : ''?>> <a href="#" onClick="setLang('en')"><span class="lang-xs lang-lbl-full" lang="en"></span></a></li>
 					</ul>
 				</li>
 				<?php

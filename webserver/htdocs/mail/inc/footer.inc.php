@@ -12,6 +12,10 @@ if (preg_match("/admin.php/i", $_SERVER['REQUEST_URI'])):
 endif;
 ?>
 <script>
+function setLang(sel) {
+	$.post( "<?=$_SERVER['REQUEST_URI'];?>", {lang: sel} );
+	location.reload();
+}
 $(document).ready(function() {
 	$("#alert-fade").fadeTo(7000, 500).slideUp(500, function(){
 		$("#alert-fade").alert('close');
