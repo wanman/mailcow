@@ -32,7 +32,7 @@ function hasDomainAccess($link, $username, $role, $domain) {
 	if ($num_results != 0 && !empty($num_results)) {
 		return true;
 	}
-	return false;	
+	return false;
 }
 function check_login($link, $user, $pass) {
 	if (!filter_var($user, FILTER_VALIDATE_EMAIL) && !ctype_alnum(str_replace(array('_', '.', '-'), '', $user))) {
@@ -178,7 +178,7 @@ function set_mailcow_config($s, $v = '') {
 				);
 				break;
 			}
-			$v = escapeshellarg($new_size);
+			$new_size = escapeshellarg($v);
 			exec('sudo /usr/local/sbin/mc_msg_size '.$new_size, $out, $return);
 			if ($return != "0") {
 				$_SESSION['return'] = array(

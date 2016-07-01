@@ -10,13 +10,15 @@ if [[ ! -z "${1##[0-9]*}" || -z $1 ]]; then
 	exit 1
 fi
 
-CONF_HTTPD_APACHE=$(grep -lir "mailcow site configuration" /etc/apache2/sites-available/)
-CONF_HTTPD_NGINX=$(grep -lir "mailcow site configuration" /etc/nginx/sites-available/)
-DIST_CODENAME=$(lsb_release -cs)
-if [[ $DIST_CODENAME == "xenial" ]]; then
+CONF_HTTPD_APACHE=$(grep -lir "mailcow site configuration" /etc/apache2/sites-available/ 2> /dev/null)
+CONF_HTTPD_NGINX=$(grep -lir "mailcow site configuration" /etc/nginx/sites-available/ 2> /dev/null)
+
+if [[ ! -z $(apt-cache search --names-only '^php5-cli$') ]]; then
 	PHPCONF="/etc/php5"
+	PHPSVC="php5-fpm"
 else
 	PHPCONF="/etc/php/7.0"
+	PHPSVC="php7.0-fpm"
 fi
 
 if [[ ! -z ${CONF_HTTPD_APACHE} ]]; then
@@ -34,14 +36,7 @@ elif [[ ! -z ${CONF_HTTPD_NGINX} ]]; then
 	echo "Reloading services..."
 	postfix reload
 	nginx -s reload
-	service php5-fpm reload
-elif [[ ! -z $(grep -ir "mailcow site configuration" /etc/apache2/sites-available/ 2> /dev/null) ]]; then
-	sed -i "/upload_max_filesize/c\php_admin_value upload_max_filesize ${1}M" /etc/apache2/sites-available/mailcow.conf
-	sed -i "/post_max_size/c\php_admin_value post_max_size $(expr $1 + 1)M"  /etc/apache2/sites-available/mailcow.conf
-	sed -i "s/message_size_limit.*/message_size_limit = $(( $1 * 1048576 ))/g" /etc/postfix/main.cf
-	echo "Reloading services..."
-	postfix reload
-	service apache2 reload
+	service ${PHPSVC} reload
 else
 	echo "Error: cannot find site configuration"
 	exit 1
