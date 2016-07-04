@@ -341,7 +341,10 @@ foreach($ssr_values_inactive as $ssr_value) {
 				<pre><?=$str;?></pre>
 			</div>
 			<div class="col-xs-1">
-				<a href="?del=<?=$file;?>" onclick="return confirm('<?=sprintf($lang['dkim']['confirm']);?>')"><span class="glyphicon glyphicon-remove-circle"></span></a>
+				<form class="form-inline" role="form" method="post">
+				<a href="#" onclick="$(this).closest('form').submit()"><span class="glyphicon glyphicon-remove-circle"></span></a>
+				<input type="hidden" name="delete_dkim_record" value="<?=$file;?>">
+				</form>
 			</div>
 		</div>
 	<?php
@@ -357,7 +360,7 @@ foreach($ssr_values_inactive as $ssr_value) {
 			<label for="dkim_selector">Selector</label>
 			<input class="form-control" id="dkim_selector" name="dkim_selector" value="default" required>
 		</div>
-		<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> <?=$lang['admin']['add'];?></button>
+		<button type="submit" name="add_dkim_record" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> <?=$lang['admin']['add'];?></button>
 	</form>
 </div>
 </div>

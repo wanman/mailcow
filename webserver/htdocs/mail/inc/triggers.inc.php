@@ -48,15 +48,15 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "admi
 		set_mailcow_config("ssr", $_POST);
 		postfix_reload();
 	}
-	if (isset($_GET["del"])) {
+	if (isset($_POST["delete_dkim_record"])) {
 		$_SESSION['last_expanded'] = "collapseDKIM";
-		opendkim_table("delete", $_GET["del"]);
+		opendkim_table("delete", $_POST["delete_dkim_record"]);
 	}
 	if (isset($_POST["maxmsgsize"])) {
 		$_SESSION['last_expanded'] = "collapseMsgSize";
 		set_mailcow_config("maxmsgsize", $_POST["maxmsgsize"]);
 	}
-	if (isset($_POST["dkim_selector"])) {
+	if (isset($_POST["add_dkim_record"])) {
 		$_SESSION['last_expanded'] = "collapseDKIM";
 		opendkim_table("add", $_POST["dkim_selector"] . "_" . $_POST["dkim_domain"]);
 	}
