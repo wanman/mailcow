@@ -119,7 +119,11 @@ After the installation, visit your dashboard @ **https://hostname.example.com**,
 
 Remember to create an alias- or a mailbox for Postmaster. ;-)
 
-Please set/update all DNS records accordingly. See "FAQ" -> "DNS records" in your mailcow admin panel.
+Please set/update all DNS records accordingly.
+
+## Default web panel language
+You can change the default language of the mailcow UI by opening `/var/www/mail/inc/vars.inc.php` and changing the default_lang parameter.
+
 
 # Upgrade
 **Please run all commands as root**
