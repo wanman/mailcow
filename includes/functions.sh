@@ -327,7 +327,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			if [[ ${mailing_platform} == "roundcube" ]]; then
 				mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'%' IDENTIFIED BY '$my_rcpass';"
 			fi
-			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "GRANT SELECT ON ${my_mailcowdb}.* TO 'vmail'@'%'; FLUSH PRIVILEGES;"
+			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "FLUSH PRIVILEGES;"
 			;;
 		postfix)
 			mkdir -p /etc/postfix/sql
