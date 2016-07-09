@@ -486,28 +486,13 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			;;
 		clamav)
 			usermod -a -G vmail clamav 2> /dev/null
-			service clamav-freshclam stop > /dev/null 2>&1
-			killall freshclam 2> /dev/null
-			sed -i '/DatabaseMirror/d' /etc/clamav/freshclam.conf
-			sed -i '/MaxFileSize/c\MaxFileSize 10240M' /etc/clamav/clamd.conf
-			sed -i '/StreamMaxLength/c\StreamMaxLength 10240M' /etc/clamav/clamd.conf
-			echo "DatabaseMirror clamav.netcologne.de
-DatabaseMirror clamav.internet24.eu
-DatabaseMirror clamav.inode.at" >> /etc/clamav/freshclam.conf
 			if [[ -f /etc/apparmor.d/usr.sbin.clamd || -f /etc/apparmor.d/local/usr.sbin.clamd ]]; then
 				rm /etc/apparmor.d/usr.sbin.clamd > /dev/null 2>&1
 				rm /etc/apparmor.d/local/usr.sbin.clamd > /dev/null 2>&1
 				service apparmor restart > /dev/null 2>&1
 			fi
-			install -m 755 clamav/clamav-unofficial-sigs.sh /usr/local/bin/clamav-unofficial-sigs.sh
-			install -m 644 clamav/clamav-unofficial-sigs.conf /etc/clamav-unofficial-sigs.conf
-			install -m 644 clamav/clamav-unofficial-sigs.8 /usr/share/man/man8/clamav-unofficial-sigs.8
-			install -m 755 clamav/clamav-unofficial-sigs-cron /etc/cron.d/clamav-unofficial-sigs-cron
-			install -m 644 clamav/clamav-unofficial-sigs-logrotate /etc/logrotate.d/clamav-unofficial-sigs-logrotate
-			[[ ! -d /var/log/clamav-unofficial-sigs ]] && mkdir /var/log/clamav-unofficial-sigs
 			sed -i '/MaxFileSize/c\MaxFileSize 10M' /etc/clamav/clamd.conf
 			sed -i '/StreamMaxLength/c\StreamMaxLength 10M' /etc/clamav/clamd.conf
-			freshclam 2> /dev/null
 			;;
 		opendkim)
 			echo 'SOCKET="inet:10040@localhost"' > /etc/default/opendkim
