@@ -112,7 +112,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				?>
 					<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_mailbox_warning'], htmlspecialchars($_GET["mailbox"]));?></div>
 					<p><?=$lang['delete']['remove_mailbox_details'];?></p>
-					<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
+					<form class="form-horizontal" role="form" method="post" action="/admin.php">
 					<input type="hidden" name="username" value="<?=$mailbox;?>">
 						<div class="form-group">
 							<div class="col-sm-offset-1 col-sm-10">
