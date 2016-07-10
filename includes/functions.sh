@@ -642,7 +642,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			defaults write sogod SOGoDraftsFolderName Drafts;
 			defaults write sogod SOGoSentFolderName Sent;
 			defaults write sogod SOGoTrashFolderName Trash;
-			defaults write sogod SOGoIMAPServer '${sys_hostname}.${sys_domain}';
+			defaults write sogod SOGoIMAPServer 'imap://127.0.0.1:143/';
 			defaults write sogod SOGoSMTPServer 127.0.0.1:588;
 			defaults write sogod SOGoMailingMechanism smtp;
 			defaults write sogod SOGoMailCustomFromEnabled YES;
