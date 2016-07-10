@@ -508,6 +508,10 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			sed -i '/^OPTIONS=/s/=.*/="--create-prefs --max-children 5 --helper-home-dir --username debian-spamd --socketpath \/var\/run\/spamd.sock --socketowner debian-spamd --socketgroup debian-spamd"/' /etc/default/spamassassin
 			sed -i '/^CRON=/s/=.*/="1"/' /etc/default/spamassassin
 			sed -i '/^ENABLED=/s/=.*/="1"/' /etc/default/spamassassin
+			sed -i "s/my_mailcowpass/${my_mailcowpass}/g" /etc/spamassassin/local.cf
+			sed -i "s/my_mailcowuser/${my_mailcowuser}/g" /etc/spamassassin/local.cf
+			sed -i "s/my_mailcowdb/${my_mailcowdb}/g" /etc/spamassassin/local.cf
+			sed -i "s/my_dbhost/${my_dbhost}/g" /etc/spamassassin/local.cf
 			# Thanks to mf3hd@GitHub
 			[[ -z $(grep RANDOM_DELAY /etc/crontab) ]] && sed -i '/SHELL/a RANDOM_DELAY=30' /etc/crontab
 			install -m 755 spamassassin/conf/spamlearn /etc/cron.daily/spamlearn
@@ -515,6 +519,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			# Thanks to mf3hd@GitHub, again!
 			chmod g+s /etc/spamassassin
 			chown -R debian-spamd: /etc/spamassassin
+			chmod 600 /etc/spamassassin/local.cf
 			razor-admin -create -home /etc/razor -conf=/etc/razor/razor-agent.conf
 			razor-admin -discover -home /etc/razor
 			razor-admin -register -home /etc/razor
