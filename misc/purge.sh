@@ -103,8 +103,8 @@ rm -f /etc/mailcow_version
 rm -f /etc/{cron.daily,cron.weekly,cron.hourly,cron.monthly}/mailcow_backup
 rm -rf /etc/mail/postfixadmin
 rm -rf /var/www/{mail,dav}
-rm -f /usr/local/sbin/mc_*
-rm -f /etc/cron.daily/mc_clean_spam_aliases
+rm -f /usr/local/sbin/mailcow-*
+rm -f /etc/cron.daily/mailcow-clean-spam-aliases
 rm -rf /var/run/fetchmail
 rm -rf /usr/local/lib/python2.7/dist-packages/fail2ban-*
 rm -f /usr/local/bin/fail2ban*

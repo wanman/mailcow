@@ -179,7 +179,7 @@ function set_mailcow_config($s, $v = '') {
 				break;
 			}
 			$new_size = escapeshellarg($v);
-			exec('sudo /usr/local/sbin/mc_msg_size '.$new_size, $out, $return);
+			exec('sudo /usr/local/sbin/mailcow-set-message-limit '.$new_size, $out, $return);
 			if ($return != "0") {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -277,7 +277,7 @@ function opendkim_table($action, $which = "") {
 			}
 			$selector	= escapeshellarg($selector);
 			$domain		= escapeshellarg($domain);
-			exec('sudo /usr/local/sbin/mc_dkim_ctrl del '.$selector.' '.$domain, $out, $return);
+			exec('sudo /usr/local/sbin/mailcow-dkim-tool del '.$selector.' '.$domain, $out, $return);
 			if ($return != "0") {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -302,7 +302,7 @@ function opendkim_table($action, $which = "") {
 			}
 			$selector	= escapeshellarg($selector);
 			$domain		= escapeshellarg($domain);
-			exec('sudo /usr/local/sbin/mc_dkim_ctrl add '.$selector.' '.$domain, $out, $return);
+			exec('sudo /usr/local/sbin/mailcow-dkim-tool add '.$selector.' '.$domain, $out, $return);
 			if ($return != "0") {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -367,7 +367,7 @@ function postfix_reload() {
 	shell_exec("sudo /usr/sbin/postfix reload");
 }
 function pflog_renew() {
-	shell_exec("sudo /usr/local/sbin/mc_pflog_renew");
+	shell_exec("sudo /usr/local/sbin/mailcow-renew-pflogsumm");
 }
 function dovecot_reload() {
 	shell_exec("sudo /usr/sbin/dovecot reload");

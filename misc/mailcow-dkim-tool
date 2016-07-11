@@ -1,0 +1,50 @@
+#!/bin/bash
+PATH=/usr/local/bin:/usr/local/sbin:/sbin:/usr/sbin:/bin:/usr/bin:/usr/bin/X11
+
+if [ "$EUID" -ne 0 ]
+        then echo "Please run as root"
+        exit 1
+fi
+
+if [[ ${#@} -lt 1 ]]; then
+	echo "$0 add|del|list (selector domain)"
+	exit 1
+fi
+
+SELECTOR=$2
+DOMAIN=$3
+ID="${RANDOM}${RANDOM}"
+
+case $1 in
+add)
+	if [[ ${#@} -eq 3 ]]; then
+		[[ -f "/etc/opendkim/dnstxt/${SELECTOR}_${DOMAIN}" ]] && exit 1
+		opendkim-genkey -S -a -r -s "${SELECTOR}" -d "${DOMAIN}" -D /tmp/
+		mv "/tmp/${SELECTOR}.txt" "/etc/opendkim/dnstxt/${SELECTOR}_${DOMAIN}"
+		mv "/tmp/${SELECTOR}.private" "/etc/opendkim/keyfiles/${SELECTOR}_${DOMAIN}.dkim"
+		sed -i "s/ ; ----- DKIM key $SELECTOR for $DOMAIN//g" "/etc/opendkim/dnstxt/${SELECTOR}_${DOMAIN}"
+		chown www-data: /etc/opendkim/dnstxt/*
+		chown opendkim: "/etc/opendkim/keyfiles/${SELECTOR}_${DOMAIN}.dkim"
+		chmod 600 "/etc/opendkim/keyfiles/${SELECTOR}_${DOMAIN}.dkim"
+		echo "${ID}     ${DOMAIN}:${SELECTOR}:/etc/opendkim/keyfiles/${SELECTOR}_${DOMAIN}.dkim" >> /etc/opendkim/KeyTable
+		echo "*@${DOMAIN}       ${ID}" >> /etc/opendkim/SigningTable
+	fi
+	;;
+del)
+	if [[ ${#@} -eq 3 ]]; then
+		[[ ! -f "/etc/opendkim/dnstxt/${SELECTOR}_${DOMAIN}" ]] && exit 1
+		rm "/etc/opendkim/dnstxt/${SELECTOR}_${DOMAIN}" 2> /dev/null
+		rm "/etc/opendkim/keyfiles/${SELECTOR}_${DOMAIN}.dkim" 2> /dev/null
+		DELID=$(grep -i "${SELECTOR}_${DOMAIN}.dkim" /etc/opendkim/KeyTable | awk '{ print $1 }')
+		sed -i "/${DELID}/d" /etc/opendkim/KeyTable 2> /dev/null
+		sed -i "/${DELID}/d" /etc/opendkim/SigningTable 2> /dev/null
+	fi
+	;;
+list)
+	for list in $(ls "/etc/opendkim/dnstxt/" 2> /dev/null); do
+		echo "Domain '$(echo $list | cut -d '_' -f 2)' with selector '$(echo $list | cut -d '_' -f 1)'"
+	done
+	;;
+esac
+
+#service opendkim reload
