@@ -271,7 +271,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			for oldfiles in /etc/cron.daily/mc_clean_spam_aliases /usr/local/sbin/mc_pflog_renew /usr/local/sbin/mc_msg_size /usr/local/sbin/mc_dkim_ctrl /usr/local/sbin/mc_resetadmin
 			do
 			if [ -f "$oldfiles" ] ; then
-			rm "$oldfile"
+			rm "$oldfiles"
 			fi
 			done
 			
