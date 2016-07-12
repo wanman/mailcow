@@ -330,15 +330,26 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 					mysql --defaults-file=/etc/mysql/debian.cnf -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${my_rootpw}'; FLUSH PRIVILEGES;"
 				fi
 			fi
-			# Need to fix a group by query, then we can remove it...
-			# Added temp. fix for admin.php
-			#mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));"
-			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "DROP DATABASE IF EXISTS ${my_mailcowdb}; DROP DATABASE IF EXISTS $my_rcdb;"
-			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "CREATE DATABASE ${my_mailcowdb}; GRANT ALL PRIVILEGES ON ${my_mailcowdb}.* TO '${my_mailcowuser}'@'%' IDENTIFIED BY '${my_mailcowpass}';"
+			SQLCMDARRAY=(
+				"DROP DATABASE IF EXISTS ${my_mailcowdb}"
+				"DROP DATABASE IF EXISTS ${my_rcdb}"
+				"CREATE DATABASE ${my_mailcowdb}"
+				"GRANT ALL PRIVILEGES ON ${my_mailcowdb}.* TO '${my_mailcowuser}'@'%' IDENTIFIED BY '${my_mailcowpass}'"
+			)
 			if [[ ${mailing_platform} == "roundcube" ]]; then
-				mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "CREATE DATABASE $my_rcdb; GRANT ALL PRIVILEGES ON $my_rcdb.* TO '$my_rcuser'@'%' IDENTIFIED BY '$my_rcpass';"
+				SQLCMDARRAY+=(
+					"CREATE DATABASE ${my_rcdb}"
+					"GRANT ALL PRIVILEGES ON ${my_rcdb}.* TO '$my_rcuser'@'%' IDENTIFIED BY '$my_rcpass'"
+				)
 			fi
-			mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "FLUSH PRIVILEGES;"
+			SQLCMDARRAY+=("FLUSH PRIVILEGES")
+			for ((i = 0; i < ${#SQLCMDARRAY[@]}; i++)); do
+				mysql --host ${my_dbhost} -u root -p${my_rootpw} -e "${SQLCMDARRAY[$i]}"
+				if [[ $? -eq 1 ]]; then
+					echo "$(redb [ERR]) - SQL failed at command '${SQLCMDARRAY[$i]}'"
+					exit 1
+				fi
+			done
 			;;
 		postfix)
 			mkdir -p /etc/postfix/sql
