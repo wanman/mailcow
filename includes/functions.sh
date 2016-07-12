@@ -323,7 +323,12 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			;;
 		mysql)
 			if [[ ${mysql_useable} -ne 1 ]]; then
-				mysql --defaults-file=/etc/mysql/debian.cnf -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${my_rootpw}'; FLUSH PRIVILEGES;"
+				if [[ ! -z $(mysql --version | grep '5.7') ]]; then
+					# MySQL >= 5.7 uses auth_socket when installing without password (like we do)
+					mysql --defaults-file=/etc/mysql/debian.cnf -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${my_rootpw}'; FLUSH PRIVILEGES;"
+				else
+					mysql --defaults-file=/etc/mysql/debian.cnf -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${my_rootpw}'; FLUSH PRIVILEGES;"
+				fi
 			fi
 			# Need to fix a group by query, then we can remove it...
 			# Added temp. fix for admin.php
