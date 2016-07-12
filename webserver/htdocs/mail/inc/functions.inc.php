@@ -8,7 +8,8 @@ function hash_password($password) {
 		return "{SSHA256}".base64_encode(hash('sha256', $password.$salt_str, true).$salt_str);
 	}
 }
-function hasDomainAccess($link, $username, $role, $domain) {
+function hasDomainAccess($username, $role, $domain) {
+	global $pdo;
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL) && !ctype_alnum(str_replace(array('_', '.', '-'), '', $username))) {
 		return false;
 	}
@@ -17,24 +18,28 @@ function hasDomainAccess($link, $username, $role, $domain) {
 		return false;
 	}
 
-	$username	= mysqli_real_escape_string($link, $username);
-	$domain		= mysqli_real_escape_string($link, $domain);
-
-	$qstring = "SELECT `domain` FROM `domain_admins`
-		WHERE (
-			`active`='1'
-			AND `username`='".$username."'
-			AND `domain`='".$domain."'
-		)
-		OR 'admin'='".$role."'";
-	$qresult = mysqli_query($link, $qstring);
-	$num_results = mysqli_num_rows($qresult);
+	try {
+		$stmt = $pdo->prepare("SELECT `domain` FROM `domain_admins`
+			WHERE (
+				`active`='1'
+				AND `username` = :username
+				AND `domain` = :domain
+			)
+			OR 'admin' = :role");
+		$stmt->execute(array(':username' => $username, ':domain' => $domain, ':role' => $role));
+		$num_results = $stmt->rowCount();
+	} catch(PDOException $e) {
+		error_log($e);
+		return false;
+	}
 	if ($num_results != 0 && !empty($num_results)) {
 		return true;
 	}
 	return false;
 }
-function check_login($link, $user, $pass) {
+function check_login($user, $pass) {
+	// Don't catch errors to prevent displaying sensitive information, just die.
+	global $pdo;
 	if (!filter_var($user, FILTER_VALIDATE_EMAIL) && !ctype_alnum(str_replace(array('_', '.', '-'), '', $user))) {
 		return false;
 	}
@@ -43,35 +48,41 @@ function check_login($link, $user, $pass) {
 	}
 	$user = strtolower(trim($user));
 	$pass = escapeshellarg($pass);
-	$result = mysqli_query($link, "SELECT `password` FROM `admin`
-		WHERE `superadmin`='1'
-		AND `username`='".$user."'");
-	while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
-		$row = "'".$row[0]."'";
-		exec('echo '.$pass.' | doveadm pw -s '.$GLOBALS['HASHING'].' -t '.$row, $out, $return);
+	$stmt = $pdo->prepare("SELECT `password` FROM `admin`
+			WHERE `superadmin` = '1'
+			AND `username` = :user");
+	$stmt->execute(array(':user' => $user));
+	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	foreach ($rows as $row) {
+		$hash = "'".$row['password']."'";
+		exec('echo '.$pass.' | doveadm pw -s '.$GLOBALS['HASHING'].' -t '.$hash, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
 			unset($_SESSION['ldelay']);
 			return "admin";
 		}
 	}
-	$result = mysqli_query($link, "SELECT `password` FROM `admin`
-		WHERE `superadmin`='0'
-		AND `active`='1'
-		AND `username`='".$user."'");
-	while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
-		$row = "'".$row[0]."'";
-		exec("echo ".$pass." | doveadm pw -s ".$GLOBALS['HASHING']." -t ".$row, $out, $return);
+	$stmt = $pdo->prepare("SELECT `password` FROM `admin`
+			WHERE `superadmin` = '0'
+			AND `active`='1'
+			AND `username` = :user");
+	$stmt->execute(array(':user' => $user));
+	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	foreach ($rows as $row) {
+		$hash = "'".$row['password']."'";
+		exec('echo '.$pass.' | doveadm pw -s '.$GLOBALS['HASHING'].' -t '.$hash, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
 			unset($_SESSION['ldelay']);
 			return "domainadmin";
 		}
 	}
-	$result = mysqli_query($link, "SELECT `password` FROM `mailbox`
-		WHERE `active`='1'
-		AND `username`='".$user."'");
-	while ($row = mysqli_fetch_array($result, MYSQLI_NUM)) {
-		$row = "'".$row[0]."'";
-		exec("echo ".$pass." | doveadm pw -s ".$GLOBALS['HASHING']." -t ".$row, $out, $return);
+	$stmt = $pdo->prepare("SELECT `password` FROM `mailbox`
+			WHERE `active`='1'
+			AND `username` = :user");
+	$stmt->execute(array(':user' => $user));
+	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	foreach ($rows as $row) {
+		$hash = "'".$row['password']."'";
+		exec('echo '.$pass.' | doveadm pw -s '.$GLOBALS['HASHING'].' -t '.$hash, $out, $return);
 		if (strpos($out[0], "verified") !== false && $return == "0") {
 			unset($_SESSION['ldelay']);
 			return "user";
@@ -95,17 +106,6 @@ function formatBytes($size, $precision = 2) {
 		return "0";
 	}
 	return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
-}
-function mysqli_result($res,$row=0,$col=0) {
-    $numrows = mysqli_num_rows($res);
-    if ($numrows && $row <= ($numrows-1) && $row >=0){
-        mysqli_data_seek($res,$row);
-        $resrow = (is_numeric($col)) ? mysqli_fetch_row($res) : mysqli_fetch_assoc($res);
-        if (isset($resrow[$col])){
-            return $resrow[$col];
-        }
-    }
-    return false;
 }
 function return_mailcow_config($s) {
 	switch ($s) {
@@ -320,10 +320,10 @@ function opendkim_table($action, $which = "") {
 function sys_info($what) {
 	switch ($what) {
 		case "ram":
-			$return['total'] = filter_var(shell_exec("free -b | grep Mem | awk '{print $2}'"), FILTER_SANITIZE_NUMBER_FLOAT);
-			$return['used'] = filter_var(shell_exec("free -b | grep Mem | awk '{print $3}'"), FILTER_SANITIZE_NUMBER_FLOAT);
-			$return['free'] = filter_var(shell_exec("free -b | grep Mem | awk '{print $4}'"), FILTER_SANITIZE_NUMBER_FLOAT);
-			$return['used_percent'] = round(shell_exec("free -b | grep Mem | awk '{print $3/$2 * 100.0}'"));
+			$return['total']		= filter_var(shell_exec("free -b | grep Mem | awk '{print $2}'"), FILTER_SANITIZE_NUMBER_FLOAT);
+			$return['used']			= filter_var(shell_exec("free -b | grep Mem | awk '{print $3}'"), FILTER_SANITIZE_NUMBER_FLOAT);
+			$return['free']			= filter_var(shell_exec("free -b | grep Mem | awk '{print $4}'"), FILTER_SANITIZE_NUMBER_FLOAT);
+			$return['used_percent']	= round(shell_exec("free -b | grep Mem | awk '{print $3/$2 * 100.0}'"));
 			return $return;
 			break;
 		case "vmail_percentage":
@@ -372,7 +372,8 @@ function pflog_renew() {
 function dovecot_reload() {
 	shell_exec("sudo /usr/sbin/dovecot reload");
 }
-function mailbox_add_domain($link, $postarray) {
+function mailbox_add_domain($postarray) {
+	global $pdo;
 	global $lang;
 	if ($_SESSION['mailcow_cc_role'] != "admin") {
 		$_SESSION['return'] = array(
@@ -381,12 +382,12 @@ function mailbox_add_domain($link, $postarray) {
 		);
 		return false;
 	}
-	$domain				= idn_to_ascii(mysqli_real_escape_string($link, strtolower(trim($postarray['domain']))));
-	$description		= mysqli_real_escape_string($link, $postarray['description']);
-	$aliases			= mysqli_real_escape_string($link, $postarray['aliases']);
-	$mailboxes			= mysqli_real_escape_string($link, $postarray['mailboxes']);
-	$maxquota			= mysqli_real_escape_string($link, $postarray['maxquota']);
-	$quota				= mysqli_real_escape_string($link, $postarray['quota']);
+	$domain				= idn_to_ascii(strtolower(trim($postarray['domain'])));
+	$description		= $postarray['description'];
+	$aliases			= $postarray['aliases'];
+	$mailboxes			= $postarray['mailboxes'];
+	$maxquota			= $postarray['maxquota'];
+	$quota				= $postarray['quota'];
 
 	if ($maxquota > $quota) {
 		$_SESSION['return'] = array(
@@ -396,10 +397,10 @@ function mailbox_add_domain($link, $postarray) {
 		return false;
 	}
 
-	isset($postarray['active']) ? $active = '1' : $active = '0';
-	isset($postarray['relay_all_recipients']) ? $relay_all_recipients = '1' : $relay_all_recipients = '0';
-	isset($postarray['backupmx']) ? $backupmx = '1' : $backupmx = '0';
-	isset($postarray['relay_all_recipients']) ? $backupmx = '1' : true;
+	isset($postarray['active'])					? $active = '1' : $active = '0';
+	isset($postarray['relay_all_recipients'])	? $relay_all_recipients = '1' : $relay_all_recipients = '0';
+	isset($postarray['backupmx'])				? $backupmx = '1' : $backupmx = '0';
+	isset($postarray['relay_all_recipients'])	? $backupmx = '1' : true;
 
 	if (!is_valid_domain_name($domain)) {
 		$_SESSION['return'] = array(
@@ -419,23 +420,57 @@ function mailbox_add_domain($link, $postarray) {
 		}
 	}
 
-	$InsertDomain = "INSERT INTO `domain` (`domain`, `description`, `aliases`, `mailboxes`, `maxquota`, `quota`, `transport`, `backupmx`, `created`, `modified`, `active`, `relay_all_recipients`)
-		VALUES ('".$domain."', '".$description."', '".$aliases."', '".$mailboxes."', '".$maxquota."', '".$quota."', 'virtual', '".$backupmx."', NOW(), NOW(), '".$active."', '".$relay_all_recipients."')";
-	if (!mysqli_query($link, $InsertDomain)) {
+	try {
+		$stmt = $pdo->prepare("SELECT `domain` FROM `domain`
+			WHERE `domain` = :domain");
+		$stmt->execute(array(':domain' => $domain));
+		$num_results = $stmt->rowCount();
+	}
+	catch(PDOException $e) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'MySQL: '.mysqli_error($link)
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
+	if ($num_results != 0) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => sprintf($lang['danger']['domain_exists'], htmlspecialchars($domain))
 		);
 		return false;
 	}
 
-	$_SESSION['return'] = array(
-		'type' => 'success',
-		'msg' => sprintf($lang['success']['domain_added'], htmlspecialchars($domain))
-	);
+	try {
+		$stmt = $pdo->prepare("INSERT INTO `domain` (`domain`, `description`, `aliases`, `mailboxes`, `maxquota`, `quota`, `transport`, `backupmx`, `created`, `modified`, `active`, `relay_all_recipients`)
+			VALUES (:domain, :description, :aliases, :mailboxes, :maxquota, :quota, 'virtual', :backupmx, NOW(), NOW(), :active, :relay_all_recipients)");
+		$stmt->execute(array(
+			':domain' => $domain,
+			':description' => $description,
+			':aliases' => $aliases,
+			':mailboxes' => $mailboxes,
+			':maxquota' => $maxquota,
+			':quota' => $quota,
+			':backupmx' => $backupmx,
+			':active' => $active,
+			':relay_all_recipients' => $relay_all_recipients
+		));
+		$_SESSION['return'] = array(
+			'type' => 'success',
+			'msg' => sprintf($lang['success']['domain_added'], htmlspecialchars($domain))
+		);
+	}
+	catch (PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
 }
-function mailbox_add_alias($link, $postarray) {
+function mailbox_add_alias($postarray) {
 	global $lang;
+	global $pdo;
 	$addresses		= array_map('trim', preg_split( "/( |,|;|\n)/", $postarray['address']));
 	$gotos			= array_map('trim', preg_split( "/( |,|;|\n)/", $postarray['goto']));
 	isset($postarray['active']) ? $active = '1' : $active = '0';
@@ -473,7 +508,7 @@ function mailbox_add_alias($link, $postarray) {
 			return false;
 		}
 
-		if (!hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
+		if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
 				'msg' => sprintf($lang['danger']['access_denied'])
@@ -481,12 +516,19 @@ function mailbox_add_alias($link, $postarray) {
 			return false;
 		}
 
-		$address = mysqli_real_escape_string($link, $address);
-
-		$qstring = "SELECT `address` FROM `alias`
-			WHERE `address`='".$address."'";
-		$qresult = mysqli_query($link, $qstring);
-		$num_results = mysqli_num_rows($qresult);
+		try {
+			$stmt = $pdo->prepare("SELECT `address` FROM `alias`
+				WHERE `address`= :address");
+			$stmt->execute(array(':address' => $address));
+			$num_results = $stmt->rowCount();
+		}
+		catch(PDOException $e) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'MySQL: '.$e
+			);
+			return false;
+		}
 		if ($num_results != 0) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -495,10 +537,19 @@ function mailbox_add_alias($link, $postarray) {
 			return false;
 		}
 
-		$qstring = "SELECT `address` FROM `spamalias`
-			WHERE address='".$address."'";
-		$qresult = mysqli_query($link, $qstring);
-		$num_results = mysqli_num_rows($qresult);
+		try {
+			$stmt = $pdo->prepare("SELECT `address` FROM `spamalias`
+				WHERE `address`= :address");
+			$stmt->execute(array(':address' => $address));
+			$num_results = $stmt->rowCount();
+		}
+		catch(PDOException $e) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'MySQL: '.$e
+			);
+			return false;
+		}
 		if ($num_results != 0) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
@@ -530,24 +581,40 @@ function mailbox_add_alias($link, $postarray) {
 				);
 				return false;
 			}
-			$goto = mysqli_real_escape_string($link, $goto);
 		}
+
 		$gotos = array_filter($gotos);
 		$goto = implode(",", $gotos);
 
-		if (!filter_var($address, FILTER_VALIDATE_EMAIL) === true) {
-			$InsertAliasQuery = "INSERT INTO `alias` (`address`, `goto`, `domain`, `created`, `modified`, `active`)
-				VALUES ('@".$domain."', '".$goto."', '".$domain."', NOW(), NOW(), '".$active."')";
-		}
-		else {
-			$InsertAliasQuery = "INSERT INTO `alias` (`address`, `goto`, `domain`, `created`, `modified`, `active`)
-				VALUES ('".$address."', '".$goto."', '".$domain."', NOW(), NOW(), '".$active."')";
-		}
+		try {
+			$stmt = $pdo->prepare("INSERT INTO `alias` (`address`, `goto`, `domain`, `created`, `modified`, `active`)
+				VALUES (:address, :goto, :domain, NOW(), NOW(), :active)");
 
-		if (!mysqli_query($link, $InsertAliasQuery)) {
+			if (!filter_var($address, FILTER_VALIDATE_EMAIL) === true) {
+				$stmt->execute(array(
+					':address' => '@'.$domain,
+					':goto' => $goto,
+					':domain' => $domain,
+					':active' => $active
+				));
+			}
+			else {
+				$stmt->execute(array(
+					':address' => $address,
+					':goto' => $goto,
+					':domain' => $domain,
+					':active' => $active
+				));
+			}
+			$_SESSION['return'] = array(
+				'type' => 'success',
+				'msg' => sprintf($lang['success']['alias_added'])
+			);
+		}
+		catch (PDOException $e) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
-				'msg' => 'MySQL: '.mysqli_error($link)
+				'msg' => 'MySQL: '.$e
 			);
 			return false;
 		}
@@ -557,8 +624,9 @@ function mailbox_add_alias($link, $postarray) {
 		'msg' => sprintf($lang['success']['alias_added'])
 	);
 }
-function mailbox_add_alias_domain($link, $postarray) {
+function mailbox_add_alias_domain($postarray) {
 	global $lang;
+	global $pdo;
 	isset($postarray['active']) ? $active = '1' : $active = '0';
 
 	if (!is_valid_domain_name($postarray['alias_domain'])) {
@@ -577,7 +645,7 @@ function mailbox_add_alias_domain($link, $postarray) {
 		return false;
 	}
 
-	if (!hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $postarray['target_domain'])) {
+	if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $postarray['target_domain'])) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['access_denied'])
@@ -593,13 +661,22 @@ function mailbox_add_alias_domain($link, $postarray) {
 		return false;
 	}
 
-	$alias_domain	= mysqli_real_escape_string($link, strtolower(trim($postarray['alias_domain'])));
-	$target_domain	= mysqli_real_escape_string($link, strtolower(trim($postarray['target_domain'])));
+	$alias_domain	= strtolower(trim($postarray['alias_domain']));
+	$target_domain	= strtolower(trim($postarray['target_domain']));
 
-	$qstring = "SELECT `domain` FROM `domain`
-		WHERE `domain`='".$target_domain."'";
-	$qresult = mysqli_query($link, $qstring);
-	$num_results = mysqli_num_rows($qresult);
+	try {
+		$stmt = $pdo->prepare("SELECT `domain` FROM `domain`
+			WHERE `domain`= :target_domain");
+		$stmt->execute(array(':target_domain' => $target_domain));
+		$num_results = $stmt->rowCount();
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
 	if ($num_results == 0) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -608,22 +685,19 @@ function mailbox_add_alias_domain($link, $postarray) {
 		return false;
 	}
 
-	$qstring = "SELECT `domain` FROM `domain`
-		WHERE `domain`='".$alias_domain."'";
-	$qresult = mysqli_query($link, $qstring);
-	$num_results = mysqli_num_rows($qresult);
-	if ($num_results == 0) {
+	try {
+		$stmt = $pdo->prepare("SELECT `alias_domain` FROM `alias_domain`
+			WHERE `alias_domain`= :alias_domain");
+		$stmt->execute(array(':alias_domain' => $alias_domain));
+		$num_results = $stmt->rowCount();
+	}
+	catch(PDOException $e) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => sprintf($lang['danger']['aliasd_not_found'])
+			'msg' => 'MySQL: '.$e
 		);
 		return false;
 	}
-
-	$qstring = "SELECT alias_domain FROM alias_domain
-		WHERE `alias_domain`='".$alias_domain."'";
-	$qresult = mysqli_query($link, $qstring);
-	$num_results = mysqli_num_rows($qresult);
 	if ($num_results != 0) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -632,26 +706,35 @@ function mailbox_add_alias_domain($link, $postarray) {
 		return false;
 	}
 
-	$InsertAliasDomainQuery = "INSERT INTO `alias_domain` (`alias_domain`, `target_domain`, `created`, `modified`, `active`)
-		VALUES ('".$alias_domain."', '".$target_domain."', NOW(), NOW(), '".$active."')";
-	if (!mysqli_query($link, $InsertAliasDomainQuery)) {
+	try {
+		$stmt = $pdo->prepare("INSERT INTO `alias_domain` (`alias_domain`, `target_domain`, `created`, `modified`, `active`)
+			VALUES (:alias_domain, :target_domain, NOW(), NOW(), :active)");
+		$stmt->execute(array(
+			':alias_domain' => $alias_domain,
+			':target_domain' => $target_domain,
+			':active' => $active
+		));
+		$_SESSION['return'] = array(
+			'type' => 'success',
+			'msg' => sprintf($lang['success']['aliasd_added'], htmlspecialchars($alias_domain))
+		);
+	}
+	catch (PDOException $e) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'MySQL: '.mysqli_error($link)
+			'msg' => 'MySQL: '.$e
 		);
 		return false;
 	}
-	$_SESSION['return'] = array(
-		'type' => 'success',
-		'msg' => sprintf($lang['success']['aliasd_added'], htmlspecialchars($alias_domain))
-	);
+
 }
-function mailbox_edit_alias_domain($link, $postarray) {
+function mailbox_edit_alias_domain($postarray) {
 	global $lang;
+	global $pdo;
 	isset($postarray['active']) ? $active = '1' : $active = '0';
 	$alias_domain		= idn_to_ascii($postarray['alias_domain']);
-	$alias_domain		= mysqli_real_escape_string($link, strtolower(trim($alias_domain)));
-	$alias_domain_now	= mysqli_real_escape_string($link, strtolower(trim($postarray['alias_domain_now'])));
+	$alias_domain		= strtolower(trim($alias_domain));
+	$alias_domain_now	= strtolower(trim($postarray['alias_domain_now']));
 	if (!is_valid_domain_name($alias_domain)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -668,10 +751,20 @@ function mailbox_edit_alias_domain($link, $postarray) {
 		return false;
 	}
 
-	$DomainData = mysqli_fetch_assoc(mysqli_query($link,
-		"SELECT `target_domain` FROM `alias_domain`
-			WHERE `alias_domain`='".$alias_domain_now."'"));
-	if (!hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $DomainData['target_domain'])) {
+	try {
+		$stmt = $pdo->prepare("SELECT `target_domain` FROM `alias_domain`
+				WHERE `alias_domain`= :alias_domain_now");
+		$stmt->execute(array(':alias_domain_now' => $alias_domain_now));
+		$DomainData = $stmt->fetch(PDO::FETCH_ASSOC);
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
+	if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $DomainData['target_domain'])) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['access_denied'])
@@ -679,10 +772,19 @@ function mailbox_edit_alias_domain($link, $postarray) {
 		return false;
 	}
 
-	$qstring = "SELECT `target_domain` FROM `alias_domain`
-		WHERE `target_domain`='".$alias_domain."'";
-	$qresult = mysqli_query($link, $qstring);
-	$num_results = mysqli_num_rows($qresult);
+	try {
+		$stmt = $pdo->prepare("SELECT `target_domain` FROM `alias_domain`
+		WHERE `target_domain`= :alias_domain");
+		$stmt->execute(array(':alias_domain' => $alias_domain));
+		$num_results = $stmt->rowCount();
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
 	if ($num_results != 0) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -691,17 +793,19 @@ function mailbox_edit_alias_domain($link, $postarray) {
 		return false;
 	}
 
-	$UpdateAliasDomainQuery = "UPDATE `alias_domain` SET `alias_domain`='".$alias_domain."', `active`='".$active."' WHERE `alias_domain`='".$alias_domain_now."'";
-	if (!mysqli_query($link, $UpdateAliasDomainQuery)) {
+	try {
+		$stmt = $pdo->prepare("UPDATE `alias_domain` SET `alias_domain` = :alias_domain, `active` = :active WHERE `alias_domain` = :alias_domain_now");
+		$stmt->execute(array(
+			':alias_domain' => $alias_domain,
+			':alias_domain_now' => $alias_domain_now,
+			':active' => $active
+		));
+	}
+	catch (PDOException $e) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'MySQL Fehler: '.mysqli_error($link)
+			'msg' => 'MySQL: '.$e
 		);
-		mail_utf8($GLOBALS['ADMIN_EMAIL'],
-			"hosted.mailcow.de",
-			"noreply@hosted.mailcow.de",
-			"mailcow - MySQL Fehler",
-			mysqli_error($link));
 		return false;
 	}
 
@@ -710,9 +814,10 @@ function mailbox_edit_alias_domain($link, $postarray) {
 		'msg' => sprintf($lang['success']['aliasd_modified'], htmlspecialchars($alias_domain))
 	);
 }
-function mailbox_add_mailbox($link, $postarray) {
+function mailbox_add_mailbox($postarray) {
+	global $pdo;
 	global $lang;
-	$username		= strtolower(trim($postarray['local_part'])).'@'.strtolower(trim($postarray['domain']));
+	$username = strtolower(trim($postarray['local_part'])).'@'.strtolower(trim($postarray['domain']));
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -727,13 +832,12 @@ function mailbox_add_mailbox($link, $postarray) {
 		);
 		return false;
 	}
-	$domain			= mysqli_real_escape_string($link, strtolower(trim($postarray['domain'])));
-	$password		= mysqli_real_escape_string($link, $postarray['password']);
-	$password2		= mysqli_real_escape_string($link, $postarray['password2']);
-	$local_part		= mysqli_real_escape_string($link, strtolower(trim($postarray['local_part'])));
-	$username		= mysqli_real_escape_string($link, $username);
-	$name			= mysqli_real_escape_string($link, $postarray['name']);
-	$quota_m		= mysqli_real_escape_string($link, $postarray['quota']);
+	$domain			= strtolower(trim($postarray['domain']));
+	$password		= $postarray['password'];
+	$password2		= $postarray['password2'];
+	$local_part		= strtolower(trim($postarray['local_part']));
+	$name			= $postarray['name'];
+	$quota_m		= $postarray['quota'];
 
 	if (empty($name)) {
 		$name = $local_part;
@@ -755,17 +859,38 @@ function mailbox_add_mailbox($link, $postarray) {
 		return false;
 	}
 
-	$DomainData = mysqli_fetch_assoc(mysqli_query($link,
-		"SELECT `mailboxes`, `maxquota`, `quota` FROM `domain`
-			WHERE domain='".$domain."'"));
-	$MailboxData = mysqli_fetch_assoc(mysqli_query($link,
-		"SELECT 
-			count(*) as count,
-			coalesce(round(sum(quota)/1048576), 0) as quota
-				FROM `mailbox`
-					WHERE domain='".$domain."'"));
+	try {
+		$stmt = $pdo->prepare("SELECT `mailboxes`, `maxquota`, `quota` FROM `domain`
+			WHERE `domain` = :domain");
+		$stmt->execute(array(':domain' => $domain));
+		$DomainData = $stmt->fetch(PDO::FETCH_ASSOC);
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
 
-	if (!hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
+	try {
+		$stmt = $pdo->prepare("SELECT 
+			COUNT(*) as count,
+			COALESCE(ROUND(SUM(`quota`)/1048576), 0) as `quota`
+				FROM `mailbox`
+					WHERE `domain` = :domain");
+		$stmt->execute(array(':domain' => $domain));
+		$MailboxData = $stmt->fetch(PDO::FETCH_ASSOC);
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
+
+	if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['access_denied'])
@@ -773,9 +898,18 @@ function mailbox_add_mailbox($link, $postarray) {
 		return false;
 	}
 
-	$qstring = "SELECT `local_part` FROM `mailbox` WHERE local_part='".$local_part."' and domain='".$domain."'";
-	$qresult = mysqli_query($link, $qstring);
-	$num_results = mysqli_num_rows($qresult);
+	try {
+		$stmt = $pdo->prepare("SELECT `local_part` FROM `mailbox` WHERE `local_part` = :local_part and `domain`= :domain");
+		$stmt->execute(array(':local_part' => $local_part, ':domain' => $domain));
+		$num_results = $stmt->rowCount();
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
 	if ($num_results != 0) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -784,9 +918,18 @@ function mailbox_add_mailbox($link, $postarray) {
 		return false;
 	}
 
-	$qstring = "SELECT `address` FROM `alias` WHERE address='".$username."'";
-	$qresult = mysqli_query($link, $qstring);
-	$num_results = mysqli_num_rows($qresult);
+	try {
+		$stmt = $pdo->prepare("SELECT `address` FROM `alias` WHERE address= :username");
+		$stmt->execute(array(':username' => $username));
+		$num_results = $stmt->rowCount();
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
 	if ($num_results != 0) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -795,9 +938,18 @@ function mailbox_add_mailbox($link, $postarray) {
 		return false;
 	}
 
-	$qstring = "SELECT `address` FROM `spamalias` WHERE address='".$username."'";
-	$qresult = mysqli_query($link, $qstring);
-	$num_results = mysqli_num_rows($qresult);
+	try {
+		$stmt = $pdo->prepare("SELECT `address` FROM `spamalias` WHERE `address`= :username");
+		$stmt->execute(array(':username' => $username));
+		$num_results = $stmt->rowCount();
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
 	if ($num_results != 0) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -840,14 +992,22 @@ function mailbox_add_mailbox($link, $postarray) {
 		return false;
 	}
 
-	$qstring = "SELECT `domain` FROM `domain`
-		WHERE `domain`='".$domain."'";
-	$qresult = mysqli_query($link, $qstring);
-	$num_results = mysqli_num_rows($qresult);
+	try {
+		$stmt = $pdo->prepare("SELECT `domain` FROM `domain` WHERE `domain`= :domain");
+		$stmt->execute(array(':domain' => $domain));
+		$num_results = $stmt->rowCount();
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
 	if ($num_results == 0) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => sprintf($lang['danger']['domain_not_found'])
+			'msg' => $lang['danger']['domain_not_found']
 		);
 		return false;
 	}
@@ -869,36 +1029,53 @@ function mailbox_add_mailbox($link, $postarray) {
 		return false;
 	}
 
-	$create_user_array = array(
-		"INSERT INTO `mailbox` (`username`, `password`, `name`, `maildir`, `quota`, `local_part`, `domain`, `created`, `modified`, `active`) 
-			VALUES ('".$username."', '".$password_hashed."', '".$name."', '$maildir', '".$quota_b."', '$local_part', '".$domain."', now(), now(), '".$active."')",
-		"INSERT INTO `quota2` (`username`, `bytes`, `messages`)
-			VALUES ('".$username."', '0', '0')",
-		"INSERT INTO `alias` (`address`, `goto`, `domain`, `created`, `modified`, `active`)
-			VALUES ('".$username."', '".$username."', '".$domain."', now(), now(), '".$active."')"
-	);
+	try {
+		$stmt = $pdo->prepare("INSERT INTO `mailbox` (`username`, `password`, `name`, `maildir`, `quota`, `local_part`, `domain`, `created`, `modified`, `active`) 
+			VALUES (:username, :password_hashed, :name, :maildir, :quota_b, :local_part, :domain, NOW(), NOW(), :active)");
+		$stmt->execute(array(
+			':username' => $username,
+			':password_hashed' => $password_hashed,
+			':name' => $name,
+			':maildir' => $maildir,
+			':quota_b' => $quota_b,
+			':local_part' => $local_part,
+			':domain' => $domain,
+			':active' => $active
+		));
 
-	foreach ($create_user_array as $create_user) {
-		if (!mysqli_query($link, $create_user)) {
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'MySQL: '.mysqli_error($link)
-			);
-			return false;
-		}
+		$stmt = $pdo->prepare("INSERT INTO `quota2` (`username`, `bytes`, `messages`)
+			VALUES (:username, '0', '0')");
+		$stmt->execute(array(':username' => $username));
+
+		$stmt = $pdo->prepare("INSERT INTO `alias` (`address`, `goto`, `domain`, `created`, `modified`, `active`)
+			VALUES (:username1, :username2, :domain, NOW(), NOW(), :active)");
+		$stmt->execute(array(
+			':username1' => $username,
+			':username2' => $username,
+			':domain' => $domain,
+			':active' => $active
+		));
+
+		$_SESSION['return'] = array(
+			'type' => 'success',
+			'msg' => sprintf($lang['success']['mailbox_added'], htmlspecialchars($username))
+		);
 	}
-
-	$_SESSION['return'] = array(
-		'type' => 'success',
-		'msg' => sprintf($lang['success']['mailbox_added'], htmlspecialchars($username))
-	);
+	catch (PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
 }
-function mailbox_edit_alias($link, $postarray) {
+function mailbox_edit_alias($postarray) {
 	global $lang;
-	$address	= mysqli_real_escape_string($link, $postarray['address']);
+	global $pdo;
+	$address	= $postarray['address'];
 	$domain		= idn_to_ascii(substr(strstr($address, '@'), 1));
 	$local_part	= strstr($address, '@', true);
-	if (!hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
+	if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['access_denied'])
@@ -942,23 +1119,32 @@ function mailbox_edit_alias($link, $postarray) {
 		);
 		return false;
 	}
-	$mystring = "UPDATE `alias` SET `goto`='".$goto."', `active`='".$active."' WHERE `address`='".$address."'";
-	if (!mysqli_query($link, $mystring)) {
+
+	try {
+		$stmt = $pdo->prepare("UPDATE `alias` SET `goto` = :goto, `active`= :active WHERE `address` = :address");
+		$stmt->execute(array(
+			':goto' => $goto,
+			':active' => $active,
+			':address' => $address
+		));
+		$_SESSION['return'] = array(
+			'type' => 'success',
+		'msg' => sprintf($lang['success']['alias_modified'], htmlspecialchars($address))
+		);
+	}
+	catch (PDOException $e) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'MySQL: '.mysqli_error($link)
+			'msg' => 'MySQL: '.$e
 		);
 		return false;
 	}
-	$_SESSION['return'] = array(
-		'type' => 'success',
-		'msg' => sprintf($lang['success']['alias_modified'], htmlspecialchars($address))
-	);
 }
-function mailbox_edit_domain($link, $postarray) {
+function mailbox_edit_domain($postarray) {
 	global $lang;
-	$domain			= mysqli_real_escape_string($link, $postarray['domain']);
-	$description	= mysqli_real_escape_string($link, $postarray['description']);
+	global $pdo;
+	$domain			= $postarray['domain'];
+	$description	= $postarray['description'];
 
 	$aliases		= filter_var($postarray['aliases'], FILTER_SANITIZE_NUMBER_FLOAT);
 	$mailboxes		= filter_var($postarray['mailboxes'], FILTER_SANITIZE_NUMBER_FLOAT);
@@ -970,26 +1156,50 @@ function mailbox_edit_domain($link, $postarray) {
 	isset($postarray['relay_all_recipients']) ? $backupmx = '1' : true;
 	isset($postarray['active']) ? $active = '1' : $active = '0';
 
-	$MailboxData = mysqli_fetch_assoc(mysqli_query($link,
-			"SELECT 
-				count(*) AS count,
-				max(coalesce(round(quota/1048576), 0)) AS maxquota,
-				coalesce(round(sum(quota)/1048576), 0) AS quota
+	try {
+		$stmt = $pdo->prepare("SELECT 
+				COUNT(*) AS count,
+				MAX(COALESCE(ROUND(`quota`/1048576), 0)) AS `maxquota`,
+				COALESCE(ROUND(SUM(`quota`)/1048576), 0) AS `quota`
 					FROM `mailbox`
-						WHERE domain='".$domain."'"));
-	$AliasData = mysqli_fetch_assoc(mysqli_query($link, 
-			"SELECT count(*) AS count FROM `alias`
-				WHERE domain='".$domain."'
+						WHERE domain= :domain");
+		$stmt->execute(array(':domain' => $domain));
+		$MailboxData = $stmt->fetch(PDO::FETCH_ASSOC);
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
+
+
+	try {
+		$stmt = $pdo->prepare("SELECT COUNT(*) AS `count` FROM `alias`
+				WHERE domain = :domain
 				AND address NOT IN (
 					SELECT `username` FROM `mailbox`
-				)"));
-	if (!hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
+				)");
+		$stmt->execute(array(':domain' => $domain));
+		$AliasData = $stmt->fetch(PDO::FETCH_ASSOC);
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
+
+	if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['access_denied'])
 		);
 		return false;
 	}
+	
 	if ($maxquota > $quota) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -997,6 +1207,7 @@ function mailbox_edit_domain($link, $postarray) {
 		);
 		return false;
 	}
+	
 	if ($MailboxData['maxquota'] > $maxquota) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1004,6 +1215,7 @@ function mailbox_edit_domain($link, $postarray) {
 		);
 		return false;
 	}
+	
 	if ($MailboxData['quota'] > $quota) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1011,6 +1223,7 @@ function mailbox_edit_domain($link, $postarray) {
 		);
 		return false;
 	}
+	
 	if ($MailboxData['count'] > $mailboxes) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1018,6 +1231,7 @@ function mailbox_edit_domain($link, $postarray) {
 		);
 		return false;
 	}
+	
 	if ($AliasData['count'] > $aliases) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1033,34 +1247,50 @@ function mailbox_edit_domain($link, $postarray) {
 		);
 		return false;
 	}
-	$UpdateDomainData = "UPDATE `domain` SET 
-		`modified`=now(),
-		`relay_all_recipients`='".$relay_all_recipients."',
-		`backupmx`='".$backupmx."',
-		`active`='".$active."',
-		`quota`='".$quota."',
-		`maxquota`='".$maxquota."',
-		`mailboxes`='".$mailboxes."',
-		`aliases`='".$aliases."',
-		`description`='".$description."'
-			WHERE domain='".$domain."'";
-	if (!mysqli_query($link, $UpdateDomainData)) {
+
+	try {
+		$stmt = $pdo->prepare("UPDATE `domain` SET 
+		`modified`= NOW(),
+		`relay_all_recipients` = :relay_all_recipients,
+		`backupmx` = :backupmx,
+		`active` = :active,
+		`quota` = :quota,
+		`maxquota` = :maxquota,
+		`mailboxes` = :mailboxes,
+		`aliases` = :aliases,
+		`description` = :description,
+			WHERE domain = :domain");
+		$stmt->execute(array(
+			':relay_all_recipients' => $relay_all_recipients,
+			':backupmx' => $backupmx,
+			':active' => $active,
+			':quota' => $quota,
+			':maxquota' => $maxquota,
+			':mailboxes' => $mailboxes,
+			':aliases' => $aliases,
+			':description' => $description,
+			':domain' => $domain
+		));
+		$_SESSION['return'] = array(
+			'type' => 'success',
+			'msg' => sprintf($lang['success']['domain_modified'], htmlspecialchars($domain))
+		);
+	}
+	catch (PDOException $e) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'MySQL: '.mysqli_error($link)
+			'msg' => 'MySQL: '.$e
 		);
 		return false;
 	}
-	$_SESSION['return'] = array(
-		'type' => 'success',
-		'msg' => sprintf($lang['success']['domain_modified'], htmlspecialchars($domain))
-	);
+
 }
-function mailbox_edit_domainadmin($link, $postarray) {
+function mailbox_edit_domainadmin($postarray) {
 	global $lang;
-	$username		= mysqli_real_escape_string($link, $postarray['username']);
-	$password		= mysqli_real_escape_string($link, $postarray['password']);
-	$password2		= mysqli_real_escape_string($link, $postarray['password2']);
+	global $pdo;
+	$username		= $postarray['username'];
+	$password		= $postarray['password'];
+	$password2		= $postarray['password2'];
 	isset($postarray['active']) ? $active = '1' : $active = '0';
 
 	if ($_SESSION['mailcow_cc_role'] != "admin") {
@@ -1070,6 +1300,7 @@ function mailbox_edit_domainadmin($link, $postarray) {
 		);
 		return false;
 	}
+	
 	foreach ($postarray['domain'] as $domain) {
 		if (!is_valid_domain_name($domain)) {
 			$_SESSION['return'] = array(
@@ -1078,7 +1309,8 @@ function mailbox_edit_domainadmin($link, $postarray) {
 			);
 			return false;
 		}
-	};
+	}
+
 	if (!ctype_alnum(str_replace(array('_', '.', '-'), '', $username))) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1086,25 +1318,40 @@ function mailbox_edit_domainadmin($link, $postarray) {
 		);
 		return false;
 	}
-	$DeleteDomainAdminsData = "DELETE FROM `domain_admins` WHERE username='".$username."'";
-	if (!mysqli_query($link, $DeleteDomainAdminsData)) {
+
+	try {
+		$stmt = $pdo->prepare("DELETE FROM `domain_admins` WHERE `username` = :username");
+		$stmt->execute(array(
+			':username' => $username,
+		));
+	}
+	catch (PDOException $e) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'MySQL: '.mysqli_error($link)
+			'msg' => 'MySQL: '.$e
 		);
 		return false;
 	}
+
 	foreach ($postarray['domain'] as $domain) {
-		$InsertDomainAdminsData = "INSERT INTO `domain_admins` (`username`, `domain`, `created`, `active`)
-			VALUES ('".$username."', '".$domain."', now(), '".$active."')";
-		if (!mysqli_query($link, $InsertDomainAdminsData)) {
+		try {
+			$stmt = $pdo->prepare("INSERT INTO `domain_admins` (`username`, `domain`, `created`, `active`)
+				VALUES (:username, :domain, NOW(), :active)");
+			$stmt->execute(array(
+				':username' => $username,
+				':domain' => $domain,
+				':active' => $active
+			));
+		}
+		catch (PDOException $e) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
-				'msg' => 'MySQL: '.mysqli_error($link)
+				'msg' => 'MySQL: '.$e
 			);
 			return false;
 		}
 	}
+
 	if (!empty($password) && !empty($password2)) {
 		if ($password != $password2) {
 			$_SESSION['return'] = array(
@@ -1114,25 +1361,47 @@ function mailbox_edit_domainadmin($link, $postarray) {
 			return false;
 		}
 		$password_hashed = hash_password($password);
-		$UpdateAdminData = "UPDATE admin SET modified=now(), active='".$active."', password='".$password_hashed."' WHERE username='".$username."';";
+		try {
+			$stmt = $pdo->prepare("UPDATE `admin` SET `modified`=NOW(), `active` = :active, `password` = :password_hashed WHERE `username` = :username");
+			$stmt->execute(array(
+				':password_hashed' => $password_hashed,
+				':username' => $username,
+				':active' => $active
+			));
+		}
+		catch (PDOException $e) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'MySQL: '.$e
+			);
+			return false;
+		}
 	}
 	else {
-		$UpdateAdminData = "UPDATE admin SET modified=now(), active='".$active."' where username='".$username."'";
+		try {
+			$stmt = $pdo->prepare("UPDATE `admin` SET `modified`=NOW(), `active` = :active WHERE `username` = :username");
+			$stmt->execute(array(
+				':username' => $username,
+				':active' => $active
+			));
+		}
+		catch (PDOException $e) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'MySQL: '.$e
+			);
+			return false;
+		}
 	}
-	if (!mysqli_query($link, $UpdateAdminData)) {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => 'MySQL: '.mysqli_error($link)
-		);
-		return false;
-	}
+
 	$_SESSION['return'] = array(
 		'type' => 'success',
 		'msg' => sprintf($lang['success']['domain_admin_modified'], htmlspecialchars($username))
 	);
 }
-function mailbox_edit_mailbox($link, $postarray) {
+function mailbox_edit_mailbox($postarray) {
 	global $lang;
+	global $pdo;
 	isset($postarray['active']) ? $active = '1' : $active = '0';
 	if (!filter_var($postarray['username'], FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
@@ -1141,32 +1410,49 @@ function mailbox_edit_mailbox($link, $postarray) {
 		);
 		return false;
 	}
-	$quota_m		= mysqli_real_escape_string($link, $postarray['quota']);
+	$quota_m		= $postarray['quota'];
 	$quota_b		= $quota_m*1048576;
-	$username		= mysqli_real_escape_string($link, $postarray['username']);
-	$name			= mysqli_real_escape_string($link, $postarray['name']);
+	$username		= $postarray['username'];
+	$name			= $postarray['name'];
 	$password		= $postarray['password'];
 	$password2		= $postarray['password2'];
-	$MailboxData1	= mysqli_fetch_assoc(mysqli_query($link,
-		"SELECT `domain`
+
+	try {
+		$stmt = $pdo->prepare("SELECT `domain`
 			FROM `mailbox`
-				WHERE username='".$username."'"));
-	$MailboxData2	= mysqli_fetch_assoc(mysqli_query($link,
-		"SELECT 
-			coalesce(round(sum(quota)/1048576), 0) as quota_m_now 
+				WHERE username = :username");
+		$stmt->execute(array(':username' => $username));
+		$MailboxData1 = $stmt->fetch(PDO::FETCH_ASSOC);
+
+		$stmt = $pdo->prepare("SELECT 
+			COALESCE(ROUND(SUM(`quota`)/1048576), 0) as `quota_m_now`
 				FROM `mailbox`
-					WHERE username='".$username."'"));
-	$MailboxData3	= mysqli_fetch_assoc(mysqli_query($link,
-		"SELECT 
-			coalesce(round(sum(quota)/1048576), 0) as quota_m_in_use
+					WHERE `username` = :username");
+		$stmt->execute(array(':username' => $username));
+		$MailboxData2 = $stmt->fetch(PDO::FETCH_ASSOC);
+
+		$stmt = $pdo->prepare("SELECT 
+			COALESCE(ROUND(SUM(`quota`)/1048576), 0) as `quota_m_in_use`
 				FROM `mailbox`
-					WHERE domain='".$MailboxData1['domain']."'"));
-	$DomainData		= mysqli_fetch_assoc(mysqli_query($link,
-		"SELECT `quota`, `maxquota`
+					WHERE `domain` = :domain");
+		$stmt->execute(array(':domain' => $MailboxData1['domain']));
+		$MailboxData3 = $stmt->fetch(PDO::FETCH_ASSOC);
+
+		$stmt = $pdo->prepare("SELECT `quota`, `maxquota`
 			FROM `domain`
-				WHERE domain='".$MailboxData1['domain']."'"));
-	
-	if (!hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $MailboxData1['domain'])) {
+				WHERE `domain` = :domain");
+		$stmt->execute(array(':domain' => $MailboxData1['domain']));
+		$DomainData = $stmt->fetch(PDO::FETCH_ASSOC);
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
+
+	if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $MailboxData1['domain'])) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['access_denied'])
@@ -1195,15 +1481,21 @@ function mailbox_edit_mailbox($link, $postarray) {
 		);
 		return false;
 	}
-	$DeleteSenderAclData = "DELETE FROM sender_acl
-		WHERE logged_in_as='".$username."';";
-	if (!mysqli_query($link, $DeleteSenderAclData)) {
+
+	try {
+		$stmt = $pdo->prepare("DELETE FROM `sender_acl` WHERE `logged_in_as` = :username");
+		$stmt->execute(array(
+			':username' => $username
+		));
+	}
+	catch (PDOException $e) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'MySQL: '.mysqli_error($link)
+			'msg' => 'MySQL: '.$e
 		);
 		return false;
 	}
+
 	if (isset($postarray['sender_acl']) && is_array($postarray['sender_acl'])) {
 		foreach ($postarray['sender_acl'] as $sender_acl) {
 			if (!filter_var($sender_acl, FILTER_VALIDATE_EMAIL) && 
@@ -1216,15 +1508,20 @@ function mailbox_edit_mailbox($link, $postarray) {
 			}
 		}
 		foreach ($postarray['sender_acl'] as $sender_acl) {
-			$InsertSenderAclData = "INSERT INTO `sender_acl`
-				(`send_as`, `logged_in_as`)
-					VALUES ('".$sender_acl."', '".$username."')";
-			if (!mysqli_query($link, $InsertSenderAclData)) {
+			try {
+				$stmt = $pdo->prepare("INSERT INTO `sender_acl` (`send_as`, `logged_in_as`)
+					VALUES (:sender_acl, :username)");
+				$stmt->execute(array(
+					':sender_acl' => $sender_acl,
+					':username' => $username
+				));
+			}
+			catch (PDOException $e) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
-					'msg' => 'MySQL: '.mysqli_error($link)
+					'msg' => 'MySQL: '.$e
 				);
-			return false;
+				return false;
 			}
 		}
 	}
@@ -1237,62 +1534,84 @@ function mailbox_edit_mailbox($link, $postarray) {
 			return false;
 		}
 		$password_hashed = hash_password($password);
-		$UpdateMailboxArray = array(
-			"UPDATE `alias` SET
-				`modified`=NOW(),
-				`active`='".$active."'
-					WHERE `address`='".$username."'",
-			"UPDATE mailbox SET
-				`modified`=NOW(),
-				`active`='".$active."',
-				`password`='".$password_hashed."',
-				`name`='".utf8_decode($name)."',
-				`quota`='".$quota_b."'
-					WHERE username='".$username."'"
-		);
-		foreach ($UpdateMailboxArray as $UpdateUserData) {
-			if (!mysqli_query($link, $UpdateUserData)) {
-				$_SESSION['return'] = array(
-					'type' => 'danger',
-					'msg' => 'MySQL: '.mysqli_error($link)
-				);
-				return false;
-			}
+		try {
+			$stmt = $pdo->prepare("UPDATE `alias` SET
+					`modified` = NOW(),
+					`active` = :active
+						WHERE `address` = :address");
+			$stmt->execute(array(
+				':address' => $username,
+				':active' => $active
+			));
+			$stmt = $pdo->prepare("UPDATE `mailbox` SET
+					`modified` = NOW(),
+					`active` = :active,
+					`password` = :password_hashed,
+					`name`= :name,
+					`quota` = :quota_b
+						WHERE `username` = :username");
+			$stmt->execute(array(
+				':password_hashed' => $password_hashed,
+				':active' => $active,
+				':name' => utf8_decode($name),
+				':active' => $active,
+				':quota_b' => $quota_b,
+				':username' => $username
+			));
+			$_SESSION['return'] = array(
+				'type' => 'success',
+				'msg' => sprintf($lang['success']['mailbox_modified'], $username)
+			);
+			return true;
 		}
+		catch (PDOException $e) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'MySQL: '.$e
+			);
+			return false;
+		}
+	}
+	try {
+		$stmt = $pdo->prepare("UPDATE `alias` SET
+				`modified` = NOW(),
+				`active` = :active
+					WHERE `address` = :address");
+		$stmt->execute(array(
+			':address' => $username,
+			':active' => $active
+		));
+		$stmt = $pdo->prepare("UPDATE `mailbox` SET
+				`modified` = NOW(),
+				`active` = :active,
+				`name`= :name,
+				`quota` = :quota_b
+					WHERE `username` = :username");
+		$stmt->execute(array(
+			':password' => $password_hashed,
+			':active' => $active,
+			':name' => utf8_decode($name),
+			':active' => $active,
+			':quota_b' => $quota_b,
+			':username' => $username
+		));
 		$_SESSION['return'] = array(
 			'type' => 'success',
 			'msg' => sprintf($lang['success']['mailbox_modified'], $username)
 		);
 		return true;
 	}
-	$UpdateMailboxArray = array(
-		"UPDATE `alias` SET
-			`modified`=NOW(),
-			`active`='".$active."'
-				WHERE address='".$username."'",
-		"UPDATE `mailbox` SET
-			`modified`=NOW(),
-			`active`='".$active."',
-			`name`='".utf8_decode($name)."',
-			`quota`='".$quota_b."'
-				WHERE `username`='".$username."'"
-	);
-	foreach ($UpdateMailboxArray as $UpdateUserData) {
-		if (!mysqli_query($link, $UpdateUserData)) {
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'MySQL: '.mysqli_error($link)
-			);
-			return false;
-		}
+	catch (PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
 	}
-	$_SESSION['return'] = array(
-		'type' => 'success',
-		'msg' => sprintf($lang['success']['mailbox_modified'], $username)
-	);
 }
-function mailbox_delete_domain($link, $postarray) {
+function mailbox_delete_domain($postarray) {
 	global $lang;
+	global $pdo;
 	$domain = $postarray['domain'];
 	if ($_SESSION['mailcow_cc_role'] != "admin") {
 		$_SESSION['return'] = array(
@@ -1308,39 +1627,78 @@ function mailbox_delete_domain($link, $postarray) {
 		);
 		return false;
 	}
-	$domain	= mysqli_real_escape_string($link, strtolower(trim($domain)));
-	$MailboxString = "SELECT `username` FROM `mailbox`
-		WHERE domain='".$domain."';";
-	$MailboxResult = mysqli_query($link, $MailboxString)
-		OR die(mysqli_error($link));
-	$MailboxCount = mysqli_num_rows($MailboxResult);
-	if ($MailboxCount != 0 || !empty($MailboxCount)) {
+	$domain	= strtolower(trim($domain));
+
+
+	try {
+		$stmt = $pdo->prepare("SELECT `username` FROM `mailbox`
+			WHERE `domain` = :domain");
+		$stmt->execute(array(':domain' => $domain));
+		$num_results = $stmt->rowCount();
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
+	if ($num_results != 0 || !empty($num_results)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['domain_not_empty'])
 		);
 		return false;
 	}
-	$DeleteDomainArray = array(
-		"DELETE FROM domain WHERE domain='".$domain."';",
-		"DELETE FROM domain_admins WHERE domain='".$domain."';",
-		"DELETE FROM alias WHERE domain='".$domain."';",
-		"DELETE FROM sender_acl WHERE logged_in_as LIKE '%@".$domain."';",
-		"DELETE FROM quota2 WHERE username LIKE '%@".$domain."';",
-		"DELETE FROM alias_domain WHERE target_domain='".$domain."';",
-		"DELETE FROM mailbox WHERE domain='".$domain."';",
-		"DELETE FROM userpref WHERE username LIKE '%@".$domain."';",
-		"DELETE FROM spamalias WHERE address LIKE '%@".$domain."';",
-		"DELETE FROM fugluconfig WHERE scope LIKE '%@".$domain."';"
-	);
-	foreach ($DeleteDomainArray as $DeleteDomainData) {
-		if (!mysqli_query($link, $DeleteDomainData)) {
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'MySQL: '.mysqli_error($link)
-			);
-			return false;
-		}
+
+	try {
+		$stmt = $pdo->prepare("DELETE FROM `domain` WHERE `domain` = :domain");
+		$stmt->execute(array(
+			':domain' => $domain,
+		));
+		$stmt = $pdo->prepare("DELETE FROM `domain_admins` WHERE `domain` = :domain");
+		$stmt->execute(array(
+			':domain' => $domain,
+		));
+		$stmt = $pdo->prepare("DELETE FROM `alias` WHERE `domain` = :domain");
+		$stmt->execute(array(
+			':domain' => $domain,
+		));
+		$stmt = $pdo->prepare("DELETE FROM `alias_domain` WHERE `target_domain` = :domain");
+		$stmt->execute(array(
+			':domain' => $domain,
+		));
+		$stmt = $pdo->prepare("DELETE FROM `mailbox` WHERE `domain` = :domain");
+		$stmt->execute(array(
+			':domain' => $domain,
+		));
+		$stmt = $pdo->prepare("DELETE FROM `sender_acl` WHERE `logged_in_as` LIKE :domain");
+		$stmt->execute(array(
+			':domain' => '%@'.$domain,
+		));
+		$stmt = $pdo->prepare("DELETE FROM `quota2` WHERE `username` = :domain");
+		$stmt->execute(array(
+			':domain' => '%@'.$domain,
+		));
+		$stmt = $pdo->prepare("DELETE FROM `userpref` WHERE `username` = :domain");
+		$stmt->execute(array(
+			':domain' => '%@'.$domain,
+		));
+		$stmt = $pdo->prepare("DELETE FROM `spamalias` WHERE `address` = :domain");
+		$stmt->execute(array(
+			':domain' => '%@'.$domain,
+		));
+		$stmt = $pdo->prepare("DELETE FROM `fugluconfig` WHERE `scope` = :domain");
+		$stmt->execute(array(
+			':domain' => '%@'.$domain,
+		));
+	}
+	catch (PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
 	}
 	$_SESSION['return'] = array(
 		'type' => 'success',
@@ -1348,25 +1706,43 @@ function mailbox_delete_domain($link, $postarray) {
 	);
 	return true;
 }
-function mailbox_delete_alias($link, $postarray) {
+function mailbox_delete_alias($postarray) {
 	global $lang;
-	$address = mysqli_real_escape_string($link, $postarray['address']);
-	$local_part = strstr($address, '@', true);
-	$domain = substr(strrchr($address, "@"), 1);
-	$gotos = mysqli_fetch_assoc(mysqli_query($link, "SELECT `goto` FROM `alias` WHERE `address`='".$address."'"));
-	$goto_array = explode(',', $gotos);
-	if (!hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
+	global $pdo;
+	$address		= $postarray['address'];
+	$local_part		= strstr($address, '@', true);
+	$domain			= substr(strrchr($address, "@"), 1);
+	try {
+		$stmt = $pdo->prepare("SELECT `goto` FROM `alias` WHERE `address` = :address");
+		$stmt->execute(array(':address' => $address));
+		$gotos = $stmt->fetch(PDO::FETCH_ASSOC);
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
+	$goto_array		= explode(',', $gotos);
+
+	if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['access_denied'])
 		);
 		return false;
 	}
-	$mystring = "DELETE FROM `alias` WHERE `address`='".$address."' AND `address` NOT IN (SELECT `username` FROM `mailbox`)";
-	if (!mysqli_query($link, $mystring)) {
+	try {
+		$stmt = $pdo->prepare("DELETE FROM `alias` WHERE `address` = :address AND `address` NOT IN (SELECT `username` FROM `mailbox`)");
+		$stmt->execute(array(
+			':address' => $address
+		));
+	}
+	catch (PDOException $e) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'MySQL: '.mysqli_error($link)
+			'msg' => 'MySQL: '.$e
 		);
 		return false;
 	}
@@ -1374,8 +1750,9 @@ function mailbox_delete_alias($link, $postarray) {
 		'type' => 'success',
 		'msg' => sprintf($lang['success']['alias_removed'], htmlspecialchars($address))
 	);
+
 }
-function mailbox_delete_alias_domain($link, $postarray) {
+function mailbox_delete_alias_domain($postarray) {
 	global $lang;
 	if (!is_valid_domain_name($postarray['alias_domain'])) {
 		$_SESSION['return'] = array(
@@ -1384,23 +1761,39 @@ function mailbox_delete_alias_domain($link, $postarray) {
 		);
 		return false;
 	}
-	$alias_domain = mysqli_real_escape_string($link, $postarray['alias_domain']);
-	$DomainData = mysqli_fetch_assoc(mysqli_query($link,
-		"SELECT `target_domain` FROM `alias_domain`
-			WHERE `alias_domain`='".$alias_domain."'"));
-	if (!hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $DomainData['target_domain'])) {
+	$alias_domain = $postarray['alias_domain'];
+	try {
+		$stmt = $pdo->prepare("SELECT `target_domain` FROM `alias_domain`
+				WHERE `alias_domain`= :alias_domain");
+		$stmt->execute(array(':alias_domain' => $alias_domain));
+		$DomainData = $stmt->fetch(PDO::FETCH_ASSOC);
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
+
+	if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $DomainData['target_domain'])) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['access_denied'])
 		);
 		return false;
 	}
-	$DeleteAliasDomain = "DELETE FROM `alias_domain`
-		WHERE alias_domain='".$alias_domain."'";
-	if (!mysqli_query($link, $DeleteAliasDomain)) {
+
+	try {
+		$stmt = $pdo->prepare("DELETE FROM `alias_domain` WHERE `alias_domain` = :alias_domain");
+		$stmt->execute(array(
+			':alias_domain' => $alias_domain,
+		));
+	}
+	catch (PDOException $e) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'MySQL: '.mysqli_error($link)
+			'msg' => 'MySQL: '.$e
 		);
 		return false;
 	}
@@ -1409,10 +1802,11 @@ function mailbox_delete_alias_domain($link, $postarray) {
 		'msg' => sprintf($lang['success']['alias_domain_removed'], htmlspecialchars($alias_domain))
 	);
 }
-function mailbox_delete_mailbox($link, $postarray) {
+function mailbox_delete_mailbox($postarray) {
 	global $lang;
-	$domain = substr(strrchr($postarray['username'], "@"), 1);
-	$username = mysqli_real_escape_string($link, $postarray['username']);
+	global $pdo;
+	$domain		= substr(strrchr($postarray['username'], "@"), 1);
+	$username	= $postarray['username'];
 	if (!filter_var($postarray['username'], FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1420,51 +1814,75 @@ function mailbox_delete_mailbox($link, $postarray) {
 		);
 		return false;
 	}
-	if (!hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
+	if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['access_denied'])
 		);
 		return false;
 	}
-	$DeleteMailboxArray = array(
-		"DELETE FROM `alias` 
-			WHERE `goto`='".$username."'",
-		"UPDATE `alias` SET
-			`goto`=REPLACE(`goto`, ',".$username.",', ',')",
-		"UPDATE `alias` SET
-			`goto`=REPLACE(`goto`, ',".$username."', '')",
-		"UPDATE `alias` SET
-			`goto`=REPLACE(`goto`, '".$username.",', '')",
-		"DELETE FROM `quota2`
-			WHERE `username`='".$username."'",
-		"DELETE FROM `mailbox`
-			WHERE `username`='".$username."'",
-		"DELETE FROM `sender_acl`
-			WHERE `logged_in_as`='".$username."'",
-		"DELETE FROM `spamalias`
-			WHERE `goto`='".$username."'",
-		"DELETE FROM `fugluconfig`
-			WHERE `scope`='".$username."'",
-		"DELETE FROM `userpref`
-			WHERE `username`='".$username."'"
-	);
-	foreach ($DeleteMailboxArray as $DeleteMailbox) {
-		if (!mysqli_query($link, $DeleteMailbox)) {
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'MySQL: '.mysqli_error($link)
-			);
-			return false;
+
+	try {
+		$stmt = $pdo->prepare("DELETE FROM `alias` WHERE `goto` = :username");
+		$stmt->execute(array(
+			':username' => $username
+		));
+		$stmt = $pdo->prepare("DELETE FROM `quota2` WHERE `username` = :username");
+		$stmt->execute(array(
+			':username' => $username
+		));
+		$stmt = $pdo->prepare("DELETE FROM `mailbox` WHERE `username` = :username");
+		$stmt->execute(array(
+			':username' => $username
+		));
+		$stmt = $pdo->prepare("DELETE FROM `sender_acl` WHERE `logged_in_as` = :username");
+		$stmt->execute(array(
+			':username' => $username
+		));
+		$stmt = $pdo->prepare("DELETE FROM `spamalias` WHERE `goto` = :username");
+		$stmt->execute(array(
+			':username' => $username
+		));
+		$stmt = $pdo->prepare("DELETE FROM `fugluconfig` WHERE `scope` = :username");
+		$stmt->execute(array(
+			':username' => $username
+		));
+		$stmt = $pdo->prepare("DELETE FROM `userpref` WHERE `username` = :username");
+		$stmt->execute(array(
+			':username' => $username
+		));
+		$stmt = $pdo->prepare("SELECT `address`, `goto` FROM `alias`
+				WHERE `goto` LIKE :username");
+		$stmt->execute(array(':username' => '%'.$username.'%'));
+		$GotoData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($GotoData as $gotos) {
+			$goto_exploded = explode(',', $gotos['goto']);
+			if (($key = array_search($username, $goto_exploded)) !== false) {
+				unset($goto_exploded[$key]);
+			}
+			$gotos_rebuild = implode(',', $goto_exploded);
+			$stmt = $pdo->prepare("UPDATE `alias` SET `goto` = :goto WHERE `address` = :address");
+			$stmt->execute(array(
+				':goto' => $gotos_rebuild,
+				':address' => $gotos['address']
+			));
 		}
+	}
+	catch (PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
 	}
 	$_SESSION['return'] = array(
 		'type' => 'success',
 		'msg' => sprintf($lang['success']['mailbox_removed'], htmlspecialchars($username))
 	);
 }
-function set_admin_account($link, $postarray) {
+function set_admin_account($postarray) {
 	global $lang;
+	global $pdo;
 	if ($_SESSION['mailcow_cc_role'] != "admin") {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1472,8 +1890,8 @@ function set_admin_account($link, $postarray) {
 		);
 		return false;
 	}
-	$name			= mysqli_real_escape_string($link, $postarray['admin_user']);
-	$name_now		= mysqli_real_escape_string($link, $postarray['admin_user_now']);
+	$name		= $postarray['admin_user'];
+	$name_now	= $postarray['admin_user_now'];
 
 	if (!ctype_alnum(str_replace(array('_', '.', '-'), '', $name)) || empty ($name)) {
 		$_SESSION['return'] = array(
@@ -1498,41 +1916,60 @@ function set_admin_account($link, $postarray) {
 			return false;
 		}
 		$password_hashed = hash_password($postarray['admin_pass']);
-		$password_hashed = mysqli_real_escape_string($link, $password_hashed);
-		$UpdateAdmin = "UPDATE `admin` SET 
-			`modified`=NOW(),
-			`password`='".$password_hashed."',
-			`username`='".$name."'
-				WHERE `username`='".$name_now."'";
-		if (!mysqli_query($link, $UpdateAdmin)) {
+		try {
+			$stmt = $pdo->prepare("UPDATE `admin` SET 
+				`modified` = NOW(),
+				`password` = :password_hashed,
+				`username` = :name
+					WHERE `username` = :name_now");
+			$stmt->execute(array(
+				':password_hashed' => $password_hashed,
+				':name' => $name,
+				':username' => $name_now
+			));
+		}
+		catch (PDOException $e) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
-				'msg' => 'MySQL: '.mysqli_error($link)
+				'msg' => 'MySQL: '.$e
 			);
 			return false;
 		}
 	}
 	else {
-		$UpdateAdmin = "UPDATE `admin` SET 
-			`modified`=NOW(),
-			`username`='".$name."'
-				WHERE `username`='".$name_now."'";
-		if (!mysqli_query($link, $UpdateAdmin)) {
+		try {
+			$stmt = $pdo->prepare("UPDATE `admin` SET 
+				`modified` = NOW(),
+				`username` = :name
+					WHERE `username` = :name_now");
+			$stmt->execute(array(
+				':name' => $name,
+				':name_now' => $name_now
+			));
+		}
+		catch (PDOException $e) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
-				'msg' => 'MySQL: '.mysqli_error($link)
+				'msg' => 'MySQL: '.$e
 			);
 			return false;
 		}
 	}
-	$UpdateDomainAdmins = "UPDATE `domain_admins` SET
-		`username`='".$name."',
-		`domain`='ALL'
-			WHERE username='".$name_now."'";
-	if (!mysqli_query($link, $UpdateDomainAdmins)) {
+	try {
+		$stmt = $pdo->prepare("UPDATE `domain_admins` SET 
+			`domain` = :domain,
+			`username` = :name
+				WHERE `username` = :name_now");
+		$stmt->execute(array(
+			':domain' => 'ALL',
+			':name' => $name,
+			':name_now' => $name_now
+		));
+	}
+	catch (PDOException $e) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'MySQL: '.mysqli_error($link)
+			'msg' => 'MySQL: '.$e
 		);
 		return false;
 	}
@@ -1541,10 +1978,11 @@ function set_admin_account($link, $postarray) {
 		'msg' => sprintf($lang['success']['admin_modified'])
 	);
 }
-function set_time_limited_aliases($link, $postarray) {
+function set_time_limited_aliases($postarray) {
 	global $lang;
-	$username = $_SESSION['mailcow_cc_username'];
-	$domain = substr($username, strpos($username, '@'));
+	global $pdo;
+	$username	= $_SESSION['mailcow_cc_username'];
+	$domain		= substr($username, strpos($username, '@'));
 	if (($_SESSION['mailcow_cc_role'] != "user" &&
 		$_SESSION['mailcow_cc_role'] != "domainadmin") || 
 			empty($username) ||
@@ -1565,48 +2003,20 @@ function set_time_limited_aliases($link, $postarray) {
 				return false;
 			}
 			$letters = 'abcefghijklmnopqrstuvwxyz1234567890';
-			$random_name = substr(str_shuffle($letters), 0, 16);
-			$SelectArray = array(
-				"SELECT `username` FROM `mailbox`
-					WHERE `username`='".$random_name.$domain."'",
-				"SELECT `address` FROM `spamalias`
-					WHERE `address`='".$random_name.$domain."'",
-				"SELECT `address` FROM `alias`
-					WHERE `address`='".$random_name.$domain."'",
-			);
-			foreach ($SelectArray as $SelectQuery) {
-				$SelectCount = mysqli_query($link, $SelectQuery)
-					OR die(mysqli_error($link));
-				if (mysqli_num_rows($SelectCount) == 0) {
-					continue;
-				}
-				else {
-					$_SESSION['return'] = array(
-						'type' => 'warning',
-						'msg' => sprintf($lang['warning']['spam_alias_temp_error'])
-					);
-					return false;
-				}
+			$random_name = substr(str_shuffle($letters), 0, 24);
+			try {
+				$stmt = $pdo->prepare("INSERT INTO `spamalias` (`address`, `goto`, `validity`) VALUES
+					(:address, :goto, DATE_ADD(NOW(), INTERVAL :validity HOUR));");
+				$stmt->execute(array(
+					':address' => $random_name.$domain,
+					':goto' => $username,
+					':validity' => $postarray["validity"]
+				));
 			}
-			$SelectSpamalias = "SELECT `goto` FROM `spamalias`
-				WHERE `goto`='".$username."'";
-			$SpamaliasResult = mysqli_query($link, $SelectSpamalias)
-				OR die(mysqli_error($link));
-			$SpamaliasCount = mysqli_num_rows($SpamaliasResult);
-			if ($SpamaliasCount == 20) {
+			catch (PDOException $e) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
-					'msg' => sprintf($lang['danger']['spam_alias_max_exceeded'])
-				);
-				return false;
-			}
-			$InsertSpamalias = "INSERT INTO `spamalias`
-				(`address`, `goto`, `validity`) VALUES
-					('".$random_name.$domain."', '".$username."', DATE_ADD(NOW(), INTERVAL ".$postarray["validity"]." HOUR));";
-			if (!mysqli_query($link, $InsertSpamalias)) {
-				$_SESSION['return'] = array(
-					'type' => 'danger',
-					'msg' => 'MySQL: '.mysqli_error($link)
+					'msg' => 'MySQL: '.$e
 				);
 				return false;
 			}
@@ -1616,29 +2026,37 @@ function set_time_limited_aliases($link, $postarray) {
 			);
 		break;
 		case "delete":
-			$DeleteSpamalias = "DELETE FROM spamalias
-				WHERE goto='".$username."'";
-			if (!mysqli_query($link, $DeleteSpamalias)) {
+			try {
+				$stmt = $pdo->prepare("DELETE FROM `spamalias` WHERE `goto` = :username");
+				$stmt->execute(array(
+					':username' => $username
+				));
+			}
+			catch (PDOException $e) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
-					'msg' => 'MySQL: '.mysqli_error($link)
+					'msg' => 'MySQL: '.$e
 				);
 				return false;
-			}
+			}	
 			$_SESSION['return'] = array(
 				'type' => 'success',
 				'msg' => sprintf($lang['success']['mailbox_modified'], htmlspecialchars($username))
 			);
 		break;
 		case "extend":
-			$UpdateSpamalias = "UPDATE `spamalias` SET
-				`validity`=DATE_ADD(validity, INTERVAL 1 HOUR)
-					WHERE `goto`='".$username."' 
-						AND `validity` >= NOW()";
-			if (!mysqli_query($link, $UpdateSpamalias)) {
+			try {
+				$stmt = $pdo->prepare("UPDATE `spamalias` SET `validity` = DATE_ADD(`validity`, INTERVAL 1 HOUR)
+					WHERE `goto` = :username 
+						AND `validity` >= NOW()");
+				$stmt->execute(array(
+					':username' => $username
+				));
+			}
+			catch (PDOException $e) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
-					'msg' => 'MySQL: '.mysqli_error($link)
+					'msg' => 'MySQL: '.$e
 				);
 				return false;
 			}
@@ -1649,8 +2067,9 @@ function set_time_limited_aliases($link, $postarray) {
 		break;
 	}
 }
-function set_user_account($link, $postarray) {
+function set_user_account($postarray) {
 	global $lang;
+	global $pdo;
 	$username			= $_SESSION['mailcow_cc_username'];
 	$password_old		= $postarray['user_old_pass'];
 	isset($postarray['togglePwNew']) ? $pwnew_active = '1' : $pwnew_active = '0';
@@ -1660,7 +2079,7 @@ function set_user_account($link, $postarray) {
 		$password_new2	= $postarray['user_new_pass2'];
 	}
 
-	if (!check_login($link, $username, $password_old) == "user") {
+	if (!check_login($username, $password_old) == "user") {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['access_denied'])
@@ -1696,28 +2115,33 @@ function set_user_account($link, $postarray) {
 					return false;
 			}
 			$password_hashed = hash_password($password_new);
-			$password_hashed = mysqli_real_escape_string($link, $password_hashed);
-			$UpdateMailboxQuery = "UPDATE mailbox SET modified=NOW(), password='".$password_hashed."' WHERE username='".$username."';";
-			if (!mysqli_query($link, $UpdateMailboxQuery)) {
+			try {
+				$stmt = $pdo->prepare("UPDATE `mailbox` SET `modified`=NOW(), `password` = :password_hashed WHERE `username` = :username");
+				$stmt->execute(array(
+					':password_hashed' => $username,
+					':username' => $username
+				));
+			}
+			catch (PDOException $e) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
-					'msg' => 'MySQL: '.mysqli_error($link)
+					'msg' => 'MySQL: '.$e
 				);
 				return false;
 			}
 		}
 	}
-
 	$_SESSION['return'] = array(
 		'type' => 'success',
 		'msg' => sprintf($lang['success']['mailbox_modified'], $username)
 	);
 }
-function add_domain_admin($link, $postarray) {
+function add_domain_admin($postarray) {
 	global $lang;
-	$username		= mysqli_real_escape_string($link, strtolower(trim($postarray['username'])));
-	$password		= mysqli_real_escape_string($link, $postarray['password']);
-	$password2		= mysqli_real_escape_string($link, $postarray['password2']);
+	global $pdo;
+	$username		= strtolower(trim($postarray['username']));
+	$password		= $postarray['password'];
+	$password2		= $postarray['password2'];
 	isset($postarray['active']) ? $active = '1' : $active = '0';
 	if ($_SESSION['mailcow_cc_role'] != "admin") {
 		$_SESSION['return'] = array(
@@ -1740,19 +2164,31 @@ function add_domain_admin($link, $postarray) {
 		);
 		return false;
 	}
-	$SelectQueryArray = array(
-		"SELECT `username` FROM `mailbox`
-			WHERE `username`='".$username."'",
-		"SELECT `username` FROM `admin`
-			WHERE `username`='".$username."'",
-		"SELECT `username` FROM `domain_admins`
-			WHERE `username`='".$username."'"
-	);
-	foreach ($SelectQueryArray as $SelectQuery) {
-		$SelectResult = mysqli_query($link, $SelectQuery)
-			OR die(mysqli_error($link));
-		$SelectCount = mysqli_num_rows($SelectResult);
-		if ($SelectCount != 0 || !empty($SelectCount)) {
+	try {
+		$stmt = $pdo->prepare("SELECT `username` FROM `mailbox`
+			WHERE `username` = :username");
+		$stmt->execute(array(':username' => $username));
+		$num_results[] = $stmt->rowCount();
+		
+		$stmt = $pdo->prepare("SELECT `username` FROM `admin`
+			WHERE `username` = :username");
+		$stmt->execute(array(':username' => $username));
+		$num_results[] = $stmt->rowCount();
+		
+		$stmt = $pdo->prepare("SELECT `username` FROM `domain_admins`
+			WHERE `username` = :username");
+		$stmt->execute(array(':username' => $username));
+		$num_results[] = $stmt->rowCount();
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
+	foreach ($num_results as $num_results_each) {
+		if ($num_results_each != 0) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
 				'msg' => sprintf($lang['danger']['object_exists'], htmlspecialchars($username))
@@ -1769,23 +2205,7 @@ function add_domain_admin($link, $postarray) {
 			return false;
 		}
 		$password_hashed = hash_password($password);
-		$DeleteArray = array(
-			"DELETE FROM `domain_admins`
-				WHERE `username`='".$username."'",
-			"DELETE FROM `admin`
-				WHERE `username`='".$username."'",
-		);
-		foreach ($DeleteArray as $DeleteQuery) {
-			if (!mysqli_query($link, $DeleteQuery)) {
-				$_SESSION['return'] = array(
-					'type' => 'danger',
-					'msg' => 'MySQL: '.mysqli_error($link)
-				);
-				return false;
-			}
-		}
 		foreach ($postarray['domain'] as $domain) {
-			$domain = mysqli_real_escape_string($link, $domain);
 			if (!is_valid_domain_name($domain)) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -1793,22 +2213,36 @@ function add_domain_admin($link, $postarray) {
 				);
 				return false;
 			}
-			$InsertDomainAdminQuery = "INSERT INTO `domain_admins` (`username`, `domain`, `created`, `active`)
-				VALUES ('".$username."', '".$domain."', now(), '".$active."')";
-			if (!mysqli_query($link, $InsertDomainAdminQuery)) {
+			try {
+				$stmt = $pdo->prepare("INSERT INTO `domain_admins` (`username`, `domain`, `created`, `active`)
+						VALUES (:username, :domain, NOW(), :active)");
+				$stmt->execute(array(
+					':username' => $username,
+					':domain' => $domain,
+					':active' => $active
+				));
+			}
+			catch (PDOException $e) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
-					'msg' => 'MySQL: '.mysqli_error($link)
+					'msg' => 'MySQL: '.$e
 				);
 				return false;
 			}
 		}
-		$InsertAdminQuery = "INSERT INTO `admin` (`username`, `password`, `superadmin`, `created`, `modified`, `active`)
-			VALUES ('".$username."', '".$password_hashed."', '0', now(), now(), '".$active."')";
-		if (!mysqli_query($link, $InsertAdminQuery)) {
+		try {
+			$stmt = $pdo->prepare("INSERT INTO `admin` (`username`, `password`, `superadmin`, `created`, `modified`, `active`)
+				VALUES (:username, :password_hashed, '0', NOW(), NOW(), :active)");
+			$stmt->execute(array(
+				':username' => $username,
+				':password_hashed' => $password_hashed,
+				':active' => $active
+			));
+		}
+		catch (PDOException $e) {
 			$_SESSION['return'] = array(
 				'type' => 'danger',
-				'msg' => 'MySQL: '.mysqli_error($link)
+				'msg' => 'MySQL: '.$e
 			);
 			return false;
 		}
@@ -1825,7 +2259,7 @@ function add_domain_admin($link, $postarray) {
 		'msg' => sprintf($lang['success']['domain_admin_added'], htmlspecialchars($username))
 	);
 }
-function delete_domain_admin($link, $postarray) {
+function delete_domain_admin($postarray) {
 	global $lang;
 	if ($_SESSION['mailcow_cc_role'] != "admin") {
 		$_SESSION['return'] = array(
@@ -1834,7 +2268,7 @@ function delete_domain_admin($link, $postarray) {
 		);
 		return false;
 	}
-	$username = mysqli_real_escape_string($link, $postarray['username']);
+	$username = $postarray['username'];
 	if (!ctype_alnum(str_replace(array('_', '.', '-'), '', $username))) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1842,56 +2276,80 @@ function delete_domain_admin($link, $postarray) {
 		);
 		return false;
 	}
-	$DeleteDomainArray = array(
-		"DELETE FROM `domain_admins` 
-			WHERE `username`='".$username."'",
-		"DELETE FROM `admin` 
-			WHERE `username`='".$username."'"
-	);
-	foreach ($DeleteDomainArray as $DeleteDomainQuery) {
-		if (!mysqli_query($link, $DeleteDomainQuery)) {
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'MySQL: '.mysqli_error($link)
-			);
-			return false;
-		}
+	try {
+		$stmt = $pdo->prepare("DELETE FROM `domain_admins` WHERE `username` = :username");
+		$stmt->execute(array(
+			':username' => $username,
+		));
+		$stmt = $pdo->prepare("DELETE FROM `admin` WHERE `username` = :username");
+		$stmt->execute(array(
+			':username' => $username,
+		));
+	}
+	catch (PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
 	}
 	$_SESSION['return'] = array(
 		'type' => 'success',
 		'msg' => sprintf($lang['success']['domain_admin_removed'], htmlspecialchars($username))
 	);
 }
-function get_spam_score($link, $username) {
-	$default		= "5, 15";
+function get_spam_score($username) {
+	global $pdo;
+	$default = "5, 15";
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		return $default;
 	}
-	$username = mysqli_real_escape_string($link, $username);
-	$SelectQuery = "SELECT * FROM `userpref`, `fugluconfig`
-		WHERE `username`='".$username."'
-		AND `scope`='".$username."'";
-	$SelectResult = mysqli_query($link, $SelectQuery)
-		OR die(mysqli_error($link));
-	$SelectCount = mysqli_num_rows($SelectResult);
-	if ($SelectCount == 0 || empty($SelectCount)) {
+	try {
+		$stmt = $pdo->prepare("SELECT * FROM `userpref`, `fugluconfig`
+			WHERE `username` = :username
+			AND `scope`= :scope");
+		$stmt->execute(array(':username' => $username, ':scope' => $username));
+		$num_results = $stmt->rowCount();
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
+	if ($num_results == 0 || empty ($num_results)) {
 		return $default;
 	}
 	else {
-		$FugluconfigData = mysqli_fetch_assoc(mysqli_query($link,
-			"SELECT `value` FROM `fugluconfig`
-				WHERE `option`='highspamlevel'
-				AND `scope`='".$username."';"));
-		$UserprefData = mysqli_fetch_assoc(mysqli_query($link,
-			"SELECT `value` FROM `userpref`
-				WHERE `preference`='required_hits'
-				AND `username`='".$username."';"));
-		return $UserprefData['value'].', '.$FugluconfigData['value'];
+		try {
+			$stmt = $pdo->prepare("SELECT `value` FROM `fugluconfig`
+					WHERE `option` = 'highspamlevel'
+					AND `scope` = :username");
+			$stmt->execute(array(':username' => $username));
+			$FugluconfigData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+			$stmt = $pdo->prepare("SELECT `value` FROM `userpref`
+				WHERE `preference` = 'required_hits'
+				AND `username` = :username");
+			$stmt->execute(array(':username' => $username));
+			$UserprefData = $stmt->fetch(PDO::FETCH_ASSOC);
+			return $UserprefData['value'].', '.$FugluconfigData['value'];
+		}
+		catch(PDOException $e) {
+			$_SESSION['return'] = array(
+				'type' => 'danger',
+				'msg' => 'MySQL: '.$e
+			);
+			return false;
+		}
 	}
 }
-function set_whitelist($link, $postarray) {
+function set_whitelist($postarray) {
 	global $lang;
+	global $pdo;
 	$username	= $_SESSION['mailcow_cc_username'];
+	$whitelist_from	= $postarray['whitelist_from'];
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1899,8 +2357,6 @@ function set_whitelist($link, $postarray) {
 		);
 		return false;
 	}
-	$username		= mysqli_real_escape_string($link, $username);
-	$whitelist_from	= mysqli_real_escape_string($link, $postarray['whitelist_from']);
 	if (!ctype_alnum(str_replace(array('@', '.', '-', '*'), '', $whitelist_from))) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1908,27 +2364,40 @@ function set_whitelist($link, $postarray) {
 		);
 		return false;
 	}
-
-	$SelectQuery = "SELECT `username` FROM `userpref`
-			WHERE `preference`='whitelist_from'
-				AND `username`='".$username."'
-				AND `value`='".$whitelist_from."'";
-	$SelectCount = mysqli_query($link, $SelectQuery)
-		OR die(mysqli_error($link));
-	if (mysqli_num_rows($SelectCount) != 0) {
+	try {
+		$stmt = $pdo->prepare("SELECT `username` FROM `userpref`
+			WHERE `preference` = 'whitelist_from'
+				AND `username` = :username
+				AND `value` = :whitelist_from");
+		$stmt->execute(array(':username' => $username, ':whitelist_from' => $whitelist_from));
+		$num_results = $stmt->rowCount();
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
+	if ($num_results != 0) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['whitelist_exists'])
 		);
 		return false;
 	}
-
-	$insertWhitelist = "INSERT INTO `userpref` (`username`, `preference` ,`value`)
-			VALUES ('".$username."', 'whitelist_from', '".$whitelist_from."')";
-	if (!mysqli_query($link, $insertWhitelist)) {
+	try {
+		$stmt = $pdo->prepare("INSERT INTO `userpref` (`username`, `preference` ,`value`)
+			VALUES (:username, 'whitelist_from', :whitelist_from)");
+		$stmt->execute(array(
+			':username' => $username,
+			':whitelist_from' => $whitelist_from
+		));
+	}
+	catch (PDOException $e) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'MySQL: '.mysqli_error($link)
+			'msg' => 'MySQL: '.$e
 		);
 		return false;
 	}
@@ -1937,10 +2406,11 @@ function set_whitelist($link, $postarray) {
 		'msg' => sprintf($lang['success']['mailbox_modified'], $username)
 	);
 }
-function delete_whitelist($link, $postarray) {
+function delete_whitelist($postarray) {
 	global $lang;
+	global $pdo;
 	$username	= $_SESSION['mailcow_cc_username'];
-	$prefid		= mysqli_real_escape_string($link, $postarray['wlid']);
+	$prefid		= $postarray['wlid'];
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1948,7 +2418,6 @@ function delete_whitelist($link, $postarray) {
 		);
 		return false;
 	}
-	$username	= mysqli_real_escape_string($link, $username);
 	if (!is_numeric($prefid)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1956,11 +2425,17 @@ function delete_whitelist($link, $postarray) {
 		);
 		return false;
 	}
-	$deleteWhitelist = "DELETE FROM `userpref` WHERE `username`='".$username."' AND `prefid`='".$prefid."'";
-	if (!mysqli_query($link, $deleteWhitelist)) {
+	try {
+		$stmt = $pdo->prepare("DELETE FROM `userpref` WHERE `username` = :username AND `prefid` = :prefid");
+		$stmt->execute(array(
+			':username' => $username,
+			':prefid' => $prefid
+		));
+	}
+	catch (PDOException $e) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'MySQL: '.mysqli_error($link)
+			'msg' => 'MySQL: '.$e
 		);
 		return false;
 	}
@@ -1969,10 +2444,11 @@ function delete_whitelist($link, $postarray) {
 		'msg' => sprintf($lang['success']['mailbox_modified'], $username)
 	);
 }
-function set_blacklist($link, $postarray) {
+function set_blacklist($postarray) {
 	global $lang;
+	global $pdo;
 	$username		= $_SESSION['mailcow_cc_username'];
-	$blacklist_from	= mysqli_real_escape_string($link, $postarray['blacklist_from']);
+	$blacklist_from	= $postarray['blacklist_from'];
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1980,7 +2456,6 @@ function set_blacklist($link, $postarray) {
 		);
 		return false;
 	}
-	$username	= mysqli_real_escape_string($link, $username);
 	if (!ctype_alnum(str_replace(array('@', '.', '-', '*'), '', $blacklist_from))) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1988,27 +2463,40 @@ function set_blacklist($link, $postarray) {
 		);
 		return false;
 	}
-
-	$SelectQuery = "SELECT `username` FROM `userpref`
-			WHERE `preference`='blacklist_from'
-				AND `username`='".$username."'
-				AND `value`='".$blacklist_from."'";
-	$SelectCount = mysqli_query($link, $SelectQuery)
-		OR die(mysqli_error($link));
-	if (mysqli_num_rows($SelectCount) != 0) {
+	try {
+		$stmt = $pdo->prepare("SELECT `username` FROM `userpref`
+			WHERE `preference` = 'blacklist_from'
+				AND `username` = :username
+				AND `value` = :blacklist_from");
+		$stmt->execute(array(':username' => $username, ':blacklist_from' => $blacklist_from));
+		$num_results = $stmt->rowCount();
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
+	if ($num_results != 0) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['blacklist_exists'])
 		);
 		return false;
 	}
-
-	$insertBlacklist = "INSERT INTO `userpref` (`username`, `preference` ,`value`)
-			VALUES ('".$username."', 'blacklist_from', '".$blacklist_from."')";
-	if (!mysqli_query($link, $insertBlacklist)) {
+	try {
+		$stmt = $pdo->prepare("INSERT INTO `userpref` (`username`, `preference` ,`value`)
+			VALUES (:username, 'blacklist_from', :blacklist_from)");
+		$stmt->execute(array(
+			':username' => $username,
+			':blacklist_from' => $blacklist_from
+		));
+	}
+	catch (PDOException $e) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'MySQL: '.mysqli_error($link)
+			'msg' => 'MySQL: '.$e
 		);
 		return false;
 	}
@@ -2017,10 +2505,11 @@ function set_blacklist($link, $postarray) {
 		'msg' => sprintf($lang['success']['mailbox_modified'], $username)
 	);
 }
-function delete_blacklist($link, $postarray) {
+function delete_blacklist($postarray) {
 	global $lang;
+	global $pdo;
 	$username	= $_SESSION['mailcow_cc_username'];
-	$prefid		= mysqli_real_escape_string($link, $postarray['wlid']);
+	$prefid		= $postarray['wlid'];
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -2028,7 +2517,6 @@ function delete_blacklist($link, $postarray) {
 		);
 		return false;
 	}
-	$username	= mysqli_real_escape_string($link, $username);
 	if (!is_numeric($prefid)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -2036,11 +2524,17 @@ function delete_blacklist($link, $postarray) {
 		);
 		return false;
 	}
-	$deleteBlacklist = "DELETE FROM `userpref` WHERE `username`='".$username."' AND `prefid`='".$prefid."'";
-	if (!mysqli_query($link, $deleteBlacklist)) {
+	try {
+		$stmt = $pdo->prepare("DELETE FROM `userpref` WHERE `username` = :username AND `prefid` = :prefid");
+		$stmt->execute(array(
+			':username' => $username,
+			':prefid' => $prefid
+		));
+	}
+	catch (PDOException $e) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'MySQL: '.mysqli_error($link)
+			'msg' => 'MySQL: '.$e
 		);
 		return false;
 	}
@@ -2049,11 +2543,12 @@ function delete_blacklist($link, $postarray) {
 		'msg' => sprintf($lang['success']['mailbox_modified'], $username)
 	);
 }
-function set_spam_score($link, $postarray) {
+function set_spam_score($postarray) {
 	global $lang;
+	global $pdo;
 	$username		= $_SESSION['mailcow_cc_username'];
-	$lowspamlevel	= explode(',', mysqli_real_escape_string($link, $postarray['score']))[0];
-	$highspamlevel	= explode(',', mysqli_real_escape_string($link, $postarray['score']))[1];
+	$lowspamlevel	= explode(',', $postarray['score'])[0];
+	$highspamlevel	= explode(',', $postarray['score'])[1];
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -2061,7 +2556,6 @@ function set_spam_score($link, $postarray) {
 		);
 		return false;
 	}
-	$username		= mysqli_real_escape_string($link, $username);
 	if (!is_numeric($lowspamlevel) || !is_numeric($highspamlevel)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -2069,51 +2563,51 @@ function set_spam_score($link, $postarray) {
 		);
 		return false;
 	}
-	$DeleteSpamScoreArray = array(
-		"DELETE FROM `fugluconfig` 
-			WHERE `scope`='".$username."'
+	try {
+		$stmt = $pdo->prepare("DELETE FROM `fugluconfig` WHERE `scope` = :username
 			AND (
 				`option`='highspamlevel'
 				OR `option`='lowspamlevel'
-			)",
-		"DELETE FROM `userpref`
-			WHERE `username`='".$username."'
-			AND preference='required_hits'"
-	);
-	foreach ($DeleteSpamScoreArray as $DeleteSpamScoreQuery) {
-		if (!mysqli_query($link, $DeleteSpamScoreQuery)) {
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'MySQL: '.mysqli_error($link)
-			);
-			return false;
-		}
+			)");
+		$stmt->execute(array(
+			':username' => $username
+		));
+		$stmt = $pdo->prepare("DELETE FROM `userpref` WHERE `username` = :username
+			AND preference='required_hits'");
+		$stmt->execute(array(
+			':username' => $username
+		));
+		$stmt = $pdo->prepare("INSERT INTO `fugluconfig` (`scope`, `section`, `option`, `value`)
+			VALUES (:username, 'SAPlugin', 'highspamlevel', :highspamlevel)");
+		$stmt->execute(array(
+			':username' => $username,
+			':highspamlevel' => $highspamlevel
+		));
+		$stmt = $pdo->prepare("INSERT INTO `userpref` (`username`, `preference` ,`value`)
+			VALUES (:username, 'required_hits', :lowspamlevel)");
+		$stmt->execute(array(
+			':username' => $username,
+			':lowspamlevel' => $lowspamlevel
+		));
 	}
-	$InsertSpamScoreArray = array(
-		"INSERT INTO `fugluconfig` (`scope`, `section`, `option`, `value`)
-			VALUES ('".$username."', 'SAPlugin', 'highspamlevel', '".$highspamlevel."')",
-		"INSERT INTO `userpref` (`username`, `preference` ,`value`)
-			VALUES ('".$username."', 'required_hits', '".$lowspamlevel."')"
-	);
-	foreach ($InsertSpamScoreArray as $InsertSpamScoreQuery) {
-		if (!mysqli_query($link, $InsertSpamScoreQuery)) {
-			$_SESSION['return'] = array(
-				'type' => 'danger',
-				'msg' => 'MySQL: '.mysqli_error($link)
-			);
-			return false;
-		}
+	catch (PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
 	}
 	$_SESSION['return'] = array(
 		'type' => 'success',
 		'msg' => sprintf($lang['success']['mailbox_modified'], $username)
 	);
 }
-function set_tls_policy($link, $postarray) {
+function set_tls_policy($postarray) {
 	global $lang;
+	global $pdo;
 	isset($postarray['tls_in']) ? $tls_in = '1' : $tls_in = '0';
 	isset($postarray['tls_out']) ? $tls_out = '1' : $tls_out = '0';
-	$username		= $_SESSION['mailcow_cc_username'];
+	$username = $_SESSION['mailcow_cc_username'];
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -2121,12 +2615,18 @@ function set_tls_policy($link, $postarray) {
 		);
 		return false;
 	}
-	$username		= mysqli_real_escape_string($link, $username);
-	$UpdateTlsPolicyQuery = "UPDATE `mailbox` SET tls_enforce_out='".$tls_out."', tls_enforce_in='".$tls_in."' WHERE `username`='".$username."'";
-	if (!mysqli_query($link, $UpdateTlsPolicyQuery)) {
+	try {
+		$stmt = $pdo->prepare("UPDATE `mailbox` SET `tls_enforce_out` = :tls_out, `tls_enforce_in` = :tls_in WHERE `username` = :username");
+		$stmt->execute(array(
+			':tls_out' => $tls_out,
+			':tls_in' => $tls_in,
+			':username' => $username
+		));
+	}
+	catch (PDOException $e) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => 'MySQL Fehler: '.mysqli_error($link)
+			'msg' => 'MySQL: '.$e
 		);
 		return false;
 	}
@@ -2135,8 +2635,9 @@ function set_tls_policy($link, $postarray) {
 		'msg' => sprintf($lang['success']['mailbox_modified'], $username)
 	);
 }
-function get_tls_policy($link, $username) {
+function get_tls_policy($username) {
 	global $lang;
+	global $pdo;
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -2144,12 +2645,19 @@ function get_tls_policy($link, $username) {
 		);
 		return false;
 	}
-	$username = mysqli_real_escape_string($link, $username);
-	$SelectQuery = "SELECT `tls_enforce_out`, `tls_enforce_in` FROM `mailbox` WHERE `username`='".$username."'";
-	$SelectResult = mysqli_query($link, $SelectQuery)
-		OR die(mysqli_error($link));
-	$SelectData = mysqli_fetch_assoc($SelectResult);
-	return $SelectData;
+	try {
+		$stmt = $pdo->prepare("SELECT `tls_enforce_out`, `tls_enforce_in` FROM `mailbox` WHERE `username` = :username");
+		$stmt->execute(array(':username' => $username));
+		$TLSData = $stmt->fetch(PDO::FETCH_ASSOC);
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+		return false;
+	}
+	return $TLSData;
 }
 function is_valid_domain_name($domain_name) {
 	if (empty($domain_name)) {

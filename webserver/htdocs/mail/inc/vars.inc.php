@@ -1,5 +1,6 @@
 <?php
 // SQL database connection variables
+$database_type = "mysql";
 $database_host = "my_dbhost";
 $database_user = "my_mailcowuser";
 $database_pass = "my_mailcowpass";

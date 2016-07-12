@@ -121,7 +121,7 @@ $(document).ready(function() {
 	$("[name='tls_out']").bootstrapSwitch();
 	$("[name='tls_in']").bootstrapSwitch();
 
-	$("#score").slider({ id: "slider1", min: 1, max: 30, step: 0.5, range: true, value: [<?=get_spam_score($link, $_SESSION['mailcow_cc_username']);?>] });
+	$("#score").slider({ id: "slider1", min: 1, max: 30, step: 0.5, range: true, value: [<?=get_spam_score($_SESSION['mailcow_cc_username']);?>] });
 
 	if ( !$("#togglePwNew").is(':checked') ) {
 		$(".passFields").hide();
@@ -161,4 +161,4 @@ $(document).ready(function() {
 </script>
 </body>
 </html>
-<?php mysqli_close($link); ?>
+<?php $stmt = null; $pdo = null; ?>

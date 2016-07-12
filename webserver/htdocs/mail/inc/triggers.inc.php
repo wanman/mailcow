@@ -1,7 +1,7 @@
 <?php
 if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
 	$login_user = strtolower(trim($_POST["login_user"]));
-	$as = check_login($link, $login_user, $_POST["pass_user"]);
+	$as = check_login($login_user, $_POST["pass_user"]);
 	if ($as == "admin") {
 		$_SESSION['mailcow_cc_username'] = $login_user;
 		$_SESSION['mailcow_cc_role'] = "admin";
@@ -27,7 +27,7 @@ if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
 if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "admin") {
 	if (isset($_POST["trigger_set_admin"])) {
 		$_SESSION['last_expanded'] = "collapseAdmin";
-		set_admin_account($link, $_POST);
+		set_admin_account($_POST);
 	}
 	if (isset($_POST["trigger_public_folder"])) {
 		$_SESSION['last_expanded'] = "collapsePubFolders";
@@ -68,88 +68,88 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "admi
 	}
 	if (isset($_POST["trigger_add_domain_admin"])) {
 		$_SESSION['last_expanded'] = "collapseDomAdmins";
-		add_domain_admin($link, $_POST);
+		add_domain_admin($_POST);
 	}
 	if (isset($_POST["trigger_delete_domain_admin"])) {
 		$_SESSION['last_expanded'] = "collapseDomAdmins";
-		delete_domain_admin($link, $_POST);
+		delete_domain_admin($_POST);
 	}
 }
 if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "user") {
 	if (isset($_POST["trigger_set_user_account"])) {
 		$_SESSION['last_expanded'] = "collapseUserDetails";
-		set_user_account($link, $_POST);
+		set_user_account($_POST);
 	}
 	if (isset($_POST["trigger_set_spam_score"])) {
 		$_SESSION['last_expanded'] = "collapseSpamFilter";
-		set_spam_score($link, $_POST);
+		set_spam_score($_POST);
 	}
 	if (isset($_POST["trigger_set_whitelist"])) {
 		$_SESSION['last_expanded'] = "collapseSpamFilter";
-		set_whitelist($link, $_POST);
+		set_whitelist($_POST);
 	}
 	if (isset($_POST["trigger_delete_whitelist"])) {
 		$_SESSION['last_expanded'] = "collapseSpamFilter";
-		delete_whitelist($link, $_POST);
+		delete_whitelist($_POST);
 	}
 	if (isset($_POST["trigger_set_blacklist"])) {
 		$_SESSION['last_expanded'] = "collapseSpamFilter";
-		set_blacklist($link, $_POST);
+		set_blacklist($_POST);
 	}
 	if (isset($_POST["trigger_delete_blacklist"])) {
 		$_SESSION['last_expanded'] = "collapseSpamFilter";
-		delete_blacklist($link, $_POST);
+		delete_blacklist($_POST);
 	}
 	if (isset($_POST["trigger_set_tls_policy"])) {
 		$_SESSION['last_expanded'] = "collapseTlsPolicy";
-		set_tls_policy($link, $_POST);
+		set_tls_policy($_POST);
 	}
 	if (isset($_POST["trigger_set_time_limited_aliases"])) {
 		$_SESSION['last_expanded'] = "collapseSpamAlias";
-		set_time_limited_aliases($link, $_POST);
+		set_time_limited_aliases($_POST);
 	}
 }
 if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "admin" || $_SESSION['mailcow_cc_role'] == "domainadmin")) {
 	if (isset($_POST["trigger_mailbox_action"])) {
 		switch ($_POST["trigger_mailbox_action"]) {
 			case "adddomain":
-				mailbox_add_domain($link, $_POST);
+				mailbox_add_domain($_POST);
 			break;
 			case "addalias":
-				mailbox_add_alias($link, $_POST);
+				mailbox_add_alias($_POST);
 			break;
 			case "editalias":
-				mailbox_edit_alias($link, $_POST);
+				mailbox_edit_alias($_POST);
 			break;
 			case "addaliasdomain":
-				mailbox_add_alias_domain($link, $_POST);
+				mailbox_add_alias_domain($_POST);
 			break;
 			case "addmailbox":
-				mailbox_add_mailbox($link, $_POST);
+				mailbox_add_mailbox($_POST);
 			break;
 			case "editdomain":
-				mailbox_edit_domain($link, $_POST);
+				mailbox_edit_domain($_POST);
 			break;
 			case "editmailbox":
-				mailbox_edit_mailbox($link, $_POST);
+				mailbox_edit_mailbox($_POST);
 			break;
 			case "editdomainadmin":
-				mailbox_edit_domainadmin($link, $_POST);
+				mailbox_edit_domainadmin($_POST);
 			break;
 			case "deletedomain":
-				mailbox_delete_domain($link, $_POST);
+				mailbox_delete_domain($_POST);
 			break;
 			case "deletealias":
-				mailbox_delete_alias($link, $_POST);
+				mailbox_delete_alias($_POST);
 			break;
 			case "deletealiasdomain":
-				mailbox_delete_alias_domain($link, $_POST);
+				mailbox_delete_alias_domain($_POST);
 			break;
 			case "editaliasdomain":
-				mailbox_edit_alias_domain($link, $_POST);
+				mailbox_edit_alias_domain($_POST);
 			break;
 			case "deletemailbox":
-				mailbox_delete_mailbox($link, $_POST);
+				mailbox_delete_mailbox($_POST);
 			break;
 		}
 	}

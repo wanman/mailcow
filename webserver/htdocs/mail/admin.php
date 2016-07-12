@@ -16,15 +16,16 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 			<div class="panel-body">
 				<form class="form-horizontal" autocapitalize="none" autocorrect="off" role="form" method="post">
 				<?php
-				$adminData = mysqli_fetch_assoc(mysqli_query($link,
-					"SELECT `username` FROM `admin`
-						WHERE `superadmin`='1' and active='1'"));
+				$stmt = $pdo->prepare("SELECT `username` FROM `admin`
+					WHERE `superadmin`='1' and active='1'");
+				$stmt->execute();
+				$AdminData = $stmt->fetch(PDO::FETCH_ASSOC);
 				?>
-					<input type="hidden" name="admin_user_now" value="<?=$adminData['username'];?>">
+					<input type="hidden" name="admin_user_now" value="<?=$AdminData['username'];?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="admin_user"><?=$lang['admin']['admin'];?>:</label>
 						<div class="col-sm-10">
-							<input type="text" class="form-control" name="admin_user" id="admin_user" value="<?=$adminData['username'];?>" required>
+							<input type="text" class="form-control" name="admin_user" id="admin_user" value="<?=$AdminData['username'];?>" required>
 							&rdsh; <kbd>a-z A-Z - _ .</kbd>
 						</div>
 					</div>
@@ -69,7 +70,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 						</thead>
 						<tbody>
 							<?php
-							$result = mysqli_query($link, "SELECT
+							$stmt = $pdo->prepare("SELECT
 								`username`, 
 								GROUP_CONCAT(DISTINCT `domain` SEPARATOR ', ') AS `domain`,
 								MAX(CASE `active` WHEN 1 THEN '".$lang['admin']['yes']."' ELSE '".$lang['admin']['no']."' END) AS `active`
@@ -77,9 +78,10 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 										WHERE `username` IN (
 											SELECT `username` FROM `admin`
 												WHERE `superadmin`!='1'
-										) GROUP BY `username`;")
-								OR die(mysqli_error($link));
-							while ($row = mysqli_fetch_array($result)):
+										) GROUP BY `username`;");
+							$stmt->execute();
+							$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+							while ($row = array_shift($rows)):
 							?>
 							<tr>
 								<td><?=strtolower($row['username']);?></td>
@@ -110,12 +112,14 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 						<label class="control-label col-sm-2" for="name"><?=$lang['admin']['admin_domains'];?>:</label>
 						<div class="col-sm-10">
 							<select title="Domains durchsuchen..." style="width:100%" name="domain[]" size="5" multiple>
-				<?php
-				$resultselect = mysqli_query($link, "SELECT domain FROM domain");
-				while ($row = mysqli_fetch_array($resultselect)) {
-				echo "<option>".$row['domain']."</option>";
-				}
-				?>
+							<?php
+							$stmt = $pdo->prepare("SELECT domain FROM domain");
+							$stmt->execute();
+							$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+							while ($row = array_shift($rows)) {
+								echo "<option>".$row['domain']."</option>";
+							}
+							?>
 							</select>
 						</div>
 					</div>

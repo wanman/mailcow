@@ -16,8 +16,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			is_valid_domain_name($_GET["domain"]) &&
 			!empty($_GET["domain"]) &&
 			$_SESSION['mailcow_cc_role'] == "admin") {
-
-			$domain = mysqli_real_escape_string($link, $_GET["domain"]);
+			$domain = $_GET["domain"];
 			?>
 				<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_domain_warning'], htmlspecialchars($_GET["domain"]));?></div>
 				<p><?=$lang['delete']['remove_domain_details'];?></p>
@@ -36,7 +35,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			(filter_var($_GET["alias"], FILTER_VALIDATE_EMAIL) || is_valid_domain_name(substr(strrchr($_GET["alias"], "@"), 1))) &&
 			!empty($_GET["alias"])) {
 				$domain = substr(strrchr($_GET["alias"], "@"), 1);
-				if (hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
+				if (hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
 				?>
 					<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_alias_warning'], htmlspecialchars($_GET["alias"]));?></div>
 					<p><?=$lang['delete']['remove_alias_details'];?></p>
@@ -61,14 +60,15 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			isset($_GET["aliasdomain"]) &&
 			is_valid_domain_name($_GET["aliasdomain"]) && 
 			!empty($_GET["aliasdomain"])) {
-				$alias_domain = mysqli_real_escape_string($link, strtolower(trim($_GET["aliasdomain"])));
-				$DomainData = mysqli_fetch_assoc(mysqli_query($link,
-					"SELECT `target_domain` FROM `alias_domain`
-						WHERE `alias_domain`='".$alias_domain."'"));
-				if (hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $DomainData['target_domain'])) {
+				$alias_domain = strtolower(trim($_GET["aliasdomain"]));
+				$stmt = $pdo->prepare("SELECT `target_domain` FROM `alias_domain`
+						WHERE `alias_domain`= :alias_domain");
+				$stmt->execute(array(':alias_domain' => $alias_domain));
+				$DomainData = $stmt->fetch(PDO::FETCH_ASSOC);
+				if (hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $DomainData['target_domain'])) {
 				?>
 					<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_domainalias_warning'], htmlspecialchars($_GET["aliasdomain"]));?></div>
-					<form class="form-horizontal" role="form" method="post" action="/manager">
+					<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
 					<input type="hidden" name="alias_domain" value="<?php echo $alias_domain ?>">
 						<div class="form-group">
 							<div class="col-sm-offset-1 col-sm-10">
@@ -89,7 +89,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			ctype_alnum(str_replace(array('_', '.', '-'), '', $_GET["domainadmin"])) &&
 			!empty($_GET["domainadmin"]) &&
 			$_SESSION['mailcow_cc_role'] == "admin") {
-				$domain_admin = mysqli_real_escape_string($link, $_GET["domainadmin"]);
+				$domain_admin = $_GET["domainadmin"];
 				?>
 				<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_domainadmin_warning'], htmlspecialchars($_GET["domainadmin"]));?></div>
 				<form class="form-horizontal" role="form" method="post" action="/admin.php">
@@ -106,13 +106,13 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 		elseif (isset($_GET["mailbox"]) &&
 			filter_var($_GET["mailbox"], FILTER_VALIDATE_EMAIL) &&
 			!empty($_GET["mailbox"])) {
-				$mailbox = mysqli_real_escape_string($link, $_GET["mailbox"]);
+				$mailbox = $_GET["mailbox"];
 				$domain = substr(strrchr($mailbox, "@"), 1);
-				if (hasDomainAccess($link, $_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
+				if (hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
 				?>
 					<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_mailbox_warning'], htmlspecialchars($_GET["mailbox"]));?></div>
 					<p><?=$lang['delete']['remove_mailbox_details'];?></p>
-					<form class="form-horizontal" role="form" method="post" action="/admin.php">
+					<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
 					<input type="hidden" name="username" value="<?=$mailbox;?>">
 						<div class="form-group">
 							<div class="col-sm-offset-1 col-sm-10">

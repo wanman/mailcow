@@ -3,7 +3,7 @@ require_once("inc/header.inc.php");
 $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user') {
 	$username = $_SESSION['mailcow_cc_username'];
-	$get_tls_policy = get_tls_policy($link, $_SESSION['mailcow_cc_username']);
+	$get_tls_policy = get_tls_policy($_SESSION['mailcow_cc_username']);
 ?>
 <div class="container">
 <h3><?=$lang['user']['mailbox_settings'];?></h3>
@@ -74,12 +74,13 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 	</thead>
 	<tbody>
 <?php
-$result = mysqli_query($link, "SELECT address, 
-	goto,
-	UNIX_TIMESTAMP(validity) as validity,
-	TIMEDIFF(validity, NOW()) as timeleft
-	FROM spamalias WHERE goto='".$username."' AND validity >= NOW() ORDER BY timeleft ASC");
-while ($row = mysqli_fetch_array($result)):
+$stmt = $pdo->prepare("SELECT `address`,
+	`goto`,
+	UNIX_TIMESTAMP(`validity`) AS `validity`,
+	TIMEDIFF(validity, NOW()) AS `timeleft`
+		FROM `spamalias` WHERE `goto` = :username AND `validity` >= NOW() ORDER BY `timeleft` ASC");
+$stmt->execute(array(':username' => $username));
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)):
 ?>
 		<tr>
 		<td><?=$row['address'];?></td>
@@ -162,16 +163,16 @@ endwhile;
 				</div>
 				<div class="row"><div class="col-sm-12"><hr></div></div>
 				<?php
-				$getWhitelistQuery = "SELECT `value`, `prefid` FROM `userpref` WHERE `preference`='whitelist_from' AND `username`='".$username."';";
-				if ($getWhitelistResult = mysqli_query($link, $getWhitelistQuery)) {
-					if (mysqli_num_rows($getWhitelistResult) == "0"):
+				$stmt = $pdo->prepare("SELECT `value`, `prefid` FROM `userpref` WHERE `preference`='whitelist_from' AND `username`= :username");
+				$stmt->execute(array(':username' => $username));
+					if ($stmt->rowCount() == "0"):
 					?>
 						<div class="row">
 							<div class="col-sm-12"><i><?=$lang['user']['spamfilter_table_empty'];?></i></div>
 						</div>
 					<?php
 					endif;
-					while ($whitelistRow = mysqli_fetch_assoc($getWhitelistResult)):
+					while ($whitelistRow = $stmt->fetch(PDO::FETCH_ASSOC)):
 				?>
 				<div class="row">
 					<form class="form-inline" method="post">
@@ -184,7 +185,6 @@ endwhile;
 				</div>
 				<?php
 					endwhile;
-				}
 				?>
 				<div class="row"><div class="col-sm-12"><hr></div></div>
 				<form class="form-inline" method="post">
@@ -203,16 +203,16 @@ endwhile;
 				</div>
 				<div class="row"><div class="col-sm-12"><hr></div></div>
 				<?php
-				$getBlacklistQuery = "SELECT `value`, `prefid` FROM `userpref` WHERE `preference`='blacklist_from' AND `username`='".$username."';";
-				if ($getBlacklistResult = mysqli_query($link, $getBlacklistQuery)) {
-					if (mysqli_num_rows($getBlacklistResult) == "0"):
+				$stmt = $pdo->prepare("SELECT `value`, `prefid` FROM `userpref` WHERE `preference`='blacklist_from' AND `username`= :username");
+				$stmt->execute(array(':username' => $username));
+					if ($stmt->rowCount() == "0"):
 					?>
 						<div class="row">
 							<div class="col-sm-12"><i><?=$lang['user']['spamfilter_table_empty'];?></i></div>
 						</div>
 					<?php
 					endif;
-					while ($blacklistRow = mysqli_fetch_assoc($getBlacklistResult)):
+					while ($blacklistRow = $stmt->fetch(PDO::FETCH_ASSOC)):
 				?>
 				<div class="row">
 					<form class="form-inline" method="post">
@@ -225,7 +225,6 @@ endwhile;
 				</div>
 				<?php
 					endwhile;
-				}
 				?>
 				<div class="row"><div class="col-sm-12"><hr></div></div>
 				<form class="form-inline" method="post">

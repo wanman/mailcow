@@ -12,30 +12,32 @@ require_once("inc/header.inc.php");
 <?php
 if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "admin"  || $_SESSION['mailcow_cc_role'] == "domainadmin")) {
 		if (isset($_GET['alias']) &&
-			filter_var($_GET["alias"], FILTER_VALIDATE_EMAIL) &&
 			!empty($_GET["alias"])) {
-				$alias = mysqli_real_escape_string($link, $_GET["alias"]);
+				$alias = $_GET["alias"];
 				$domain = substr(strrchr($alias, "@"), 1);
-				$qstring = "SELECT * FROM `alias`
-					WHERE `address`='".$alias."' 
-					AND `goto`!='".$alias."'
+				$stmt = $pdo->prepare("SELECT * FROM `alias`
+					WHERE `address`= :address 
+					AND `goto` != :goto
 					AND (
 						`domain` IN (
 							SELECT `domain` FROM `domain_admins`
 								WHERE `active`='1'
-								AND `username`='".$_SESSION['mailcow_cc_username']."'
+								AND `username`= :username
 						)
-						OR 'admin'='".$_SESSION['mailcow_cc_role']."'
-					)";
-				$qresult = mysqli_query($link, $qstring)
-					OR die(mysqli_error($link));
-				$num_results = mysqli_num_rows($qresult);
-				$result = mysqli_fetch_assoc($qresult);
-				if ($num_results != 0 && !empty($num_results)) {
+						OR 'admin'= :admin
+					)");
+				$stmt->execute(array(
+					':address' => $alias,
+					':goto' => $alias,
+					':username' => $_SESSION['mailcow_cc_username'],
+					':admin' => $_SESSION['mailcow_cc_role']
+				));
+				$result = $stmt->fetch(PDO::FETCH_ASSOC);
+				if ($stmt->rowCount() != 0) {
 				?>
 					<h4><?=$lang['edit']['alias'];?></h4>
 					<br />
-					<form class="form-horizontal" role="form" method="post">
+					<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
 					<input type="hidden" name="address" value="<?=$alias;?>">
 						<div class="form-group">
 							<label class="control-label col-sm-2" for="name"><?=$lang['edit']['target_address'];?></label>
@@ -69,14 +71,14 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			!empty($_GET["domainadmin"]) &&
 			$_GET["domainadmin"] != 'admin' &&
 			$_SESSION['mailcow_cc_role'] == "admin") {
-				$domain_admin = mysqli_real_escape_string($link, $_GET["domainadmin"]);
-				$qstring = "SELECT * FROM `domain_admins`
-					WHERE `username`='".$domain_admin."'";
-				$qresult = mysqli_query($link, $qstring)
-					OR die(mysqli_error($link));
-				$num_results = mysqli_num_rows($qresult);
-				$result = mysqli_fetch_assoc($qresult);
-				if ($num_results != 0 && !empty($num_results)) {
+				$domain_admin = $_GET["domainadmin"];
+				$stmt = $pdo->prepare("SELECT * FROM `domain_admins`
+					WHERE `username`= :domain_admin");
+				$stmt->execute(array(
+					':domain_admin' => $domain_admin
+				));
+				$result = $stmt->fetch(PDO::FETCH_ASSOC);
+				if ($stmt->rowCount() != 0) {
 				?>
 				<h4><?=$lang['edit']['domain_admin'];?></h4>
 				<br />
@@ -87,22 +89,24 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 						<div class="col-sm-10">
 							<select name="domain[]" multiple>
 							<?php
-							$result_selected = mysqli_query($link, "SELECT `domain` FROM `domain`
+							$stmt = $pdo->prepare("SELECT `domain` FROM `domain`
 								WHERE `domain` IN (
 									SELECT `domain` FROM `domain_admins`
-										WHERE `username`='".$domain_admin."')")
-								OR die(mysqli_error($link));
-							while ($row_selected = mysqli_fetch_array($result_selected)):
+										WHERE `username`= :domain_admin)");
+							$stmt->execute(array(':domain_admin' => $domain_admin));
+							$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+							while ($row_selected = array_shift($rows)):
 							?>
 								<option selected><?=$row_selected['domain'];?></option>
 							<?php
 							endwhile;
-							$result_unselected = mysqli_query($link, "SELECT `domain` FROM `domain`
+							$stmt = $pdo->prepare("SELECT `domain` FROM `domain`
 								WHERE `domain` NOT IN (
 									SELECT `domain` FROM `domain_admins`
-										WHERE `username`='".$domain_admin."')")
-								OR die(mysqli_error($link));
-							while ($row_unselected = mysqli_fetch_array($result_unselected)):
+										WHERE `username`= :domain_admin)");
+							$stmt->execute(array(':domain_admin' => $domain_admin));
+							$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+							while ($row_unselected = array_shift($rows)):
 							?>
 								<option><?=$row_unselected['domain'];?></option>
 							<?php
@@ -147,24 +151,25 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 	elseif (isset($_GET['domain']) &&
 		is_valid_domain_name($_GET["domain"]) &&
 		!empty($_GET["domain"])) {
-			$domain = mysqli_real_escape_string($link, $_GET["domain"]);
-			$qstring = "SELECT * FROM `domain` WHERE `domain`='".$domain."' 
-				AND (
-					`domain` IN (
-						SELECT `domain` from `domain_admins`
-							WHERE `active`='1'
-							AND `username`='".$_SESSION['mailcow_cc_username']."'
-					) 
-					OR 'admin'='".$_SESSION['mailcow_cc_role']."'
-				)";
-			$qresult = mysqli_query($link, $qstring)
-				OR die(mysqli_error($link));
-			$num_results = mysqli_num_rows($qresult);
-			$result = mysqli_fetch_assoc($qresult);
-			if ($num_results != 0 && !empty($num_results)) {
+			$domain = $_GET["domain"];
+			$stmt = $pdo->prepare("SELECT * FROM `domain` WHERE `domain`='".$domain."' 
+			AND (
+				`domain` IN (
+					SELECT `domain` from `domain_admins`
+						WHERE `active`='1'
+						AND `username` = :username
+				) 
+				OR 'admin'= :admin
+			)");
+			$stmt->execute(array(
+				':username' => $_SESSION['mailcow_cc_username'],
+				':admin' => $_SESSION['mailcow_cc_role']
+			));
+			$result = $stmt->fetch(PDO::FETCH_ASSOC);
+			if ($stmt->rowCount() != 0) {
 			?>
 				<h4><?=$lang['edit']['domain'];?></h4>
-				<form class="form-horizontal" role="form" method="post">
+				<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
 				<input type="hidden" name="domain" value="<?=$domain;?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="description"><?=$lang['edit']['description'];?></label>
@@ -230,7 +235,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				$dnstxt_folder = scandir($GLOBALS["MC_ODKIM_TXT"]);
 				$dnstxt_files = array_diff($dnstxt_folder, array('.', '..'));
 				foreach($dnstxt_files as $file) {
-					if(explode("_", $file)[1] == $domain) {
+					if (explode("_", $file)[1] == $domain) {
 						$str = file_get_contents($GLOBALS["MC_ODKIM_TXT"]."/".$file);
 						$str = preg_replace('/\r|\t|\n/', '', $str);
 						preg_match('/\(.*\)/im', $str, $matches);
@@ -245,7 +250,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							<div class="col-xs-10">
 								<div class="col-md-2"><b><?=$lang['edit']['dkim_txt_name'];?></b></div>
 								<div class="col-md-10">
-									<pre>default._domainkey</pre>
+									<pre><?=explode("_", $file)[0];?>._domainkey</pre>
 								</div>
 								<div class="col-md-2"><b><?=$lang['edit']['dkim_txt_value'];?></b></div>
 								<div class="col-md-10">
@@ -267,23 +272,26 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 	elseif (isset($_GET['aliasdomain']) &&
 		is_valid_domain_name($_GET["aliasdomain"]) &&
 		!empty($_GET["aliasdomain"])) {
-			$alias_domain = mysqli_real_escape_string($link, $_GET["aliasdomain"]);
-			$qstring = "SELECT * FROM `alias_domain` WHERE `alias_domain`='".$alias_domain."' 
+			$alias_domain = $_GET["aliasdomain"];
+			$stmt = $pdo->prepare("SELECT * FROM `alias_domain`
+				WHERE `alias_domain`= :alias_domain 
 				AND (
 					`target_domain` IN (
-						SELECT `domain` from `domain_admins`
+						SELECT `domain` FROM `domain_admins`
 							WHERE `active`='1'
-							AND `username`='".$_SESSION['mailcow_cc_username']."'
-					) 
-					OR 'admin'='".$_SESSION['mailcow_cc_role']."'
-				)";
-			$qresult = mysqli_query($link, $qstring)
-				OR die(mysqli_error($link));
-			$num_results = mysqli_num_rows($qresult);
-			$result = mysqli_fetch_assoc($qresult);
-			if ($num_results != 0 && !empty($num_results)) {
+							AND `username`= :username
+					)
+					OR 'admin'= :admin
+				)");
+			$stmt->execute(array(
+				':alias_domain' => $alias_domain,
+				':username' => $_SESSION['mailcow_cc_username'],
+				':admin' => $_SESSION['mailcow_cc_role']
+			));
+			$result = $stmt->fetch(PDO::FETCH_ASSOC);
+			if ($stmt->rowCount() != 0) {
 			?>
-				<h4><?=$lang['edit']['domain'];?></h4>
+				<h4><?=$lang['edit']['edit_alias_domain'];?></h4>
 				<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
 					<input type="hidden" name="alias_domain_now" value="<?=$alias_domain;?>">
 					<div class="form-group">
@@ -314,32 +322,29 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			}
 	}
 	elseif (isset($_GET['mailbox']) && filter_var($_GET["mailbox"], FILTER_VALIDATE_EMAIL) && !empty($_GET["mailbox"])) {
-			$mailbox = mysqli_real_escape_string($link, $_GET["mailbox"]);
-			$domain = substr(strrchr($mailbox, "@"), 1);
-			$qstring = "SELECT
-				`username`,
-				`domain`,
-				`name`,
-				round(sum(quota / 1048576)) as quota,
-				`active`
+			$mailbox = $_GET["mailbox"];
+			// any_value would not be compatible with mysql <= 5.7, so using this dirty workaround
+			$stmt = $pdo->prepare("SELECT MAX(`username`), MAX(`domain`), MAX(`name`), ROUND(SUM(`quota` / 1048576)) AS `quota`, MAX(`active`)
 					FROM `mailbox`
-						WHERE `username`='".$mailbox."'
+						WHERE `username` = :username1
 						AND (
 							`domain` IN (
 								SELECT `domain` FROM `domain_admins`
-									WHERE `active`='1'
-									AND `username`='".$_SESSION['mailcow_cc_username']."'
+									WHERE `active` = '1'
+									AND `username`= :username2
 							)
-							OR 'admin'='".$_SESSION['mailcow_cc_role']."'
-						)";
-			$qresult = mysqli_query($link, $qstring) 
-				OR die(mysqli_error($link));
-			$num_results = mysqli_num_rows($qresult);
-			$result = mysqli_fetch_assoc($qresult);
-			if ($num_results != 0 && !empty($num_results)) {
+							OR 'admin'= :admin
+						)");
+			$stmt->execute(array(
+				':username1' => $mailbox,
+				':username2' => $_SESSION['mailcow_cc_username'],
+				':admin' => $_SESSION['mailcow_cc_role']
+			));
+			$result = $stmt->fetch(PDO::FETCH_ASSOC);
+			if ($stmt->rowCount() != 0) {
 			?>
 				<h4><?=$lang['edit']['mailbox'];?></h4>
-				<form class="form-horizontal" role="form" method="post">
+				<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
 				<input type="hidden" name="username" value="<?=$result['username'];?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="name"><?=$lang['edit']['name'];?></label>
@@ -358,18 +363,19 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 						<div class="col-sm-10">
 							<select title="Durchsuchen..." style="width:100%" name="sender_acl[]" size="10" multiple>
 							<?php
-							$result_goto_from_alias = mysqli_query($link, "SELECT `address` FROM `alias` WHERE `goto`='".$mailbox."'")
-								OR die(mysqli_error($link));
-							while ($row_goto_from_alias = mysqli_fetch_array($result_goto_from_alias)):
+							$stmt = $pdo->prepare("SELECT `address` FROM `alias` WHERE `goto`= :goto");
+							$stmt->execute(array(':goto' => $mailbox));
+							$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+							while ($row_goto_from_alias = array_shift($rows)):
 							?>
 								<option selected disabled="disabled"><?=$row_goto_from_alias['address'];?></option>
 							<?php
 							endwhile;
 
-							$result_selected_sender_acl = mysqli_query($link, "SELECT `send_as` FROM `sender_acl`
-								WHERE `logged_in_as`='".$mailbox."'")
-									OR die(mysqli_error($link));
-							while ($row_selected_sender_acl = mysqli_fetch_array($result_selected_sender_acl)):
+							$stmt = $pdo->prepare("SELECT `send_as` FROM `sender_acl` WHERE `logged_in_as`= :logged_in_as");
+							$stmt->execute(array(':logged_in_as' => $mailbox));
+							$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+							while ($row_selected_sender_acl = array_shift($rows)):
 									if (!filter_var($row_selected_sender_acl['send_as'], FILTER_VALIDATE_EMAIL)):
 									?>
 										<option data-subtext="(gesamte Domain)" selected><?=$row_selected_sender_acl['send_as'];?></option>
@@ -381,26 +387,29 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 									endif;
 							endwhile;
 
-							$result_unselected_sender_acl = mysqli_query($link, "SELECT DISTINCT `domain` FROM `alias`
-								WHERE `domain`='".$result['domain']."'
+
+							$stmt = $pdo->prepare("SELECT DISTINCT `domain` FROM `alias`
+								WHERE `domain`= :domain
 									AND	CONCAT('@', domain) NOT IN (
 										SELECT `send_as` FROM `sender_acl` 
-											WHERE `logged_in_as`='".$mailbox."')")
-								OR die(mysqli_error($link));
-							while ($row_unselected_sender_acl = mysqli_fetch_array($result_unselected_sender_acl)):
+											WHERE `logged_in_as`= :logged_in_as)");
+							$stmt->execute(array(':logged_in_as' => $mailbox, ':domain' => $result['domain']));
+							$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+							while ($row_unselected_sender_acl = array_shift($rows)):
 							?>
 								<option data-subtext="(gesamte Domain)">@<?=$row_unselected_sender_acl['domain'];?></option>
 							<?php
 							endwhile;
 
-							$result_unselected_sender_acl = mysqli_query($link, "SELECT `address` FROM `alias`
-								WHERE `goto`!='".$mailbox."'
-									AND `domain`='".$result['domain']."'
+							$stmt = $pdo->prepare("SELECT `address` FROM `alias`
+								WHERE `goto` != :goto
+									AND `domain` = :domain
 									AND `address` NOT IN (
 										SELECT `send_as` FROM `sender_acl` 
-											WHERE `logged_in_as`='".$mailbox."')")
-								OR die(mysqli_error($link));
-							while ($row_unselected_sender_acl = mysqli_fetch_array($result_unselected_sender_acl)):
+											WHERE `logged_in_as` = :logged_in_as)");
+							$stmt->execute(array(':logged_in_as' => $mailbox, ':goto' => $mailbox, ':domain' => $result['domain']));
+							$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+							while ($row_unselected_sender_acl = array_shift($rows)):
 							?>
 								<option><?=$row_unselected_sender_acl['address'];?></option>
 							<?php

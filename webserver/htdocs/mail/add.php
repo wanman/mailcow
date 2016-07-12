@@ -127,15 +127,16 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 						<div class="col-sm-10">
 							<select name="target_domain" title="<?=$lang['add']['select'];?>">
 								<?php
-								$result = mysqli_query($link, "SELECT `domain` FROM `domain`
+								$stmt = $pdo->prepare("SELECT `domain` FROM `domain`
 										WHERE `domain` IN (
 												SELECT `domain` FROM `domain_admins`
-														WHERE `username`='".$_SESSION['mailcow_cc_username']."'
+														WHERE `username`= :username
 														AND active='1'
 												)
-										OR 'admin'='".$_SESSION['mailcow_cc_role']."'")
-										OR die(mysqli_error($link));
-								while ($row = mysqli_fetch_array($result)) {
+										OR 'admin' = :admin");
+								$stmt->execute(array(':username' => $_SESSION['mailcow_cc_username'], ':admin' => $_SESSION['mailcow_cc_role']));
+								$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+								while ($row = array_shift($rows)) {
 										echo "<option>".$row['domain']."</option>";
 								}
 								?>
@@ -172,15 +173,16 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 						<div class="col-sm-10">
 							<select name="domain" title="<?=$lang['add']['select'];?>">
 							<?php
-							$result = mysqli_query($link, "SELECT `domain` FROM `domain`
-								WHERE `domain` IN (
-									SELECT `domain` FROM `domain_admins`
-										WHERE `username`='".$_SESSION['mailcow_cc_username']."'
-										AND active='1'
-								)
-								OR 'admin'='".$_SESSION['mailcow_cc_role']."'")
-								OR die(mysqli_error($link));
-							while ($row = mysqli_fetch_array($result)) {
+							$stmt = $pdo->prepare("SELECT `domain` FROM `domain`
+									WHERE `domain` IN (
+											SELECT `domain` FROM `domain_admins`
+													WHERE `username`= :username
+													AND active='1'
+											)
+									OR 'admin' = :admin");
+							$stmt->execute(array(':username' => $_SESSION['mailcow_cc_username'], ':admin' => $_SESSION['mailcow_cc_role']));
+							$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+							while ($row = array_shift($rows)) {
 								echo "<option>".$row['domain']."</option>";
 							}
 							?>

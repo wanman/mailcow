@@ -8,10 +8,14 @@ if (isset($_POST["logout"])) {
 }
 
 require_once 'inc/vars.inc.php';
-$link = mysqli_connect($database_host, $database_user, $database_pass, $database_name);
-if (!$link) {
-	die("Connection error: " . mysqli_connect_error());
-}
+
+$dsn = "$database_type:host=$database_host;dbname=$database_name";
+$opt = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+];
+$pdo = new PDO($dsn, $database_user, $database_pass, $opt);
 
 if (isset($_POST['lang'])) {
 	switch ($_POST['lang']) {
