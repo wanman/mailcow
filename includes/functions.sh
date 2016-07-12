@@ -323,7 +323,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			;;
 		mysql)
 			if [[ ${mysql_useable} -ne 1 ]]; then
-				mysql --defaults-file=/etc/mysql/debian.cnf -e "UPDATE mysql.user SET Password=PASSWORD('$my_rootpw') WHERE USER='root'; FLUSH PRIVILEGES;"
+				mysql --defaults-file=/etc/mysql/debian.cnf -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${my_rootpw}'; FLUSH PRIVILEGES;"
 			fi
 			# Need to fix a group by query, then we can remove it...
 			# Added temp. fix for admin.php
