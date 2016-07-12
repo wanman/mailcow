@@ -1495,7 +1495,6 @@ function mailbox_edit_mailbox($postarray) {
 		);
 		return false;
 	}
-
 	if (isset($postarray['sender_acl']) && is_array($postarray['sender_acl'])) {
 		foreach ($postarray['sender_acl'] as $sender_acl) {
 			if (!filter_var($sender_acl, FILTER_VALIDATE_EMAIL) && 
@@ -1554,7 +1553,6 @@ function mailbox_edit_mailbox($postarray) {
 				':password_hashed' => $password_hashed,
 				':active' => $active,
 				':name' => utf8_decode($name),
-				':active' => $active,
 				':quota_b' => $quota_b,
 				':username' => $username
 			));
@@ -1588,10 +1586,8 @@ function mailbox_edit_mailbox($postarray) {
 				`quota` = :quota_b
 					WHERE `username` = :username");
 		$stmt->execute(array(
-			':password' => $password_hashed,
 			':active' => $active,
 			':name' => utf8_decode($name),
-			':active' => $active,
 			':quota_b' => $quota_b,
 			':username' => $username
 		));

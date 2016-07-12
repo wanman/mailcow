@@ -324,7 +324,11 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 	elseif (isset($_GET['mailbox']) && filter_var($_GET["mailbox"], FILTER_VALIDATE_EMAIL) && !empty($_GET["mailbox"])) {
 			$mailbox = $_GET["mailbox"];
 			// any_value would not be compatible with mysql <= 5.7, so using this dirty workaround
-			$stmt = $pdo->prepare("SELECT MAX(`username`), MAX(`domain`), MAX(`name`), ROUND(SUM(`quota` / 1048576)) AS `quota`, MAX(`active`)
+			$stmt = $pdo->prepare("SELECT MAX(`username`) AS `username`,
+				MAX(`domain`) AS `domain`,
+				MAX(`name`) AS `name`,
+				ROUND(SUM(`quota` / 1048576)) AS `quota`,
+				MAX(`active`) AS `active` 
 					FROM `mailbox`
 						WHERE `username` = :username1
 						AND (
@@ -341,6 +345,8 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				':admin' => $_SESSION['mailcow_cc_role']
 			));
 			$result = $stmt->fetch(PDO::FETCH_ASSOC);
+			print_r($result);
+
 			if ($stmt->rowCount() != 0) {
 			?>
 				<h4><?=$lang['edit']['mailbox'];?></h4>

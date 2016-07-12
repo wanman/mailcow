@@ -80,7 +80,8 @@ $stmt = $pdo->prepare("SELECT `address`,
 	TIMEDIFF(validity, NOW()) AS `timeleft`
 		FROM `spamalias` WHERE `goto` = :username AND `validity` >= NOW() ORDER BY `timeleft` ASC");
 $stmt->execute(array(':username' => $username));
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)):
+$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+while ($row = array_shift($rows)):
 ?>
 		<tr>
 		<td><?=$row['address'];?></td>
@@ -172,7 +173,8 @@ endwhile;
 						</div>
 					<?php
 					endif;
-					while ($whitelistRow = $stmt->fetch(PDO::FETCH_ASSOC)):
+					$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+					while ($whitelistRow = array_shift($rows)):
 				?>
 				<div class="row">
 					<form class="form-inline" method="post">
@@ -212,7 +214,8 @@ endwhile;
 						</div>
 					<?php
 					endif;
-					while ($blacklistRow = $stmt->fetch(PDO::FETCH_ASSOC)):
+					$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+					while ($blacklistRow = array_shift($rows)):
 				?>
 				<div class="row">
 					<form class="form-inline" method="post">
