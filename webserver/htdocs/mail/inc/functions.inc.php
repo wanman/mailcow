@@ -27,7 +27,7 @@ function hasDomainAccess($username, $role, $domain) {
 			)
 			OR 'admin' = :role");
 		$stmt->execute(array(':username' => $username, ':domain' => $domain, ':role' => $role));
-		$num_results = $stmt->rowCount();
+		$num_results = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 	} catch(PDOException $e) {
 		error_log($e);
 		return false;
@@ -424,7 +424,7 @@ function mailbox_add_domain($postarray) {
 		$stmt = $pdo->prepare("SELECT `domain` FROM `domain`
 			WHERE `domain` = :domain");
 		$stmt->execute(array(':domain' => $domain));
-		$num_results = $stmt->rowCount();
+		$num_results = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 	}
 	catch(PDOException $e) {
 		$_SESSION['return'] = array(
@@ -520,7 +520,7 @@ function mailbox_add_alias($postarray) {
 			$stmt = $pdo->prepare("SELECT `address` FROM `alias`
 				WHERE `address`= :address");
 			$stmt->execute(array(':address' => $address));
-			$num_results = $stmt->rowCount();
+			$num_results = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 		}
 		catch(PDOException $e) {
 			$_SESSION['return'] = array(
@@ -541,7 +541,7 @@ function mailbox_add_alias($postarray) {
 			$stmt = $pdo->prepare("SELECT `address` FROM `spamalias`
 				WHERE `address`= :address");
 			$stmt->execute(array(':address' => $address));
-			$num_results = $stmt->rowCount();
+			$num_results = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 		}
 		catch(PDOException $e) {
 			$_SESSION['return'] = array(
@@ -668,7 +668,7 @@ function mailbox_add_alias_domain($postarray) {
 		$stmt = $pdo->prepare("SELECT `domain` FROM `domain`
 			WHERE `domain`= :target_domain");
 		$stmt->execute(array(':target_domain' => $target_domain));
-		$num_results = $stmt->rowCount();
+		$num_results = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 	}
 	catch(PDOException $e) {
 		$_SESSION['return'] = array(
@@ -689,7 +689,7 @@ function mailbox_add_alias_domain($postarray) {
 		$stmt = $pdo->prepare("SELECT `alias_domain` FROM `alias_domain`
 			WHERE `alias_domain`= :alias_domain");
 		$stmt->execute(array(':alias_domain' => $alias_domain));
-		$num_results = $stmt->rowCount();
+		$num_results = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 	}
 	catch(PDOException $e) {
 		$_SESSION['return'] = array(
@@ -776,7 +776,7 @@ function mailbox_edit_alias_domain($postarray) {
 		$stmt = $pdo->prepare("SELECT `target_domain` FROM `alias_domain`
 		WHERE `target_domain`= :alias_domain");
 		$stmt->execute(array(':alias_domain' => $alias_domain));
-		$num_results = $stmt->rowCount();
+		$num_results = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 	}
 	catch(PDOException $e) {
 		$_SESSION['return'] = array(
@@ -901,7 +901,7 @@ function mailbox_add_mailbox($postarray) {
 	try {
 		$stmt = $pdo->prepare("SELECT `local_part` FROM `mailbox` WHERE `local_part` = :local_part and `domain`= :domain");
 		$stmt->execute(array(':local_part' => $local_part, ':domain' => $domain));
-		$num_results = $stmt->rowCount();
+		$num_results = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 	}
 	catch(PDOException $e) {
 		$_SESSION['return'] = array(
@@ -921,7 +921,7 @@ function mailbox_add_mailbox($postarray) {
 	try {
 		$stmt = $pdo->prepare("SELECT `address` FROM `alias` WHERE address= :username");
 		$stmt->execute(array(':username' => $username));
-		$num_results = $stmt->rowCount();
+		$num_results = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 	}
 	catch(PDOException $e) {
 		$_SESSION['return'] = array(
@@ -941,7 +941,7 @@ function mailbox_add_mailbox($postarray) {
 	try {
 		$stmt = $pdo->prepare("SELECT `address` FROM `spamalias` WHERE `address`= :username");
 		$stmt->execute(array(':username' => $username));
-		$num_results = $stmt->rowCount();
+		$num_results = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 	}
 	catch(PDOException $e) {
 		$_SESSION['return'] = array(
@@ -995,7 +995,7 @@ function mailbox_add_mailbox($postarray) {
 	try {
 		$stmt = $pdo->prepare("SELECT `domain` FROM `domain` WHERE `domain`= :domain");
 		$stmt->execute(array(':domain' => $domain));
-		$num_results = $stmt->rowCount();
+		$num_results = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 	}
 	catch(PDOException $e) {
 		$_SESSION['return'] = array(
@@ -1247,7 +1247,6 @@ function mailbox_edit_domain($postarray) {
 		);
 		return false;
 	}
-
 	try {
 		$stmt = $pdo->prepare("UPDATE `domain` SET 
 		`modified`= NOW(),
@@ -1258,8 +1257,8 @@ function mailbox_edit_domain($postarray) {
 		`maxquota` = :maxquota,
 		`mailboxes` = :mailboxes,
 		`aliases` = :aliases,
-		`description` = :description,
-			WHERE domain = :domain");
+		`description` = :description
+			WHERE `domain` = :domain");
 		$stmt->execute(array(
 			':relay_all_recipients' => $relay_all_recipients,
 			':backupmx' => $backupmx,
@@ -1630,7 +1629,7 @@ function mailbox_delete_domain($postarray) {
 		$stmt = $pdo->prepare("SELECT `username` FROM `mailbox`
 			WHERE `domain` = :domain");
 		$stmt->execute(array(':domain' => $domain));
-		$num_results = $stmt->rowCount();
+		$num_results = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 	}
 	catch(PDOException $e) {
 		$_SESSION['return'] = array(
@@ -1720,7 +1719,7 @@ function mailbox_delete_alias($postarray) {
 		);
 		return false;
 	}
-	$goto_array		= explode(',', $gotos);
+	$goto_array = explode(',', $gotos['goto']);
 
 	if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
 		$_SESSION['return'] = array(
@@ -1750,6 +1749,7 @@ function mailbox_delete_alias($postarray) {
 }
 function mailbox_delete_alias_domain($postarray) {
 	global $lang;
+	global $pdo;
 	if (!is_valid_domain_name($postarray['alias_domain'])) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -1917,7 +1917,7 @@ function set_admin_account($postarray) {
 				`modified` = NOW(),
 				`password` = :password_hashed,
 				`username` = :name
-					WHERE `username` = :name_now");
+					WHERE `username` = :username");
 			$stmt->execute(array(
 				':password_hashed' => $password_hashed,
 				':name' => $name,
@@ -2164,17 +2164,17 @@ function add_domain_admin($postarray) {
 		$stmt = $pdo->prepare("SELECT `username` FROM `mailbox`
 			WHERE `username` = :username");
 		$stmt->execute(array(':username' => $username));
-		$num_results[] = $stmt->rowCount();
+		$num_results[] = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 		
 		$stmt = $pdo->prepare("SELECT `username` FROM `admin`
 			WHERE `username` = :username");
 		$stmt->execute(array(':username' => $username));
-		$num_results[] = $stmt->rowCount();
+		$num_results[] = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 		
 		$stmt = $pdo->prepare("SELECT `username` FROM `domain_admins`
 			WHERE `username` = :username");
 		$stmt->execute(array(':username' => $username));
-		$num_results[] = $stmt->rowCount();
+		$num_results[] = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 	}
 	catch(PDOException $e) {
 		$_SESSION['return'] = array(
@@ -2305,7 +2305,7 @@ function get_spam_score($username) {
 			WHERE `username` = :username
 			AND `scope`= :scope");
 		$stmt->execute(array(':username' => $username, ':scope' => $username));
-		$num_results = $stmt->rowCount();
+		$num_results = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 	}
 	catch(PDOException $e) {
 		$_SESSION['return'] = array(
@@ -2345,7 +2345,7 @@ function set_whitelist($postarray) {
 	global $lang;
 	global $pdo;
 	$username	= $_SESSION['mailcow_cc_username'];
-	$whitelist_from	= $postarray['whitelist_from'];
+	$whitelist_from	= trim(strtolower($postarray['whitelist_from']));
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -2366,7 +2366,7 @@ function set_whitelist($postarray) {
 				AND `username` = :username
 				AND `value` = :whitelist_from");
 		$stmt->execute(array(':username' => $username, ':whitelist_from' => $whitelist_from));
-		$num_results = $stmt->rowCount();
+		$num_results = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 	}
 	catch(PDOException $e) {
 		$_SESSION['return'] = array(
@@ -2444,7 +2444,7 @@ function set_blacklist($postarray) {
 	global $lang;
 	global $pdo;
 	$username		= $_SESSION['mailcow_cc_username'];
-	$blacklist_from	= $postarray['blacklist_from'];
+	$blacklist_from	= trim(strtolower($postarray['blacklist_from']));
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -2465,7 +2465,7 @@ function set_blacklist($postarray) {
 				AND `username` = :username
 				AND `value` = :blacklist_from");
 		$stmt->execute(array(':username' => $username, ':blacklist_from' => $blacklist_from));
-		$num_results = $stmt->rowCount();
+		$num_results = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 	}
 	catch(PDOException $e) {
 		$_SESSION['return'] = array(

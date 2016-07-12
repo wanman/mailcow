@@ -33,7 +33,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 					':admin' => $_SESSION['mailcow_cc_role']
 				));
 				$result = $stmt->fetch(PDO::FETCH_ASSOC);
-				if ($stmt->rowCount() != 0) {
+				if ($result !== false) {
 				?>
 					<h4><?=$lang['edit']['alias'];?></h4>
 					<br />
@@ -78,7 +78,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 					':domain_admin' => $domain_admin
 				));
 				$result = $stmt->fetch(PDO::FETCH_ASSOC);
-				if ($stmt->rowCount() != 0) {
+				if ($result !== false) {
 				?>
 				<h4><?=$lang['edit']['domain_admin'];?></h4>
 				<br />
@@ -166,7 +166,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				':admin' => $_SESSION['mailcow_cc_role']
 			));
 			$result = $stmt->fetch(PDO::FETCH_ASSOC);
-			if ($stmt->rowCount() != 0) {
+			if ($result !== false) {
 			?>
 				<h4><?=$lang['edit']['domain'];?></h4>
 				<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
@@ -289,7 +289,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				':admin' => $_SESSION['mailcow_cc_role']
 			));
 			$result = $stmt->fetch(PDO::FETCH_ASSOC);
-			if ($stmt->rowCount() != 0) {
+			if ($result !== false) {
 			?>
 				<h4><?=$lang['edit']['edit_alias_domain'];?></h4>
 				<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
@@ -345,9 +345,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				':admin' => $_SESSION['mailcow_cc_role']
 			));
 			$result = $stmt->fetch(PDO::FETCH_ASSOC);
-			print_r($result);
-
-			if ($stmt->rowCount() != 0) {
+			if ($result !== false) {
 			?>
 				<h4><?=$lang['edit']['mailbox'];?></h4>
 				<form class="form-horizontal" role="form" method="post" action="/mailbox.php">

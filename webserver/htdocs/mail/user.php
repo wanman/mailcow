@@ -166,15 +166,15 @@ endwhile;
 				<?php
 				$stmt = $pdo->prepare("SELECT `value`, `prefid` FROM `userpref` WHERE `preference`='whitelist_from' AND `username`= :username");
 				$stmt->execute(array(':username' => $username));
-					if ($stmt->rowCount() == "0"):
-					?>
-						<div class="row">
-							<div class="col-sm-12"><i><?=$lang['user']['spamfilter_table_empty'];?></i></div>
-						</div>
-					<?php
-					endif;
-					$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-					while ($whitelistRow = array_shift($rows)):
+				$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				if (count($rows) == 0):
+				?>
+					<div class="row">
+						<div class="col-sm-12"><i><?=$lang['user']['spamfilter_table_empty'];?></i></div>
+					</div>
+				<?php
+				endif;
+				while ($whitelistRow = array_shift($rows)):
 				?>
 				<div class="row">
 					<form class="form-inline" method="post">
@@ -186,7 +186,7 @@ endwhile;
 					</form>
 				</div>
 				<?php
-					endwhile;
+				endwhile;
 				?>
 				<div class="row"><div class="col-sm-12"><hr></div></div>
 				<form class="form-inline" method="post">
@@ -207,15 +207,15 @@ endwhile;
 				<?php
 				$stmt = $pdo->prepare("SELECT `value`, `prefid` FROM `userpref` WHERE `preference`='blacklist_from' AND `username`= :username");
 				$stmt->execute(array(':username' => $username));
-					if ($stmt->rowCount() == "0"):
-					?>
-						<div class="row">
-							<div class="col-sm-12"><i><?=$lang['user']['spamfilter_table_empty'];?></i></div>
-						</div>
-					<?php
-					endif;
-					$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-					while ($blacklistRow = array_shift($rows)):
+				$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				if (count($rows) == 0):
+				?>
+					<div class="row">
+						<div class="col-sm-12"><i><?=$lang['user']['spamfilter_table_empty'];?></i></div>
+					</div>
+				<?php
+				endif;
+				while ($blacklistRow = array_shift($rows)):
 				?>
 				<div class="row">
 					<form class="form-inline" method="post">
@@ -227,7 +227,7 @@ endwhile;
 					</form>
 				</div>
 				<?php
-					endwhile;
+				endwhile;
 				?>
 				<div class="row"><div class="col-sm-12"><hr></div></div>
 				<form class="form-inline" method="post">
