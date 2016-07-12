@@ -1284,7 +1284,7 @@ function mailbox_edit_domain($postarray) {
 	}
 
 }
-function mailbox_edit_domainadmin($postarray) {
+function edit_domain_admin($postarray) {
 	global $lang;
 	global $pdo;
 	$username		= $postarray['username'];
@@ -2256,6 +2256,7 @@ function add_domain_admin($postarray) {
 	);
 }
 function delete_domain_admin($postarray) {
+	global $pdo;
 	global $lang;
 	if ($_SESSION['mailcow_cc_role'] != "admin") {
 		$_SESSION['return'] = array(

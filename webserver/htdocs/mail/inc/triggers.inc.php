@@ -74,6 +74,10 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "admi
 		$_SESSION['last_expanded'] = "collapseDomAdmins";
 		delete_domain_admin($_POST);
 	}
+	if (isset($_POST["trigger_edit_domain_admin"])) {
+		$_SESSION['last_expanded'] = "collapseDomAdmins";
+		edit_domain_admin($_POST);
+	}
 }
 if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "user") {
 	if (isset($_POST["trigger_set_user_account"])) {
@@ -132,9 +136,6 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			break;
 			case "editmailbox":
 				mailbox_edit_mailbox($_POST);
-			break;
-			case "editdomainadmin":
-				mailbox_edit_domainadmin($_POST);
 			break;
 			case "deletedomain":
 				mailbox_delete_domain($_POST);

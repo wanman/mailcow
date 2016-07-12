@@ -136,7 +136,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" name="trigger_mailbox_action" value="editdomainadmin" class="btn btn-success btn-sm"><?=$lang['edit']['save'];?></button>
+							<button type="submit" name="trigger_edit_domain_admin" class="btn btn-success btn-sm"><?=$lang['edit']['save'];?></button>
 						</div>
 					</div>
 				</form>
