@@ -106,11 +106,3 @@ CREATE TABLE IF NOT EXISTS `userpref` (
   PRIMARY KEY (`prefid`),
   KEY `username` (`username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=latin1;
-
-ALTER TABLE `quota2` ENGINE=InnoDB;
-ALTER TABLE `mailbox` ENGINE=InnoDB;
-ALTER TABLE `domain_admins` ENGINE=InnoDB;
-ALTER TABLE `domain` ENGINE=InnoDB;
-ALTER TABLE `alias_domain` ENGINE=InnoDB;
-ALTER TABLE `alias` ENGINE=InnoDB;
-ALTER TABLE `admin` ENGINE=InnoDB;

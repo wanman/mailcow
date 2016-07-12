@@ -72,7 +72,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 							<?php
 							$stmt = $pdo->prepare("SELECT
 								`username`, 
-								GROUP_CONCAT(DISTINCT `domain` SEPARATOR ', ') AS `domain`,
+								GROUP_CONCAT(`domain`, ', ') AS `domain`,
 								MAX(CASE `active` WHEN 1 THEN '".$lang['admin']['yes']."' ELSE '".$lang['admin']['no']."' END) AS `active`
 									FROM `domain_admins` 
 										WHERE `username` IN (
