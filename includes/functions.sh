@@ -267,6 +267,14 @@ solr-jetty > /dev/null
 			cp /etc/ssl/certs/ssl-cert-snakeoil.pem /etc/dovecot/private/dovecot.pem
 			cp /etc/ssl/private/ssl-cert-snakeoil.key /etc/dovecot/private/dovecot.key
 DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d dovecot-solr >/dev/null
+			
+			for oldfiles in /etc/cron.daily/mc_clean_spam_aliases /usr/local/sbin/mc_pflog_renew /usr/local/sbin/mc_msg_size /usr/local/sbin/mc_dkim_ctrl /usr/local/sbin/mc_resetadmin
+			do
+			if [ -f "$oldfiles" ] ; then
+			rm "$oldfiles"
+			fi
+			done
+			
 			install -m 755 misc/mailcow-clean-spam-aliases /etc/cron.daily/mailcow-clean-spam-aliases
 			install -m 755 misc/mailcow-renew-pflogsumm /usr/local/sbin/mailcow-renew-pflogsumm
 			install -m 755 misc/mailcow-set-message-limit /usr/local/sbin/mailcow-set-message-limit
