@@ -37,8 +37,31 @@ function hasDomainAccess($username, $role, $domain) {
 	}
 	return false;
 }
+function doveadm_authenticate($hash, $algorithm, $password) {
+	$descr = array(0 => array('pipe', 'r'), 1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
+	$pipes = array();
+	$process = proc_open("/usr/bin/doveadm pw -s ".$algorithm." -t '".$hash."'", $descr, $pipes);
+	if (is_resource($process)) {
+		fputs($pipes[0], $password);
+		fclose($pipes[0]);
+		while ($f = fgets($pipes[1])) {
+			if (preg_match('/(verified)/', $f)) {
+				proc_close($process);
+				return true;
+			}
+			return false;
+		}
+		fclose($pipes[1]);
+		while ($f = fgets($pipes[2])) {
+			proc_close($process);
+			return false;
+		}
+		fclose($pipes[2]);
+		proc_close($process);
+	}
+	return false;
+}
 function check_login($user, $pass) {
-	// Don't catch errors to prevent displaying sensitive information, just die.
 	global $pdo;
 	if (!filter_var($user, FILTER_VALIDATE_EMAIL) && !ctype_alnum(str_replace(array('_', '.', '-'), '', $user))) {
 		return false;
@@ -47,16 +70,13 @@ function check_login($user, $pass) {
 		return false;
 	}
 	$user = strtolower(trim($user));
-	$pass = escapeshellarg($pass);
 	$stmt = $pdo->prepare("SELECT `password` FROM `admin`
 			WHERE `superadmin` = '1'
 			AND `username` = :user");
 	$stmt->execute(array(':user' => $user));
 	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	foreach ($rows as $row) {
-		$hash = "'".$row['password']."'";
-		exec('echo '.$pass.' | doveadm pw -s '.$GLOBALS['HASHING'].' -t '.$hash, $out, $return);
-		if (strpos($out[0], "verified") !== false && $return == "0") {
+		if (doveadm_authenticate($row['password'], $GLOBALS['HASHING'], $pass) !== false) {
 			unset($_SESSION['ldelay']);
 			return "admin";
 		}
@@ -68,9 +88,7 @@ function check_login($user, $pass) {
 	$stmt->execute(array(':user' => $user));
 	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	foreach ($rows as $row) {
-		$hash = "'".$row['password']."'";
-		exec('echo '.$pass.' | doveadm pw -s '.$GLOBALS['HASHING'].' -t '.$hash, $out, $return);
-		if (strpos($out[0], "verified") !== false && $return == "0") {
+		if (doveadm_authenticate($row['password'], $GLOBALS['HASHING'], $pass) !== false) {
 			unset($_SESSION['ldelay']);
 			return "domainadmin";
 		}
@@ -81,9 +99,7 @@ function check_login($user, $pass) {
 	$stmt->execute(array(':user' => $user));
 	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	foreach ($rows as $row) {
-		$hash = "'".$row['password']."'";
-		exec('echo '.$pass.' | doveadm pw -s '.$GLOBALS['HASHING'].' -t '.$hash, $out, $return);
-		if (strpos($out[0], "verified") !== false && $return == "0") {
+		if (doveadm_authenticate($row['password'], $GLOBALS['HASHING'], $pass) !== false) {
 			unset($_SESSION['ldelay']);
 			return "user";
 		}
