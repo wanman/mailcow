@@ -14,7 +14,7 @@ endif;
 <script>
 function setLang(sel) {
 	$.post( "<?=$_SERVER['REQUEST_URI'];?>", {lang: sel} );
-	location.reload();
+	window.location.href = window.location.pathname + window.location.search;
 }
 $(document).ready(function() {
 	$("#alert-fade").fadeTo(7000, 500).slideUp(500, function(){
