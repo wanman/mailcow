@@ -6,4 +6,4 @@ DBNAME=$(grep database_name /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
 DBUSER=$(grep database_user /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
 DBPASS=$(grep database_pass /var/www/mail/inc/vars.inc.php | cut -d'"' -f2)
 
-mysql --host ${DBHOST} -u ${DBUSER} -p${DBPASS} ${DBNAME} -e "DELETE FROM spamalias WHERE validity <= NOW()"
+mysql --host ${DBHOST} -u ${DBUSER} -p${DBPASS} ${DBNAME} -e "DELETE FROM spamalias WHERE validity <= UNIX_TIMESTAMP()"

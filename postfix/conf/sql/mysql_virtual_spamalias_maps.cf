@@ -3,5 +3,5 @@ user = my_mailcowuser
 password = my_mailcowpass
 hosts = my_dbhost
 dbname = my_mailcowdb
-query = SELECT goto FROM spamalias WHERE address='%s' AND validity >= NOW()
+query = SELECT goto FROM spamalias WHERE address='%s' AND validity >= UNIX_TIMESTAMP()
 #expansion_limit = 100

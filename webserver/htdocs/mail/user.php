@@ -69,32 +69,27 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 	<tr>
 		<th><?=$lang['user']['alias'];?></th>
 		<th><?=$lang['user']['alias_valid_until'];?></th>
-		<th><?=$lang['user']['alias_time_left'];?></th>
 	</tr>
 	</thead>
 	<tbody>
-<?php
-$stmt = $pdo->prepare("SELECT `address`,
-	`goto`,
-	UNIX_TIMESTAMP(`validity`) AS `validity`,
-	TIMEDIFF(validity, NOW()) AS `timeleft`
-		FROM `spamalias` WHERE `goto` = :username AND `validity` >= NOW() ORDER BY `timeleft` ASC");
-$stmt->execute(array(':username' => $username));
-$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-while ($row = array_shift($rows)):
-?>
+	<?php
+	$stmt = $pdo->prepare("SELECT `address`,
+		`goto`,
+		`validity`
+			FROM `spamalias`
+				WHERE `goto` = :username
+					AND `validity` >= :unixnow");
+	$stmt->execute(array(':username' => $username, ':unixnow' => time()));
+	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	while ($row = array_shift($rows)):
+	?>
 		<tr>
 		<td><?=$row['address'];?></td>
 		<td><?=date($lang['user']['alias_full_date'], $row['validity']);?></td>
-		<td><?php
-		echo explode(':', $row['timeleft'])[0]."h, ";
-		echo explode(':', $row['timeleft'])[1]."m, ";
-		echo explode(':', $row['timeleft'])[2]."s";
-		?></td>
 		</tr>
-<?php
-endwhile;
-?>
+	<?php
+	endwhile;
+	?>
 	</tbody>
 </table>
 </div>
