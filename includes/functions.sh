@@ -327,7 +327,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 					# MySQL >= 5.7 uses auth_socket when installing without password (like we do)
 					mysql --defaults-file=/etc/mysql/debian.cnf -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${my_rootpw}'; FLUSH PRIVILEGES;"
 				else
-					mysql --defaults-file=/etc/mysql/debian.cnf -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${my_rootpw}'; FLUSH PRIVILEGES;"
+					mysql --defaults-file=/etc/mysql/debian.cnf -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('${my_rootpw}'); FLUSH PRIVILEGES;"
 				fi
 			fi
 			SQLCMDARRAY=(
