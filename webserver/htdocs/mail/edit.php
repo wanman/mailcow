@@ -394,8 +394,8 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 
 							$stmt = $pdo->prepare("SELECT DISTINCT `domain` FROM `alias`
 								WHERE `domain`= :domain
-									AND	CONCAT('@', domain) NOT IN (
-										SELECT `send_as` FROM `sender_acl` 
+									AND	`domain` NOT IN (
+										SELECT REPLACE(`send_as`, '@', '') FROM `sender_acl` 
 											WHERE `logged_in_as`= :logged_in_as)");
 							$stmt->execute(array(':logged_in_as' => $mailbox, ':domain' => $result['domain']));
 							$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
