@@ -76,7 +76,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 		
 						$stmt = $pdo->prepare("SELECT 
 							COUNT(*) AS `count`,
-							COALESCE(SUM(`quota`)) AS `quota`
+							COALESCE(SUM(`quota`), '0') AS `quota`
 								FROM `mailbox`
 									WHERE `domain` = :domain");
 						$stmt->execute(array(':domain' => $row['domain']));
