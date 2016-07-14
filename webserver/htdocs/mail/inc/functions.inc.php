@@ -2152,7 +2152,7 @@ function set_user_account($postarray) {
 			try {
 				$stmt = $pdo->prepare("UPDATE `mailbox` SET `modified` = :modified, `password` = :password_hashed WHERE `username` = :username");
 				$stmt->execute(array(
-					':password_hashed' => $username,
+					':password_hashed' => $password_hashed,
 					':modified' => date('Y-m-d H:i:s'),
 					':username' => $username
 				));
