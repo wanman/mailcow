@@ -614,7 +614,7 @@ function mailbox_add_alias($postarray) {
 					':goto' => $goto,
 					':domain' => $domain,
 					':created' => date('Y-m-d H:i:s'),
-					':modified' => date('Y-m-d H:i:s'),					
+					':modified' => date('Y-m-d H:i:s'),
 					':active' => $active
 				));
 			}
@@ -623,6 +623,8 @@ function mailbox_add_alias($postarray) {
 					':address' => $address,
 					':goto' => $goto,
 					':domain' => $domain,
+					':created' => date('Y-m-d H:i:s'),
+					':modified' => date('Y-m-d H:i:s'),
 					':active' => $active
 				));
 			}
