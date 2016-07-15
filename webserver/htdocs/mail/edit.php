@@ -72,8 +72,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			$_GET["domainadmin"] != 'admin' &&
 			$_SESSION['mailcow_cc_role'] == "admin") {
 				$domain_admin = $_GET["domainadmin"];
-				$stmt = $pdo->prepare("SELECT * FROM `domain_admins`
-					WHERE `username`= :domain_admin");
+				$stmt = $pdo->prepare("SELECT * FROM `domain_admins` WHERE `username`= :domain_admin");
 				$stmt->execute(array(
 					':domain_admin' => $domain_admin
 				));
@@ -323,29 +322,12 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 	}
 	elseif (isset($_GET['mailbox']) && filter_var($_GET["mailbox"], FILTER_VALIDATE_EMAIL) && !empty($_GET["mailbox"])) {
 			$mailbox = $_GET["mailbox"];
-			// any_value would not be compatible with mysql <= 5.7, so using this dirty workaround
-			$stmt = $pdo->prepare("SELECT MAX(`username`) AS `username`,
-				MAX(`domain`) AS `domain`,
-				MAX(`name`) AS `name`,
-				ROUND(SUM(`quota` / 1048576)) AS `quota`,
-				MAX(`active`) AS `active` 
-					FROM `mailbox`
-						WHERE `username` = :username1
-						AND (
-							`domain` IN (
-								SELECT `domain` FROM `domain_admins`
-									WHERE `active` = '1'
-									AND `username`= :username2
-							)
-							OR 'admin'= :admin
-						)");
+			$stmt = $pdo->prepare("SELECT `username`, `domain`, `name`, `quota`, `active` FROM `mailbox` WHERE `username` = :username1");
 			$stmt->execute(array(
 				':username1' => $mailbox,
-				':username2' => $_SESSION['mailcow_cc_username'],
-				':admin' => $_SESSION['mailcow_cc_role']
 			));
 			$result = $stmt->fetch(PDO::FETCH_ASSOC);
-			if ($result !== false) {
+			if ($result !== false && hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $result['domain'])) {
 			?>
 				<h4><?=$lang['edit']['mailbox'];?></h4>
 				<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
