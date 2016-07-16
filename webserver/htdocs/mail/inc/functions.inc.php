@@ -1277,7 +1277,7 @@ function mailbox_edit_domain($postarray) {
 	}
 	try {
 		$stmt = $pdo->prepare("UPDATE `domain` SET 
-		`modified`= modified,
+		`modified`= :modified,
 		`relay_all_recipients` = :relay_all_recipients,
 		`backupmx` = :backupmx,
 		`active` = :active,
