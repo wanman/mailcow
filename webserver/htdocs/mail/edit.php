@@ -341,7 +341,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="quota"><?=$lang['edit']['quota_mb'];?></label>
 						<div class="col-sm-10">
-						<input type="number" class="form-control" name="quota" id="quota" value="<?=$result['quota'];?>">
+						<input type="number" class="form-control" name="quota" id="quota" value="<?=$result['quota'] / 1048576;?>">
 						</div>
 					</div>
 					<div class="form-group">
