@@ -1039,7 +1039,7 @@ function mailbox_add_mailbox($postarray) {
 	if ($quota_m > $DomainData['maxquota']) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => sprintf($lang['danger']['mailbox_quota_exceeded'], $quota_m, $DomainData['maxquota'])
+			'msg' => sprintf($lang['danger']['mailbox_quota_exceeded'], $DomainData['maxquota'])
 		);
 		return false;
 	}
@@ -1239,7 +1239,7 @@ function mailbox_edit_domain($postarray) {
 	if ($MailboxData['maxquota'] > $maxquota) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => sprintf($lang['danger']['maxquota_in_use'], $MailboxData['maxquota'])
+			'msg' => sprintf($lang['danger']['max_quota_in_use'], $MailboxData['maxquota'])
 		);
 		return false;
 	}
@@ -1500,7 +1500,7 @@ function mailbox_edit_mailbox($postarray) {
 	if ($quota_m > $DomainData['maxquota']) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
-			'msg' => sprintf($lang['danger']['mailbox_quota_exceeded'], $quota_m, $DomainData['maxquota'])
+			'msg' => sprintf($lang['danger']['mailbox_quota_exceeded'], $DomainData['maxquota'])
 		);
 		return false;
 	}
@@ -2700,7 +2700,49 @@ function get_tls_policy($username) {
 	}
 	return $TLSData;
 }
-function is_valid_domain_name($domain_name) {
+function remaining_specs($domain, $object = null, $js = null) {
+	// left_m	without object given	= MiB left in domain
+	// left_m	with object given		= Max. MiB we can assign to given object
+	// limit_m							= Domain limit in MiB
+	// left_c							= Mailboxes we can create depending on domain quota
+	global $pdo;
+	if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $domain)) {
+		return false;
+	}
+	try {
+		$stmt = $pdo->prepare("SELECT `mailboxes`, `maxquota`, `quota` FROM `domain` WHERE `domain` = :domain");
+		$stmt->execute(array(':domain' => $domain));
+		$DomainData			= $stmt->fetch(PDO::FETCH_ASSOC);
+
+		$stmt = $pdo->prepare("SELECT COUNT(*) AS `count`, COALESCE(ROUND(SUM(`quota`)/1048576), 0) as `in_use_m` FROM `mailbox` WHERE `domain` = :domain AND `username` != :object");
+		$stmt->execute(array(':domain' => $domain, ':object' => $object));
+		$MailboxDataDomain	= $stmt->fetch(PDO::FETCH_ASSOC);
+
+		$quota_left_m	= $DomainData['quota']		- $MailboxDataDomain['in_use_m'];
+		$mboxs_left		= $DomainData['mailboxes']	- $MailboxDataDomain['count'];
+
+		if ($quota_left_m > $DomainData['maxquota']) {
+			$quota_left_m = $DomainData['maxquota'];
+		}
+
+	}
+	catch (PDOException $e) {
+		return false;
+	}
+	if (is_numeric($quota_left_m)) {
+		$spec['left_m']		= $quota_left_m;
+		$spec['limit_m']	= $DomainData['maxquota'];
+	}
+	if (is_numeric($mboxs_left)) {
+		$spec['left_c']		= $mboxs_left;
+	}
+	if (!empty($js)) {
+		echo $quota_left_m;
+		exit;
+	}
+	return $spec;
+}
+function is_valid_domain_name($domain_name) { 
 	if (empty($domain_name)) {
 		return false;
 	}

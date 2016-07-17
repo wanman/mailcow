@@ -48,7 +48,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="quota"><?=$lang['add']['domain_quota_m'];?></label>
 						<div class="col-sm-10">
-						<input type="number" class="form-control" name="quota" id="quota" value="15360">
+						<input type="number" class="form-control" name="quota" id="quota" value="10240">
 						</div>
 					</div>
 					<div class="form-group">
@@ -169,17 +169,17 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="name"><?=$lang['add']['domain'];?>:</label>
+						<label class="control-label col-sm-2" for="domain"><?=$lang['add']['domain'];?>:</label>
 						<div class="col-sm-10">
-							<select name="domain" title="<?=$lang['add']['select'];?>">
+							<select id="addSelectDomain" name="domain" title="<?=$lang['add']['select'];?>" required>
 							<?php
 							$stmt = $pdo->prepare("SELECT `domain` FROM `domain`
 									WHERE `domain` IN (
-											SELECT `domain` FROM `domain_admins`
-													WHERE `username`= :username
-													AND active='1'
-											)
-									OR 'admin' = :admin");
+										SELECT `domain` FROM `domain_admins`
+												WHERE `username`= :username
+												AND active='1'
+										)
+										OR 'admin' = :admin");
 							$stmt->execute(array(':username' => $_SESSION['mailcow_cc_username'], ':admin' => $_SESSION['mailcow_cc_role']));
 							$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 							while ($row = array_shift($rows)) {
@@ -196,9 +196,11 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="quota"><?=$lang['add']['quota_mb'];?></label>
+						<label class="control-label col-sm-2" for="quota"><?=$lang['add']['quota_mb'];?>
+							<br /><span id="quotaBadge" class="badge">max. - MiB</span>
+						</label>
 						<div class="col-sm-10">
-						<input type="number" class="form-control" name="quota" id="quota" value="1024">
+						<input type="text" class="form-control" name="quota" min="1" max="" id="addInputQuota" disabled value="<?=$lang['add']['select_domain'];?>" required>
 						</div>
 					</div>
 					<div class="form-group">

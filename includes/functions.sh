@@ -309,6 +309,8 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 				sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /etc/ssl/mail/domains.txt
 				# Set postmaster as certificate owner
 				sed -i "s/MAILCOW_DOMAIN/${sys_domain}/g" /opt/letsencrypt-sh/config.sh
+				# letsencrypt-sh will use config instead of config.sh for versions >= 0.2.0
+				cp /opt/letsencrypt-sh/config.sh /opt/letsencrypt-sh/config
 				install -m 755 letsencrypt-sh/conf/le-renew /etc/cron.weekly/le-renew
 				rm -rf letsencrypt-sh/inst/${letsencrypt_sh_version}
 				/etc/cron.weekly/le-renew

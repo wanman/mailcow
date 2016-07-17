@@ -6,12 +6,12 @@ require_once("inc/header.inc.php");
 		<div class="col-md-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title"><?=$lang['edit']['title'];?></h3>
+					<h3 class="panel-title"><?=reset($_GET);?> - <?=$lang['edit']['title'];?></h3>
 				</div>
 				<div class="panel-body">
 <?php
 if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "admin"  || $_SESSION['mailcow_cc_role'] == "domainadmin")) {
-		if (isset($_GET['alias']) &&
+		if (isset($_GET["alias"]) &&
 			!empty($_GET["alias"])) {
 				$alias = $_GET["alias"];
 				$domain = substr(strrchr($alias, "@"), 1);
@@ -151,13 +151,13 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 		is_valid_domain_name($_GET["domain"]) &&
 		!empty($_GET["domain"])) {
 			$domain = $_GET["domain"];
-			$stmt = $pdo->prepare("SELECT * FROM `domain` WHERE `domain`='".$domain."' 
+			$stmt = $pdo->prepare("SELECT * FROM `domain` WHERE `domain`='".$domain."'
 			AND (
 				`domain` IN (
 					SELECT `domain` from `domain_admins`
 						WHERE `active`='1'
 						AND `username` = :username
-				) 
+				)
 				OR 'admin'= :admin
 			)");
 			$stmt->execute(array(
@@ -328,24 +328,27 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			));
 			$result = $stmt->fetch(PDO::FETCH_ASSOC);
 			if ($result !== false && hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $result['domain'])) {
+				$left_m = remaining_specs($result['domain'], $_GET['mailbox'])['left_m'];
 			?>
 				<h4><?=$lang['edit']['mailbox'];?></h4>
 				<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
 				<input type="hidden" name="username" value="<?=$result['username'];?>">
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="name"><?=$lang['edit']['name'];?></label>
+						<label class="control-label col-sm-2" for="name"><?=$lang['edit']['full_name'];?></label>
 						<div class="col-sm-10">
 						<input type="text" class="form-control" name="name" id="name" value="<?=utf8_encode($result['name']);?>">
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="quota"><?=$lang['edit']['quota_mb'];?></label>
+						<label class="control-label col-sm-2" for="quota"><?=$lang['edit']['quota_mb'];?>
+							<br /><span id="quotaBadge" class="badge">max. <?=$left_m?> MiB</span>
+						</label>
 						<div class="col-sm-10">
-						<input type="number" class="form-control" name="quota" id="quota" value="<?=$result['quota'] / 1048576;?>">
+							<input type="number" name="quota" id="destroyable" style="width:100%" min="1" max="<?=$left_m;?>" value="<?=$result['quota'] / 1048576;?>" class="form-control">
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="quota"><?=$lang['edit']['sender_acl'];?></label>
+						<label class="control-label col-sm-2" for="sender_acl"><?=$lang['edit']['sender_acl'];?></label>
 						<div class="col-sm-10">
 							<select title="Durchsuchen..." style="width:100%" name="sender_acl[]" size="10" multiple>
 							<?php
@@ -407,7 +410,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="password"><?=$lang['edit']['password'];?></label>
 						<div class="col-sm-10">
-						<input type="password" class="form-control" name="password" id="password" placeholder="">
+						<input type="password" class="form-control" name="password" id="password" placeholder="<?=$lang['edit']['unchanged_if_empty'];?>">
 						</div>
 					</div>
 					<div class="form-group">

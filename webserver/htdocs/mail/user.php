@@ -132,7 +132,16 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 	<form class="form-horizontal" role="form" method="post">
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-10">
-				<input name="score" id="score" type="text" /><br /><br />
+				<input name="score" id="score" type="text" 
+					data-provide="slider"
+					data-slider-min="1"
+					data-slider-max="30"
+					data-slider-step="0.5"
+					data-slider-range="true"
+					data-slider-id="slider1"
+					data-slider-value="[<?=get_spam_score($_SESSION['mailcow_cc_username']);?>]"
+					data-slider-step="1" />
+				<br /><br />
 				<ul>
 					<li><?=$lang['user']['spamfilter_green'];?></li>
 					<li><?=$lang['user']['spamfilter_yellow'];?></li>

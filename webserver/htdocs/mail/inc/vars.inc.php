@@ -1,10 +1,10 @@
 <?php
 // SQL database connection variables
 $database_type = "mysql";
-$database_host = "my_dbhost";
-$database_user = "my_mailcowuser";
-$database_pass = "my_mailcowpass";
-$database_name = "my_mailcowdb";
+$database_host = "localhost";
+$database_user = "mailcow";
+$database_pass = "cBb5sc9Hw3JYOts1ue6ombtg";
+$database_name = "mailcow";
 
 // File locations should not be changed
 $MC_ANON_HEADERS = "/etc/postfix/mailcow_anonymize_headers.pcre";
@@ -14,6 +14,12 @@ $PFLOG = "/var/log/pflogsumm.log";
 
 // Change default language, "de" or "en"
 $DEFAULT_LANG = "en";
+
+// Change theme (default: lumen)
+// Needs to be one of those: cerulean, cosmo, cyborg, darkly, flatly, journal, lumen, paper, readable, sandstone,
+// simplex, slate, spacelab, superhero, united, yeti
+// See https://bootswatch.com/
+$DEFAULT_THEME = "lumen";
 
 // Unlisted elements cannot be moved to "inactive".
 // reject_unauth_destination is not listed to prevent accidental removal.
@@ -39,5 +45,5 @@ $VALID_SRR = array(
 );
 
 // Default hashing mechanism should not be changed. If changed, adjust dovecot-mysql.conf accordingly
-$HASHING = "MAILCOW_HASHING";
+$HASHING = "SSHA256";
 ?>

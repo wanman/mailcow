@@ -114,6 +114,13 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "user
 	}
 }
 if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "admin" || $_SESSION['mailcow_cc_role'] == "domainadmin")) {
+	if (isset($_GET["js"])) {
+		switch ($_GET["js"]) {
+			case "remaining_specs":
+				remaining_specs($_GET['domain'], $_GET['object'], "y");
+			break;
+		}
+	}
 	if (isset($_POST["trigger_mailbox_action"])) {
 		switch ($_POST["trigger_mailbox_action"]) {
 			case "adddomain":

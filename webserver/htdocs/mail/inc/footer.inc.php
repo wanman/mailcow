@@ -12,14 +12,20 @@ if (preg_match("/admin.php/i", $_SERVER['REQUEST_URI'])):
 endif;
 ?>
 <script>
+// Select language and reopen active URL without POST
 function setLang(sel) {
 	$.post( "<?=$_SERVER['REQUEST_URI'];?>", {lang: sel} );
 	window.location.href = window.location.pathname + window.location.search;
 }
+
 $(document).ready(function() {
+
+	// Hide alerts after n seconds
 	$("#alert-fade").fadeTo(7000, 500).slideUp(500, function(){
 		$("#alert-fade").alert('close');
 	});
+	
+	// Disable submit after submitting form
 	$('form').submit(function() {
 		if ($('form button[type="submit"]').data('submitted') == '1') {
 			return false;
@@ -33,6 +39,9 @@ $(document).ready(function() {
 	<?php
 	if (preg_match("/admin.php/i", $_SERVER['REQUEST_URI'])):
 	?>
+
+	// admin.php
+	// Postfix restrictions, drag and drop functions
 	$( "[id*=srr-sortable]" ).sortable({
 		items: "li:not(.list-heading)",
 		cancel: ".ui-state-disabled",
@@ -61,12 +70,19 @@ $(document).ready(function() {
 		var input = $("<input>").attr("type", "hidden").attr("name", "ssr_value").val(ssr_joined_vals);
 		$('#ssr_form').append($(input));
 	});
+
 	<?php
 	elseif (preg_match("/mailbox.php/i", $_SERVER['REQUEST_URI'])):
 	?>
+
+	// mailbox.php
+	// IE fix to hide scrollbars when table body is empty
 	$('tbody').filter(function (index) { 
 		return $(this).children().length < 1; 
 	}).remove();
+
+	// mailbox.php
+	// Show element counter for tables
 	$('[data-toggle="tooltip"]').tooltip();
 	var rowCountDomainAlias = $('#domainaliastable >tbody >tr').length;
 	var rowCountDomain = $('#domaintable >tbody >tr').length;
@@ -76,6 +92,9 @@ $(document).ready(function() {
 	$("#numRowsDomain").text(rowCountDomain);
 	$("#numRowsMailbox").text(rowCountMailbox);
 	$("#numRowsAlias").text(rowCountAlias);
+	
+	// mailbox.php
+	// Filter table function
 	$.fn.extend({
 		filterTable: function(){
 			return this.each(function(){
@@ -112,21 +131,39 @@ $(document).ready(function() {
 			$panel.find('.panel-body input').focus();
 		}
 	});
+
 	<?php
 	endif;
 	if (isset($_SESSION['mailcow_cc_role'])):
 	?>
+	
+	// Init Bootstrap Switch and Selectpicker
 	$('select').selectpicker();
 	$.fn.bootstrapSwitch.defaults.onColor = 'success';
 	$("[name='tls_out']").bootstrapSwitch();
 	$("[name='tls_in']").bootstrapSwitch();
 
-	$("#score").slider({ id: "slider1", min: 1, max: 30, step: 0.5, range: true, value: [<?=get_spam_score($_SESSION['mailcow_cc_username']);?>] });
+	// add.php
+	// Get max. possible quota for a domain when domain field changes
+	$('#addSelectDomain').on('change', function() {
+		$.get("add.php", { js:"remaining_specs", domain:this.value, object:"new" }, function(data){
+			if (data != '0') {
+				$("#quotaBadge").html('max. ' + data + ' MiB');
+				$('#addInputQuota').attr({"disabled": false, "value": "", "type": "number", "max": data});
+			}
+			else {
+				$("#quotaBadge").html('max. ' + data + ' MiB');
+				$('#addInputQuota').attr({"disabled": true, "value": "", "type": "text", "value": "n/a"});
+			}
+		});
+	});
 
+	// user.php
+	// Show and activate password fields after box was checked
+	// Hidden by default
 	if ( !$("#togglePwNew").is(':checked') ) {
 		$(".passFields").hide();
 	}
-
 	$('#togglePwNew').click(function() {
 		$("#user_new_pass").attr("disabled", !this.checked);
 		$("#user_new_pass2").attr("disabled", !this.checked);
@@ -138,22 +175,30 @@ $(document).ready(function() {
 		}
 	});
 
+	// user.php
+	// Show generate button after time selection
 	$('#trigger_set_time_limited_aliases').hide(); 
 	$('#validity').change(function(){
 		$('#trigger_set_time_limited_aliases').show(); 
 	});
+
+	// Collapse last active panel
 	<?php
 	if (isset($_SESSION['last_expanded'])):
 	?>
-	$('#<?=$_SESSION['last_expanded'];?>').collapse('toggle');
-	<?php
-	unset($_SESSION['last_expanded']);
+		$('#<?=$_SESSION['last_expanded'];?>').collapse('toggle');
+		<?php
+		unset($_SESSION['last_expanded']);
 	endif;
+
 	endif;
+
+	// index.php
+	// Hide navbar on index
 	// basename to validate against "/" without filename
 	if (preg_match('/index/i', basename($_SERVER['PHP_SELF']))):
 	?>
-	$('nav').hide();
+		$('nav').hide();
 	<?php
 	endif;
 	?>
