@@ -145,7 +145,7 @@ When autodetection of your hostname and/or domain name fails, use the `-H` param
 Please remove the components you do not need manually. mailcow installs components that may be used by other software on your system.
 mailcow is an installer that installs and configures software, so there is no routine to remove itself.
 
-**A list of by apt-get installed components:
+**A list of by apt-get installed components**
 ```
 # System tools
 dnsutils sudo zip bzip2 unzip unrar-free curl openssl file bsd-mailx
@@ -173,7 +173,7 @@ nginx-extras ${PHP}-fpm
 dovecot-common dovecot-core dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d dovecot-solr
 ```
 
-**System modifications
+**System modifications**
 ```
 # Cronjobs
 rm /etc/cron.daily/mc_clean_spam_aliases /etc/cron.daily/mailcow-clean-spam-aliases /etc/cron.daily/dovemaint /etc/cron.d/solrmaint /etc/cron.daily/spamlearn /etc/cron.daily/spamassassin_heinlein /etc/cron.weekly/le-renew
@@ -185,7 +185,7 @@ rm /etc/sudoers.d/mailcow
 rm /usr/local/sbin/mailcow-reset-admin /usr/local/sbin/mailcow-dkim-tool /usr/local/sbin/mailcow-set-message-limit /usr/local/sbin/mailcow-renew-pflogsumm /usr/local/sbin/mc_pflog_renew /usr/local/sbin/mc_msg_size /usr/local/sbin/mc_dkim_ctrl /usr/local/sbin/mc_resetadmin
 ```
 
-**Manually installed components and miscellaneous
+**Manually installed components and miscellaneous**
 ```
 # Databases
 # Besides aboves packages, you may want to drop the mailcow and, if installed, Roundcube database. SOGo uses the mailcow database.
@@ -201,10 +201,4 @@ rm -rf /usr/local/lib/python2.7/dist-packages/fuglu*
 update-rc.d -f fuglu remove
 userdel fuglu
 ```
-
-
-
-
-
-
 
