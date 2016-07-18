@@ -581,7 +581,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			sed -i "s/my_mailcowuser/${my_mailcowuser}/g" /var/www/mail/inc/vars.inc.php
 			sed -i "s/my_mailcowdb/${my_mailcowdb}/g" /var/www/mail/inc/vars.inc.php
 			sed -i "s/MAILCOW_HASHING/${hashing_method}/g" /var/www/mail/inc/vars.inc.php
-			chown -R www-data: /var/www/{.,mail} ${PHPLIB}/sessions
+			chown -R www-data: /var/www/mail/. ${PHPLIB}/sessions
 			mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} < webserver/htdocs/init.sql
 			if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "SHOW COLUMNS FROM domain LIKE 'relay_all_recipients';" -N -B) ]]; then
 				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "ALTER TABLE domain ADD relay_all_recipients tinyint(1) NOT NULL DEFAULT '0';" -N -B
@@ -846,9 +846,8 @@ A backup will be stored in ./before_upgrade_${timestamp}
 	installtask spamassassin
 
 	returnwait "Webserver configuration"
-	cp before_upgrade_${timestamp}/mail_wwwroot/inc/vars.inc.php /var/www/mail/inc/vars.inc.php
-	mv /var/www/PFLOG /var/log/pflogsumm.log 2> /dev/null
 	installtask webserver
+	mv /var/www/PFLOG /var/log/pflogsumm.log 2> /dev/null
 
 	if [[ ${mailing_platform} == "roundcube" ]]; then
 		returnwait "Roundcube configuration"

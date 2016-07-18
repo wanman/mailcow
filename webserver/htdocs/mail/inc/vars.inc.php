@@ -1,10 +1,16 @@
 <?php
+
+/*
+PLEASE USE THE FILE "vars.local.inc.php" TO OVERWRITE SETTINGS
+THIS WILL MAKE CHANGES PERSISTENT
+*/
+
 // SQL database connection variables
 $database_type = "mysql";
-$database_host = "localhost";
-$database_user = "mailcow";
-$database_pass = "cBb5sc9Hw3JYOts1ue6ombtg";
-$database_name = "mailcow";
+$database_host = "my_dbhost";
+$database_user = "my_mailcowuser";
+$database_pass = "my_mailcowpass";
+$database_name = "my_mailcowdb";
 
 // File locations should not be changed
 $MC_ANON_HEADERS = "/etc/postfix/mailcow_anonymize_headers.pcre";
@@ -45,5 +51,7 @@ $VALID_SRR = array(
 );
 
 // Default hashing mechanism should not be changed. If changed, adjust dovecot-mysql.conf accordingly
-$HASHING = "SSHA256";
+$HASHING = "MAILCOW_HASHING";
+
+include_once "vars.local.inc.php"
 ?>
