@@ -8,14 +8,13 @@ cat includes/banner
 source includes/versions
 source includes/functions.sh
 
-while getopts suhUH:D:? par; do
+while getopts suhH:D:? par; do
 case ${par} in
 	h|'?')
 		usage
 		exit 0
 		;;
 	u|U)
-		[[ ${par} == "U" ]] && inst_confirm_proceed="no"
 		is_upgradetask="yes"
 		;;
 	H) sys_hostname="$OPTARG" ;;

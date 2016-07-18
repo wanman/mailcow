@@ -137,11 +137,6 @@ To start the upgrade, run the following command:
 ./install.sh -u
 ```
 
-If you don't want to confirm each step of the upgrade, use `-U` instead:
-```
-./install -U
-```
-
 When autodetection of your hostname and/or domain name fails, use the `-H` parameter to overwrite the hostname and/or `-D` to overwrite the domain name:
 ```
 # FQDN: mx.example.org

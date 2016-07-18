@@ -27,12 +27,7 @@ usage() {
 	-h | -?
 		Print this text
 
-	-u
-		Upgrade mailcow to a newer version
-
-	-U
-		Upgrade mailcow to a newer version
-		and do not ask to press any key to continue
+	-u	Upgrade mailcow to a newer version
 
 	-s	Retry to obtain Lets Encrypt certificates
 
@@ -58,7 +53,6 @@ genpasswd() {
 	done
 	echo ${pw_valid}
 }
-
 returnwait_task=""
 returnwait() {
 	if [[ ! -z "${returnwait_task}" ]]; then
@@ -808,7 +802,7 @@ A backup will be stored in ./before_upgrade_${timestamp}
 		[[ -d "${dir}" ]] && cp -R "/etc/${dir}/" "before_upgrade_${timestamp}/"
 	done
 	echo -e "$(greenb "[OK]")"
-	echo -en "\nStopping services, this may take a few seconds... \t\t"
+	echo -en "Stopping services, this may take a few seconds... \t\t"
 	if [[ ${httpd_platform} == "nginx" ]]; then
 		FPM="${PHPSVC}"
 	else
@@ -835,7 +829,7 @@ A backup will be stored in ./before_upgrade_${timestamp}
 
 	PF_RR_BEFORE=$(postconf smtpd_recipient_restrictions 2> /dev/null)
 	PF_SR_BEFORE=$(postconf smtpd_sender_restrictions 2> /dev/null)
-	returnwait "Postfix configuration"
+	returnwait "Postfix configuration (recipient and sender restrictions will be restored)"
 	installtask postfix
 	postconf -e "${PF_RR_BEFORE}"
 	postconf -e "${PF_SR_BEFORE}"
@@ -853,6 +847,7 @@ A backup will be stored in ./before_upgrade_${timestamp}
 	installtask spamassassin
 
 	returnwait "Webserver configuration"
+	cp before_upgrade_${timestamp}/mail_wwwroot/inc/vars.inc.php /var/www/mail/inc/vars.inc.php
 	mv /var/www/PFLOG /var/log/pflogsumm.log 2> /dev/null
 	installtask webserver
 

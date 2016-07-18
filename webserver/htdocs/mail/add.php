@@ -131,7 +131,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 										WHERE `domain` IN (
 												SELECT `domain` FROM `domain_admins`
 														WHERE `username`= :username
-														AND active='1'
+														AND `active`='1'
 												)
 										OR 'admin' = :admin");
 								$stmt->execute(array(':username' => $_SESSION['mailcow_cc_username'], ':admin' => $_SESSION['mailcow_cc_role']));
@@ -177,7 +177,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 									WHERE `domain` IN (
 										SELECT `domain` FROM `domain_admins`
 												WHERE `username`= :username
-												AND active='1'
+												AND `active`='1'
 										)
 										OR 'admin' = :admin");
 							$stmt->execute(array(':username' => $_SESSION['mailcow_cc_username'], ':admin' => $_SESSION['mailcow_cc_role']));
