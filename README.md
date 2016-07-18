@@ -171,6 +171,11 @@ nginx-extras ${PHP}-fpm
 
 # Dovecot components
 dovecot-common dovecot-core dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d dovecot-solr
+
+# SOGo
+# ALSO: rm /etc/apt/sources.list.d/sogo.list
+sogo sogo-activesync libwbxml2-0 memcached
+
 ```
 
 **System modifications**
