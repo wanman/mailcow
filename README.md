@@ -128,9 +128,7 @@ You can change the default language of the mailcow UI by opening `/var/www/mail/
 # Upgrade
 **Please run all commands as root**
 
-Upgrade is supported since mailcow v0.7.x. From v0.9 on you do not need the file `installer.log` from a previous installation.
-
-The mailcow configuration file will not be read, so there is no need to adjust it in any way before upgrading.
+The mailcow configuration file (mailcow.config) will not be read, so there is no need to adjust it in any way before upgrading.
 
 To start the upgrade, run the following command:
 ```
@@ -144,14 +142,69 @@ When autodetection of your hostname and/or domain name fails, use the `-H` param
 ```
 
 # Uninstall
-Run `bash misc/purge.sh` from within mailcow directory to remove mailcow main components.
+Please remove the components you do not need manually. mailcow installs components that may be used by other software on your system.
+mailcow is an installer that installs and configures software, so there is no routine to remove itself.
 
-Your web server + web root, MySQL server + databases as well as your mail directory (/var/vmail) will **not** be removed (>= v0.9).
+**A list of by apt-get installed components:
+```
+# System tools
+dnsutils sudo zip bzip2 unzip unrar-free curl openssl file bsd-mailx
 
-Please open and review the script before running it!
+# Core components
+# ${OPENJDK} is either "openjdk-7" or "openjdk-9"
+rrdtool mailgraph fcgiwrap spawn-fcgi python-setuptools libmail-spf-perl libmail-dkim-perl mailutils pyzor razor postfix postfix-mysql postfix-pcre postgrey pflogsumm spamassassin spamc opendkim opendkim-tools clamav-daemon python-magic liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl ${OPENJDK}-jre-headless libcurl4-openssl-dev libexpat1-dev solr-jetty
 
-**You can perform a FULL WIPE** by appending `--all`:
+# PHP components
+# ${PHP} is either PHP or PHP5
+php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp php-net-socket php-net-url php-pear php-soap ${PHP} ${PHP}-cli ${PHP}-common ${PHP}-curl ${PHP}-gd ${PHP}-imap ${PHP}-intl ${PHP}-xsl libawl-php ${PHP}-mcrypt ${PHP}-mysql ${PHP}-xmlrpc
 
-```bash misc/purge.sh --all```
+# Database components
+mariadb-client mariadb-server
+# or...
+mysql-client mysql-server
 
-This WILL purge sensible data like your web root, databases + MySQL installation, mail directory and more... 
+# Webserver components
+# ${PHP} is either PHP or PHP5
+apache2 apache2-utils libapache2-mod-${PHP}
+# or...
+nginx-extras ${PHP}-fpm
+
+# Dovecot components
+dovecot-common dovecot-core dovecot-imapd dovecot-lmtpd dovecot-managesieved dovecot-sieve dovecot-mysql dovecot-pop3d dovecot-solr
+```
+
+**System modifications
+```
+# Cronjobs
+rm /etc/cron.daily/mc_clean_spam_aliases /etc/cron.daily/mailcow-clean-spam-aliases /etc/cron.daily/dovemaint /etc/cron.d/solrmaint /etc/cron.daily/spamlearn /etc/cron.daily/spamassassin_heinlein /etc/cron.weekly/le-renew
+
+# Sudo
+rm /etc/sudoers.d/mailcow
+
+# Executables
+rm /usr/local/sbin/mailcow-reset-admin /usr/local/sbin/mailcow-dkim-tool /usr/local/sbin/mailcow-set-message-limit /usr/local/sbin/mailcow-renew-pflogsumm /usr/local/sbin/mc_pflog_renew /usr/local/sbin/mc_msg_size /usr/local/sbin/mc_dkim_ctrl /usr/local/sbin/mc_resetadmin
+```
+
+**Manually installed components and miscellaneous
+```
+# Databases
+# Besides aboves packages, you may want to drop the mailcow and, if installed, Roundcube database. SOGo uses the mailcow database.
+DROP DATABASE $mailcowdb;
+DROP DATABASE $roundcubedb;
+ 
+# Let's Encrypt
+rm -r /opt/letsencrypt-sh/
+
+# FuGlu
+systemctl disable fuglu
+rm -rf /usr/local/lib/python2.7/dist-packages/fuglu*
+update-rc.d -f fuglu remove
+userdel fuglu
+```
+
+
+
+
+
+
+
