@@ -53,5 +53,4 @@ $VALID_SRR = array(
 // Default hashing mechanism should not be changed. If changed, adjust dovecot-mysql.conf accordingly
 $HASHING = "MAILCOW_HASHING";
 
-include_once "vars.local.inc.php"
 ?>

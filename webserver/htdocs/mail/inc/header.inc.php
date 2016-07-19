@@ -8,6 +8,7 @@ if (isset($_POST["logout"])) {
 }
 
 require_once 'inc/vars.inc.php';
+include_once 'inc/vars.local.inc.php';
 
 $dsn = "$database_type:host=$database_host;dbname=$database_name";
 $opt = [

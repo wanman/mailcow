@@ -210,6 +210,7 @@ foreach($srr_values_inactive as $srr_value) {
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-10">
 				<button type="submit" name="srr" class="btn btn-default"><?=$lang['admin']['save'];?></button>
+				<button type="submit" name="reset-srr" class="btn btn-primary"><?=$lang['admin']['reset_defaults'];?></button>
 			</div>
 		</div>
 	</form>
@@ -253,6 +254,7 @@ foreach($ssr_values_inactive as $ssr_value) {
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-10">
 				<button type="submit" name="ssr" class="btn btn-default"><?=$lang['admin']['save'];?></button>
+				<button type="submit" name="reset-ssr" class="btn btn-primary"><?=$lang['admin']['reset_defaults'];?></button>
 			</div>
 		</div>
 	</form>

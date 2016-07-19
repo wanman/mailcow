@@ -270,6 +270,26 @@ namespace {
 				break;
 			}
 			break;
+		case "reset-ssr":
+			exec('sudo /usr/sbin/postconf -e smtpd_sender_restrictions="reject_authenticated_sender_login_mismatch, permit_mynetworks, reject_sender_login_mismatch, permit_sasl_authenticated, reject_unlisted_sender, reject_unknown_sender_domain"', $out, $return);
+			if ($return != "0") {
+				$_SESSION['return'] = array(
+					'type' => 'danger',
+					'msg' => $lang['admin']['set_rr_failed']
+				);
+				break;
+			}
+			break;
+		case "reset-srr":
+			exec('sudo /usr/sbin/postconf -e smtpd_recipient_restrictions="permit_sasl_authenticated, permit_mynetworks, reject_invalid_helo_hostname, reject_unknown_reverse_client_hostname, reject_unauth_destination"', $out, $return);
+			if ($return != "0") {
+				$_SESSION['return'] = array(
+					'type' => 'danger',
+					'msg' => $lang['admin']['set_rr_failed']
+				);
+				break;
+			}
+			break;
 	}
 	if (!isset($_SESSION['return'])) {
 		$_SESSION['return'] = array(

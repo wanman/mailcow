@@ -297,6 +297,7 @@ $lang['login']['trash_login'] = "Login verwerfen";
 $lang['admin']['restrictions'] = 'Postifx Restriktionen';
 $lang['admin']['rr'] = 'Postifx Recipient Restriktionen';
 $lang['admin']['sr'] = 'Postifx Sender Restriktionen';
+$lang['admin']['reset_defaults'] = 'Standard wiederherstellen';
 $lang['admin']['r_inactive'] = 'Inaktive Restriktionen';
 $lang['admin']['r_active'] = 'Aktive Restriktionen';
 $lang['admin']['r_info'] = 'Ausgegraute/deaktivierte Elemente sind mailcow nicht bekannt und können nicht in die Liste inaktiver Elemente verschoben werden. Unbekannte Restriktionen werden trotzdem in Reihenfolge der Erscheinung gesetzt.<br />Sie können ein Element in der Datei <code>inc/vars.inc.php</code> als bekannt hinzufügen, um es zu bewegen.';
