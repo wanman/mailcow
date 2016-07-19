@@ -18,7 +18,7 @@ mailcow is a mail server suite based on Dovecot, Postfix and other open source s
 
 mailcow supports **Debian 8 Jessie, Ubuntu LTS 14.04 Trusty and Ubuntu LTS 16.04 Xenial**
 
-Screenshots placeholder.
+[Everybody loves screenshots (v0.14)](http://imgur.com/a/lWX2V)
 
 # Introduction
 
