@@ -1,8 +1,8 @@
 <?php
 
 /*
-PLEASE USE THE FILE "vars.local.inc.php" TO OVERWRITE SETTINGS
-THIS WILL MAKE CHANGES PERSISTENT
+PLEASE USE THE FILE "vars.local.inc.php" TO OVERWRITE SETTINGS AND MAKE THEM PERSISTENT!
+This file will be reset on upgrades.
 */
 
 // SQL database connection variables
