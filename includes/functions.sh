@@ -628,19 +628,19 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			if [[ $dist_id == "Debian" ]]; then
 				if [[ $dist_codename == "jessie" ]]; then
 					echo "$(textb [INFO]) - Adding official SOGo repository..."
-					echo "deb http://inverse.ca/debian-v3 jessie jessie" > /etc/apt/sources.list.d/sogo.list
+					echo "deb http://packages.inverse.ca/SOGo/nightly/3/debian/ jessie jessie" > /etc/apt/sources.list.d/sogo.list
 					apt-key adv --keyserver keys.gnupg.net --recv-key 0x810273C4 > /dev/null 2>&1
 					apt-get -y update >/dev/null
 				fi
 			elif [[ $dist_id == "Ubuntu" ]]; then
 				if [[ $dist_codename == "trusty" ]]; then
 					echo "$(textb [INFO]) - Adding official SOGo repository..."
-					echo "deb http://inverse.ca/ubuntu-v3 trusty trusty" > /etc/apt/sources.list.d/sogo.list
+					echo "deb http://packages.inverse.ca/SOGo/nightly/3/ubuntu/ trusty trusty" > /etc/apt/sources.list.d/sogo.list
 					apt-key adv --keyserver keys.gnupg.net --recv-key 0x810273C4 > /dev/null 2>&1
 					apt-get -y update >/dev/null
 				elif [[ $dist_codename == "xenial" ]]; then
 					echo "$(textb [INFO]) - Adding official SOGo repository..."
-					echo "deb http://inverse.ca/ubuntu-v3 xenial xenial" > /etc/apt/sources.list.d/sogo.list
+					echo "deb http://packages.inverse.ca/SOGo/nightly/3/ubuntu/ xenial xenial" > /etc/apt/sources.list.d/sogo.list
 					apt-key adv --keyserver keys.gnupg.net --recv-key 0x810273C4 > /dev/null 2>&1
 					apt-get -y update >/dev/null
 				fi
