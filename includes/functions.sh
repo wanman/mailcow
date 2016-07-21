@@ -522,7 +522,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			if [[ ! -f /etc/spamassassin/local.cf.include ]]; then
                         	cp spamassassin/conf/local.cf.include /etc/spamassassin/local.cf.include
                         fi
-			sed -i '/^OPTIONS=/s/=.*/="--create-prefs --max-children 5 --helper-home-dir --username debian-spamd --socketpath \/var\/run\/spamd.sock --socketowner debian-spamd --socketgroup debian-spamd"/' /etc/default/spamassassin
+			sed -i '/^OPTIONS=/s/=.*/="--create-prefs --max-children 5 --helper-home-dir --username debian-spamd --socketpath \/var\/run\/spamd.sock --socketowner debian-spamd --socketgroup debian-spamd --sql-config --nouser-config"/' /etc/default/spamassassin
 			sed -i '/^CRON=/s/=.*/="1"/' /etc/default/spamassassin
 			sed -i '/^ENABLED=/s/=.*/="1"/' /etc/default/spamassassin
 			sed -i "s/my_mailcowpass/${my_mailcowpass}/g" /etc/spamassassin/local.cf
