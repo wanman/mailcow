@@ -12,6 +12,11 @@ $database_user = "my_mailcowuser";
 $database_pass = "my_mailcowpass";
 $database_name = "my_mailcowdb";
 
+// Where to go after adding and editing objects
+// Can be "form" or "previous"
+// "form" will stay in the current form, "previous" will redirect to previous page
+$FORM_ACTION = "previous";
+
 // File locations should not be changed
 $MC_ANON_HEADERS = "/etc/postfix/mailcow_anonymize_headers.pcre";
 $MC_PUB_FOLDER = "/etc/dovecot/mailcow_public_folder.conf";

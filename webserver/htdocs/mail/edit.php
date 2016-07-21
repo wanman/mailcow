@@ -45,7 +45,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				?>
 					<h4><?=$lang['edit']['alias'];?></h4>
 					<br />
-					<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
+					<form class="form-horizontal" role="form" method="post" action="<?=($FORM_ACTION == "previous") ? $_SESSION['return_to'] : null;?>">
 					<input type="hidden" name="address" value="<?=$alias;?>">
 						<div class="form-group">
 							<label class="control-label col-sm-2" for="name"><?=$lang['edit']['target_address'];?></label>
@@ -97,7 +97,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				?>
 				<h4><?=$lang['edit']['domain_admin'];?></h4>
 				<br />
-				<form class="form-horizontal" role="form" method="post" action="/admin.php">
+				<form class="form-horizontal" role="form" method="post" action="<?=($FORM_ACTION == "previous") ? $_SESSION['return_to'] : null;?>">
 				<input type="hidden" name="username" value="<?=$domain_admin;?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="name"><?=$lang['edit']['domains'];?></label>
@@ -208,7 +208,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			if ($result !== false) {
 			?>
 				<h4><?=$lang['edit']['domain'];?></h4>
-				<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
+				<form class="form-horizontal" role="form" method="post" action="<?=($FORM_ACTION == "previous") ? $_SESSION['return_to'] : null;?>">
 				<input type="hidden" name="domain" value="<?=$domain;?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="description"><?=$lang['edit']['description'];?></label>
@@ -339,7 +339,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			if ($result !== false) {
 			?>
 				<h4><?=$lang['edit']['edit_alias_domain'];?></h4>
-				<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
+				<form class="form-horizontal" role="form" method="post" action="<?=($FORM_ACTION == "previous") ? $_SESSION['return_to'] : null;?>">
 					<input type="hidden" name="alias_domain_now" value="<?=$alias_domain;?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="alias_domain"><?=$lang['edit']['alias_domain'];?></label>
@@ -387,7 +387,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				$left_m = remaining_specs($result['domain'], $_GET['mailbox'])['left_m'];
 			?>
 				<h4><?=$lang['edit']['mailbox'];?></h4>
-				<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
+				<form class="form-horizontal" role="form" method="post" action="<?=($FORM_ACTION == "previous") ? $_SESSION['return_to'] : null;?>">
 				<input type="hidden" name="username" value="<?=$result['username'];?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="name"><?=$lang['edit']['full_name'];?></label>

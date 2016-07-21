@@ -14,7 +14,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 	if (isset($_GET['domain']) && $_SESSION['mailcow_cc_role'] == "admin") {
 ?>
 				<h4><?=$lang['add']['domain'];?></h4>
-				<form class="form-horizontal" role="form" method="post">
+				<form class="form-horizontal" role="form" method="post" action="<?=($FORM_ACTION == "previous") ? $_SESSION['return_to'] : null;?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="domain"><?=$lang['add']['domain'];?>:</label>
 						<div class="col-sm-10">
@@ -81,7 +81,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 ?>
 				<h4><?=$lang['add']['alias'];?></h4>
 				<p><?=$lang['add']['alias_spf_fail'];?></p>
-				<form class="form-horizontal" role="form" method="post">
+				<form class="form-horizontal" role="form" method="post" action="<?=($FORM_ACTION == "previous") ? $_SESSION['return_to'] : null;?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="address"><?=$lang['add']['alias_address'];?></label>
 						<div class="col-sm-10">
@@ -114,7 +114,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 	elseif (isset($_GET['aliasdomain'])) {
 	?>
 				<h4><?=$lang['add']['alias_domain'];?></h4>
-				<form class="form-horizontal" role="form" method="post">
+				<form class="form-horizontal" role="form" method="post" action="<?=($FORM_ACTION == "previous") ? $_SESSION['return_to'] : null;?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="alias_domain"><?=$lang['add']['alias_domain'];?></label>
 						<div class="col-sm-10">
@@ -169,7 +169,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 	elseif (isset($_GET['mailbox'])) {
 	?>
 				<h4><?=$lang['add']['mailbox'];?></h4>
-				<form class="form-horizontal" role="form" method="post">
+				<form class="form-horizontal" role="form" method="post" action="<?=($FORM_ACTION == "previous") ? $_SESSION['return_to'] : null;?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="local_part"><?=$lang['add']['mailbox_username'];?></label>
 						<div class="col-sm-10">

@@ -380,7 +380,7 @@ foreach($ssr_values_inactive as $ssr_value) {
 	?>
 		<div class="row">
 			<div class="col-xs-2">
-				<p>Domain: <strong><?=explode("_", $file)[1];?></strong> (default._domainkey)</p>
+				<p>Domain: <strong><?=explode("_", $file)[1];?></strong> (<?=explode("_", $file)[0];?>._domainkey)</p>
 			</div>
 			<div class="col-xs-9">
 				<pre><?=$str;?></pre>
@@ -404,6 +404,12 @@ foreach($ssr_values_inactive as $ssr_value) {
 		<div class="form-group">
 			<label for="dkim_selector">Selector</label>
 			<input class="form-control" id="dkim_selector" name="dkim_selector" value="default" required>
+		</div>
+		<div class="form-group">
+			<select class="form-control" id="dkim_key_size" name="dkim_key_size" title="<?=$lang['admin']['dkim_key_length'];?>" required>
+				<option>1024</option>
+				<option>2048</option>
+			</select>
 		</div>
 		<button type="submit" name="add_dkim_record" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> <?=$lang['admin']['add'];?></button>
 	</form>

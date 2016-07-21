@@ -327,8 +327,16 @@ function opendkim_table($action, $which = "") {
 			);
 			break;
 		case "add":
-			$selector	= explode("_", $which)[0];
-			$domain		= explode("_", $which)[1];
+			$selector	= trim($which['dkim_selector']);
+			$domain		= trim($which['dkim_domain']);
+			$key_length	= trim($which['dkim_key_size']);
+			if (!is_numeric($key_length)) {
+				$_SESSION['return'] = array(
+					'type' => 'danger',
+					'msg' => sprintf($lang['danger']['dkim_key_length_invalid'])
+				);
+				break;
+			}
 			if (!ctype_alnum($selector) || !is_valid_domain_name($domain)) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -338,7 +346,7 @@ function opendkim_table($action, $which = "") {
 			}
 			$selector	= escapeshellarg($selector);
 			$domain		= escapeshellarg($domain);
-			exec('sudo /usr/local/sbin/mailcow-dkim-tool add '.$selector.' '.$domain, $out, $return);
+			exec('sudo /usr/local/sbin/mailcow-dkim-tool add '.$selector.' '.$domain.' '.$key_length, $out, $return);
 			if ($return != "0") {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
@@ -512,8 +520,7 @@ function mailbox_add_alias($postarray) {
 	$addresses		= array_map('trim', preg_split( "/( |,|;|\n)/", $postarray['address']));
 	$gotos			= array_map('trim', preg_split( "/( |,|;|\n)/", $postarray['goto']));
 	isset($postarray['active']) ? $active = '1' : $active = '0';
-
-	if (empty($addresses)) {
+	if (empty($addresses[0])) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['alias_empty'])
@@ -521,7 +528,7 @@ function mailbox_add_alias($postarray) {
 		return false;
 	}
 
-	if (empty($gotos)) {
+	if (empty($gotos[0])) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['goto_empty'])

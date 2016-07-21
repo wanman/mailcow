@@ -7,19 +7,21 @@ if [ "$EUID" -ne 0 ]
 fi
 
 if [[ ${#@} -lt 1 ]]; then
-	echo "$0 add|del|list (selector domain)"
+	echo "$0 add|del|list (selector domain keylength)"
 	exit 1
 fi
 
 SELECTOR=$2
 DOMAIN=$3
+KEYLENGTH=$4
+
 ID="${RANDOM}${RANDOM}"
 
 case $1 in
 add)
-	if [[ ${#@} -eq 3 ]]; then
+	if [[ ${#@} -eq 4 ]]; then
 		[[ -f "/etc/opendkim/dnstxt/${SELECTOR}_${DOMAIN}" ]] && exit 1
-		opendkim-genkey -S -a -r -s "${SELECTOR}" -d "${DOMAIN}" -D /tmp/
+		opendkim-genkey -b ${KEYLENGTH} -S -a -r -s "${SELECTOR}" -d "${DOMAIN}" -D /tmp/
 		mv "/tmp/${SELECTOR}.txt" "/etc/opendkim/dnstxt/${SELECTOR}_${DOMAIN}"
 		mv "/tmp/${SELECTOR}.private" "/etc/opendkim/keyfiles/${SELECTOR}_${DOMAIN}.dkim"
 		sed -i "s/ ; ----- DKIM key $SELECTOR for $DOMAIN//g" "/etc/opendkim/dnstxt/${SELECTOR}_${DOMAIN}"
@@ -47,4 +49,4 @@ list)
 	;;
 esac
 
-#service opendkim reload
+service opendkim reload

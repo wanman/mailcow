@@ -68,7 +68,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "admi
 	}
 	if (isset($_POST["add_dkim_record"])) {
 		$_SESSION['last_expanded'] = "collapseDKIM";
-		opendkim_table("add", $_POST["dkim_selector"] . "_" . $_POST["dkim_domain"]);
+		opendkim_table("add", $_POST);
 	}
 	if (isset($_POST["trigger_anonymize"])) {
 		isset($_POST['anonymize']) ? $anonymize = 'on' : $anonymize = '';
