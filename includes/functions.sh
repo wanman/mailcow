@@ -693,7 +693,6 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			if [[ ${httpd_platform} == "apache2" ]]; then
 				a2disconf SOGo
 				cat /dev/null > /etc/apache2/conf-available/SOGo.conf
-				chattr +i /etc/apache2/conf-available/SOGo.conf
 			fi
 			;;
 		restartservices)
