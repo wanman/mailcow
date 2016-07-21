@@ -276,7 +276,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			mkdir /etc/ssl/mail 2> /dev/null
 			echo "$(textb [INFO]) - Generating 2048 bit DH parameters, this may take a while, please wait..."
 			openssl dhparam -out /etc/ssl/mail/dhparams.pem 2048 2> /dev/null
-			openssl req -new -newkey rsa:4096 -sha256 -days 1095 -nodes -x509 -subj "/C=ZZ/ST=mailcow/L=mailcow/O=mailcow/CN=${sys_hostname}.${sys_domain}/subjectAltName=DNS.1=${sys_hostname}.${sys_domain},DNS.2=autodiscover.{sys_domain}" -keyout /etc/ssl/mail/mail.key -out /etc/ssl/mail/mail.crt
+			openssl req -new -newkey rsa:4096 -sha256 -days 1095 -nodes -x509 -subj "/C=ZZ/ST=mailcow/L=mailcow/O=mailcow/CN=${sys_hostname}.${sys_domain}/subjectAltName=DNS.1=${sys_hostname}.${sys_domain}" -keyout /etc/ssl/mail/mail.key -out /etc/ssl/mail/mail.crt
 			chmod 600 /etc/ssl/mail/mail.key
 			cp /etc/ssl/mail/mail.crt /usr/local/share/ca-certificates/
 			update-ca-certificates
