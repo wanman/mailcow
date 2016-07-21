@@ -48,39 +48,57 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					</thead>
 					<tbody>
 					<?php
-					$stmt = $pdo->prepare("SELECT 
-							`domain`,
-							`aliases`,
-							`mailboxes`, 
-							`maxquota` * 1048576 AS `maxquota`,
-							`quota` * 1048576 AS `quota`,
-							CASE `backupmx` WHEN 1 THEN '".$lang['mailbox']['yes']."' ELSE '".$lang['mailbox']['no']."' END AS `backupmx`,
-							CASE `active` WHEN 1 THEN '".$lang['mailbox']['yes']."' ELSE '".$lang['mailbox']['no']."' END AS `active`
-								FROM `domain` WHERE
-									`domain` IN (
-										SELECT `domain` FROM `domain_admins` WHERE `username`= :username AND `active`='1'
-									)
-									OR 'admin'= :admin");
-					$stmt->execute(array(
-						':username' => $_SESSION['mailcow_cc_username'],
-						':admin' => $_SESSION['mailcow_cc_role'],
-					));
-					$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-					while($row = array_shift($rows)):
-						$stmt = $pdo->prepare("SELECT COUNT(*) AS `count` FROM `alias`
-							WHERE `domain`= :domain
-							AND `address` NOT IN (
-								SELECT `username` FROM `mailbox`)");
-						$stmt->execute(array(':domain' => $row['domain']));
-						$AliasData = $stmt->fetch(PDO::FETCH_ASSOC);
-		
+					try {
 						$stmt = $pdo->prepare("SELECT 
-							COUNT(*) AS `count`,
-							COALESCE(SUM(`quota`), '0') AS `quota`
-								FROM `mailbox`
-									WHERE `domain` = :domain");
-						$stmt->execute(array(':domain' => $row['domain']));
-						$MailboxData = $stmt->fetch(PDO::FETCH_ASSOC);
+								`domain`,
+								`aliases`,
+								`mailboxes`, 
+								`maxquota` * 1048576 AS `maxquota`,
+								`quota` * 1048576 AS `quota`,
+								CASE `backupmx` WHEN 1 THEN '".$lang['mailbox']['yes']."' ELSE '".$lang['mailbox']['no']."' END AS `backupmx`,
+								CASE `active` WHEN 1 THEN '".$lang['mailbox']['yes']."' ELSE '".$lang['mailbox']['no']."' END AS `active`
+									FROM `domain` WHERE
+										`domain` IN (
+											SELECT `domain` FROM `domain_admins` WHERE `username`= :username AND `active`='1'
+										)
+										OR 'admin'= :admin");
+						$stmt->execute(array(
+							':username' => $_SESSION['mailcow_cc_username'],
+							':admin' => $_SESSION['mailcow_cc_role'],
+						));
+						$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+					}
+					catch (PDOException $e) {
+						$_SESSION['return'] = array(
+							'type' => 'danger',
+							'msg' => 'MySQL: '.$e
+						);
+						return false;
+					}
+					while($row = array_shift($rows)):
+						try {
+							$stmt = $pdo->prepare("SELECT COUNT(*) AS `count` FROM `alias`
+								WHERE `domain`= :domain
+								AND `address` NOT IN (
+									SELECT `username` FROM `mailbox`)");
+							$stmt->execute(array(':domain' => $row['domain']));
+							$AliasData = $stmt->fetch(PDO::FETCH_ASSOC);
+			
+							$stmt = $pdo->prepare("SELECT 
+								COUNT(*) AS `count`,
+								COALESCE(SUM(`quota`), '0') AS `quota`
+									FROM `mailbox`
+										WHERE `domain` = :domain");
+							$stmt->execute(array(':domain' => $row['domain']));
+							$MailboxData = $stmt->fetch(PDO::FETCH_ASSOC);
+						}
+						catch (PDOException $e) {
+							$_SESSION['return'] = array(
+								'type' => 'danger',
+								'msg' => 'MySQL: '.$e
+							);
+							return false;
+						}
 					?>
 						<tr>
 							<td><?=$row['domain'];?></td>
@@ -142,22 +160,29 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					</thead>
 					<tbody>
 					<?php
-					$stmt = $pdo->prepare("SELECT 
-							`alias_domain`,
-							`target_domain`,
-							CASE `active` WHEN 1 THEN '".$lang['mailbox']['yes']."' ELSE '".$lang['mailbox']['no']."' END AS `active`
-								FROM `alias_domain`
-									WHERE `target_domain` IN (
-										SELECT `domain` FROM `domain_admins`
-											WHERE `username`= :username 
-											AND `active`='1'
-									)
-									OR 'admin' = :admin");
-					$stmt->execute(array(
-						':username' => $_SESSION['mailcow_cc_username'],
-						':admin' => $_SESSION['mailcow_cc_role'],
-					));
-					$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+					try {
+						$stmt = $pdo->prepare("SELECT 
+								`alias_domain`,
+								`target_domain`,
+								CASE `active` WHEN 1 THEN '".$lang['mailbox']['yes']."' ELSE '".$lang['mailbox']['no']."' END AS `active`
+									FROM `alias_domain`
+										WHERE `target_domain` IN (
+											SELECT `domain` FROM `domain_admins`
+												WHERE `username`= :username 
+												AND `active`='1'
+										)
+										OR 'admin' = :admin");
+						$stmt->execute(array(
+							':username' => $_SESSION['mailcow_cc_username'],
+							':admin' => $_SESSION['mailcow_cc_role'],
+						));
+						$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+					} catch(PDOException $e) {
+						$_SESSION['return'] = array(
+							'type' => 'danger',
+							'msg' => 'MySQL: '.$e
+						);
+					}
 					while($row = array_shift($rows)):
 					?>
 						<tr>
@@ -207,29 +232,38 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					</thead>
 					<tbody>
 						<?php
-						$stmt = $pdo->prepare("SELECT
-								`domain`.`backupmx`,
-								`mailbox`.`username`,
-								`mailbox`.`name`,
-								CASE `mailbox`.`active` WHEN 1 THEN '".$lang['mailbox']['yes']."' ELSE '".$lang['mailbox']['no']."' END AS `active`,
-								`mailbox`.`domain`,
-								`mailbox`.`quota`,
-								`quota2`.`bytes`,
-								`quota2`.`messages`
-									FROM `mailbox`, `quota2`, `domain`
-										WHERE (`mailbox`.`username` = `quota2`.`username`)
-										AND (`domain`.`domain` = `mailbox`.`domain`)
-										AND (`mailbox`.`domain` IN (
-											SELECT `domain` FROM `domain_admins`
-												WHERE `username`= :username
-													AND `active`='1'
-												)
-												OR 'admin' = :admin)");
-						$stmt->execute(array(
-							':username' => $_SESSION['mailcow_cc_username'],
-							':admin' => $_SESSION['mailcow_cc_role'],
-						));
-						$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+						try {
+							$stmt = $pdo->prepare("SELECT
+									`domain`.`backupmx`,
+									`mailbox`.`username`,
+									`mailbox`.`name`,
+									CASE `mailbox`.`active` WHEN 1 THEN '".$lang['mailbox']['yes']."' ELSE '".$lang['mailbox']['no']."' END AS `active`,
+									`mailbox`.`domain`,
+									`mailbox`.`quota`,
+									`quota2`.`bytes`,
+									`quota2`.`messages`
+										FROM `mailbox`, `quota2`, `domain`
+											WHERE (`mailbox`.`username` = `quota2`.`username`)
+											AND (`domain`.`domain` = `mailbox`.`domain`)
+											AND (`mailbox`.`domain` IN (
+												SELECT `domain` FROM `domain_admins`
+													WHERE `username`= :username
+														AND `active`='1'
+													)
+													OR 'admin' = :admin)");
+							$stmt->execute(array(
+								':username' => $_SESSION['mailcow_cc_username'],
+								':admin' => $_SESSION['mailcow_cc_role'],
+							));
+							$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+						}
+						catch (PDOException $e) {
+							$_SESSION['return'] = array(
+								'type' => 'danger',
+								'msg' => 'MySQL: '.$e
+							);
+							return false;
+						}
 						while($row = array_shift($rows)):
 						?>
 						<tr>
@@ -308,28 +342,37 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					</thead>
 					<tbody>
 					<?php
-					$stmt = $pdo->prepare("SELECT
-							`address`,
-							`goto`,
-							`domain`,
-							CASE `active` WHEN 1 THEN '".$lang['mailbox']['yes']."' ELSE '".$lang['mailbox']['no']."' END AS `active`
-								FROM alias
-									WHERE (
-										`address` NOT IN (
-											SELECT `username` FROM `mailbox`
-										)
-										AND `address` != `goto`
-									) AND (`domain` IN (
-										SELECT `domain` FROM `domain_admins`
-											WHERE `username` = :username 
-											AND active='1'
-										)
-										OR 'admin' = :admin)");
-					$stmt->execute(array(
-						':username' => $_SESSION['mailcow_cc_username'],
-						':admin' => $_SESSION['mailcow_cc_role'],
-					));
-					$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+					try {
+						$stmt = $pdo->prepare("SELECT
+								`address`,
+								`goto`,
+								`domain`,
+								CASE `active` WHEN 1 THEN '".$lang['mailbox']['yes']."' ELSE '".$lang['mailbox']['no']."' END AS `active`
+									FROM alias
+										WHERE (
+											`address` NOT IN (
+												SELECT `username` FROM `mailbox`
+											)
+											AND `address` != `goto`
+										) AND (`domain` IN (
+											SELECT `domain` FROM `domain_admins`
+												WHERE `username` = :username 
+												AND active='1'
+											)
+											OR 'admin' = :admin)");
+						$stmt->execute(array(
+							':username' => $_SESSION['mailcow_cc_username'],
+							':admin' => $_SESSION['mailcow_cc_role'],
+						));
+						$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+					}
+					catch (PDOException $e) {
+						$_SESSION['return'] = array(
+							'type' => 'danger',
+							'msg' => 'MySQL: '.$e
+						);
+						return false;
+					}
 					while($row = array_shift($rows)):
 					?>
 						<tr>

@@ -204,6 +204,21 @@ $(document).ready(function() {
 	?>
 });
 </script>
+<?php
+if (isset($_SESSION['return'])):
+?>
+<div class="container">
+	<div style="position:fixed;bottom:8px;right:25px;min-width:300px;max-width:350px;z-index:2000">
+		<div <?=($_SESSION['return']['type'] == 'danger') ? null : 'id="alert-fade"'?> class="alert alert-<?=$_SESSION['return']['type'];?>" role="alert">
+		<a href="#" class="close" data-dismiss="alert"> &times;</a>
+		<?=$_SESSION['return']['msg'];?>
+		</div>
+	</div>
+</div>
+<?php
+unset($_SESSION['return']);
+endif;
+?>
 </body>
 </html>
 <?php $stmt = null; $pdo = null; ?>

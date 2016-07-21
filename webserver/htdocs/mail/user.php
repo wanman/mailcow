@@ -73,14 +73,22 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 	</thead>
 	<tbody>
 	<?php
-	$stmt = $pdo->prepare("SELECT `address`,
-		`goto`,
-		`validity`
-			FROM `spamalias`
-				WHERE `goto` = :username
-					AND `validity` >= :unixnow");
-	$stmt->execute(array(':username' => $username, ':unixnow' => time()));
-	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	try {
+		$stmt = $pdo->prepare("SELECT `address`,
+			`goto`,
+			`validity`
+				FROM `spamalias`
+					WHERE `goto` = :username
+						AND `validity` >= :unixnow");
+		$stmt->execute(array(':username' => $username, ':unixnow' => time()));
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	}
+	catch(PDOException $e) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => 'MySQL: '.$e
+		);
+	}
 	while ($row = array_shift($rows)):
 	?>
 		<tr>
@@ -168,9 +176,17 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 				</div>
 				<div class="row"><div class="col-sm-12"><hr></div></div>
 				<?php
-				$stmt = $pdo->prepare("SELECT `value`, `prefid` FROM `userpref` WHERE `preference`='whitelist_from' AND `username`= :username");
-				$stmt->execute(array(':username' => $username));
-				$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				try {
+					$stmt = $pdo->prepare("SELECT `value`, `prefid` FROM `userpref` WHERE `preference`='whitelist_from' AND `username`= :username");
+					$stmt->execute(array(':username' => $username));
+					$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				}
+				catch(PDOException $e) {
+					$_SESSION['return'] = array(
+						'type' => 'danger',
+						'msg' => 'MySQL: '.$e
+					);
+				}
 				if (count($rows) == 0):
 				?>
 					<div class="row">
@@ -209,9 +225,17 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 				</div>
 				<div class="row"><div class="col-sm-12"><hr></div></div>
 				<?php
-				$stmt = $pdo->prepare("SELECT `value`, `prefid` FROM `userpref` WHERE `preference`='blacklist_from' AND `username`= :username");
-				$stmt->execute(array(':username' => $username));
-				$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				try {
+					$stmt = $pdo->prepare("SELECT `value`, `prefid` FROM `userpref` WHERE `preference`='blacklist_from' AND `username`= :username");
+					$stmt->execute(array(':username' => $username));
+					$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				}
+				catch(PDOException $e) {
+					$_SESSION['return'] = array(
+						'type' => 'danger',
+						'msg' => 'MySQL: '.$e
+					);
+				}
 				if (count($rows) == 0):
 				?>
 					<div class="row">

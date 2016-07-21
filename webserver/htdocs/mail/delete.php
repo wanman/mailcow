@@ -61,10 +61,18 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			is_valid_domain_name($_GET["aliasdomain"]) && 
 			!empty($_GET["aliasdomain"])) {
 				$alias_domain = strtolower(trim($_GET["aliasdomain"]));
-				$stmt = $pdo->prepare("SELECT `target_domain` FROM `alias_domain`
-						WHERE `alias_domain`= :alias_domain");
-				$stmt->execute(array(':alias_domain' => $alias_domain));
-				$DomainData = $stmt->fetch(PDO::FETCH_ASSOC);
+				try {
+					$stmt = $pdo->prepare("SELECT `target_domain` FROM `alias_domain`
+							WHERE `alias_domain`= :alias_domain");
+					$stmt->execute(array(':alias_domain' => $alias_domain));
+					$DomainData = $stmt->fetch(PDO::FETCH_ASSOC);
+				}
+				catch(PDOException $e) {
+					$_SESSION['return'] = array(
+						'type' => 'danger',
+						'msg' => 'MySQL: '.$e
+					);
+				}
 				if (hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $DomainData['target_domain'])) {
 				?>
 					<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_domainalias_warning'], htmlspecialchars($_GET["aliasdomain"]));?></div>

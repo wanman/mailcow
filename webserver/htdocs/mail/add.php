@@ -127,15 +127,23 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 						<div class="col-sm-10">
 							<select name="target_domain" title="<?=$lang['add']['select'];?>">
 								<?php
-								$stmt = $pdo->prepare("SELECT `domain` FROM `domain`
-										WHERE `domain` IN (
-												SELECT `domain` FROM `domain_admins`
-														WHERE `username`= :username
-														AND `active`='1'
-												)
-										OR 'admin' = :admin");
-								$stmt->execute(array(':username' => $_SESSION['mailcow_cc_username'], ':admin' => $_SESSION['mailcow_cc_role']));
-								$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+								try {
+									$stmt = $pdo->prepare("SELECT `domain` FROM `domain`
+											WHERE `domain` IN (
+													SELECT `domain` FROM `domain_admins`
+															WHERE `username`= :username
+															AND `active`='1'
+													)
+											OR 'admin' = :admin");
+									$stmt->execute(array(':username' => $_SESSION['mailcow_cc_username'], ':admin' => $_SESSION['mailcow_cc_role']));
+									$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+								}
+								catch(PDOException $e) {
+									$_SESSION['return'] = array(
+										'type' => 'danger',
+										'msg' => 'MySQL: '.$e
+									);
+								}
 								while ($row = array_shift($rows)) {
 										echo "<option>".$row['domain']."</option>";
 								}
@@ -173,15 +181,23 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 						<div class="col-sm-10">
 							<select id="addSelectDomain" name="domain" title="<?=$lang['add']['select'];?>" required>
 							<?php
-							$stmt = $pdo->prepare("SELECT `domain` FROM `domain`
-									WHERE `domain` IN (
-										SELECT `domain` FROM `domain_admins`
-												WHERE `username`= :username
-												AND `active`='1'
-										)
-										OR 'admin' = :admin");
-							$stmt->execute(array(':username' => $_SESSION['mailcow_cc_username'], ':admin' => $_SESSION['mailcow_cc_role']));
-							$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+							try {
+								$stmt = $pdo->prepare("SELECT `domain` FROM `domain`
+										WHERE `domain` IN (
+											SELECT `domain` FROM `domain_admins`
+													WHERE `username`= :username
+													AND `active`='1'
+											)
+											OR 'admin' = :admin");
+								$stmt->execute(array(':username' => $_SESSION['mailcow_cc_username'], ':admin' => $_SESSION['mailcow_cc_role']));
+								$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+							}
+							catch(PDOException $e) {
+								$_SESSION['return'] = array(
+									'type' => 'danger',
+									'msg' => 'MySQL: '.$e
+								);
+							}
 							while ($row = array_shift($rows)) {
 								echo "<option>".$row['domain']."</option>";
 							}

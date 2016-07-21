@@ -16,10 +16,18 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 			<div class="panel-body">
 				<form class="form-horizontal" autocapitalize="none" autocorrect="off" role="form" method="post">
 				<?php
+				try {
 				$stmt = $pdo->prepare("SELECT `username` FROM `admin`
 					WHERE `superadmin`='1' and active='1'");
 				$stmt->execute();
 				$AdminData = $stmt->fetch(PDO::FETCH_ASSOC);
+				}
+				catch(PDOException $e) {
+					$_SESSION['return'] = array(
+						'type' => 'danger',
+						'msg' => 'MySQL: '.$e
+					);
+				}
 				?>
 					<input type="hidden" name="admin_user_now" value="<?=$AdminData['username'];?>">
 					<div class="form-group">
@@ -70,24 +78,40 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 						</thead>
 						<tbody>
 							<?php
-							$stmt = $pdo->query("SELECT DISTINCT
-								`username`, 
-								CASE WHEN `active`='1' THEN '".$lang['admin']['yes']."' ELSE '".$lang['admin']['no']."' END AS `active`
-									FROM `domain_admins` 
-										WHERE `username` IN (
-											SELECT `username` FROM `admin`
-												WHERE `superadmin`!='1'
-										)");
-							$rows_username = $stmt->fetchAll(PDO::FETCH_ASSOC);
+							try {
+								$stmt = $pdo->query("SELECT DISTINCT
+									`username`, 
+									CASE WHEN `active`='1' THEN '".$lang['admin']['yes']."' ELSE '".$lang['admin']['no']."' END AS `active`
+										FROM `domain_admins` 
+											WHERE `username` IN (
+												SELECT `username` FROM `admin`
+													WHERE `superadmin`!='1'
+											)");
+								$rows_username = $stmt->fetchAll(PDO::FETCH_ASSOC);
+							}
+							catch(PDOException $e) {
+								$_SESSION['return'] = array(
+									'type' => 'danger',
+									'msg' => 'MySQL: '.$e
+								);
+							}
 							while ($row_user_state = array_shift($rows_username)):
 							?>
 							<tr>
 								<td><?=strtolower($row_user_state['username']);?></td>
 								<td>
 								<?php
-								$stmt = $pdo->prepare("SELECT `domain` FROM `domain_admins` WHERE `username` = :username");
-								$stmt->execute(array('username' => $row_user_state['username']));
-								$rows_domain = $stmt->fetchAll(PDO::FETCH_ASSOC);
+								try {
+									$stmt = $pdo->prepare("SELECT `domain` FROM `domain_admins` WHERE `username` = :username");
+									$stmt->execute(array('username' => $row_user_state['username']));
+									$rows_domain = $stmt->fetchAll(PDO::FETCH_ASSOC);
+								}
+								catch(PDOException $e) {
+									$_SESSION['return'] = array(
+										'type' => 'danger',
+										'msg' => 'MySQL: '.$e
+									);
+								}
 								while ($row_domain = array_shift($rows_domain)) {
 									echo $row_domain['domain'].'<br />';
 								}
@@ -121,8 +145,16 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 						<div class="col-sm-10">
 							<select title="Domains durchsuchen..." style="width:100%" name="domain[]" size="5" multiple>
 							<?php
-							$stmt = $pdo->query("SELECT domain FROM domain");
-							$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+							try {
+								$stmt = $pdo->query("SELECT domain FROM domain");
+								$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+							}
+							catch(PDOException $e) {
+								$_SESSION['return'] = array(
+									'type' => 'danger',
+									'msg' => 'MySQL: '.$e
+								);
+							}
 							while ($row = array_shift($rows)) {
 								echo "<option>".$row['domain']."</option>";
 							}
