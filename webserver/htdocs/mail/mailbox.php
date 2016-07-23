@@ -411,6 +411,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 		</div>
 	</div>
 </div> <!-- /container -->
+<script src="js/mailbox.js"></script>
 <?php
 }
 else {

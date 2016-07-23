@@ -264,6 +264,7 @@ else {
 	</div>
 <a href="<?=$_SESSION['return_to'];?>">&#8592; <?=$lang['add']['previous'];?></a>
 </div> <!-- /container -->
+<script src="js/add.js"></script>
 <?php
 require_once("inc/footer.inc.php");
 ?>

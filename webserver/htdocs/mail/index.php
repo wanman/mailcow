@@ -90,6 +90,7 @@ elseif (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "
 		</div>
 	</div>
 </div> <!-- /container -->
+<script src="js/index.js"></script>
 <?php
 require_once("inc/footer.inc.php");
 ?>

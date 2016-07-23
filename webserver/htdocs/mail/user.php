@@ -307,6 +307,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 
 </div> <!-- /panel-group accordion -->
 </div> <!-- /container -->
+<script src="js/user.js"></script>
 <?php
 }
 else {
