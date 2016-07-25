@@ -143,7 +143,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="name"><?=$lang['admin']['admin_domains'];?>:</label>
 						<div class="col-sm-10">
-							<select title="Domains durchsuchen..." style="width:100%" name="domain[]" size="5" multiple>
+							<select title="<?=$lang['admin']['search_domain_da'];?>" style="width:100%" name="domain[]" size="5" multiple>
 							<?php
 							try {
 								$stmt = $pdo->query("SELECT domain FROM domain");

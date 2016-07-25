@@ -295,6 +295,7 @@ $lang['login']['confirm'] = "Bestätigen";
 $lang['login']['otp'] = "Einmalpasswort";
 $lang['login']['trash_login'] = "Login verwerfen";
 
+$lang['admin']['search_domain_da'] = 'Domains durchsuchen';
 $lang['admin']['restrictions'] = 'Postifx Restriktionen';
 $lang['admin']['rr'] = 'Postifx Recipient Restriktionen';
 $lang['admin']['sr'] = 'Postifx Sender Restriktionen';

@@ -294,6 +294,7 @@ $lang['login']['confirm'] = "Confirm";
 $lang['login']['otp'] = "One-time password";
 $lang['login']['trash_login'] = "Trash login";
 
+$lang['admin']['search_domain_da'] = 'Search domains';
 $lang['admin']['restrictions'] = 'Postifx Restrictions';
 $lang['admin']['rr'] = 'Postifx Recipient Restrictions';
 $lang['admin']['sr'] = 'Postifx Sender Restrictions';
