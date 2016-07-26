@@ -3,6 +3,5 @@ user = my_mailcowuser
 password = my_mailcowpass
 hosts = my_dbhost
 dbname = my_mailcowdb
-query = SELECT logged_in_as FROM sender_acl WHERE send_as='%s'
-#expansion_limit = 100
+query = SELECT sender_acl.logged_in_as, alias.goto FROM sender_acl, alias WHERE sender_acl.send_as='%s' AND alias.address='%s'
 
