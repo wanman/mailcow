@@ -453,8 +453,11 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 									WHERE `domain`= :domain
 										AND	`domain` NOT IN (
 											SELECT REPLACE(`send_as`, '@', '') FROM `sender_acl` 
-												WHERE `logged_in_as`= :logged_in_as)");
-								$stmt->execute(array(':logged_in_as' => $mailbox, ':domain' => $result['domain']));
+												WHERE `logged_in_as`= :logged_in_as)
+										AND	`domain` NOT IN (
+											SELECT REPLACE(`address`, '@', '') FROM `alias` 
+												WHERE `goto`= :goto)");
+								$stmt->execute(array(':logged_in_as' => $mailbox, ':domain' => $result['domain'], ':goto' => $mailbox));
 								$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 							}
 							catch(PDOException $e) {
@@ -465,7 +468,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							}
 							while ($row_unselected_sender_acl = array_shift($rows)):
 							?>
-								<option data-subtext="(gesamte Domain)">@<?=$row_unselected_sender_acl['domain'];?></option>
+								<option>@<?=$row_unselected_sender_acl['domain'];?></option>
 							<?php
 							endwhile;
 

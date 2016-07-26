@@ -58,7 +58,8 @@ smtpd_sender_restrictions = reject_authenticated_sender_login_mismatch,
    reject_unlisted_sender,
    reject_unknown_sender_domain
 
-smtpd_recipient_restrictions = permit_sasl_authenticated,
+smtpd_recipient_restrictions = check_recipient_access proxy:mysql:/etc/postfix/sql/mysql_tls_enforce_in_policy.cf,
+   permit_sasl_authenticated,
    permit_mynetworks,
    reject_invalid_helo_hostname,
    reject_unknown_reverse_client_hostname,
@@ -76,6 +77,8 @@ greylist = permit_dnswl_client list.dnswl.org,
 # Determine valid MAIL FROM addresses for a SASL authenticated user.
 
 smtpd_sender_login_maps = proxy:mysql:/etc/postfix/sql/mysql_virtual_sender_acl.cf
+
+sender_dependent_default_transport_maps = proxy:mysql:/etc/postfix/sql/mysql_tls_enforce_out_policy.cf
 
 # Certificates
 smtp_tls_cert_file = /etc/ssl/mail/mail.crt
@@ -152,7 +155,7 @@ smtpd_sasl_authenticated_header = yes
 broken_sasl_auth_clients = yes
 
 # The lookup tables that the proxymap server is allowed to access for the read-only service.
-proxy_read_maps = $local_recipient_maps $mydestination $virtual_alias_maps $virtual_alias_domains $virtual_mailbox_maps $virtual_mailbox_domains $relay_recipient_maps $relay_domains $canonical_maps $sender_canonical_maps $recipient_canonical_maps $relocated_maps $transport_maps $mynetworks $smtpd_sender_login_maps
+proxy_read_maps = proxy:mysql:/etc/postfix/sql/mysql_virtual_sender_acl.cf, proxy:mysql:/etc/postfix/sql/mysql_tls_enforce_out_policy.cf, proxy:mysql:/etc/postfix/sql/mysql_tls_enforce_in_policy.cf, $local_recipient_maps $mydestination $virtual_alias_maps $virtual_alias_domains $virtual_mailbox_maps $virtual_mailbox_domains $relay_recipient_maps $relay_domains $canonical_maps $sender_canonical_maps $recipient_canonical_maps $relocated_maps $transport_maps $mynetworks $smtpd_sender_login_maps
 
 ## Virtual transport configuration
 # A prefix that the virtual delivery agent prepends to all pathname results from $virtual_mailbox_maps

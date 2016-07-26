@@ -3,4 +3,5 @@ user = my_mailcowuser
 password = my_mailcowpass
 hosts = my_dbhost
 dbname = my_mailcowdb
-query = SELECT alias.goto, sender_acl.logged_in_as FROM alias LEFT JOIN sender_acl ON sender_acl.send_as=alias.address WHERE alias.address='%s'
+query = SELECT logged_in_as FROM sender_acl WHERE send_as='%s' OR send_as = CONCAT('@', RIGHT('%s', LENGTH('%s')-INSTR('%s', '@')));
+
