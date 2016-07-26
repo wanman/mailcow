@@ -76,8 +76,7 @@ greylist = permit_dnswl_client list.dnswl.org,
 
 # Determine valid MAIL FROM addresses for a SASL authenticated user.
 
-smtpd_sender_login_maps = proxy:mysql:/etc/postfix/sql/mysql_virtual_sender_acl.cf
-
+smtpd_sender_login_maps = unionmap:{proxy:mysql:/etc/postfix/sql/mysql_virtual_sender_acl.cf, proxy:mysql:/etc/postfix/sql/mysql_virtual_alias_maps.cf}
 sender_dependent_default_transport_maps = proxy:mysql:/etc/postfix/sql/mysql_tls_enforce_out_policy.cf
 
 # Certificates
