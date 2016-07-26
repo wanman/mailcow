@@ -406,7 +406,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="sender_acl"><?=$lang['edit']['sender_acl'];?></label>
 						<div class="col-sm-10">
-							<select title="Durchsuchen..." style="width:100%" name="sender_acl[]" size="10" multiple>
+							<select style="width:100%" name="sender_acl[]" size="10" multiple>
 							<?php
 							try {
 								$stmt = $pdo->prepare("SELECT `address` FROM `alias` WHERE `goto`= :goto");
@@ -419,10 +419,17 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 									'msg' => 'MySQL: '.$e
 								);
 							}
+
 							while ($row_goto_from_alias = array_shift($rows)):
-							?>
-								<option selected disabled="disabled"><?=$row_goto_from_alias['address'];?></option>
-							<?php
+									if (!filter_var($row_goto_from_alias['address'], FILTER_VALIDATE_EMAIL)):
+									?>
+										<option data-subtext="(Wildcard)" disabled selected><?=$row_goto_from_alias['address'];?></option>
+									<?php
+									else:
+									?>
+										<option disabled selected><?=$row_goto_from_alias['address'];?></option>
+									<?php
+									endif;
 							endwhile;
 
 							try {
@@ -439,7 +446,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							while ($row_selected_sender_acl = array_shift($rows)):
 									if (!filter_var($row_selected_sender_acl['send_as'], FILTER_VALIDATE_EMAIL)):
 									?>
-										<option selected>*<?=$row_selected_sender_acl['send_as'];?></option>
+										<option data-subtext="(Wildcard)" selected><?=$row_selected_sender_acl['send_as'];?></option>
 									<?php
 									else:
 									?>
@@ -468,7 +475,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							}
 							while ($row_unselected_sender_acl = array_shift($rows)):
 							?>
-								<option>*@<?=$row_unselected_sender_acl['domain'];?></option>
+								<option data-subtext="(Wildcard)">@<?=$row_unselected_sender_acl['domain'];?></option>
 							<?php
 							endwhile;
 

@@ -3,4 +3,5 @@ user = my_mailcowuser
 password = my_mailcowpass
 hosts = my_dbhost
 dbname = my_mailcowdb
-query = SELECT goto FROM alias WHERE address='%s' UNION ALL SELECT logged_in_as FROM sender_acl WHERE send_as='@%d' OR send_as='@%s' AND NOT EXISTS (SELECT goto FROM alias WHERE address='%s')
+query = SELECT goto FROM alias WHERE address='%s' OR address='@%d' UNION SELECT logged_in_as FROM sender_acl WHERE send_as='@%d' OR send_as='%s' AND NOT EXISTS (SELECT goto FROM alias WHERE address='%s')
+
