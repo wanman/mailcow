@@ -439,7 +439,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							while ($row_selected_sender_acl = array_shift($rows)):
 									if (!filter_var($row_selected_sender_acl['send_as'], FILTER_VALIDATE_EMAIL)):
 									?>
-										<option data-subtext="(gesamte Domain)" selected><?=$row_selected_sender_acl['send_as'];?></option>
+										<option selected>*<?=$row_selected_sender_acl['send_as'];?></option>
 									<?php
 									else:
 									?>
