@@ -197,6 +197,7 @@ installtask() {
 					JETTY_NAME="jetty8"
 					install -m 644 postfix/conf/testing.pref /etc/apt/preferences.d/testing.pref
 					install -m 644 postfix/conf/testing.list /etc/apt/sources.list.d/testing.list
+					POSTFIX="postfix/testing postfix-mysql/testing postfix-pcre/testing"
 					apt-get -y update > /dev/null
 				else
 					echo "$(redb [ERR]) - Your Debian distribution is currently not supported"
@@ -245,11 +246,12 @@ installtask() {
 				DATABASE_BACKEND=""
 			fi
 			[[ -z ${APT} ]] && APT="apt-get --force-yes"
+			[[ -z ${POSTFIX} ]] && POSTFIX="postfix postfix-mysql postfix-pcre"
 DEBIAN_FRONTEND=noninteractive ${APT} -y install dnsutils sudo zip bzip2 unzip unrar-free curl rrdtool mailgraph fcgiwrap spawn-fcgi python-setuptools libmail-spf-perl libmail-dkim-perl file bsd-mailx \
 openssl php-auth-sasl php-http-request php-mail php-mail-mime php-mail-mimedecode php-net-dime php-net-smtp \
 php-net-socket php-net-url php-pear php-soap ${PHP} ${PHP}-cli ${PHP}-common ${PHP}-curl ${PHP}-gd ${PHP}-imap \
 ${PHP}-intl ${PHP}-xsl ${PHP}-mcrypt ${PHP}-mysql libawl-php ${PHP}-xmlrpc ${DATABASE_BACKEND} ${WEBSERVER_BACKEND} mailutils pyzor razor \
-postfix postfix-mysql postfix-pcre postgrey pflogsumm spamassassin spamc libdbd-mysql-perl opendkim opendkim-tools clamav-daemon \
+${POSTFIX} postgrey pflogsumm spamassassin spamc libdbd-mysql-perl opendkim opendkim-tools clamav-daemon \
 python-magic liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl \
 ${OPENJDK}-jre-headless libcurl4-openssl-dev libexpat1-dev solr-jetty > /dev/null
 			if [ "$?" -ne "0" ]; then
