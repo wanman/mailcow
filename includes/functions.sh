@@ -835,12 +835,12 @@ A backup will be stored in ./before_upgrade_${timestamp}
 	returnwait "Package installation"
 	installtask installpackages
 
-	PF_RR_BEFORE=$(postconf smtpd_recipient_restrictions 2> /dev/null)
-	PF_SR_BEFORE=$(postconf smtpd_sender_restrictions 2> /dev/null)
-	returnwait "Postfix configuration (recipient and sender restrictions will be restored)"
+	#PF_RR_BEFORE=$(postconf smtpd_recipient_restrictions 2> /dev/null)
+	#PF_SR_BEFORE=$(postconf smtpd_sender_restrictions 2> /dev/null)
+	returnwait "Postfix configuration"
 	installtask postfix
-	postconf -e "${PF_RR_BEFORE}"
-	postconf -e "${PF_SR_BEFORE}"
+	#postconf -e "${PF_RR_BEFORE}"
+	#postconf -e "${PF_SR_BEFORE}"
 
 	returnwait "Dovecot configuration"
 	installtask dovecot
