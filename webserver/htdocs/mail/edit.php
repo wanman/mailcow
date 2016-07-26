@@ -468,7 +468,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							}
 							while ($row_unselected_sender_acl = array_shift($rows)):
 							?>
-								<option>@<?=$row_unselected_sender_acl['domain'];?></option>
+								<option>*@<?=$row_unselected_sender_acl['domain'];?></option>
 							<?php
 							endwhile;
 
