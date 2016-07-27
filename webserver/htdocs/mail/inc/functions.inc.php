@@ -2769,6 +2769,126 @@ function remaining_specs($domain, $object = null, $js = null) {
 	}
 	return $spec;
 }
+function get_sender_acl_handles($mailbox, $which) {
+	global $pdo;
+	if ($_SESSION['mailcow_cc_role'] != "admin" && $_SESSION['mailcow_cc_role'] != "domainadmin") {
+		return false;
+	}
+	switch ($which) {
+		case "preselected":
+			try {
+				$stmt = $pdo->prepare("SELECT `address` FROM `alias` WHERE `goto` = :goto");
+				$stmt->execute(array(':goto' => $mailbox));
+				$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				return $rows;
+			}
+			catch(PDOException $e) {
+				$_SESSION['return'] = array(
+					'type' => 'danger',
+					'msg' => 'MySQL: '.$e
+				);
+				return false;
+			}
+			break;
+		case "selected":
+			try {
+				$stmt = $pdo->prepare("SELECT `send_as` FROM `sender_acl` WHERE `logged_in_as` = :logged_in_as");
+				$stmt->execute(array(':logged_in_as' => $mailbox));
+				$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				return $rows;
+			}
+			catch(PDOException $e) {
+				$_SESSION['return'] = array(
+					'type' => 'danger',
+					'msg' => 'MySQL: '.$e
+				);
+				return false;
+			}
+			break;
+		case "unselected-domains":
+			try {
+				if ($_SESSION['mailcow_cc_role'] == "admin"  ) {
+					$stmt = $pdo->prepare("SELECT DISTINCT `domain` FROM `domain`
+						WHERE `domain` NOT IN (
+							SELECT REPLACE(`send_as`, '@', '') FROM `sender_acl` 
+								WHERE `logged_in_as` = :logged_in_as)
+						AND	`domain` NOT IN (
+								SELECT REPLACE(`address`, '@', '') FROM `alias` 
+									WHERE `goto` = :goto)");
+					$stmt->execute(array(
+						':logged_in_as' => $mailbox,
+						':goto' => $mailbox,
+					));
+				}
+				else {
+					$stmt = $pdo->prepare("SELECT DISTINCT `domain` FROM `domain_admins`
+						WHERE `username` = :username
+							AND `domain` != 'ALL'
+							AND	`domain` NOT IN (
+								SELECT REPLACE(`send_as`, '@', '') FROM `sender_acl` 
+									WHERE `logged_in_as` = :logged_in_as)
+							AND	`domain` NOT IN (
+								SELECT REPLACE(`address`, '@', '') FROM `alias` 
+									WHERE `goto` = :goto)");
+					$stmt->execute(array(
+						':logged_in_as' => $mailbox,
+						':goto' => $mailbox,
+						':username' => $_SESSION['mailcow_cc_username']
+					));
+				}
+				$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				return $rows;
+			}
+			catch(PDOException $e) {
+				$_SESSION['return'] = array(
+					'type' => 'danger',
+					'msg' => 'MySQL: '.$e
+				);
+				return false;
+			}
+			break;
+		case "unselected-addresses":
+			try {
+				if ($_SESSION['mailcow_cc_role'] == "admin"  ) {
+					$stmt = $pdo->prepare("SELECT `address` FROM `alias`
+						WHERE `goto` != :goto
+							AND `address` NOT IN (
+								SELECT `send_as` FROM `sender_acl` 
+									WHERE `logged_in_as` = :logged_in_as)");
+					$stmt->execute(array(
+						':logged_in_as' => $mailbox,
+						':goto' => $mailbox
+					));
+				}
+				else {
+					$stmt = $pdo->prepare("SELECT `address` FROM `alias`
+						WHERE `goto` != :goto
+							AND `domain` IN (
+								SELECT `domain` FROM `domain_admins`
+									WHERE `username` = :username)
+							AND `address` NOT IN (
+								SELECT `send_as` FROM `sender_acl` 
+									WHERE `logged_in_as` = :logged_in_as)");
+					$stmt->execute(array(
+						':logged_in_as' => $mailbox,
+						':goto' => $mailbox,
+						':username' => $_SESSION['mailcow_cc_username']
+					));
+				}
+				$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				return $rows;
+			}
+			catch(PDOException $e) {
+				$_SESSION['return'] = array(
+					'type' => 'danger',
+					'msg' => 'MySQL: '.$e
+				);
+				return false;
+			}
+			break;
+	}
+	return false;
+}
 function is_valid_domain_name($domain_name) { 
 	if (empty($domain_name)) {
 		return false;

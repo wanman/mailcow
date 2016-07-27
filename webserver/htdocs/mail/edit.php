@@ -390,13 +390,13 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				<form class="form-horizontal" role="form" method="post" action="<?=($FORM_ACTION == "previous") ? $_SESSION['return_to'] : null;?>">
 				<input type="hidden" name="username" value="<?=$result['username'];?>">
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="name"><?=$lang['edit']['full_name'];?></label>
+						<label class="control-label col-sm-2" for="name"><?=$lang['edit']['full_name'];?>:</label>
 						<div class="col-sm-10">
 						<input type="text" class="form-control" name="name" id="name" value="<?=utf8_encode($result['name']);?>">
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="quota"><?=$lang['edit']['quota_mb'];?>
+						<label class="control-label col-sm-2" for="quota"><?=$lang['edit']['quota_mb'];?>:
 							<br /><span id="quotaBadge" class="badge">max. <?=$left_m?> MiB</span>
 						</label>
 						<div class="col-sm-10">
@@ -404,22 +404,12 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="sender_acl"><?=$lang['edit']['sender_acl'];?></label>
+						<label class="control-label col-sm-2" for="sender_acl"><?=$lang['edit']['sender_acl'];?>:</label>
 						<div class="col-sm-10">
 							<select style="width:100%" name="sender_acl[]" size="10" multiple>
 							<?php
-							try {
-								$stmt = $pdo->prepare("SELECT `address` FROM `alias` WHERE `goto`= :goto");
-								$stmt->execute(array(':goto' => $mailbox));
-								$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-							}
-							catch(PDOException $e) {
-								$_SESSION['return'] = array(
-									'type' => 'danger',
-									'msg' => 'MySQL: '.$e
-								);
-							}
-
+							// All pre-selected due to being aliases to self (also catch-all)
+							$rows = get_sender_acl_handles($mailbox, "preselected");
 							while ($row_goto_from_alias = array_shift($rows)):
 									if (!filter_var($row_goto_from_alias['address'], FILTER_VALIDATE_EMAIL)):
 									?>
@@ -432,17 +422,8 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 									endif;
 							endwhile;
 
-							try {
-								$stmt = $pdo->prepare("SELECT `send_as` FROM `sender_acl` WHERE `logged_in_as`= :logged_in_as");
-								$stmt->execute(array(':logged_in_as' => $mailbox));
-								$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-							}
-							catch(PDOException $e) {
-								$_SESSION['return'] = array(
-									'type' => 'danger',
-									'msg' => 'MySQL: '.$e
-								);
-							}
+							// All manual selected
+							$rows = get_sender_acl_handles($mailbox, "selected");
 							while ($row_selected_sender_acl = array_shift($rows)):
 									if (!filter_var($row_selected_sender_acl['send_as'], FILTER_VALIDATE_EMAIL)):
 									?>
@@ -454,47 +435,17 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 									<?php
 									endif;
 							endwhile;
-
-							try {
-								$stmt = $pdo->prepare("SELECT DISTINCT `domain` FROM `alias`
-									WHERE `domain`= :domain
-										AND	`domain` NOT IN (
-											SELECT REPLACE(`send_as`, '@', '') FROM `sender_acl` 
-												WHERE `logged_in_as`= :logged_in_as)
-										AND	`domain` NOT IN (
-											SELECT REPLACE(`address`, '@', '') FROM `alias` 
-												WHERE `goto`= :goto)");
-								$stmt->execute(array(':logged_in_as' => $mailbox, ':domain' => $result['domain'], ':goto' => $mailbox));
-								$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-							}
-							catch(PDOException $e) {
-								$_SESSION['return'] = array(
-									'type' => 'danger',
-									'msg' => 'MySQL: '.$e
-								);
-							}
+							
+							// Unselected domains
+							$rows = get_sender_acl_handles($mailbox, "unselected-domains");
 							while ($row_unselected_sender_acl = array_shift($rows)):
 							?>
 								<option data-subtext="(Wildcard)">@<?=$row_unselected_sender_acl['domain'];?></option>
 							<?php
 							endwhile;
 
-							try {
-								$stmt = $pdo->prepare("SELECT `address` FROM `alias`
-									WHERE `goto` != :goto
-										AND `domain` = :domain
-										AND `address` NOT IN (
-											SELECT `send_as` FROM `sender_acl` 
-												WHERE `logged_in_as` = :logged_in_as)");
-								$stmt->execute(array(':logged_in_as' => $mailbox, ':goto' => $mailbox, ':domain' => $result['domain']));
-								$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-							}
-							catch(PDOException $e) {
-								$_SESSION['return'] = array(
-									'type' => 'danger',
-									'msg' => 'MySQL: '.$e
-								);
-							}
+							// Unselected addresses
+							$rows = get_sender_acl_handles($mailbox, "unselected-addresses");
 							while ($row_unselected_sender_acl = array_shift($rows)):
 							?>
 								<option><?=$row_unselected_sender_acl['address'];?></option>
@@ -502,6 +453,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							endwhile;
 							?>
 							</select>
+							<p class="help-block"><?=$lang['edit']['sender_acl_info'];?></p>
 						</div>
 					</div>
 					<div class="form-group">
