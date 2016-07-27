@@ -1,3 +1,0 @@
-Package: postfix*
-Pin: release a=testing
-Pin-Priority: 995
