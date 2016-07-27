@@ -281,7 +281,7 @@ namespace {
 			}
 			break;
 		case "reset-srr":
-			exec('sudo /usr/sbin/postconf -e smtpd_recipient_restrictions="permit_sasl_authenticated, permit_mynetworks, reject_invalid_helo_hostname, reject_unknown_reverse_client_hostname, reject_unauth_destination"', $out, $return);
+			exec('sudo /usr/sbin/postconf -e smtpd_recipient_restrictions="check_recipient_access proxy:mysql:/etc/postfix/sql/mysql_tls_enforce_in_policy.cf permit_sasl_authenticated, permit_mynetworks, reject_invalid_helo_hostname, reject_unknown_reverse_client_hostname, reject_unauth_destination"', $out, $return);
 			if ($return != "0") {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
