@@ -200,7 +200,7 @@ installtask() {
 					exit 1
 				fi
 			elif [[ ${dist_id} == "Ubuntu" ]]; then
-				if [[ ${dist_codename} == "need-to-add-ppa-for-postfix-trusty" ]]; then
+				if [[ ${dist_codename} == "trusty" ]]; then
 					if [[ ${httpd_platform} == "apache2" ]]; then
 						echo "$(textb [INFO]) - Adding ondrej/apache2 repository..."
 						echo "deb http://ppa.launchpad.net/ondrej/apache2/ubuntu trusty main" > /etc/apt/sources.list.d/ondrej.list
