@@ -684,7 +684,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			defaults write sogod SOGoMaximumSyncWindowSize 15480;
 			defaults write sogod SOGoInternalSyncInterval 30;"
 			# ~1 for 10 users, more when AS is enabled - 384M is the absolute max. it may reach
-			PREFORK=$(( ($(free -mt | grep Total | awk '{print $2}') - 100) / 384 * 5 ))
+			PREFORK=$(( ($(free -mt | tail -1 | awk '{print $2}') - 100) / 384 * 5 ))
 			[[ ${PREFORK} -eq 0 ]] && PREFORK="5"
 			sed -i "/PREFORK/c\PREFORK=${PREFORK}" /etc/default/sogo
 			sed -i '/SHOWWARNING/c\SHOWWARNING=false' /etc/tmpreaper.conf
