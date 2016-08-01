@@ -587,7 +587,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "ALTER TABLE domain ADD relay_all_recipients tinyint(1) NOT NULL DEFAULT '0';" -N -B
 			fi
 			if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "SHOW COLUMNS FROM mailbox LIKE 'tls_enforce_in';" -N -B) ]]; then
-				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "ALTER TABLE domain ADD tls_enforce_in tinyint(1) NOT NULL DEFAULT '0';" -N -B
+				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "ALTER TABLE mailbox ADD tls_enforce_in tinyint(1) NOT NULL DEFAULT '0';" -N -B
 				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "ALTER TABLE mailbox ADD tls_enforce_out tinyint(1) NOT NULL DEFAULT '0';" -N -B
 			fi
 			mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "DELETE FROM spamalias"
