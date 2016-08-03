@@ -26,6 +26,9 @@ if (isset($_POST['lang'])) {
 		case "en":
 			$_SESSION['mailcow_locale'] = 'en';
 		break;
+		case "pt":
+			$_SESSION['mailcow_locale'] = 'pt';
+		break;
 	}
 }
 if (!isset($_SESSION['mailcow_locale'])) {
