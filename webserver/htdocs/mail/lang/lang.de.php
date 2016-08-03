@@ -164,9 +164,6 @@ $lang['header']['user_settings'] = 'Benutzereinstellungen';
 $lang['header']['login'] = 'Anmeldung';
 $lang['header']['logged_in_as_logout'] = 'Eingeloggt als <b>%s</b> (abmelden)';
 $lang['header']['locale'] = 'Sprache';
-$lang['header']['locale_de'] = 'Deutsch';
-$lang['header']['locale_en'] = 'Englisch (&beta;eta)';
-
 $lang['mailbox']['domain'] = 'Domain';
 $lang['mailbox']['alias'] = 'Alias';
 $lang['mailbox']['aliases'] = 'Aliasse';
