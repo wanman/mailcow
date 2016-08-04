@@ -5,7 +5,7 @@
 //
 */
 $lang['footer']['loading'] = "Aguarde...";
-$lang['getmail']['no_status'] = "Nenhum registro anterior encontrado
+$lang['getmail']['no_status'] = "Nenhum registro anterior encontrado";
 $lang['dkim']['confirm'] = "Tem certeza?";
 $lang['danger']['dkim_not_found'] = "Registro DKIM não encontrado";
 $lang['danger']['dkim_remove_failed'] = "Não foi possível remover o registro DKIM selecionado";
@@ -56,7 +56,7 @@ $lang['danger']['password_empty'] = "A senha não pode ser vazia ou em branco";
 $lang['danger']['login_failed'] = "Login falhou";
 $lang['danger']['mailbox_invalid'] = "Conta inválida";
 $lang['danger']['mailbox_invalid_suggest'] = 'Conta inválida, sugestão: "%s"?';
-$lang['info']['fetchmail_planned'] = "Task to fetch emails has been planned. Please check the process at a later time.";
+$lang['info']['fetchmail_planned'] = "Procedimento de retirada de emails foi agendado. Verifique o processo mais tarde.";
 $lang['danger']['fetchmail_source_empty'] = "Definir a pasta de origem";
 $lang['danger']['fetchmail_dest_empty'] = "Definir a pasta de destino";
 $lang['danger']['is_alias'] = "o endereço %s já é um Apelido";
@@ -126,8 +126,8 @@ $lang['user']['spamfilter_yellow'] = 'Amarelo: essa mensagem <b>pode ser</b> spa
 $lang['user']['spamfilter_red'] = 'Vermelho: essa mensagem <b>é mesmo spam</b> e será rejeitada definitivamente pelo servidor';
 $lang['user']['spamfilter_default_score'] = 'Valores padrão:';
 $lang['user']['spamfilter_hint'] = 'O primeiro espaço indica "baixo nível de spam", a segunda representa "alto nível de spam".';
-$lang['user']['tls_policy_warning'] = '<strong>Aviso:</strong> If you decide to enforce encrypted mail transfer, you may lose emails.<br />Messages to not satisfy the policy will be bounced with a hard fail by the mail system.';
-$lang['user']['tls_policy'] = 'Encryption policy';
+$lang['user']['tls_policy_warning'] = '<strong>Aviso:</strong> Se você selecionar para forçar o envio encryptado , alguns emails poderão ser rejeitados.<br />Mensages que não satisfizerem as politicas dos outros servidores serão rejeitadas definitivamente.';
+$lang['user']['tls_policy'] = 'Regras de Encryptação';
 $lang['user']['tls_enforce_in'] = 'Forçar TLS na entrada';
 $lang['user']['tls_enforce_out'] = 'Forçar TLS na saída';
 $lang['user']['misc_settings'] = 'Outras configurações';
