@@ -336,6 +336,6 @@ $lang['admin']['unchanged_if_empty'] = 'Deixar em branco para não alterar';
 $lang['admin']['yes'] = '&#10004;';
 $lang['admin']['no'] = '&#10008;';
 $lang['admin']['access'] = 'Acessos';
-$lang['admin']['site_not_found'] = 'Não foi possível localizar as configuração do site mailcow';
+$lang['admin']['site_not_found'] = 'Não foi possível localizar as configuração do site Mailcow';
 $lang['admin']['set_rr_failed'] = 'Não foi possível alterar Postfix Restrictions';
 ?>
