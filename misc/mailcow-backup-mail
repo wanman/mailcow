@@ -1,0 +1,14 @@
+#!/bin/bash
+PATH=/usr/local/bin:/usr/local/sbin:/sbin:/usr/sbin:/bin:/usr/bin:/usr/bin/X11
+
+if [[ -z $(which rsync) ]]; then
+	echo "Please install rsync"
+	exit 1
+fi
+
+TMPDIR=$(mktemp -d)
+DATESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
+
+rsync -avz --info=progress2 --delete /var/vmail ${TMPDIR}
+tar fcz vmail_${DATESTAMP}.tar.gz -C ${TMPDIR} .
+rm -rf ${TMPDIR}
