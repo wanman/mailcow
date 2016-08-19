@@ -68,7 +68,7 @@ else
 		postmap /etc/postfix/smarthost_passwd
 	fi
 	chown root: /etc/postfix/smarthost_passwd
-	chmod 600 /etc/postfix/smarthost_passwd
+	chmod 600 /etc/postfix/smarthost_passwd*
 	postfix reload
 	exit $?
 fi
