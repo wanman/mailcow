@@ -78,7 +78,7 @@ checkports() {
 	if [[ -z $(which mysql) || -z $(which dig) || -z $(which nc) ]]; then
 		echo "$(textb [INFO]) - Installing prerequisites for DNS and port checks"
 		apt-get -y update > /dev/null
-		apt-get -y install curl nc dnsutils mysql-client > /dev/null 2>&1
+		apt-get -y install curl netcat-traditional dnsutils mysql-client > /dev/null 2>&1
 	fi
 	for port in 25 143 465 587 993 995 8983
 	do
@@ -321,9 +321,17 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			if [[ ${mysql_useable} -ne 1 ]]; then
 				if [[ ! -z $(mysql --version | grep '5.7') ]]; then
 					# MySQL >= 5.7 uses auth_socket when installing without password (like we do)
-					mysql --defaults-file=/etc/mysql/debian.cnf -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${my_rootpw}'; FLUSH PRIVILEGES;"
+					mysql --defaults-file=/etc/mysql/debian.cnf -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${my_rootpw}';"
+					mysql --defaults-file=/etc/mysql/debian.cnf -e "ALTER USER 'root'@'127.0.0.1' IDENTIFIED WITH mysql_native_password BY '${my_rootpw}';"
+					mysql --defaults-file=/etc/mysql/debian.cnf -e "ALTER USER 'root'@'::1' IDENTIFIED WITH mysql_native_password BY '${my_rootpw}';"
+					mysql --defaults-file=/etc/mysql/debian.cnf -e "ALTER USER 'root'@'${sys_hostname}.${sys_domain}' IDENTIFIED WITH mysql_native_password BY '${my_rootpw}';"
+					mysql --defaults-file=/etc/mysql/debian.cnf -e "FLUSH PRIVILEGES;"
 				else
-					mysql --defaults-file=/etc/mysql/debian.cnf -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('${my_rootpw}'); FLUSH PRIVILEGES;"
+					mysql --defaults-file=/etc/mysql/debian.cnf -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('${my_rootpw}');"
+					mysql --defaults-file=/etc/mysql/debian.cnf -e "SET PASSWORD FOR 'root'@'127.0.0.1' = PASSWORD('${my_rootpw}');"
+					mysql --defaults-file=/etc/mysql/debian.cnf -e "SET PASSWORD FOR 'root'@'::1' = PASSWORD('${my_rootpw}');"
+					mysql --defaults-file=/etc/mysql/debian.cnf -e "SET PASSWORD FOR 'root'@'${sys_hostname}.${sys_domain}' = PASSWORD('${my_rootpw}');"
+					mysql --defaults-file=/etc/mysql/debian.cnf -e "FLUSH PRIVILEGES;"
 				fi
 			fi
 			SQLCMDARRAY=(
