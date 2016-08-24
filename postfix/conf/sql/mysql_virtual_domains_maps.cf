@@ -3,8 +3,6 @@ user = my_mailcowuser
 password = my_mailcowpass
 hosts = my_dbhost
 dbname = my_mailcowdb
-#query          = SELECT domain FROM domain WHERE domain='%s' AND active = '1'
-#query          = SELECT domain FROM domain WHERE domain='%s'
+query          = SELECT alias_domain from alias_domain WHERE alias_domain='%s' AND active='1' UNION SELECT domain FROM domain WHERE domain='%s' AND active = '1' AND backupmx = '0'
 #optional query to use when relaying for backup MX
-query           = SELECT domain FROM domain WHERE domain='%s' AND backupmx = '0' AND active = '1'
 #expansion_limit = 100
