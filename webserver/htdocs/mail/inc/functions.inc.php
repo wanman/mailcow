@@ -735,9 +735,10 @@ function mailbox_add_alias_domain($postarray) {
 	}
 
 	try {
-		$stmt = $pdo->prepare("SELECT `alias_domain` FROM `alias_domain`
-			WHERE `alias_domain`= :alias_domain");
-		$stmt->execute(array(':alias_domain' => $alias_domain));
+		$stmt = $pdo->prepare("SELECT `alias_domain` FROM `alias_domain` WHERE `alias_domain`= :alias_domain
+			UNION
+			SELECT `alias_domain` FROM `alias_domain` WHERE `alias_domain`= :alias_domain_in_domain");
+		$stmt->execute(array(':alias_domain' => $alias_domain, ':alias_domain_in_domain' => $alias_domain));
 		$num_results = count($stmt->fetchAll(PDO::FETCH_ASSOC));
 	}
 	catch(PDOException $e) {
