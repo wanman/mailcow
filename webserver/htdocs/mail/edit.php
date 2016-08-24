@@ -361,6 +361,36 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 					</div>
 				</form>
 				<?php
+				$dnstxt_folder = scandir($GLOBALS["MC_ODKIM_TXT"]);
+				$dnstxt_files = array_diff($dnstxt_folder, array('.', '..'));
+				foreach($dnstxt_files as $file) {
+					if (explode("_", $file)[1] == $domain) {
+						$str = file_get_contents($GLOBALS["MC_ODKIM_TXT"]."/".$file);
+						$str = preg_replace('/\r|\t|\n/', '', $str);
+						preg_match('/\(.*\)/im', $str, $matches);
+						if(isset($matches[0])) {
+							$str = str_replace(array(' ', '"', '(', ')'), '', $matches[0]);
+						}
+				?>
+						<div class="row">
+							<div class="col-xs-2">
+								<p class="text-right"><?=$lang['edit']['dkim_signature'];?></p>
+							</div>
+							<div class="col-xs-10">
+								<div class="col-md-2"><b><?=$lang['edit']['dkim_txt_name'];?></b></div>
+								<div class="col-md-10">
+									<pre><?=explode("_", $file)[0];?>._domainkey</pre>
+								</div>
+								<div class="col-md-2"><b><?=$lang['edit']['dkim_txt_value'];?></b></div>
+								<div class="col-md-10">
+									<pre><?=$str;?></pre>
+									<?=$lang['edit']['dkim_record_info'];?>
+								</div>
+							</div>
+						</div>
+				<?php
+					}
+				}
 			}
 			else {
 			?>
