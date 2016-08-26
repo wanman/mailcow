@@ -321,16 +321,14 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			if [[ ${mysql_useable} -ne 1 ]]; then
 				if [[ ! -z $(mysql --version | grep '5.7') ]]; then
 					# MySQL >= 5.7 uses auth_socket when installing without password (like we do)
-					mysql --defaults-file=/etc/mysql/debian.cnf -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${my_rootpw}';"
-					mysql --defaults-file=/etc/mysql/debian.cnf -e "ALTER USER 'root'@'127.0.0.1' IDENTIFIED WITH mysql_native_password BY '${my_rootpw}';"
-					mysql --defaults-file=/etc/mysql/debian.cnf -e "ALTER USER 'root'@'::1' IDENTIFIED WITH mysql_native_password BY '${my_rootpw}';"
-					mysql --defaults-file=/etc/mysql/debian.cnf -e "ALTER USER 'root'@'${sys_hostname}.${sys_domain}' IDENTIFIED WITH mysql_native_password BY '${my_rootpw}';"
+					for host in $(mysql --defaults-file=/etc/mysql/debian.cnf mysql -e "select Host from user where User='root';" -BN); do
+						mysql --defaults-file=/etc/mysql/debian.cnf -e "ALTER USER 'root'@'${host}' IDENTIFIED WITH mysql_native_password BY '${my_rootpw}';"
+					done
 					mysql --defaults-file=/etc/mysql/debian.cnf -e "FLUSH PRIVILEGES;"
 				else
-					mysql --defaults-file=/etc/mysql/debian.cnf -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('${my_rootpw}');"
-					mysql --defaults-file=/etc/mysql/debian.cnf -e "SET PASSWORD FOR 'root'@'127.0.0.1' = PASSWORD('${my_rootpw}');"
-					mysql --defaults-file=/etc/mysql/debian.cnf -e "SET PASSWORD FOR 'root'@'::1' = PASSWORD('${my_rootpw}');"
-					mysql --defaults-file=/etc/mysql/debian.cnf -e "SET PASSWORD FOR 'root'@'${sys_hostname}.${sys_domain}' = PASSWORD('${my_rootpw}');"
+					for host in $(mysql --defaults-file=/etc/mysql/debian.cnf mysql -e "select Host from user where User='root';" -BN); do
+						mysql --defaults-file=/etc/mysql/debian.cnf -e "SET PASSWORD FOR 'root'@'${host}' = PASSWORD('${my_rootpw}');"
+					done
 					mysql --defaults-file=/etc/mysql/debian.cnf -e "FLUSH PRIVILEGES;"
 				fi
 			fi
