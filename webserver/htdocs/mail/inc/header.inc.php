@@ -122,6 +122,7 @@ endif;
 					<ul class="dropdown-menu" role="menu">
 						<li <?=($_SESSION['mailcow_locale'] == 'de') ? 'class="active"' : ''?>> <a href="#" onClick="setLang('de')"><span class="lang-xs lang-lbl-full" lang="de"></span></a></li>
 						<li <?=($_SESSION['mailcow_locale'] == 'en') ? 'class="active"' : ''?>> <a href="#" onClick="setLang('en')"><span class="lang-xs lang-lbl-full" lang="en"></span></a></li>
+						<li <?=($_SESSION['mailcow_locale'] == 'pt') ? 'class="active"' : ''?>> <a href="#" onClick="setLang('pt')"><span class="lang-xs lang-lbl-full" lang="pt"></span></a></li>
 					</ul>
 				</li>
 				<?php

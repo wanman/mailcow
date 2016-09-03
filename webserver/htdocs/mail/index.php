@@ -43,7 +43,7 @@ elseif (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "
 									<span class="lang-sm lang-lbl" lang="<?=$_SESSION['mailcow_locale'];?>"></span> <span class="caret"></span>
 								</button>
 								<ul class="dropdown-menu">
-									<li <?=($_SESSION['mailcow_locale'] == 'de') ? 'class="active"' : ''?>> <a href="#" onClick="setLang('de')"><span class="lang-xs lang-lbl-full" lang="de"></a></li>
+									<li <?=($_SESSION['mailcow_locale'] == 'de') ? 'class="active"' : ''?>><a href="#" onClick="setLang('de')"><span class="lang-xs lang-lbl-full" lang="de"></a></li>
 									<li <?=($_SESSION['mailcow_locale'] == 'en') ? 'class="active"' : ''?>><a href="#" onClick="setLang('en')"><span class="lang-xs lang-lbl-full" lang="en"></a></li>
 									<li <?=($_SESSION['mailcow_locale'] == 'pt') ? 'class="active"' : ''?>><a href="#" onClick="setLang('pt')"><span class="lang-xs lang-lbl-full" lang="pt"></a></li>
 								</ul>
