@@ -90,6 +90,9 @@ nano mailcow.config
 
 * **sys_hostname** - Hostname without domain
 * **sys_domain** - Domain name. "$sys_hostname.$sys_domain" equals to FQDN.
+
+** :exclamation: Please make sure your FQDN resolves correctly! **
+
 * **sys_timezone** - The timezone must be defined in a valid format (Europe/Berlin, America/New_York etc.)
 * **use_lets_encrypt** - Tries to obtain a certificate from Let's Encrypt CA. If it fails, it can be retried by calling `./install.sh -s`. Installs a cronjob to renew the certificate but keeps the same key.
 * **httpd_platform** - Select wether to use Nginx ("nginx") or Apache2 ("apache2"). Nginx is default.
