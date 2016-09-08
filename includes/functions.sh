@@ -251,7 +251,8 @@ postfix postfix-mysql postfix-pcre postgrey pflogsumm spamassassin spamc sa-comp
 python-magic liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl \
 ${OPENJDK}-jre-headless libcurl4-openssl-dev libexpat1-dev solr-jetty > /dev/null
 			if [ "$?" -ne "0" ]; then
-				echo "$(redb [ERR]) - Package installation failed"
+				echo "$(redb [ERR]) - Package installation failed:"
+				tail -n 20 /var/log/dpkg.log
 				exit 1
 			fi
 			update-alternatives --set mailx /usr/bin/bsd-mailx --quiet > /dev/null 2>&1
