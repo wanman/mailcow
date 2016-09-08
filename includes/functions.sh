@@ -628,10 +628,8 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			rm -rf roundcube/inst/${roundcube_version}
 			rm -rf /var/www/mail/rc/installer/
 			;;
-                sogo)
-			if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "SHOW TABLES LIKE 'sogo_view'" -N -B) ]]; then
-				mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "CREATE VIEW sogo_view (c_uid, c_name, c_password, c_cn, mail, home) AS SELECT username, username, password, CONVERT(name USING latin1), username, CONCAT('/var/vmail/', maildir) FROM mailbox WHERE active=1;" -N -B
-			fi
+		sogo)
+			mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} < webserver/htdocs/sogo.sql
 			if [[ $dist_id == "Debian" ]]; then
 				if [[ $dist_codename == "jessie" ]]; then
 					echo "$(textb [INFO]) - Adding official SOGo repository..."
@@ -655,7 +653,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			echo "$(textb [INFO]) - Installing SOGo packages, please stand by."
 			${APT} -y install sogo sogo-activesync libwbxml2-0 memcached
 			sudo -u sogo bash -c "
-			defaults write sogod SOGoUserSources '({type = sql;id = directory;viewURL = mysql://${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}:3306/${my_mailcowdb}/sogo_view;canAuthenticate = YES;isAddressBook = YES;displayName = \"Global Address Book\";userPasswordAlgorithm = ssha256;})'
+			defaults write sogod SOGoUserSources '({type = sql;id = directory;viewURL = mysql://${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}:3306/${my_mailcowdb}/sogo_view;canAuthenticate = YES;isAddressBook = YES;displayName = \"Global Address Book\";MailFieldNames = (aliases, senderacl);userPasswordAlgorithm = ssha256;})'
 			defaults write sogod SOGoProfileURL 'mysql://${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}:3306/${my_mailcowdb}/sogo_user_profile'
 			defaults write sogod OCSFolderInfoURL 'mysql://${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}:3306/${my_mailcowdb}/sogo_folder_info'
 			defaults write sogod OCSEMailAlarmsFolderURL 'mysql://${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}:3306/${my_mailcowdb}/sogo_alarms_folder'
