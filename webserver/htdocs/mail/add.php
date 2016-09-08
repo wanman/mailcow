@@ -85,14 +85,14 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="address"><?=$lang['add']['alias_address'];?></label>
 						<div class="col-sm-10">
-							<textarea autocorrect="off" autocapitalize="none" class="form-control" rows="5" name="address"></textarea>
+							<textarea autocorrect="off" autocapitalize="none" class="form-control" rows="5" name="address" id="address"></textarea>
 							<p><?=$lang['add']['alias_address_info'];?></p>
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="goto"><?=$lang['add']['target_address'];?></label>
 						<div class="col-sm-10">
-							<textarea autocorrect="off" autocapitalize="none" class="form-control" rows="5" name="goto"></textarea>
+							<textarea autocorrect="off" autocapitalize="none" class="form-control" rows="5" id="goto" name="goto"></textarea>
 							<p><?=$lang['add']['target_address_info'];?></p>
 						</div>
 					</div>
@@ -118,14 +118,14 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="alias_domain"><?=$lang['add']['alias_domain'];?></label>
 						<div class="col-sm-10">
-							<textarea autocorrect="off" autocapitalize="none" class="form-control" rows="5" name="alias_domain"></textarea>
+							<textarea autocorrect="off" autocapitalize="none" class="form-control" rows="5" name="alias_domain" id="alias_domain"></textarea>
 							<p><?=$lang['add']['alias_domain_info'];?></p>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="name"><?=$lang['add']['target_domain'];?></label>
+						<label class="control-label col-sm-2" for="target_domain"><?=$lang['add']['target_domain'];?></label>
 						<div class="col-sm-10">
-							<select name="target_domain" title="<?=$lang['add']['select'];?>">
+							<select name="target_domain" id="target_domain" title="<?=$lang['add']['select'];?>">
 								<?php
 								try {
 									$stmt = $pdo->prepare("SELECT `domain` FROM `domain`
@@ -179,7 +179,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="domain"><?=$lang['add']['domain'];?>:</label>
 						<div class="col-sm-10">
-							<select id="addSelectDomain" name="domain" title="<?=$lang['add']['select'];?>" required>
+							<select id="addSelectDomain" name="domain" id="domain" title="<?=$lang['add']['select'];?>" required>
 							<?php
 							try {
 								$stmt = $pdo->prepare("SELECT `domain` FROM `domain`
@@ -212,7 +212,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="quota"><?=$lang['add']['quota_mb'];?>
+						<label class="control-label col-sm-2" for="addInputQuota"><?=$lang['add']['quota_mb'];?>
 							<br /><span id="quotaBadge" class="badge">max. - MiB</span>
 						</label>
 						<div class="col-sm-10">

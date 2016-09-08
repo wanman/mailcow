@@ -48,9 +48,9 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 					<form class="form-horizontal" role="form" method="post" action="<?=($FORM_ACTION == "previous") ? $_SESSION['return_to'] : null;?>">
 					<input type="hidden" name="address" value="<?=$alias;?>">
 						<div class="form-group">
-							<label class="control-label col-sm-2" for="name"><?=$lang['edit']['target_address'];?></label>
+							<label class="control-label col-sm-2" for="goto"><?=$lang['edit']['target_address'];?></label>
 							<div class="col-sm-10">
-								<textarea class="form-control" autocapitalize="none" autocorrect="off" rows="10" name="goto"><?=$result['goto'] ?></textarea>
+								<textarea class="form-control" autocapitalize="none" autocorrect="off" rows="10" id="goto" name="goto"><?=$result['goto'] ?></textarea>
 							</div>
 						</div>
 						<div class="form-group">
@@ -100,9 +100,9 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				<form class="form-horizontal" role="form" method="post" action="<?=($FORM_ACTION == "previous") ? $_SESSION['return_to'] : null;?>">
 				<input type="hidden" name="username" value="<?=$domain_admin;?>">
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="name"><?=$lang['edit']['domains'];?></label>
+						<label class="control-label col-sm-2" for="domain"><?=$lang['edit']['domains'];?></label>
 						<div class="col-sm-10">
-							<select name="domain[]" multiple>
+							<select id="domain" name="domain[]" multiple>
 							<?php
 							try {
 								$stmt = $pdo->prepare("SELECT `domain` FROM `domain`
@@ -430,13 +430,13 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							<br /><span id="quotaBadge" class="badge">max. <?=$left_m?> MiB</span>
 						</label>
 						<div class="col-sm-10">
-							<input type="number" name="quota" id="destroyable" style="width:100%" min="1" max="<?=$left_m;?>" value="<?=$result['quota'] / 1048576;?>" class="form-control">
+							<input type="number" name="quota" id="quota" id="destroyable" style="width:100%" min="1" max="<?=$left_m;?>" value="<?=$result['quota'] / 1048576;?>" class="form-control">
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="sender_acl"><?=$lang['edit']['sender_acl'];?>:</label>
 						<div class="col-sm-10">
-							<select style="width:100%" name="sender_acl[]" size="10" multiple>
+							<select style="width:100%" id="sender_acl" name="sender_acl[]" size="10" multiple>
 							<?php
 							// All pre-selected due to being aliases to self (also catch-all)
 							$rows = get_sender_acl_handles($mailbox, "preselected");
