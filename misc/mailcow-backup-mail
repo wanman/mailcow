@@ -1,6 +1,25 @@
 #!/bin/bash
 PATH=/usr/local/bin:/usr/local/sbin:/sbin:/usr/sbin:/bin:/usr/bin:/usr/bin/X11
 
+if [ $# -eq 0 ]
+	then
+	echo "Creates a tar.gz archive of an rsynced copy of your /var/vmail directory."
+	echo
+	echo "Usage: ${0} destination-folder"
+	echo
+	exit 1
+fi
+
+if [[ -d "${1}" ]]; then
+	if ! test -w "${1}"; then
+		echo "Not write permission in destination folder"
+		exit 1
+	fi
+else
+	echo "Destination is not a folder"
+	exit 1
+fi
+
 if [[ -z $(which rsync) ]]; then
 	echo "Please install rsync"
 	exit 1
@@ -10,5 +29,5 @@ TMPDIR=$(mktemp -d)
 DATESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 
 rsync -avz --info=progress2 --delete /var/vmail ${TMPDIR}
-tar fcz vmail_${DATESTAMP}.tar.gz -C ${TMPDIR} .
+tar fcz "${1}/vmail_${DATESTAMP}.tar.gz" -C ${TMPDIR} .
 rm -rf ${TMPDIR}
