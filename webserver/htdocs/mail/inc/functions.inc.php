@@ -2778,7 +2778,7 @@ function get_sender_acl_handles($mailbox, $which) {
 	switch ($which) {
 		case "preselected":
 			try {
-				$stmt = $pdo->prepare("SELECT `address` FROM `alias` WHERE `goto` = :goto");
+				$stmt = $pdo->prepare("SELECT `address` FROM `alias` WHERE `goto` = :goto AND `address` NOT LIKE '@%'");
 				$stmt->execute(array(':goto' => $mailbox));
 				$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 				return $rows;
@@ -2827,10 +2827,7 @@ function get_sender_acl_handles($mailbox, $which) {
 							AND `domain` != 'ALL'
 							AND	`domain` NOT IN (
 								SELECT REPLACE(`send_as`, '@', '') FROM `sender_acl` 
-									WHERE `logged_in_as` = :logged_in_as)
-							AND	`domain` NOT IN (
-								SELECT REPLACE(`address`, '@', '') FROM `alias` 
-									WHERE `goto` = :goto)");
+									WHERE `logged_in_as` = :logged_in_as)");
 					$stmt->execute(array(
 						':logged_in_as' => $mailbox,
 						':goto' => $mailbox,
