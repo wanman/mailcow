@@ -438,18 +438,11 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 						<div class="col-sm-10">
 							<select style="width:100%" id="sender_acl" name="sender_acl[]" size="10" multiple>
 							<?php
-							// All pre-selected due to being aliases to self (also catch-all)
 							$rows = get_sender_acl_handles($mailbox, "preselected");
 							while ($row_goto_from_alias = array_shift($rows)):
-									if (!filter_var($row_goto_from_alias['address'], FILTER_VALIDATE_EMAIL)):
-									?>
-										<option data-subtext="(Wildcard)" disabled selected><?=$row_goto_from_alias['address'];?></option>
-									<?php
-									else:
-									?>
-										<option disabled selected><?=$row_goto_from_alias['address'];?></option>
-									<?php
-									endif;
+							?>
+								<option disabled selected><?=$row_goto_from_alias['address'];?></option>
+							<?php
 							endwhile;
 
 							// All manual selected
@@ -457,7 +450,9 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							while ($row_selected_sender_acl = array_shift($rows)):
 									if (!filter_var($row_selected_sender_acl['send_as'], FILTER_VALIDATE_EMAIL)):
 									?>
-										<option data-subtext="(Wildcard)" selected><?=$row_selected_sender_acl['send_as'];?></option>
+										<option data-divider="true"></option>
+											<option value="<?=$row_selected_sender_acl['send_as'];?>" selected><?=sprintf($lang['edit']['dont_check_sender_acl'], str_replace('@', '', $row_selected_sender_acl['send_as']));?></option>
+										<option data-divider="true"></option>
 									<?php
 									else:
 									?>
@@ -470,7 +465,9 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							$rows = get_sender_acl_handles($mailbox, "unselected-domains");
 							while ($row_unselected_sender_acl = array_shift($rows)):
 							?>
-								<option data-subtext="(Wildcard)">@<?=$row_unselected_sender_acl['domain'];?></option>
+								<option data-divider="true"></option>
+									<option value="@<?=$row_unselected_sender_acl['domain'];?>"><?=sprintf($lang['edit']['dont_check_sender_acl'], $row_unselected_sender_acl['domain']);?></option>
+								<option data-divider="true"></option>
 							<?php
 							endwhile;
 
@@ -483,7 +480,6 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							endwhile;
 							?>
 							</select>
-							<p class="help-block"><?=$lang['edit']['sender_acl_info'];?></p>
 						</div>
 					</div>
 					<div class="form-group">
