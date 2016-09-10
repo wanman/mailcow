@@ -237,6 +237,7 @@ $lang['edit']['dkim_txt_name'] = 'Nome do registro TXT:';
 $lang['edit']['dkim_txt_value'] = 'Valor do registro TXT:';
 $lang['edit']['previous'] = 'Voltar';
 $lang['edit']['unchanged_if_empty'] = 'Deixar em branco para não modificar';
+$lang['edit']['dont_check_sender_acl'] = 'Não verificar o remetente para o domínio %s';
 $lang['add']['object'] = 'Adicionar objeto';
 $lang['add']['domain'] = 'Domínio';
 $lang['add']['active'] = 'Ativo';
