@@ -242,6 +242,7 @@ $lang['edit']['dkim_txt_name'] = 'TXT-Record Name:';
 $lang['edit']['dkim_txt_value'] = 'TXT-Record Wert:';
 $lang['edit']['previous'] = 'Vorherige Seite';
 $lang['edit']['unchanged_if_empty'] = 'Unverändert, wenn leer';
+$lang['edit']['dont_check_sender_acl'] = 'Absender für Domain %s nicht prüfen';
 
 $lang['add']['object'] = 'Objekt anlegen';
 $lang['add']['domain'] = 'Domain';
