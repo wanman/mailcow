@@ -129,8 +129,8 @@ $lang['user']['spamfilter_hint'] = 'The first value describes the "low spam scor
 
 $lang['user']['tls_policy_warning'] = '<strong>Warning:</strong> If you decide to enforce encrypted mail transfer, you may lose emails.<br />Messages to not satisfy the policy will be bounced with a hard fail by the mail system.';
 $lang['user']['tls_policy'] = 'Encryption policy';
-$lang['user']['tls_enforce_in'] = 'Encforce TLS incoming';
-$lang['user']['tls_enforce_out'] = 'Encforce TLS outgoing';
+$lang['user']['tls_enforce_in'] = 'Enforce TLS incoming';
+$lang['user']['tls_enforce_out'] = 'Enforce TLS outgoing';
 
 $lang['user']['misc_settings'] = 'Other profile settings';
 $lang['user']['misc_delete_profile'] = 'Other profile settings';
