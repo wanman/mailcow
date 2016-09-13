@@ -683,6 +683,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			defaults write sogod SOGoLanguage English;
 			defaults write sogod SOGoMemcachedHost '127.0.0.1';
 			defaults write sogod WOListenQueueSize 300;
+			defaults write sogod WOPidFile = '/var/run/sogo.pid';
 			defaults write sogod WOWatchDogRequestTimeout 10;
 			defaults write sogod SOGoMaximumPingInterval 354;
 			defaults write sogod SOGoMaximumSyncInterval 354;
