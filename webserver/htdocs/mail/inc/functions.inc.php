@@ -2419,6 +2419,7 @@ function set_whitelist($postarray) {
 	global $pdo;
 	$username	= $_SESSION['mailcow_cc_username'];
 	$whitelist_from	= trim(strtolower($postarray['whitelist_from']));
+	$whitelist_from = preg_replace("/\.\*/", "*", $whitelist_from);
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -2518,6 +2519,7 @@ function set_blacklist($postarray) {
 	global $pdo;
 	$username		= $_SESSION['mailcow_cc_username'];
 	$blacklist_from	= trim(strtolower($postarray['blacklist_from']));
+	$blacklist_from = preg_replace("/\.\*/", "*", $blacklist_from);
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
