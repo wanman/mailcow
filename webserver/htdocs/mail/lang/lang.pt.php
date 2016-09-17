@@ -1,7 +1,7 @@
 <?php
 /*
 //
-//  Portuguese (pt) language file - Português do Brasil (pt_BR)
+//  Portuguese (pt) language file - Português do Brasil (pt_BR) - ISO-8859-1
 //
 */
 $lang['footer']['loading'] = "Aguarde...";
@@ -15,10 +15,9 @@ $lang['danger']['dkim_key_length_invalid'] = "Registro DKIM com tamanho inválid
 $lang['success']['dkim_removed'] = " Registro DKIM removido com sucesso";
 $lang['success']['dkim_added'] = "Registro DKIM salvo com sucesso";
 $lang['danger']['access_denied'] = "Acesso negado ou dados inválidos";
-$lang['danger']['whitelist_from_invalid'] = "Whitelist registro inválido";
 $lang['danger']['domain_invalid'] = "Domínio inválido";
 $lang['danger']['mailbox_quota_exceeds_domain_quota'] = "Max. espaço excede o espaço do domínio";
-$lang['danger']['object_is_not_numeric'] = "Valor %s não é numerico";
+$lang['danger']['object_is_not_numeric'] = "Valor %s não é numérico";
 $lang['success']['domain_added'] = "Domínio adicionado %s";
 $lang['danger']['alias_empty'] = "Você deve preencher o campo do Apelido";
 $lang['danger']['goto_empty'] = "Você deve preencher o campo Encaminhar para";
@@ -184,9 +183,9 @@ $lang['mailbox']['no'] = '&#10008;';
 $lang['mailbox']['quota'] = 'Espaço';
 $lang['mailbox']['in_use'] = 'Em uso (%)';
 $lang['mailbox']['msg_num'] = 'Mensagens';
-$lang['mailbox']['remove'] = 'remover';
-$lang['mailbox']['edit'] = 'editar';
-$lang['mailbox']['view'] = 'abrir';
+$lang['mailbox']['remove'] = 'Remover';
+$lang['mailbox']['edit'] = 'Alterar';
+$lang['mailbox']['view'] = 'Abrir';
 $lang['mailbox']['archive'] = 'Arquivo';
 $lang['info']['no_action'] = 'Nenhuma ação foi definida';
 $lang['delete']['title'] = 'Remover objeto';
@@ -303,7 +302,7 @@ $lang['admin']['public_folder_pusf'] = 'Habilitar visualização por usuário';
 $lang['admin']['public_folder_pusf_text'] = 'A "per-user seen flag"-enabled system will not mark a mail as read for User B, when User A has seen it, but User B did not.';
 $lang['admin']['privacy'] = 'Privacidade';
 $lang['admin']['privacy_text'] = 'Esta opção habilita a tabela PCRE para remover "User-Agent", "X-Enigmail", "X-Mailer", "X-Originating-IP" e substitui pelo Header "Received: from" localhost/127.0.0.1.';
-$lang['admin']['privacy_anon_mail'] = 'Limpar Header dos emails de saída';
+$lang['admin']['privacy_anon_mail'] = 'Limpar o Header dos emails de saída';
 $lang['admin']['dkim_txt_name'] = 'Registro TXT:';
 $lang['admin']['dkim_txt_value'] = 'Valor do TXT:';
 $lang['admin']['dkim_key_length'] = 'Tamanho do registro DKIM (bits)';
@@ -328,8 +327,8 @@ $lang['admin']['add_domain_admin'] = 'Adicionar administrador de domínio(s)';
 $lang['admin']['admin_domains'] = 'Acesso aos Domínios';
 $lang['admin']['domain_admins'] = 'Administradores de domínio';
 $lang['admin']['username'] = 'Administrador';
-$lang['admin']['edit'] = 'editar';
-$lang['admin']['remove'] = 'remover';
+$lang['admin']['edit'] = 'Editar';
+$lang['admin']['remove'] = 'Remover';
 $lang['admin']['save'] = 'Salvar';
 $lang['admin']['admin'] = 'Administrador';
 $lang['admin']['admin_details'] = 'Editar informações do administrator';
