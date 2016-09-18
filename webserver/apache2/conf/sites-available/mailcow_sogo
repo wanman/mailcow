@@ -78,6 +78,7 @@ ProxyPass /Microsoft-Server-ActiveSync \
  retry=60 connectiontimeout=10 timeout=400
 
 ProxyPass /SOGo http://127.0.0.1:20000/SOGo retry=0
+ProxyPass /principals http://127.0.0.1:20000/SOGo/dav/
 
 <Proxy http://127.0.0.1:20000/SOGo>
 	<IfModule headers_module>
