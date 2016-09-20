@@ -122,8 +122,12 @@ checkconfig() {
 		echo "$(redb [ERR]) - \"mailing_platform\" is neither sogo nor roundcube"
 		exit 1
 	fi
-	if [[ ${mailing_platform} == "sogo" && ${my_usemariadb} == "yes" ]]; then
-		echo "$(redb [ERR]) - Cannot use MariaDB with SOGo"
+	#if [[ ${mailing_platform} == "sogo" && ${my_usemariadb} == "yes" ]]; then
+	#	echo "$(redb [ERR]) - Cannot use MariaDB with SOGo"
+	#	exit 1
+	#fi
+	if [[ ${mailing_platform} == "sogo" && $(arch) != "x86_64" ]]; then
+		echo "$(redb [ERR]) - Cannot install SOGo on $(arch) hardware, need x86_64"
 		exit 1
 	fi
 	for var in sys_hostname sys_domain sys_timezone my_dbhost my_mailcowdb my_mailcowuser my_mailcowpass my_rootpw my_rcuser my_rcpass my_rcdb mailcow_admin_user mailcow_admin_pass

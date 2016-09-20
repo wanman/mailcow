@@ -51,12 +51,17 @@ echo "    $(textb "Hostname")            ${sys_hostname}
     $(textb "Domain")              ${sys_domain}
     $(textb "FQDN")                ${sys_hostname}.${sys_domain}
     $(textb "Timezone")            ${sys_timezone}
-    $(textb "mailcow MySQL")       ${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}/${my_mailcowdb}"
+    -----------------------------------------------
+    $(textb "MySQL root passwd")   ${my_rootpw}
+    $(textb "mailcow MySQL URI")   ${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}/${my_mailcowdb}"
 if [[ ${mailing_platform} == "roundcube" ]]; then
-	echo "    $(textb "Roundcube MySQL")     ${my_rcuser}:${my_rcpass}@${my_dbhost}/${my_rcdb}"
+	echo "    $(textb "Roundcube MySQL URI") ${my_rcuser}:${my_rcpass}@${my_dbhost}/${my_rcdb}"
 fi
-echo "    $(textb "mailcow admin user")  ${mailcow_admin_user}
-"
+echo "    -----------------------------------------------
+    $(textb "mailcow admin user")  ${mailcow_admin_user}
+    $(textb "mailcow admin passwd: ${mailcow_admin_pass}
+    -----------------------------------------------
+    $(textb "mailcow version:      ${mailcow_version}_${mailing_platform}"
 
 returnwait "System environment"
 echo --------------------------------- > installer.log
