@@ -61,7 +61,7 @@ echo "    -----------------------------------------------
     $(textb "mailcow admin user")  ${mailcow_admin_user}
     $(textb "mailcow admin pwd")   ${mailcow_admin_pass}
     -----------------------------------------------
-    $(textb "mailcow version:      ${mailcow_version}_${mailing_platform}"
+    $(textb "mailcow version:")      ${mailcow_version}_${mailing_platform}"
 echo
 returnwait "System environment"
 echo --------------------------------- > installer.log
