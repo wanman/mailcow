@@ -2832,7 +2832,6 @@ function get_sender_acl_handles($mailbox, $which) {
 									WHERE `logged_in_as` = :logged_in_as)");
 					$stmt->execute(array(
 						':logged_in_as' => $mailbox,
-						':goto' => $mailbox,
 						':username' => $_SESSION['mailcow_cc_username']
 					));
 				}
