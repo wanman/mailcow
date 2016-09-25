@@ -34,8 +34,8 @@ smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
 smtpd_tls_mandatory_protocols = !SSLv2, !SSLv3
 smtpd_tls_protocols = !SSLv2, !SSLv3
 smtpd_tls_mandatory_ciphers=high
-smtpd_tls_exclude_ciphers = ECDHE-RSA-RC4-SHA
-smtpd_tls_mandatory_exclude_ciphers = ECDHE-RSA-RC4-SHA
+smtpd_tls_exclude_ciphers = ECDHE-RSA-RC4-SHA, RC4, aNULL
+smtpd_tls_mandatory_exclude_ciphers = ECDHE-RSA-RC4-SHA, RC4, aNULL
 
 # Log TLS handling
 smtpd_tls_loglevel = 1
