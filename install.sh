@@ -150,7 +150,7 @@ echo "Logged credentials and further information to file `tput bold`installer.lo
 echo
 echo "Next steps:"
 echo " * Backup installer.log to a safe place and delete it from your server"
-echo " * Login to https://$sys_hostname.$sys_domain (pease use the full URL and not your IP address)"
+echo " * Login to https://$sys_hostname.$sys_domain (please use the full URL and not your IP address)"
 echo "   Username: ${mailcow_admin_user}"
 echo "   Password: ${mailcow_admin_pass}"
 echo " * Please recheck PTR records in ReverseDNS for both IPv4 and IPv6, also verify you have setup SPF TXT records."
