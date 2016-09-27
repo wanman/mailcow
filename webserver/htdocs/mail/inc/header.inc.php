@@ -1,4 +1,5 @@
 <?php
+ini_set("session.cookie_secure", 1);
 session_start();
 if (isset($_POST["logout"])) {
 	session_unset();
