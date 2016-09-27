@@ -35,6 +35,15 @@ server {
 	index index.html index.htm index.php;
 	error_page 502 /redir.html;
 
+        # Block site from being framed (Old style)
+        add_header X-Frame-Options "DENY";
+        # Block site from being framed (new  style by means of CSP)
+        add_header Content-Security-Policy "frame-ancestors 'none';";
+        # Prevent browsers from incorrectly detecting non-scripts as scripts
+        add_header X-Content-Type-Options nosniff;
+        # Block pages from loading when they detect reflected XSS attacks
+        add_header X-XSS-Protection "1; mode=block";
+
 	location /redir.html {
 		return 301 /admin.php;
 	}
