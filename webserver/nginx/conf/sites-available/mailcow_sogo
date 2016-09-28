@@ -47,10 +47,12 @@ server {
 		fastcgi_read_timeout 630;
 		fastcgi_keep_conn on;
 	}
-	location ^~ /.well-known/acme-challenge/ {
-		root /var/www/mail/.well-known/acme-challenge;
+	location ^~ /.well-known/acme-challenge {
+		try_files $uri /dev/null =404;
 	}
-	rewrite ^(.*) /autodiscover.php last;
+	location / {
+		rewrite ^(.*) /autodiscover.php last;
+	}
 }
 server {
 	listen 443;
