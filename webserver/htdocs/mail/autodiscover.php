@@ -80,21 +80,19 @@ else if ($config['autodiscoverType'] == 'activesync') {
 	];
 	$pdo = new PDO($dsn, $database_user, $database_pass, $opt);
 	$username = trim($email);
-    if ($pdo) {
-		try {
-			$stmt = $pdo->prepare("SELECT `name` FROM `mailbox` WHERE `username`= :username");
-			$stmt->execute(array(':username' => $username));
-			$MailboxData = $stmt->fetch(PDO::FETCH_ASSOC);
-		}
-		catch(PDOException $e) {
-			die("Failed to determine name from SQL");
-		}
-		if (!empty($MailboxData['name'])) {
-			$displayname = utf8_encode($mailboxAssoc['name']);
-		}
-		else {
-			$displayname = $email;
-		}
+	try {
+		$stmt = $pdo->prepare("SELECT `name` FROM `mailbox` WHERE `username`= :username");
+		$stmt->execute(array(':username' => $username));
+		$MailboxData = $stmt->fetch(PDO::FETCH_ASSOC);
+	}
+	catch(PDOException $e) {
+		die("Failed to determine name from SQL");
+	}
+	if (!empty($MailboxData['name'])) {
+		$displayname = utf8_encode($MailboxData['name']);
+	}
+	else {
+		$displayname = $email;
 	}
 ?>
 <Response xmlns="http://schemas.microsoft.com/exchange/autodiscover/mobilesync/responseschema/2006">
