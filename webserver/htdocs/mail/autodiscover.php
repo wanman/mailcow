@@ -21,7 +21,7 @@ if (strpos($_SERVER['HTTP_USER_AGENT'], 'Outlook')) {
         $config['autodiscoverType'] = 'imap';
 }
 ?>
-<?xml version="1.0" encoding="utf-8" ?>
+<?php echo '<?xml version="1.0" encoding="utf-8" ?>'; ?>
 <Autodiscover xmlns="http://schemas.microsoft.com/exchange/autodiscover/responseschema/2006">
 <?php
 $data = file_get_contents("php://input");
