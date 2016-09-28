@@ -612,6 +612,9 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			sed -i "s/my_mailcowuser/${my_mailcowuser}/g" /var/www/mail/inc/vars.inc.php
 			sed -i "s/my_mailcowdb/${my_mailcowdb}/g" /var/www/mail/inc/vars.inc.php
 			sed -i "s/MAILCOW_HASHING/${hashing_method}/g" /var/www/mail/inc/vars.inc.php
+			if [[ ! -f "/var/www/mail/inc/vars.local.inc.php" ]]; then
+   				echo -e "<?php\n// Custom vars file\n?>" > "/var/www/mail/inc/vars.local.inc.php"
+		        fi
 			chown -R www-data: /var/www/mail/. ${PHPLIB}/sessions
 			mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} < webserver/htdocs/init.sql
 			if [[ -z $(mysql --host ${my_dbhost} -u root -p${my_rootpw} ${my_mailcowdb} -e "SHOW COLUMNS FROM domain LIKE 'relay_all_recipients';" -N -B) ]]; then
