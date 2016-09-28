@@ -3,7 +3,7 @@
 server {
 	listen 80;
 	listen [::]:80;
-	server_name MAILCOW_HOST.MAILCOW_DOMAIN;
+	server_name MAILCOW_HOST.MAILCOW_DOMAIN autodiscover.MAILCOW_DOMAIN;
 	server_tokens off;
 	root /var/www/mail;
 	return 301 https://$host$request_uri;
