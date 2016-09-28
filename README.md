@@ -4,7 +4,7 @@
 
 - [mailcow](#mailcow)
 - [Introduction](#introduction)
-- [Before You Begin](#before-you-begin)
+- [Before You Begin (Prerequisites)](#before-you-begin)
 - [Installation](#installation)
 - [Upgrade](#upgrade)
 - [Uninstall](#uninstall)
@@ -39,6 +39,7 @@ mailcow supports **Debian 8 Jessie, Ubuntu LTS 14.04 Trusty and Ubuntu LTS 16.04
 * per-user ACL
 * Shared Namespace
 * Quotas
+* Auto-configuration for ActiveSync + Thunderbird (and its derivates)
 
 Comes with...
 * Roundcube
@@ -49,7 +50,7 @@ or
 * SOGo
     * Full groupware with ActiveSync and Card-/CalDAV support
 
-# Before You Begin
+# Before You Begin: Prerequisites
 - **Please remove any web- and mail services** running on your server. I recommend using a clean Debian minimal installation.
 Remember to purge Debians default MTA Exim4:
 ```
@@ -68,7 +69,39 @@ apt-get purge exim4*
 | Dovecot ManageSieve   | TCP      | 4190   |
 | HTTP(S)               | TCP      | 80/443 |
 
+- Setup DNS records:
+
+Obviously you will need an A and/or AAAA record `sys_hostname.sys_domain` pointing to your IP address and a valid MX record.
+Let's Encrypt does not assign certificates when it cannot determine a valid IPv4 address.
+
+| Name                       | Type   | Value                        | Priority   |
+| ---------------------------|:------:|:----------------------------:|:-----------|
+| `sys_hostname.sys_domain`  | A/AAAA | IPv4/6                       | any        |
+| `sys_domain`               | MX     | `sys_hostname.sys_domain`25  |            |
+
+Optional: Auto-configuration services for Thunderbird (and derivates) + ActiveSync.
+You do not need to setup `autodiscover` when not using SOGo with ActiveSync.
+
+| Name                       | Type   | Value                        | Priority   |
+| ---------------------------|:------:|:----------------------------:|:-----------|
+| autoconfig.`sys_domain`    | A/AAAA | IPv4/6                       | any        |
+| autodiscover.`sys_domain`  | A/AAAA | IPv4/6                       | any        |
+
+**Hint:** ActiveSync auto-discovery is setup to configure desktop clients with IMAP!
+
+The following records are optional but recommended:
+
+Please setup a SPF TXT record according to docs you will find on the internet.
+SPF is broken by design and a huge headache when it comes to forwarding.
+Try to not push yourself with a `-all` record but prefere `?all`. Also known as "I use SPF but I do not actually care". :-)
+
+After finishing the installation, head to the mailcow web UI, log in as admin and create DKIM TXT records for your domains.
+You will find them ready to copy and paste to your DNS servers configuration.
+
 - Next it is important that you **do not use Google DNS** or another public DNS which is known to be blocked by DNS-based Blackhole List (DNSBL) providers.
+
+I recommend PowerDNS Recursor as a local recursor with DNSSEC capabilities. See https://repo.powerdns.com/
+Though any non-blocked or ratelimited DNS server your ISP gave you *should* be fine.
 
 # Installation
 **Please run all commands as root**
@@ -91,7 +124,7 @@ nano mailcow.config
 * **sys_hostname** - Hostname without domain
 * **sys_domain** - Domain name. "$sys_hostname.$sys_domain" equals to FQDN.
 
-** :exclamation: Please make sure your FQDN resolves correctly! **
+:exclamation: Please make sure your FQDN resolves correctly!
 
 * **sys_timezone** - The timezone must be defined in a valid format (Europe/Berlin, America/New_York etc.)
 * **use_lets_encrypt** - Tries to obtain a certificate from Let's Encrypt CA. If it fails, it can be retried by calling `./install.sh -s`. Installs a cronjob to renew the certificate but keeps the same key.
@@ -120,13 +153,17 @@ More debugging is about to come. Though everything should work as intended.
 
 After the installation, visit your dashboard @ **https://hostname.example.com**, use the logged credentials in `./installer.log`
 
-Remember to create an alias- or a mailbox for Postmaster. ;-)
+Remember to create an alias- or a mailbox for `postmaster`.
 
-Please set/update all DNS records accordingly.
+Again, please check you setup all DNS records accordingly.
 
-## Default web panel language
-You can change the default language of the mailcow UI by opening `/var/www/mail/inc/vars.inc.php` and changing the default_lang parameter.
+## Web UI configuration variables
 
+Some settings can be changed be overwriting defaults of `/var/www/mail/inc/vars.inc.php` in `/var/www/mail/inc/vars.local.inc.php`.
+
+Changes to `/var/www/mail/inc/vars.local.inc.php` will not be overwritten when upgrading mailcow.
+
+##
 
 # Upgrade
 **Please run all commands as root**
@@ -137,6 +174,8 @@ To start the upgrade, run the following command:
 ```
 ./install.sh -u
 ```
+
+**Please double check the detected FQDN!**
 
 When autodetection of your hostname and/or domain name fails, use the `-H` parameter to overwrite the hostname and/or `-D` to overwrite the domain name:
 ```

@@ -282,30 +282,42 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			mkdir /etc/ssl/mail 2> /dev/null
 			echo "$(textb [INFO]) - Generating 2048 bit DH parameters, this may take a while, please wait..."
 			openssl dhparam -out /etc/ssl/mail/dhparams.pem 2048 2> /dev/null
-			openssl req -new -newkey rsa:4096 -sha256 -days 1095 -nodes -x509 -subj "/C=ZZ/ST=mailcow/L=mailcow/O=mailcow/CN=${sys_hostname}.${sys_domain}/subjectAltName=DNS.1=${sys_hostname}.${sys_domain}" -keyout /etc/ssl/mail/mail.key -out /etc/ssl/mail/mail.crt
+			openssl req -new -newkey rsa:4096 -sha256 -days 1095 -nodes -x509 -subj "/C=ZZ/ST=mailcow/L=mailcow/O=mailcow/CN=${sys_hostname}.${sys_domain}/subjectAltName=DNS.1=${sys_hostname}.${sys_domain},DNS.2=autodiscover.${sys_domain}" -keyout /etc/ssl/mail/mail.key -out /etc/ssl/mail/mail.crt
 			chmod 600 /etc/ssl/mail/mail.key
 			cp /etc/ssl/mail/mail.crt /usr/local/share/ca-certificates/
 			update-ca-certificates
 			;;
 		ssl_le)
 			curled_ip="$(curl -4s ifconfig.co)"
-			for ip in  $(dig ${sys_hostname}.${sys_domain} a +short)
+			for ip in $(dig ${sys_hostname}.${sys_domain} a +short)
 			do
 				if [[ "${ip}" == "${curled_ip}" ]]; then
-					ip_useable=1
+					ip_fqdn_useable=1
 				fi
 			done
-			if [[ ${ip_useable} -ne 1 ]]; then
-				echo "$(redb [ERR]) - Cannot validate IP address against DNS"
-				echo "You can retry to obtain Let's Encrypt certificates after fixing this error by running ./install.sh -s"
+			for ip in $(dig autodiscover.${sys_domain} a +short)
+			do
+				if [[ "${ip}" == "${curled_ip}" ]]; then
+					ip_as_useable=1
+				fi
+			done
+			if [[ ${ip_fqdn_useable} -ne 1 ]]; then
+				echo "$(redb [ERR]) - Cannot validate IP address against hostname ${sys_hostname}.${sys_domain}"
+				echo "You can retry to obtain Let's Encrypt certificates by running ./install.sh -s"
+			elif [[ ${mailing_platform} == "sogo" && ${ip_as_useable} -ne 1 ]]; then
+				echo "$(redb [ERR]) - Cannot validate IP address against hostname autodiscover.${sys_domain}"
+				echo "You can retry to obtain Let's Encrypt certificates by running ./install.sh -s"
 			else
 				mkdir -p /opt/letsencrypt-sh/
 				mkdir -p "/var/www/mail/.well-known/acme-challenge"
 				tar xf letsencrypt-sh/inst/${letsencrypt_sh_version}.tar -C letsencrypt-sh/inst/ 2> /dev/null
 				cp -R letsencrypt-sh/inst/${letsencrypt_sh_version}/* /opt/letsencrypt-sh/
 				install -m 644 letsencrypt-sh/conf/config.sh /opt/letsencrypt-sh/config.sh
-				install -m 644 letsencrypt-sh/conf/domains.txt /etc/ssl/mail/domains.txt
-				sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /etc/ssl/mail/domains.txt
+				if [[ ${mailing_platform} == "sogo" ]]; then
+					echo "${sys_hostname}.${sys_domain} autodiscover.${sys_domain}" > /etc/ssl/mail/domains.txt
+				else
+					echo "${sys_hostname}.${sys_domain}" > /etc/ssl/mail/domains.txt
+				fi
 				# Set postmaster as certificate owner
 				sed -i "s/MAILCOW_DOMAIN/${sys_domain}/g" /opt/letsencrypt-sh/config.sh
 				# letsencrypt-sh will use config instead of config.sh for versions >= 0.2.0
@@ -588,6 +600,13 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			find /var/www/mail -type d -exec chmod 755 {} \;
 			find /var/www/mail -type f -exec chmod 644 {} \;
 			echo none > /var/log/pflogsumm.log
+			if [[ ${mailing_platform} == "sogo" ]]; then
+				mv /var/www/mail/autoconfig/mail/{config-v1.1.xml_sogo,config-v1.1.xml}
+			else
+				mv /var/www/mail/autoconfig/mail/{config-v1.1.xml_rc,config-v1.1.xml}
+			fi
+			sed -i "s/MAILCOW_HOST.MAILCOW_DOMAIN/${sys_hostname}.${sys_domain}/g" /var/www/mail/autoconfig/mail/config-v1.1.xml /var/www/mail/autodiscover.php
+			sed -i "s/MAILCOW_DOMAIN/${sys_domain}/g" /var/www/mail/autoconfig/mail/config-v1.1.xml /var/www/mail/autodiscover.php
 			sed -i "s/my_dbhost/${my_dbhost}/g" /var/www/mail/inc/vars.inc.php
 			sed -i "s/my_mailcowpass/${my_mailcowpass}/g" /var/www/mail/inc/vars.inc.php
 			sed -i "s/my_mailcowuser/${my_mailcowuser}/g" /var/www/mail/inc/vars.inc.php

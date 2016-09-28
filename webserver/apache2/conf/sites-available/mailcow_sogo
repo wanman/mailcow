@@ -19,6 +19,16 @@ Listen 127.0.0.1:81
 	RewriteCond %{HTTPS} !=on
 	RewriteRule ^/?(.*) https://%{HTTP_HOST}/$1 [L,R,NE]
 </VirtualHost>
+<VirtualHost *:80>
+    ServerSignature off
+    TraceEnable off
+    AddDefaultCharset utf-8
+    ServerName "autoconfig.MAILCOW_DOMAIN"
+    DocumentRoot /var/www/mail/autoconfig
+    <Directory /var/www/mail/autoconfig>
+        Options -Indexes
+    </Directory>
+</VirtualHost>
 <IfModule mod_ssl.c>
 	<VirtualHost *:443>
 		ServerSignature off
@@ -48,6 +58,27 @@ Listen 127.0.0.1:81
         	Header always set X-Content-Type-Options nosniff
         	SSLCompression off
         	SSLUseStapling on
+	</VirtualHost>
+	<VirtualHost *:443>
+		ServerName "autodiscover.MAILCOW_DOMAIN"
+		ErrorLog ${APACHE_LOG_DIR}/error.log
+		CustomLog ${APACHE_LOG_DIR}/access.log combined
+		RequestHeader set X-Forwarded-Proto "https"
+		AliasMatch (?i)/Autodiscover/Autodiscover.xml$ "/var/www/mail/autodiscover.php"
+		SSLEngine on
+		SSLCertificateFile      /etc/ssl/mail/mail.crt
+		SSLCertificateKeyFile   /etc/ssl/mail/mail.key
+		<FilesMatch "\.(cgi|shtml|phtml|php)$">
+			SSLOptions +StdEnvVars
+		</FilesMatch>
+		<Directory /usr/lib/cgi-bin>
+			SSLOptions +StdEnvVars
+		</Directory>
+		DocumentRoot /var/www/html
+		<Directory />
+			Options +FollowSymLinks -Indexes
+			AllowOverride Options Indexes Limit FileInfo AuthConfig
+		</Directory>
 	</VirtualHost>
 </IfModule>
 Alias /SOGo.woa/WebServerResources/ \

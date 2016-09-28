@@ -8,7 +8,6 @@ server {
 	root /var/www/mail;
 	return 301 https://$host$request_uri;
 }
-
 server {
 	listen 127.0.0.1:81;
 
@@ -18,7 +17,13 @@ server {
 		fastcgi_pass unix:/var/run/fcgiwrap.socket;
 	}
 }
-
+server {
+	listen 80;
+	listen [::]:80;
+	server_name autoconfig.MAILCOW_DOMAIN;
+	server_tokens off;
+	root /var/www/mail/autoconfig;
+}
 server {
 	listen 443;
 	listen [::]:443;
