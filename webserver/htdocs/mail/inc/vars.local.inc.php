@@ -1,2 +1,0 @@
-<?php
-// Custom vars file
