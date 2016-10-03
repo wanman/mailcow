@@ -37,6 +37,7 @@ server {
 	ssl_dhparam /etc/ssl/mail/dhparams.pem;
 	add_header Strict-Transport-Security max-age=15768000;
 	ssl_session_timeout 30m;
+	root /var/www/mail;
 	location ~ \.php$ {
 		include fastcgi_params;
 		fastcgi_split_path_info ^(.+\.php)(/.+)$;
