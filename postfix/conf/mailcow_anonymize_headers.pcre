@@ -3,4 +3,4 @@
 /^\s*X-Enigmail/        IGNORE
 /^\s*X-Mailer/          IGNORE
 /^\s*X-Originating-IP/  IGNORE
-/^\s*X-Forward/  IGNORE
+/^\s*X-Forward/			IGNORE
