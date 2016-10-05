@@ -685,6 +685,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			defaults write sogod OCSFolderInfoURL 'mysql://${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}:3306/${my_mailcowdb}/sogo_folder_info'
 			defaults write sogod OCSEMailAlarmsFolderURL 'mysql://${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}:3306/${my_mailcowdb}/sogo_alarms_folder'
 			defaults write sogod OCSSessionsFolderURL 'mysql://${my_mailcowuser}:${my_mailcowpass}@${my_dbhost}:3306/${my_mailcowdb}/sogo_sessions_folder'
+			defaults write sogod SOGoCalendarDefaultRoles '("PublicDAndTViewer","ConfidentialDAndTViewer","PrivateDAndTViewer")'
 			defaults write sogod SOGoEnableEMailAlarms YES
 			defaults write sogod SOGoPageTitle '${sys_hostname}.${sys_domain}';
 			defaults write sogod SOGoForwardEnabled YES;
