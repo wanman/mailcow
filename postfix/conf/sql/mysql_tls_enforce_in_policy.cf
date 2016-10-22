@@ -1,6 +1,6 @@
 # mysql_tls_enforce_in_policy.cf
-user = my_mailcowuser
+user     = my_mailcowuser
 password = my_mailcowpass
-hosts = my_dbhost
-dbname = my_mailcowdb
-query           = SELECT IF( EXISTS( SELECT username FROM mailbox WHERE username='%s' AND active='1' AND tls_enforce_in='1'), 'reject_plaintext_session', 'DUNNO') AS 'tls_enforce_in';
+hosts    = my_dbhost
+dbname   = my_mailcowdb
+query    = SELECT IF( EXISTS( SELECT 'TLS_ACTIVE' FROM alias LEFT OUTER JOIN mailbox ON mailbox.username = alias.address WHERE (address='%s' OR address IN (SELECT CONCAT('%u', '@', target_domain) FROM alias_domain WHERE alias_domain='%d')) AND mailbox.tls_enforce_in = '1' AND mailbox.active = '1'), 'reject_plaintext_session', 'DUNNO') AS 'tls_enforce_in';
