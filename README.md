@@ -77,7 +77,7 @@ Let's Encrypt does not assign certificates when it cannot determine a valid IPv4
 | Name                       | Type   | Value                        | Priority   |
 | ---------------------------|:------:|:----------------------------:|:-----------|
 | `sys_hostname.sys_domain`  | A/AAAA | IPv4/6                       | any        |
-| `sys_domain`               | MX     | `sys_hostname.sys_domain`25  |            |
+| `sys_domain`               | MX     | `sys_hostname.sys_domain`    | 25         |
 
 Optional: Auto-configuration services for Thunderbird (and derivates) + ActiveSync.
 You do not need to setup `autodiscover` when not using SOGo with ActiveSync.
