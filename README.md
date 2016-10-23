@@ -93,7 +93,7 @@ The following records are optional but recommended:
 
 Please setup a SPF TXT record according to docs you will find on the internet.
 SPF is broken by design and a huge headache when it comes to forwarding.
-Try to not push yourself with a `-all` record but prefere `?all`. Also known as "I use SPF but I do not actually care". :-)
+Try to not push yourself with a `-all` record but prefer `?all`. Also known as "I use SPF but I do not actually care". :-)
 
 After finishing the installation, head to the mailcow web UI, log in as admin and create DKIM TXT records for your domains.
 You will find them ready to copy and paste to your DNS servers configuration.
