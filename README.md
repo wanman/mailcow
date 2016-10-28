@@ -4,7 +4,7 @@
 
 - [mailcow](#mailcow)
 - [Introduction](#introduction)
-- [Before You Begin (Prerequisites)](#before-you-begin)
+- [Before You Begin (Prerequisites)](#before-you-begin-prerequisites)
 - [Installation](#installation)
 - [Upgrade](#upgrade)
 - [Uninstall](#uninstall)
