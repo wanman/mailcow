@@ -191,11 +191,11 @@ $lang['mailbox']['remove'] = 'Remover';
 $lang['mailbox']['edit'] = 'Alterar';
 $lang['mailbox']['view'] = 'Abrir';
 $lang['mailbox']['archive'] = 'Arquivo';
-$lang['mailbox']['no_record'] = 'No Record';
-$lang['mailbox']['add_domain'] = 'Adicionar domínio';
-$lang['mailbox']['add_domain_alias'] = 'Adicionar Domínio Alias';
-$lang['mailbox']['add_mailbox'] = 'Adicionar Mailbox';
-$lang['mailbox']['add_alias'] = 'Adicionar Alias';
+$lang['mailbox']['no_record'] = 'No Record'; //Needs Proofreading. Please delete this comment after proofreading.
+$lang['mailbox']['add_domain'] = 'Adicionar domínio'; //Needs Proofreading. Please delete this comment after proofreading.
+$lang['mailbox']['add_domain_alias'] = 'Adicionar Domínio Alias'; //Needs Proofreading. Please delete this comment after proofreading.
+$lang['mailbox']['add_mailbox'] = 'Adicionar Mailbox'; //Needs Proofreading. Please delete this comment after proofreading.
+$lang['mailbox']['add_alias'] = 'Adicionar Alias'; //Needs Proofreading. Please delete this comment after proofreading.
 
 $lang['info']['no_action'] = 'Nenhuma ação foi definida';
 $lang['delete']['title'] = 'Remover objeto';

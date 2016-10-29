@@ -195,11 +195,11 @@ $lang['mailbox']['remove'] = 'entfernen';
 $lang['mailbox']['edit'] = 'bearbeiten';
 $lang['mailbox']['view'] = 'öffnen';
 $lang['mailbox']['archive'] = 'Archiv-Zugriff';
-$lang['mailbox']['no_record'] = 'Keine Aufzeichnungen';
-$lang['mailbox']['add_domain'] = 'In domäne';
-$lang['mailbox']['add_domain_alias'] = 'Domain-Alias hinzufügen';
-$lang['mailbox']['add_mailbox'] = 'Mailbox hinzufügen';
-$lang['mailbox']['add_alias'] = 'In alias';
+$lang['mailbox']['no_record'] = 'Keine Aufzeichnungen'; //Needs Proofreading. Please delete this comment after proofreading.
+$lang['mailbox']['add_domain'] = 'In domäne'; //Needs Proofreading. Please delete this comment after proofreading.
+$lang['mailbox']['add_domain_alias'] = 'Domain-Alias hinzufügen'; //Needs Proofreading. Please delete this comment after proofreading.
+$lang['mailbox']['add_mailbox'] = 'Mailbox hinzufügen'; //Needs Proofreading. Please delete this comment after proofreading.
+$lang['mailbox']['add_alias'] = 'In alias'; //Needs Proofreading. Please delete this comment after proofreading.
 
 $lang['info']['no_action'] = 'Keine Aktion anwendbar';
 
