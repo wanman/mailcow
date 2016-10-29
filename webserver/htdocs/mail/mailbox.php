@@ -75,6 +75,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 						);
 						return false;
 					}
+	        if(!empty($rows)):
 					while($row = array_shift($rows)):
 						try {
 							$stmt = $pdo->prepare("SELECT COUNT(*) AS `count` FROM `alias`
@@ -100,7 +101,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							return false;
 						}
 					?>
-						<tr>
+						<tr id="data">
 							<td><?=$row['domain'];?></td>
 							<td><?=$AliasData['count'];?> / <?=$row['aliases'];?></td>
 							<td><?=$MailboxData['count'];?> / <?=$row['mailboxes'];?></td>
@@ -122,11 +123,27 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							else:
 							?>
 								<td><a href="/edit.php?domain=<?=urlencode($row['domain']);?>"><?=$lang['mailbox']['view'];?></a></td>
+						</tr>
 							<?php
 							endif;
 							endwhile;
+	            else:
 							?>
+							  <tr id="no-data"><td colspan="8" style="text-align: center; font-style: italic;"><?=$lang['mailbox']['no_record'];?></td></tr>
+							<?php
+							endif;
+							?>
+							<?php
+				        if ($_SESSION['mailcow_cc_role'] == "admin"):
+				      ?>
+						<tr id="no-data">
+							<td colspan="8" style="text-align: center; font-style: italic;">
+								<a href="/add.php?domain"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_domain'];?></a>
+							</td>
 						</tr>
+			      	<?php
+				        endif;
+				      ?>
 					</tbody>
 				</table>
 				</div>
@@ -183,9 +200,10 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							'msg' => 'MySQL: '.$e
 						);
 					}
+	        if(!empty($rows)):
 					while($row = array_shift($rows)):
 					?>
-						<tr>
+						<tr id="data">
 							<td><?=$row['alias_domain'];?></td>
 							<td><?=$row['target_domain'];?></td>
 							<td><?=$row['active'];?></td>
@@ -194,7 +212,17 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 						</tr>
 					<?php
 					endwhile;
+	        else:
+	        ?>
+						<tr id="no-data"><td colspan="4" style="text-align: center; font-style: italic;"><?=$lang['mailbox']['no_record'];?></td></tr>
+	        <?php
+	        endif;
 					?>
+						<tr id="no-data">
+							<td colspan="8" style="text-align: center; font-style: italic;">
+								<a href="/add.php?aliasdomain"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_domain_alias'];?></a>
+							</td>
+						</tr>
 					</tbody>
 				</table>
 				</div>
@@ -264,9 +292,10 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							);
 							return false;
 						}
+	          if(!empty($rows)):
 						while($row = array_shift($rows)):
 						?>
-						<tr>
+						<tr id="data">
 							<?php
 							if ($row['backupmx'] == "0"):
 							?>
@@ -307,7 +336,17 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 						</tr>
 						<?php
 						endwhile;
+	          else:
 						?>
+						  <tr id="no-data"><td colspan="8" style="text-align: center; font-style: italic;"><?=$lang['mailbox']['no_record'];?></td></tr>
+						<?php
+						endif;
+						?>
+						<tr id="no-data">
+							<td colspan="8" style="text-align: center; font-style: italic;">
+								<a href="/add.php?mailbox"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_mailbox'];?></a>
+							</td>
+						</tr>
 					</tbody>
 				</table>
 				</div>
@@ -373,9 +412,10 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 						);
 						return false;
 					}
+	        if(!empty($rows)):
 					while($row = array_shift($rows)):
 					?>
-						<tr>
+						<tr id="data">
 							<td>
 							<?php
 							if(!filter_var($row['address'], FILTER_VALIDATE_EMAIL)):
@@ -403,7 +443,17 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 						</tr>
 					<?php
 					endwhile;
+	        else:
 					?>
+					  <tr id="no-data"><td colspan="5" style="text-align: center; font-style: italic;"><?=$lang['mailbox']['no_record'];?></td></tr>
+					<?php
+					endif;	
+					?>
+						<tr id="no-data">
+							<td colspan="8" style="text-align: center; font-style: italic;">
+								<a href="/add.php?alias"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_alias'];?></a>
+							</td>
+						</tr>
 					</tbody>
 				</table>
 				</div>

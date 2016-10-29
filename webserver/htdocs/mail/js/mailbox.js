@@ -1,10 +1,10 @@
 $(document).ready(function() {
 	// Show element counter for tables
 	$('[data-toggle="tooltip"]').tooltip();
-	var rowCountDomainAlias = $('#domainaliastable >tbody >tr').length;
-	var rowCountDomain = $('#domaintable >tbody >tr').length;
-	var rowCountMailbox = $('#mailboxtable >tbody >tr').length;
-	var rowCountAlias = $('#aliastable >tbody >tr').length;
+	var rowCountDomainAlias = $('#domainaliastable >tbody >#data').length;
+	var rowCountDomain = $('#domaintable >tbody >#data').length;
+	var rowCountMailbox = $('#mailboxtable >tbody >#data').length;
+	var rowCountAlias = $('#aliastable >tbody >#data').length;
 	$("#numRowsDomainAlias").text(rowCountDomainAlias);
 	$("#numRowsDomain").text(rowCountDomain);
 	$("#numRowsMailbox").text(rowCountMailbox);
