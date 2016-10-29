@@ -195,6 +195,11 @@ $lang['mailbox']['remove'] = 'entfernen';
 $lang['mailbox']['edit'] = 'bearbeiten';
 $lang['mailbox']['view'] = 'öffnen';
 $lang['mailbox']['archive'] = 'Archiv-Zugriff';
+$lang['mailbox']['no_record'] = 'Keine Aufzeichnungen';
+$lang['mailbox']['add_domain'] = 'In domäne';
+$lang['mailbox']['add_domain_alias'] = 'Domain-Alias hinzufügen';
+$lang['mailbox']['add_mailbox'] = 'Mailbox hinzufügen';
+$lang['mailbox']['add_alias'] = 'In alias';
 
 $lang['info']['no_action'] = 'Keine Aktion anwendbar';
 
