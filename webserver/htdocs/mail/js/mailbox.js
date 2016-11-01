@@ -20,18 +20,20 @@ $(document).ready(function() {
                         search = $this.val().toLowerCase(),
                         target = $this.attr('data-filters'),
                         $target = $(target),
-                        $rows = $target.find('tbody tr');
+                        $rows = $target.find('tbody #data');
 					if(search == '') {
+						$target.find('tbody #no-data').show();
 						$rows.show();
 					} else {
+						$target.find('tbody #no-data').hide();
 						$rows.each(function(){
 							var $this = $(this);
 							$this.text().toLowerCase().indexOf(search) === -1 ? $this.hide() : $this.show();
 						})
-						if($target.find('tbody tr:visible').size() === 0) {
-							var col_count = $target.find('tr').first().find('td').size();
+						if($target.find('tbody #data:visible').size() === 0) {
+							var col_count = $target.find('#data').first().find('td').size();
 							var no_results = $('<tr class="filterTable_no_results"><td colspan="100%">-</td></tr>')
-							$target.find('tbody').append(no_results);
+							$target.find('tbody').prepend(no_results);
 						}
 					}
 				});
