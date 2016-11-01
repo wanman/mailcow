@@ -95,6 +95,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 									'msg' => 'MySQL: '.$e
 								);
 							}
+							if(!empty($rows_username)):
 							while ($row_user_state = array_shift($rows_username)):
 							?>
 							<tr>
@@ -125,6 +126,11 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 
 							<?php
 							endwhile;
+							else:
+							?>
+								<tr><td colspan="4" style="text-align: center; font-style: italic;"><?=$lang['admin']['no_record'];?></td></tr>
+							<?php
+							endif;
 							?>
 						</tbody>
 					</table>

@@ -352,4 +352,5 @@ $lang['admin']['no'] = '&#10008;';
 $lang['admin']['access'] = 'Zugang';
 $lang['admin']['site_not_found'] = 'Kann mailcow Site-Konfiguration nicht finden';
 $lang['admin']['set_rr_failed'] = 'Kann Postfix Restriktionen nicht setzen';
+$lang['admin']['no_record'] = 'No Record';  //Needs Proofreading. Please delete this comment after proofreading.
 ?>
