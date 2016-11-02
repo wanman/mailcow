@@ -161,6 +161,9 @@ if (preg_match("/mailbox.php/i", $_SERVER['REQUEST_URI'])):
 .clickable {
 	cursor: pointer;
 }
+.progress {
+	margin-bottom: 0px;	
+}
 </style>
 <?php
 endif;
