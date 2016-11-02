@@ -137,6 +137,7 @@ $lang['user']['tls_enforce_in'] = 'Forçar TLS na entrada';
 $lang['user']['tls_enforce_out'] = 'Forçar TLS na saída';
 $lang['user']['misc_settings'] = 'Outras configurações';
 $lang['user']['misc_delete_profile'] = 'Outras configurações';
+$lang['user']['no_record'] = 'Nenhum registro';
 $lang['start']['dashboard'] = '%s - Painel';
 $lang['start']['start_rc'] = 'Webmail Roundcube';
 $lang['start']['start_sogo'] = 'Abrir SOGo';
@@ -349,4 +350,5 @@ $lang['admin']['no'] = '&#10008;';
 $lang['admin']['access'] = 'Acessos';
 $lang['admin']['site_not_found'] = 'Não foi possível localizar as configuração do site Mailcow';
 $lang['admin']['set_rr_failed'] = 'Não foi possível alterar Postfix Restrictions';
+$lang['admin']['no_record'] = 'Nenhum registro';
 ?>
