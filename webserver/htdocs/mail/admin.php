@@ -67,13 +67,13 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 			<div class="panel-body">
 				<form method="post">
 					<div class="table-responsive">
-					<table class="table table-striped" id="domainadminstable">
+					<table class="table table-striped sortable" id="domainadminstable">
 						<thead>
 						<tr>
 							<th><?=$lang['admin']['username'];?></th>
 							<th><?=$lang['admin']['admin_domains'];?></th>
-							<th><?=$lang['admin']['active'];?></th>
-							<th><?=$lang['admin']['action'];?></th>
+							<th class="sorttable_nosort"><?=$lang['admin']['active'];?></th>
+							<th class="sorttable_nosort"><?=$lang['admin']['action'];?></th>
 						</tr>
 						</thead>
 						<tbody>
@@ -495,6 +495,7 @@ else {
 ?>
 </div> <!-- /container -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js" integrity="sha384-YWP9O4NjmcGo4oEJFXvvYSEzuHIvey+LbXkBNJ1Kd0yfugEZN9NCQNpRYBVC1RvA" crossorigin="anonymous"></script>
+<script src="js/sorttable.js"></script>
 <script src="js/admin.js"></script>
 <?php
 require_once("inc/footer.inc.php");
