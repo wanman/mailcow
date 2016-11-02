@@ -98,7 +98,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 							if(!empty($rows_username)):
 							while ($row_user_state = array_shift($rows_username)):
 							?>
-							<tr>
+							<tr id="data">
 								<td><?=strtolower($row_user_state['username']);?></td>
 								<td>
 								<?php
@@ -128,7 +128,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 							endwhile;
 							else:
 							?>
-								<tr><td colspan="4" style="text-align: center; font-style: italic;"><?=$lang['admin']['no_record'];?></td></tr>
+								<tr id="no-data"><td colspan="4" style="text-align: center; font-style: italic;"><?=$lang['admin']['no_record'];?></td></tr>
 							<?php
 							endif;
 							?>
