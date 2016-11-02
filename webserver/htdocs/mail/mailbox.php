@@ -27,7 +27,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					<input type="text" class="form-control" id="domaintable-filter" data-action="filter" data-filters="#domaintable" placeholder="Filter" />
 				</div>
 				<div class="table-responsive">
-				<table class="table table-striped sortable" id="domaintable">
+				<table class="table table-striped sortable-theme-bootstrap" data-sortable id="domaintable">
 					<thead>
 						<tr>
 							<th><?=$lang['mailbox']['domain'];?></th>
@@ -38,12 +38,12 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<?php
 							if ($_SESSION['mailcow_cc_role'] == "admin"):
 							?>
-								<th class="sorttable_nosort"><?=$lang['mailbox']['backup_mx'];?></th>
+								<th><?=$lang['mailbox']['backup_mx'];?></th>
 							<?php
 							endif;
 							?>
-							<th class="sorttable_nosort"><?=$lang['mailbox']['active'];?></th>
-							<th class="sorttable_nosort"><?=$lang['mailbox']['action'];?></th>
+							<th><?=$lang['mailbox']['active'];?></th>
+							<th data-sortable="false"><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -168,13 +168,13 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					<input type="text" class="form-control" id="domainaliastable-filter" data-action="filter" data-filters="#domainaliastable" placeholder="Filter" />
 				</div>
 				<div class="table-responsive">
-				<table class="table table-striped sortable" id="domainaliastable">
+				<table class="table table-striped sortable-theme-bootstrap" data-sortable id="domainaliastable">
 					<thead>
 						<tr>
 							<th><?=$lang['mailbox']['alias'];?></th>
 							<th><?=$lang['mailbox']['target_domain'];?></th>
-							<th class="sorttable_nosort"><?=$lang['mailbox']['active'];?></th>
-							<th class="sorttable_nosort"><?=$lang['mailbox']['action'];?></th>
+							<th><?=$lang['mailbox']['active'];?></th>
+							<th data-sortable="false"><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -249,7 +249,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					<input type="text" class="form-control" id="mailboxtable-filter" data-action="filter" data-filters="#mailboxtable" placeholder="Filter" />
 				</div>
 				<div class="table-responsive">
-				<table class="table table-striped sortable" id="mailboxtable">
+				<table class="table table-striped sortable-theme-bootstrap" data-sortable id="mailboxtable">
 					<thead>
 						<tr>
 							<th><?=$lang['mailbox']['username'];?></th>
@@ -258,8 +258,8 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<th><?=$lang['mailbox']['quota'];?></th>
 							<th><?=$lang['mailbox']['in_use'];?></th>
 							<th><?=$lang['mailbox']['msg_num'];?></th>
-							<th class="sorttable_nosort"><?=$lang['mailbox']['active'];?></th>
-							<th class="sorttable_nosort"><?=$lang['mailbox']['action'];?></th>
+							<th><?=$lang['mailbox']['active'];?></th>
+							<th data-sortable="false"><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -375,14 +375,14 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					<input type="text" class="form-control" id="aliastable-filter" data-action="filter" data-filters="#aliastable" placeholder="Filter" />
 				</div>
 				<div class="table-responsive">
-				<table class="table table-striped sortable" id="aliastable">
+				<table class="table table-striped sortable-theme-bootstrap" data-sortable id="aliastable">
 					<thead>
 						<tr>
 							<th><?=$lang['mailbox']['alias'];?></th>
 							<th><?=$lang['mailbox']['target_address'];?></th>
 							<th><?=$lang['mailbox']['domain'];?></th>
-							<th class="sorttable_nosort"><?=$lang['mailbox']['active'];?></th>
-							<th class="sorttable_nosort"><?=$lang['mailbox']['action'];?></th>
+							<th><?=$lang['mailbox']['active'];?></th>
+							<th data-sortable="false"><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>

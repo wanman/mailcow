@@ -67,13 +67,13 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 			<div class="panel-body">
 				<form method="post">
 					<div class="table-responsive">
-					<table class="table table-striped sortable" id="domainadminstable">
+					<table class="table table-striped sortable-theme-bootstrap" data-sortable id="domainadminstable">
 						<thead>
 						<tr>
 							<th><?=$lang['admin']['username'];?></th>
 							<th><?=$lang['admin']['admin_domains'];?></th>
-							<th class="sorttable_nosort"><?=$lang['admin']['active'];?></th>
-							<th class="sorttable_nosort"><?=$lang['admin']['action'];?></th>
+							<th><?=$lang['admin']['active'];?></th>
+							<th data-sortable="false"><?=$lang['admin']['action'];?></th>
 						</tr>
 						</thead>
 						<tbody>
