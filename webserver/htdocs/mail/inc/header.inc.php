@@ -79,6 +79,13 @@ ul[id$="sortable-inactive"] li {cursor:move }
 #slider1 .slider-track-low {
 	background: #66CD00;
 }
+table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after { 
+	content: " \25B4\25BE" 
+}
+table.sortable th:not(.sorttable_nosort) {
+	cursor: pointer;
+	cursor: hand;
+}
 </style>
 <?php
 if (preg_match("/mailbox.php/i", $_SERVER['REQUEST_URI'])):
@@ -96,13 +103,6 @@ if (preg_match("/mailbox.php/i", $_SERVER['REQUEST_URI'])):
 }
 .clickable {
 	cursor: pointer;
-}
-table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after { 
-	content: " \25B4\25BE" 
-}
-table.sortable th:not(.sorttable_nosort) {
-	cursor: pointer;
-	cursor: hand;
 }
 </style>
 <?php
