@@ -135,6 +135,7 @@ $lang['user']['tls_policy_warning'] = '<strong>Aviso:</strong> Se você selecion
 $lang['user']['tls_policy'] = 'Regras de Encryptação';
 $lang['user']['tls_enforce_in'] = 'Forçar TLS na entrada';
 $lang['user']['tls_enforce_out'] = 'Forçar TLS na saída';
+$lang['user']['no_record'] = 'Nenhum registro';
 $lang['user']['misc_settings'] = 'Outras configurações';
 $lang['user']['misc_delete_profile'] = 'Outras configurações';
 $lang['start']['dashboard'] = '%s - Painel';

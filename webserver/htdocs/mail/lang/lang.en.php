@@ -133,6 +133,7 @@ $lang['user']['tls_policy_warning'] = '<strong>Warning:</strong> If you decide t
 $lang['user']['tls_policy'] = 'Encryption policy';
 $lang['user']['tls_enforce_in'] = 'Enforce TLS incoming';
 $lang['user']['tls_enforce_out'] = 'Enforce TLS outgoing';
+$lang['user']['no_record'] = 'No Record';
 
 $lang['user']['misc_settings'] = 'Other profile settings';
 $lang['user']['misc_delete_profile'] = 'Other profile settings';

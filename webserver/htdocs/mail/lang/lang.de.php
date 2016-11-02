@@ -136,6 +136,7 @@ $lang['user']['tls_policy_warning'] = '<strong>Vorsicht:</strong> Entscheiden Si
 $lang['user']['tls_policy'] = 'Verschlüsselungsrichtlinie';
 $lang['user']['tls_enforce_in'] = 'TLS eingehend erzwingen';
 $lang['user']['tls_enforce_out'] = 'TLS ausgehend erzwingen';
+$lang['user']['no_record'] = 'No Record'; //Needs Proofreading. Please delete this comment after proofreading.
 
 $lang['user']['misc_settings'] = 'Sonstige Kontoeinstellungen';
 $lang['user']['misc_delete_profile'] = 'Sonstige Kontoeinstellungen';
@@ -352,5 +353,5 @@ $lang['admin']['no'] = '&#10008;';
 $lang['admin']['access'] = 'Zugang';
 $lang['admin']['site_not_found'] = 'Kann mailcow Site-Konfiguration nicht finden';
 $lang['admin']['set_rr_failed'] = 'Kann Postfix Restriktionen nicht setzen';
-$lang['admin']['no_record'] = 'No Record';  //Needs Proofreading. Please delete this comment after proofreading.
+$lang['admin']['no_record'] = 'No Record'; //Needs Proofreading. Please delete this comment after proofreading.
 ?>
