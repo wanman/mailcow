@@ -67,13 +67,13 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 			<div class="panel-body">
 				<form method="post">
 					<div class="table-responsive">
-					<table class="table table-striped" id="domainadminstable">
+					<table class="table table-striped sortable-theme-bootstrap" data-sortable id="domainadminstable">
 						<thead>
 						<tr>
 							<th><?=$lang['admin']['username'];?></th>
 							<th><?=$lang['admin']['admin_domains'];?></th>
 							<th><?=$lang['admin']['active'];?></th>
-							<th><?=$lang['admin']['action'];?></th>
+							<th data-sortable="false"><?=$lang['admin']['action'];?></th>
 						</tr>
 						</thead>
 						<tbody>
@@ -95,9 +95,10 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 									'msg' => 'MySQL: '.$e
 								);
 							}
+							if(!empty($rows_username)):
 							while ($row_user_state = array_shift($rows_username)):
 							?>
-							<tr>
+							<tr id="data">
 								<td><?=strtolower($row_user_state['username']);?></td>
 								<td>
 								<?php
@@ -125,6 +126,11 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 
 							<?php
 							endwhile;
+							else:
+							?>
+								<tr id="no-data"><td colspan="4" style="text-align: center; font-style: italic;"><?=$lang['admin']['no_record'];?></td></tr>
+							<?php
+							endif;
 							?>
 						</tbody>
 					</table>
@@ -489,6 +495,7 @@ else {
 ?>
 </div> <!-- /container -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js" integrity="sha384-YWP9O4NjmcGo4oEJFXvvYSEzuHIvey+LbXkBNJ1Kd0yfugEZN9NCQNpRYBVC1RvA" crossorigin="anonymous"></script>
+<script src="js/sorttable.js"></script>
 <script src="js/admin.js"></script>
 <?php
 require_once("inc/footer.inc.php");

@@ -64,7 +64,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 <div class="panel-body">
 <form class="form-horizontal" role="form" method="post">
 <div class="table-responsive">
-<table class="table table-striped" id="timelimitedaliases">
+<table class="table table-striped sortable-theme-bootstrap" data-sortable id="timelimitedaliases">
 	<thead>
 	<tr>
 		<th><?=$lang['user']['alias'];?></th>
@@ -89,14 +89,20 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 			'msg' => 'MySQL: '.$e
 		);
 	}
+	if(!empty($rows)):
 	while ($row = array_shift($rows)):
 	?>
-		<tr>
+		<tr id="data">
 		<td><?=$row['address'];?></td>
 		<td><?=date($lang['user']['alias_full_date'], $row['validity']);?></td>
 		</tr>
 	<?php
 	endwhile;
+	else:
+	?>
+		<tr id="no-data"><td colspan="2" style="text-align: center; font-style: italic;"><?=$lang['user']['no_record'];?></td></tr>
+	<?php
+	endif;	
 	?>
 	</tbody>
 </table>
@@ -307,6 +313,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 
 </div> <!-- /panel-group accordion -->
 </div> <!-- /container -->
+<script src="js/sorttable.js"></script>
 <script src="js/user.js"></script>
 <?php
 }

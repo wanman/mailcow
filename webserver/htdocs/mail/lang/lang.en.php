@@ -133,6 +133,7 @@ $lang['user']['tls_policy_warning'] = '<strong>Warning:</strong> If you decide t
 $lang['user']['tls_policy'] = 'Encryption policy';
 $lang['user']['tls_enforce_in'] = 'Enforce TLS incoming';
 $lang['user']['tls_enforce_out'] = 'Enforce TLS outgoing';
+$lang['user']['no_record'] = 'No Record';
 
 $lang['user']['misc_settings'] = 'Other profile settings';
 $lang['user']['misc_delete_profile'] = 'Other profile settings';
@@ -355,4 +356,5 @@ $lang['admin']['no'] = '&#10008;';
 $lang['admin']['access'] = 'Access';
 $lang['admin']['site_not_found'] = 'Cannot locate mailcow site configuration';
 $lang['admin']['set_rr_failed'] = 'Cannot set Postfix restrictions';
+$lang['admin']['no_record'] = 'No Record';
 ?>

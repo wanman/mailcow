@@ -27,7 +27,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					<input type="text" class="form-control" id="domaintable-filter" data-action="filter" data-filters="#domaintable" placeholder="Filter" />
 				</div>
 				<div class="table-responsive">
-				<table class="table table-striped" id="domaintable">
+				<table class="table table-striped sortable-theme-bootstrap" data-sortable id="domaintable">
 					<thead>
 						<tr>
 							<th><?=$lang['mailbox']['domain'];?></th>
@@ -43,7 +43,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							endif;
 							?>
 							<th><?=$lang['mailbox']['active'];?></th>
-							<th><?=$lang['mailbox']['action'];?></th>
+							<th data-sortable="false"><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -133,18 +133,20 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<?php
 							endif;
 							?>
-							<?php
-				        if ($_SESSION['mailcow_cc_role'] == "admin"):
-				      ?>
+					</tbody>
+						<?php
+						if ($_SESSION['mailcow_cc_role'] == "admin"):
+						?>
+					<tfoot>
 						<tr id="no-data">
-							<td colspan="8" style="text-align: center; font-style: italic;">
+							<td colspan="8" style="text-align: center; font-style: italic; border-top: 1px solid #e7e7e7;">
 								<a href="/add.php?domain"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_domain'];?></a>
 							</td>
 						</tr>
-			      	<?php
-				        endif;
-				      ?>
-					</tbody>
+					</tfoot>
+						<?php
+						endif;
+						?>
 				</table>
 				</div>
 			</div>
@@ -166,13 +168,13 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					<input type="text" class="form-control" id="domainaliastable-filter" data-action="filter" data-filters="#domainaliastable" placeholder="Filter" />
 				</div>
 				<div class="table-responsive">
-				<table class="table table-striped" id="domainaliastable">
+				<table class="table table-striped sortable-theme-bootstrap" data-sortable id="domainaliastable">
 					<thead>
 						<tr>
 							<th><?=$lang['mailbox']['alias'];?></th>
 							<th><?=$lang['mailbox']['target_domain'];?></th>
 							<th><?=$lang['mailbox']['active'];?></th>
-							<th><?=$lang['mailbox']['action'];?></th>
+							<th data-sortable="false"><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -218,12 +220,14 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 	        <?php
 	        endif;
 					?>
+					</tbody>
+					<tfoot>
 						<tr id="no-data">
-							<td colspan="8" style="text-align: center; font-style: italic;">
+							<td colspan="8" style="text-align: center; font-style: italic; border-top: 1px solid #e7e7e7;">
 								<a href="/add.php?aliasdomain"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_domain_alias'];?></a>
 							</td>
 						</tr>
-					</tbody>
+					</tfoot>
 				</table>
 				</div>
 			</div>
@@ -245,7 +249,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					<input type="text" class="form-control" id="mailboxtable-filter" data-action="filter" data-filters="#mailboxtable" placeholder="Filter" />
 				</div>
 				<div class="table-responsive">
-				<table class="table table-striped" id="mailboxtable">
+				<table class="table table-striped sortable-theme-bootstrap" data-sortable id="mailboxtable">
 					<thead>
 						<tr>
 							<th><?=$lang['mailbox']['username'];?></th>
@@ -255,7 +259,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<th><?=$lang['mailbox']['in_use'];?></th>
 							<th><?=$lang['mailbox']['msg_num'];?></th>
 							<th><?=$lang['mailbox']['active'];?></th>
-							<th><?=$lang['mailbox']['action'];?></th>
+							<th data-sortable="false"><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -342,12 +346,14 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 						<?php
 						endif;
 						?>
+					</tbody>
+					<tfoot>
 						<tr id="no-data">
-							<td colspan="8" style="text-align: center; font-style: italic;">
+							<td colspan="8" style="text-align: center; font-style: italic; border-top: 1px solid #e7e7e7;">
 								<a href="/add.php?mailbox"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_mailbox'];?></a>
 							</td>
 						</tr>
-					</tbody>
+					</tfoot>
 				</table>
 				</div>
 			</div>
@@ -369,14 +375,14 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					<input type="text" class="form-control" id="aliastable-filter" data-action="filter" data-filters="#aliastable" placeholder="Filter" />
 				</div>
 				<div class="table-responsive">
-				<table class="table table-striped" id="aliastable">
+				<table class="table table-striped sortable-theme-bootstrap" data-sortable id="aliastable">
 					<thead>
 						<tr>
 							<th><?=$lang['mailbox']['alias'];?></th>
 							<th><?=$lang['mailbox']['target_address'];?></th>
 							<th><?=$lang['mailbox']['domain'];?></th>
 							<th><?=$lang['mailbox']['active'];?></th>
-							<th><?=$lang['mailbox']['action'];?></th>
+							<th data-sortable="false"><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -449,18 +455,21 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					<?php
 					endif;	
 					?>
+					</tbody>
+					<tfoot>
 						<tr id="no-data">
-							<td colspan="8" style="text-align: center; font-style: italic;">
+							<td colspan="8" style="text-align: center; font-style: italic; border-top: 1px solid #e7e7e7;">
 								<a href="/add.php?alias"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_alias'];?></a>
 							</td>
 						</tr>
-					</tbody>
+					</tfoot>
 				</table>
 				</div>
 			</div>
 		</div>
 	</div>
 </div> <!-- /container -->
+<script src="js/sorttable.js"></script>
 <script src="js/mailbox.js"></script>
 <?php
 }
