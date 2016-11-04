@@ -29,11 +29,11 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 					);
 				}
 				?>
-					<input type="hidden" name="admin_user_now" value="<?=$AdminData['username'];?>">
+					<input type="hidden" name="admin_user_now" value="<?=htmlspecialchars($AdminData['username']);?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="admin_user"><?=$lang['admin']['admin'];?>:</label>
 						<div class="col-sm-10">
-							<input type="text" class="form-control" name="admin_user" id="admin_user" value="<?=$AdminData['username'];?>" required>
+							<input type="text" class="form-control" name="admin_user" id="admin_user" value="<?=htmlspecialchars($AdminData['username']);?>" required>
 							&rdsh; <kbd>a-z A-Z - _ .</kbd>
 						</div>
 					</div>
@@ -99,7 +99,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 							while ($row_user_state = array_shift($rows_username)):
 							?>
 							<tr id="data">
-								<td><?=strtolower($row_user_state['username']);?></td>
+								<td><?=htmlspecialchars(strtolower($row_user_state['username']));?></td>
 								<td>
 								<?php
 								try {
@@ -114,7 +114,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 									);
 								}
 								while ($row_domain = array_shift($rows_domain)) {
-									echo $row_domain['domain'].'<br />';
+									echo htmlspecialchars($row_domain['domain']).'<br />';
 								}
 								?>
 								</td>
@@ -162,7 +162,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 								);
 							}
 							while ($row = array_shift($rows)) {
-								echo "<option>".$row['domain']."</option>";
+								echo "<option>".htmlspecialchars($row['domain'])."</option>";
 							}
 							?>
 							</select>
@@ -320,7 +320,7 @@ foreach($ssr_values_inactive as $ssr_value) {
 	<div class="form-group">
 		<label class="control-label col-sm-4" for="location"><?=$lang['admin']['public_folder_name'];?>:</label>
 		<div class="col-sm-8">
-		<input type="text" class="form-control" name="public_folder_name" id="public_folder_name" value="<?=return_mailcow_config("public_folder_name");?>">
+		<input type="text" class="form-control" name="public_folder_name" id="public_folder_name" value="<?=htmlspecialchars(return_mailcow_config("public_folder_name"));?>">
 		</div>
 	</div>
 	<div class="form-group">
@@ -386,7 +386,7 @@ foreach($ssr_values_inactive as $ssr_value) {
 	?>
 		<div class="row">
 			<div class="col-xs-2">
-				<p>Domain: <strong><?=explode("_", $file)[1];?></strong> (<?=explode("_", $file)[0];?>._domainkey)</p>
+				<p>Domain: <strong><?=htmlspecialchars(explode("_", $file)[1]);?></strong> (<?=htmlspecialchars(explode("_", $file)[0]);?>._domainkey)</p>
 			</div>
 			<div class="col-xs-9">
 				<pre><?=$str;?></pre>
@@ -394,7 +394,7 @@ foreach($ssr_values_inactive as $ssr_value) {
 			<div class="col-xs-1">
 				<form class="form-inline" role="form" method="post">
 				<a href="#" onclick="$(this).closest('form').submit()"><span class="glyphicon glyphicon-remove-circle"></span></a>
-				<input type="hidden" name="delete_dkim_record" value="<?=$file;?>">
+				<input type="hidden" name="delete_dkim_record" value="<?=htmlspecialchars($file);?>">
 				</form>
 			</div>
 		</div>
@@ -430,7 +430,7 @@ foreach($ssr_values_inactive as $ssr_value) {
 <div id="collapseMsgSize" class="panel-collapse collapse">
 <div class="panel-body">
 <form class="form-inline" method="post">
-	<p><?=$lang['admin']['msg_size_limit'];?>: <strong><?=return_mailcow_config("maxmsgsize");?>MB</strong></p>
+	<p><?=$lang['admin']['msg_size_limit'];?>: <strong><?=intval(return_mailcow_config("maxmsgsize"));?> MB</strong></p>
 	<p><?=$lang['admin']['msg_size_limit_details'];?></p>
 	<div class="form-group">
 		<input type="number" class="form-control" id="maxmsgsize" name="maxmsgsize" placeholder="in MB" min="1" max="250" required>
