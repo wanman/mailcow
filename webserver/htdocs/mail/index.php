@@ -17,9 +17,7 @@ elseif (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "
 			<div class="panel panel-default">
 				<div class="panel-heading"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <?=$lang['login']['login'];?></div>
 				<div class="panel-body">
-					<center>
-						<img class="img-responsive" src="img/200.png" alt="mailcow">
-					</center>
+				  <img style="margin-left: auto; margin-right: auto;" class="img-responsive" src="img/200.png" alt="mailcow">
 					<legend>mailcow UI</legend>
 						<form method="post" autofill="off">
 						<div class="form-group">
