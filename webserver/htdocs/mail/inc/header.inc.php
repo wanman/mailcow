@@ -61,8 +61,8 @@ require_once 'inc/triggers.inc.php';
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.min.css">
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700&subset=latin,latin-ext">
 <link rel="stylesheet" href="/inc/languages.min.css">
-<link rel="shortcut icon" href="/favicon.png" type="image/png" />
-<link rel="icon" href="/favicon.png" type="image/png" />
+<link rel="shortcut icon" href="/favicon.png" type="image/png">
+<link rel="icon" href="/favicon.png" type="image/png">
 <style>
 ul[id*="sortable"] { word-wrap: break-word; list-style-type: none; float: left; padding: 0 15px 0 0; width: 48%; cursor:move}
 ul[id$="sortable-active"] li {cursor:move; }
@@ -160,6 +160,9 @@ if (preg_match("/mailbox.php/i", $_SERVER['REQUEST_URI'])):
 }
 .clickable {
 	cursor: pointer;
+}
+.progress {
+	margin-bottom: 0px;	
 }
 </style>
 <?php
