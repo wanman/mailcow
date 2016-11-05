@@ -145,7 +145,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 									);
 								}
 								while ($row = array_shift($rows)) {
-										echo "<option>".$row['domain']."</option>";
+										echo "<option>".htmlspecialchars($row['domain'])."</option>";
 								}
 								?>
 							</select>
@@ -199,7 +199,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 								);
 							}
 							while ($row = array_shift($rows)) {
-								echo "<option>".$row['domain']."</option>";
+								echo "<option>".htmlspecialchars($row['domain'])."</option>";
 							}
 							?>
 							</select>
