@@ -93,8 +93,8 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 	while ($row = array_shift($rows)):
 	?>
 		<tr id="data">
-		<td><?=$row['address'];?></td>
-		<td><?=date($lang['user']['alias_full_date'], $row['validity']);?></td>
+		<td><?=htmlspecialchars($row['address']);?></td>
+		<td><?=htmlspecialchars(date($lang['user']['alias_full_date'], $row['validity']));?></td>
 		</tr>
 	<?php
 	endwhile;
@@ -204,7 +204,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 				?>
 				<div class="row">
 					<form class="form-inline" method="post">
-					<div class="col-sm-6"><?=$whitelistRow['value'];?></div>
+					<div class="col-sm-6"><?=htmlspecialchars($whitelistRow['value']);?></div>
 					<div class="col-sm-6">
 						<input type="hidden" name="wlid" value="<?=$whitelistRow['prefid'];?>">
 						<button type="submit" id="trigger_delete_whitelist" name="trigger_delete_whitelist" style="margin-bottom:1px;" class="btn btn-xs btn-danger"><?=$lang['user']['spamfilter_table_remove'];?></button>
@@ -253,7 +253,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 				?>
 				<div class="row">
 					<form class="form-inline" method="post">
-					<div class="col-sm-6"><?=$blacklistRow['value'];?></div>
+					<div class="col-sm-6"><?=htmlspecialchars($blacklistRow['value']);?></div>
 					<div class="col-sm-6">
 						<input type="hidden" name="wlid" value="<?=$blacklistRow['prefid'];?>">
 						<button type="submit" id="trigger_delete_blacklist" name="trigger_delete_blacklist" style="margin-bottom:1px;" class="btn btn-xs btn-danger"><?=$lang['user']['spamfilter_table_remove'];?></button>
