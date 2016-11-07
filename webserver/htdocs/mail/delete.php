@@ -21,7 +21,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_domain_warning'], htmlspecialchars($_GET["domain"]));?></div>
 				<p><?=$lang['delete']['remove_domain_details'];?></p>
 				<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
-				<input type="hidden" name="domain" value="<?php echo $domain ?>">
+				<input type="hidden" name="domain" value="<?php echo htmlspecialchars($domain) ?>">
 					<div class="form-group">
 						<div class="col-sm-offset-1 col-sm-10">
 							<button type="submit" name="trigger_mailbox_action" value="deletedomain" class="btn btn-default btn-sm"><?=$lang['delete']['remove_button'];?></button>
@@ -40,7 +40,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 					<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_alias_warning'], htmlspecialchars($_GET["alias"]));?></div>
 					<p><?=$lang['delete']['remove_alias_details'];?></p>
 					<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
-					<input type="hidden" name="address" value="<?php echo $_GET["alias"] ?>">
+					<input type="hidden" name="address" value="<?php echo htmlspecialchars($_GET["alias"]) ?>">
 						<div class="form-group">
 							<div class="col-sm-offset-1 col-sm-10">
 								<button type="submit" name="trigger_mailbox_action" value="deletealias" class="btn btn-default btn-sm"><?=$lang['delete']['remove_button'];?></button>
@@ -77,7 +77,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				?>
 					<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_domainalias_warning'], htmlspecialchars($_GET["aliasdomain"]));?></div>
 					<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
-					<input type="hidden" name="alias_domain" value="<?php echo $alias_domain ?>">
+					<input type="hidden" name="alias_domain" value="<?php echo htmlspecialchars($alias_domain) ?>">
 						<div class="form-group">
 							<div class="col-sm-offset-1 col-sm-10">
 								<button type="submit" name="trigger_mailbox_action" value="deletealiasdomain" class="btn btn-default btn-sm"><?=$lang['delete']['remove_button'];?></button>
@@ -101,7 +101,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				?>
 				<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_domainadmin_warning'], htmlspecialchars($_GET["domainadmin"]));?></div>
 				<form class="form-horizontal" role="form" method="post" action="/admin.php">
-				<input type="hidden" name="username" value="<?=$domain_admin;?>">
+				<input type="hidden" name="username" value="<?=htmlspecialchars($domain_admin);?>">
 					<div class="form-group">
 						<div class="col-sm-offset-1 col-sm-10">
 							<button type="submit" name="trigger_delete_domain_admin" class="btn btn-default btn-sm"><?=$lang['delete']['remove_button'];?></button>
@@ -121,7 +121,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 					<div class="alert alert-warning" role="alert"><?=sprintf($lang['delete']['remove_mailbox_warning'], htmlspecialchars($_GET["mailbox"]));?></div>
 					<p><?=$lang['delete']['remove_mailbox_details'];?></p>
 					<form class="form-horizontal" role="form" method="post" action="/mailbox.php">
-					<input type="hidden" name="username" value="<?=$mailbox;?>">
+					<input type="hidden" name="username" value="<?=htmlspecialchars($mailbox);?>">
 						<div class="form-group">
 							<div class="col-sm-offset-1 col-sm-10">
 								<button type="submit" name="trigger_mailbox_action" value="deletemailbox" class="btn btn-default btn-sm"><?=$lang['delete']['remove_button'];?></button>

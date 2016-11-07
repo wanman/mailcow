@@ -102,11 +102,11 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 						}
 					?>
 						<tr id="data">
-							<td><?=$row['domain'];?></td>
-							<td><?=$AliasData['count'];?> / <?=$row['aliases'];?></td>
+							<td><?=htmlspecialchars($row['domain']);?></td>
+							<td><?=intval($AliasData['count']);?> / <?=intval($row['aliases']);?></td>
 							<td><?=$MailboxData['count'];?> / <?=$row['mailboxes'];?></td>
-							<td><?=formatBytes($row['maxquota'], 2);?></td>
-							<td><?=formatBytes($MailboxData['quota'], 2);?> / <?=formatBytes($row['quota']);?></td>
+							<td><?=formatBytes(intval($row['maxquota']), 2);?></td>
+							<td><?=formatBytes(intval($MailboxData['quota']), 2);?> / <?=formatBytes(intval($row['quota']));?></td>
 							<?php
 							if ($_SESSION['mailcow_cc_role'] == "admin"):
 							?>
@@ -206,8 +206,8 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					while($row = array_shift($rows)):
 					?>
 						<tr id="data">
-							<td><?=$row['alias_domain'];?></td>
-							<td><?=$row['target_domain'];?></td>
+							<td><?=htmlspecialchars($row['alias_domain']);?></td>
+							<td><?=htmlspecialchars($row['target_domain']);?></td>
 							<td><?=$row['active'];?></td>
 							<td><a href="/delete.php?aliasdomain=<?=urlencode($row['alias_domain']);?>"><?=$lang['mailbox']['remove'];?></a> |
 							<a href="/edit.php?aliasdomain=<?=urlencode($row['alias_domain']);?>"><?=$lang['mailbox']['edit'];?></a></td>
@@ -303,20 +303,20 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<?php
 							if ($row['backupmx'] == "0"):
 							?>
-								<td><?=$row['username'];?></td>
+								<td><?=htmlspecialchars($row['username']);?></td>
 							<?php
 							else:
 							?>
-								<td><span data-toggle="tooltip" title="Relayed"><i class="glyphicon glyphicon-forward"></i> <?=$row['username'];?></span></td>
+								<td><span data-toggle="tooltip" title="Relayed"><i class="glyphicon glyphicon-forward"></i> <?=htmlspecialchars($row['username']);?></span></td>
 							<?php
 							endif;
 							?>
-							<td><?=utf8_encode($row['name']);?></td>
-							<td><?=$row['domain'];?></td>
-							<td><?=formatBytes($row['bytes'], 2);?> / <?=formatBytes($row['quota'], 2);?></td>
+							<td><?=htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8');?></td>
+							<td><?=htmlspecialchars($row['domain']);?></td>
+							<td><?=formatBytes(intval($row['bytes']), 2);?> / <?=formatBytes(intval($row['quota']), 2);?></td>
 							<td style="min-width:120px;">
 								<?php
-								$percentInUse = round(($row['bytes'] / $row['quota']) * 100);
+								$percentInUse = round((intval($row['bytes']) / intval($row['quota'])) * 100);
 								if ($percentInUse >= 90) {
 									$pbar = "progress-bar-danger";
 								}
@@ -426,21 +426,21 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<?php
 							if(!filter_var($row['address'], FILTER_VALIDATE_EMAIL)):
 							?>
-								<span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span> Catch-all @<?=$row['domain'];?>
+								<span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span> Catch-all @<?=htmlspecialchars($row['domain']);?>
 							<?php
 							else:
-								echo $row['address'];
+								echo htmlspecialchars($row['address']);
 							endif;
 							?>
 							</td>
 							<td>
 							<?php
 							foreach(explode(",", $row['goto']) as $goto) {
-								echo nl2br($goto.PHP_EOL);
+								echo nl2br(htmlspecialchars($goto.PHP_EOL));
 							}
 							?>
 							</td>
-							<td><?=$row['domain'];?></td>
+							<td><?=htmlspecialchars($row['domain']);?></td>
 							<td><?=$row['active'];?></td>
 							<td>
 								<a href="/delete.php?alias=<?=urlencode($row['address']);?>"><?=$lang['mailbox']['remove'];?></a> 
