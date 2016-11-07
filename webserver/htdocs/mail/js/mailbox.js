@@ -15,12 +15,12 @@ $(document).ready(function() {
 		filterTable: function(){
 			return this.each(function(){
 				$(this).on('keyup', function(e){
-					$('.filterTable_no_results').remove();
 					var $this = $(this),
                         search = $this.val().toLowerCase(),
                         target = $this.attr('data-filters'),
                         $target = $(target),
                         $rows = $target.find('tbody #data');
+					$target.find('tbody .filterTable_no_results').remove();
 					if(search == '') {
 						$target.find('tbody #no-data').show();
 						$rows.show();
