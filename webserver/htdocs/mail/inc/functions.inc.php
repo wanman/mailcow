@@ -2580,7 +2580,7 @@ function delete_blacklist($postarray) {
 	global $lang;
 	global $pdo;
 	$username	= $_SESSION['mailcow_cc_username'];
-	$prefid		= $postarray['wlid'];
+	$prefid		= $postarray['blid'];
 	if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
