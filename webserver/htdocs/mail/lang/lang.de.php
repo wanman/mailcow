@@ -136,7 +136,7 @@ $lang['user']['tls_policy_warning'] = '<strong>Vorsicht:</strong> Entscheiden Si
 $lang['user']['tls_policy'] = 'Verschlüsselungsrichtlinie';
 $lang['user']['tls_enforce_in'] = 'TLS eingehend erzwingen';
 $lang['user']['tls_enforce_out'] = 'TLS ausgehend erzwingen';
-$lang['user']['no_record'] = 'No Record'; //Needs Proofreading. Please delete this comment after proofreading.
+$lang['user']['no_record'] = 'Kein Eintrag';
 
 $lang['user']['misc_settings'] = 'Sonstige Kontoeinstellungen';
 $lang['user']['misc_delete_profile'] = 'Sonstige Kontoeinstellungen';
@@ -196,11 +196,11 @@ $lang['mailbox']['remove'] = 'entfernen';
 $lang['mailbox']['edit'] = 'bearbeiten';
 $lang['mailbox']['view'] = 'öffnen';
 $lang['mailbox']['archive'] = 'Archiv-Zugriff';
-$lang['mailbox']['no_record'] = 'Keine Aufzeichnungen'; //Needs Proofreading. Please delete this comment after proofreading.
-$lang['mailbox']['add_domain'] = 'In domäne'; //Needs Proofreading. Please delete this comment after proofreading.
-$lang['mailbox']['add_domain_alias'] = 'Domain-Alias hinzufügen'; //Needs Proofreading. Please delete this comment after proofreading.
-$lang['mailbox']['add_mailbox'] = 'Mailbox hinzufügen'; //Needs Proofreading. Please delete this comment after proofreading.
-$lang['mailbox']['add_alias'] = 'In alias'; //Needs Proofreading. Please delete this comment after proofreading.
+$lang['mailbox']['no_record'] = 'Kein Eintrag';
+$lang['mailbox']['add_domain'] = 'Domain hinzufügen';
+$lang['mailbox']['add_domain_alias'] = 'Domain-Alias hinzufügen';
+$lang['mailbox']['add_mailbox'] = 'Mailbox hinzufügen';
+$lang['mailbox']['add_alias'] = 'Alias hinzufügen';
 
 $lang['info']['no_action'] = 'Keine Aktion anwendbar';
 
@@ -353,5 +353,5 @@ $lang['admin']['no'] = '&#10008;';
 $lang['admin']['access'] = 'Zugang';
 $lang['admin']['site_not_found'] = 'Kann mailcow Site-Konfiguration nicht finden';
 $lang['admin']['set_rr_failed'] = 'Kann Postfix Restriktionen nicht setzen';
-$lang['admin']['no_record'] = 'No Record'; //Needs Proofreading. Please delete this comment after proofreading.
+$lang['admin']['no_record'] = 'Kein Eintrag';
 ?>
