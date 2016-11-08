@@ -64,6 +64,7 @@ require_once 'inc/triggers.inc.php';
 <link rel="shortcut icon" href="/favicon.png" type="image/png">
 <link rel="icon" href="/favicon.png" type="image/png">
 <style>
+#maxmsgsize { min-width: 80px; }
 ul[id*="sortable"] { word-wrap: break-word; list-style-type: none; float: left; padding: 0 15px 0 0; width: 48%; cursor:move}
 ul[id$="sortable-active"] li {cursor:move; }
 ul[id$="sortable-inactive"] li {cursor:move }
@@ -162,7 +163,7 @@ if (preg_match("/mailbox.php/i", $_SERVER['REQUEST_URI'])):
 	cursor: pointer;
 }
 .progress {
-	margin-bottom: 0px;	
+	margin-bottom: 0px;
 }
 </style>
 <?php
