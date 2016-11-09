@@ -70,10 +70,10 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 					<table class="table table-striped sortable-theme-bootstrap" data-sortable id="domainadminstable">
 						<thead>
 						<tr>
-							<th><?=$lang['admin']['username'];?></th>
-							<th><?=$lang['admin']['admin_domains'];?></th>
-							<th><?=$lang['admin']['active'];?></th>
-							<th data-sortable="false"><?=$lang['admin']['action'];?></th>
+							<th style="min-width: 100px;"><?=$lang['admin']['username'];?></th>
+							<th style="min-width: 166px;"><?=$lang['admin']['admin_domains'];?></th>
+							<th style="min-width: 76px;"><?=$lang['admin']['active'];?></th>
+							<th style="min-width: 100px;" data-sortable="false"><?=$lang['admin']['action'];?></th>
 						</tr>
 						</thead>
 						<tbody>
