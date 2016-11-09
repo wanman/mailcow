@@ -30,20 +30,20 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 				<table class="table table-striped sortable-theme-bootstrap" data-sortable id="domaintable">
 					<thead>
 						<tr>
-							<th><?=$lang['mailbox']['domain'];?></th>
-							<th><?=$lang['mailbox']['aliases'];?></th>
-							<th><?=$lang['mailbox']['mailboxes'];?></th>
-							<th><?=$lang['mailbox']['mailbox_quota'];?></th>
-							<th><?=$lang['mailbox']['domain_quota'];?></th>
+							<th style="min-width: 86px;"><?=$lang['mailbox']['domain'];?></th>
+							<th style="min-width: 81px;"><?=$lang['mailbox']['aliases'];?></th>
+							<th style="min-width: 99px;"><?=$lang['mailbox']['mailboxes'];?></th>
+							<th style="min-width: 172px;"><?=$lang['mailbox']['mailbox_quota'];?></th>
+							<th style="min-width: 117px;"><?=$lang['mailbox']['domain_quota'];?></th>
 							<?php
 							if ($_SESSION['mailcow_cc_role'] == "admin"):
 							?>
-								<th><?=$lang['mailbox']['backup_mx'];?></th>
+								<th style="min-width: 105px;"><?=$lang['mailbox']['backup_mx'];?></th>
 							<?php
 							endif;
 							?>
-							<th><?=$lang['mailbox']['active'];?></th>
-							<th data-sortable="false"><?=$lang['mailbox']['action'];?></th>
+							<th style="min-width: 76px;"><?=$lang['mailbox']['active'];?></th>
+							<th style="min-width: 77px;" data-sortable="false"><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -171,10 +171,10 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 				<table class="table table-striped sortable-theme-bootstrap" data-sortable id="domainaliastable">
 					<thead>
 						<tr>
-							<th><?=$lang['mailbox']['alias'];?></th>
-							<th><?=$lang['mailbox']['target_domain'];?></th>
-							<th><?=$lang['mailbox']['active'];?></th>
-							<th data-sortable="false"><?=$lang['mailbox']['action'];?></th>
+							<th style="min-width: 67px;"><?=$lang['mailbox']['alias'];?></th>
+							<th style="min-width: 127px;"><?=$lang['mailbox']['target_domain'];?></th>
+							<th style="min-width: 76px;"><?=$lang['mailbox']['active'];?></th>
+							<th style="min-width: 77px;" data-sortable="false"><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -252,14 +252,14 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 				<table class="table table-striped sortable-theme-bootstrap" data-sortable id="mailboxtable">
 					<thead>
 						<tr>
-							<th><?=$lang['mailbox']['username'];?></th>
-							<th><?=$lang['mailbox']['fname'];?></th>
-							<th><?=$lang['mailbox']['domain'];?></th>
-							<th><?=$lang['mailbox']['quota'];?></th>
-							<th><?=$lang['mailbox']['in_use'];?></th>
-							<th><?=$lang['mailbox']['msg_num'];?></th>
-							<th><?=$lang['mailbox']['active'];?></th>
-							<th data-sortable="false"><?=$lang['mailbox']['action'];?></th>
+							<th style="min-width: 100px;"><?=$lang['mailbox']['username'];?></th>
+							<th style="min-width: 98px;"><?=$lang['mailbox']['fname'];?></th>
+							<th style="min-width: 86px;"><?=$lang['mailbox']['domain'];?></th>
+							<th style="min-width: 75px;"><?=$lang['mailbox']['quota'];?></th>
+							<th style="min-width: 99px;"><?=$lang['mailbox']['in_use'];?></th>
+							<th style="min-width: 100px;"><?=$lang['mailbox']['msg_num'];?></th>
+							<th style="min-width: 76px;"><?=$lang['mailbox']['active'];?></th>
+							<th style="min-width: 77px;" data-sortable="false"><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -378,11 +378,11 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 				<table class="table table-striped sortable-theme-bootstrap" data-sortable id="aliastable">
 					<thead>
 						<tr>
-							<th><?=$lang['mailbox']['alias'];?></th>
-							<th><?=$lang['mailbox']['target_address'];?></th>
-							<th><?=$lang['mailbox']['domain'];?></th>
-							<th><?=$lang['mailbox']['active'];?></th>
-							<th data-sortable="false"><?=$lang['mailbox']['action'];?></th>
+							<th style="min-width: 67px;"><?=$lang['mailbox']['alias'];?></th>
+							<th style="min-width: 119px;"><?=$lang['mailbox']['target_address'];?></th>
+							<th style="min-width: 86px;"><?=$lang['mailbox']['domain'];?></th>
+							<th style="min-width: 76px;"><?=$lang['mailbox']['active'];?></th>
+							<th style="min-width: 77px;" data-sortable="false"><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
