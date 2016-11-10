@@ -67,8 +67,8 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 <table class="table table-striped sortable-theme-bootstrap" data-sortable id="timelimitedaliases">
 	<thead>
 	<tr>
-		<th><?=$lang['user']['alias'];?></th>
-		<th><?=$lang['user']['alias_valid_until'];?></th>
+		<th style="min-width: 96px;"><?=$lang['user']['alias'];?></th>
+		<th style="min-width: 135px;"><?=$lang['user']['alias_valid_until'];?></th>
 	</tr>
 	</thead>
 	<tbody>
