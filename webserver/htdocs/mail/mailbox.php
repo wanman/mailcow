@@ -30,20 +30,20 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 				<table class="table table-striped sortable-theme-bootstrap" data-sortable id="domaintable">
 					<thead>
 						<tr>
-							<th style="min-width: 86px;"><?=$lang['mailbox']['domain'];?></th>
-							<th style="min-width: 81px;"><?=$lang['mailbox']['aliases'];?></th>
-							<th style="min-width: 99px;"><?=$lang['mailbox']['mailboxes'];?></th>
-							<th style="min-width: 172px;"><?=$lang['mailbox']['mailbox_quota'];?></th>
-							<th style="min-width: 117px;"><?=$lang['mailbox']['domain_quota'];?></th>
+							<th class="sort-table" style="min-width: 86px;"><?=$lang['mailbox']['domain'];?></th>
+							<th class="sort-table" style="min-width: 81px;"><?=$lang['mailbox']['aliases'];?></th>
+							<th class="sort-table" style="min-width: 99px;"><?=$lang['mailbox']['mailboxes'];?></th>
+							<th class="sort-table" style="min-width: 172px;"><?=$lang['mailbox']['mailbox_quota'];?></th>
+							<th class="sort-table" style="min-width: 117px;"><?=$lang['mailbox']['domain_quota'];?></th>
 							<?php
 							if ($_SESSION['mailcow_cc_role'] == "admin"):
 							?>
-								<th style="min-width: 105px;"><?=$lang['mailbox']['backup_mx'];?></th>
+								<th class="sort-table" style="min-width: 105px;"><?=$lang['mailbox']['backup_mx'];?></th>
 							<?php
 							endif;
 							?>
-							<th style="min-width: 76px;"><?=$lang['mailbox']['active'];?></th>
-							<th style="min-width: 77px;" data-sortable="false"><?=$lang['mailbox']['action'];?></th>
+							<th class="sort-table" style="min-width: 76px;"><?=$lang['mailbox']['active'];?></th>
+							<th style="text-align: right; min-width: 200px;" data-sortable="false"><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -118,11 +118,20 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<?php
 							if ($_SESSION['mailcow_cc_role'] == "admin"):
 							?>
-								<td><a href="/delete.php?domain=<?=urlencode($row['domain']);?>"><?=$lang['mailbox']['remove'];?></a> | <a href="/edit.php?domain=<?=urlencode($row['domain']);?>"><?=$lang['mailbox']['edit'];?></a></td>
+								<td style="text-align: right;">
+									<div class="btn-group">
+										<a href="/edit.php?domain=<?=urlencode($row['domain']);?>" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-pencil"></span> <?=$lang['mailbox']['edit'];?></a>
+										<a href="/delete.php?domain=<?=urlencode($row['domain']);?>" class="btn-del btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span> <?=$lang['mailbox']['remove'];?></a>
+									</div>
+								</td>
 							<?php
 							else:
 							?>
-								<td><a href="/edit.php?domain=<?=urlencode($row['domain']);?>"><?=$lang['mailbox']['view'];?></a></td>
+								<td style="text-align: right;">
+									<div class="btn-group">
+										<a href="/edit.php?domain=<?=urlencode($row['domain']);?>" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-pencil"></span> <?=$lang['mailbox']['edit'];?></a>
+									</div>
+								</td>
 						</tr>
 							<?php
 							endif;
@@ -139,8 +148,8 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 						?>
 					<tfoot>
 						<tr id="no-data">
-							<td colspan="8" style="text-align: center; font-style: italic; border-top: 1px solid #e7e7e7;">
-								<a href="/add.php?domain"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_domain'];?></a>
+							<td colspan="8" style="text-align: center; font-style: normal; border-top: 1px solid #e7e7e7;">
+								<a href="/add.php?domain" class="btn btn-xs btn-primary"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_domain'];?></a>
 							</td>
 						</tr>
 					</tfoot>
@@ -171,10 +180,10 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 				<table class="table table-striped sortable-theme-bootstrap" data-sortable id="domainaliastable">
 					<thead>
 						<tr>
-							<th style="min-width: 67px;"><?=$lang['mailbox']['alias'];?></th>
-							<th style="min-width: 127px;"><?=$lang['mailbox']['target_domain'];?></th>
-							<th style="min-width: 76px;"><?=$lang['mailbox']['active'];?></th>
-							<th style="min-width: 77px;" data-sortable="false"><?=$lang['mailbox']['action'];?></th>
+							<th class="sort-table" style="min-width: 67px;"><?=$lang['mailbox']['alias'];?></th>
+							<th class="sort-table" style="min-width: 127px;"><?=$lang['mailbox']['target_domain'];?></th>
+							<th class="sort-table" style="min-width: 76px;"><?=$lang['mailbox']['active'];?></th>
+							<th style="text-align: right; min-width: 200px;" data-sortable="false"><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -209,8 +218,12 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<td><?=htmlspecialchars($row['alias_domain']);?></td>
 							<td><?=htmlspecialchars($row['target_domain']);?></td>
 							<td><?=$row['active'];?></td>
-							<td><a href="/delete.php?aliasdomain=<?=urlencode($row['alias_domain']);?>"><?=$lang['mailbox']['remove'];?></a> |
-							<a href="/edit.php?aliasdomain=<?=urlencode($row['alias_domain']);?>"><?=$lang['mailbox']['edit'];?></a></td>
+							<td style="text-align: right;">
+								<div class="btn-group">
+									<a href="/edit.php?aliasdomain=<?=urlencode($row['alias_domain']);?>" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-pencil"></span> <?=$lang['mailbox']['edit'];?></a>
+									<a href="/delete.php?aliasdomain=<?=urlencode($row['alias_domain']);?>" class="btn-del btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span> <?=$lang['mailbox']['remove'];?></a>
+								</div>
+							</td>
 						</tr>
 					<?php
 					endwhile;
@@ -223,8 +236,8 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					</tbody>
 					<tfoot>
 						<tr id="no-data">
-							<td colspan="8" style="text-align: center; font-style: italic; border-top: 1px solid #e7e7e7;">
-								<a href="/add.php?aliasdomain"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_domain_alias'];?></a>
+							<td colspan="8" style="text-align: center; border-top: 1px solid #e7e7e7;">
+								<a href="/add.php?aliasdomain" class="btn btn-xs btn-primary"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_domain_alias'];?></a>
 							</td>
 						</tr>
 					</tfoot>
@@ -252,14 +265,14 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 				<table class="table table-striped sortable-theme-bootstrap" data-sortable id="mailboxtable">
 					<thead>
 						<tr>
-							<th style="min-width: 100px;"><?=$lang['mailbox']['username'];?></th>
-							<th style="min-width: 98px;"><?=$lang['mailbox']['fname'];?></th>
-							<th style="min-width: 86px;"><?=$lang['mailbox']['domain'];?></th>
-							<th style="min-width: 75px;"><?=$lang['mailbox']['quota'];?></th>
-							<th style="min-width: 99px;"><?=$lang['mailbox']['in_use'];?></th>
-							<th style="min-width: 100px;"><?=$lang['mailbox']['msg_num'];?></th>
-							<th style="min-width: 76px;"><?=$lang['mailbox']['active'];?></th>
-							<th style="min-width: 77px;" data-sortable="false"><?=$lang['mailbox']['action'];?></th>
+							<th class="sort-table" style="min-width: 100px;"><?=$lang['mailbox']['username'];?></th>
+							<th class="sort-table" style="min-width: 98px;"><?=$lang['mailbox']['fname'];?></th>
+							<th class="sort-table" style="min-width: 86px;"><?=$lang['mailbox']['domain'];?></th>
+							<th class="sort-table" style="min-width: 75px;"><?=$lang['mailbox']['quota'];?></th>
+							<th class="sort-table" style="min-width: 99px;"><?=$lang['mailbox']['in_use'];?></th>
+							<th class="sort-table" style="min-width: 100px;"><?=$lang['mailbox']['msg_num'];?></th>
+							<th class="sort-table" style="min-width: 76px;"><?=$lang['mailbox']['active'];?></th>
+							<th style="text-align: right; min-width: 200px;" data-sortable="false"><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -335,8 +348,12 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							</td>
 							<td><?=$row['messages'];?></td>
 							<td><?=$row['active'];?></td>
-							<td><a href="/delete.php?mailbox=<?=urlencode($row['username']);?>"><?=$lang['mailbox']['remove'];?></a> | 
-							<a href="/edit.php?mailbox=<?=urlencode($row['username']);?>"><?=$lang['mailbox']['edit'];?></a></td>
+							<td style="text-align: right;">
+								<div class="btn-group">
+									<a href="/edit.php?mailbox=<?=urlencode($row['username']);?>" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-pencil"></span> <?=$lang['mailbox']['edit'];?></a>
+									<a href="/delete.php?mailbox=<?=urlencode($row['username']);?>" class="btn-del btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span> <?=$lang['mailbox']['remove'];?></a>
+								</div>
+							</td>
 						</tr>
 						<?php
 						endwhile;
@@ -349,8 +366,8 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					</tbody>
 					<tfoot>
 						<tr id="no-data">
-							<td colspan="8" style="text-align: center; font-style: italic; border-top: 1px solid #e7e7e7;">
-								<a href="/add.php?mailbox"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_mailbox'];?></a>
+							<td colspan="8" style="text-align: center; border-top: 1px solid #e7e7e7;">
+								<a href="/add.php?mailbox" class="btn btn-xs btn-primary"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_mailbox'];?></a>
 							</td>
 						</tr>
 					</tfoot>
@@ -378,11 +395,11 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 				<table class="table table-striped sortable-theme-bootstrap" data-sortable id="aliastable">
 					<thead>
 						<tr>
-							<th style="min-width: 67px;"><?=$lang['mailbox']['alias'];?></th>
-							<th style="min-width: 119px;"><?=$lang['mailbox']['target_address'];?></th>
-							<th style="min-width: 86px;"><?=$lang['mailbox']['domain'];?></th>
-							<th style="min-width: 76px;"><?=$lang['mailbox']['active'];?></th>
-							<th style="min-width: 77px;" data-sortable="false"><?=$lang['mailbox']['action'];?></th>
+							<th class="sort-table" style="min-width: 67px;"><?=$lang['mailbox']['alias'];?></th>
+							<th class="sort-table" style="min-width: 119px;"><?=$lang['mailbox']['target_address'];?></th>
+							<th class="sort-table" style="min-width: 86px;"><?=$lang['mailbox']['domain'];?></th>
+							<th class="sort-table" style="min-width: 76px;"><?=$lang['mailbox']['active'];?></th>
+							<th style="text-align: right; min-width: 200px;" data-sortable="false"><?=$lang['mailbox']['action'];?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -442,9 +459,11 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							</td>
 							<td><?=htmlspecialchars($row['domain']);?></td>
 							<td><?=$row['active'];?></td>
-							<td>
-								<a href="/delete.php?alias=<?=urlencode($row['address']);?>"><?=$lang['mailbox']['remove'];?></a> 
-								| <a href="/edit.php?alias=<?=urlencode($row['address']);?>"><?=$lang['mailbox']['edit'];?></a>
+							<td style="text-align: right;">
+								<div class="btn-group">
+									<a href="/edit.php?alias=<?=urlencode($row['address']);?>" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-pencil"></span> <?=$lang['mailbox']['edit'];?></a>
+									<a href="/delete.php?alias=<?=urlencode($row['address']);?>" class="btn-del btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span> <?=$lang['mailbox']['remove'];?></a>
+								</div>
 							</td>
 						</tr>
 					<?php
@@ -458,8 +477,8 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					</tbody>
 					<tfoot>
 						<tr id="no-data">
-							<td colspan="8" style="text-align: center; font-style: italic; border-top: 1px solid #e7e7e7;">
-								<a href="/add.php?alias"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_alias'];?></a>
+							<td colspan="8" style="text-align: center; border-top: 1px solid #e7e7e7;">
+								<a href="/add.php?alias" class="btn btn-xs btn-primary"><span class="glyphicon glyphicon-plus"></span> <?=$lang['mailbox']['add_alias'];?></a>
 							</td>
 						</tr>
 					</tfoot>
