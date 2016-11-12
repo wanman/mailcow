@@ -150,10 +150,6 @@ table[data-sortable].sortable-theme-bootstrap.sortable-theme-bootstrap-striped t
 .btn {
    text-transform: none;
 }
-.btn-del, .btn-del:hover {
-	background-color: #F22613;
-	border-color: #CF3A24;
-}
 #data td, #no-data td {
 	vertical-align: middle;
 }
