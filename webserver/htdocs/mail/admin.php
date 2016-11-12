@@ -70,10 +70,10 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 					<table class="table table-striped sortable-theme-bootstrap" data-sortable id="domainadminstable">
 						<thead>
 						<tr>
-							<th style="min-width: 100px;"><?=$lang['admin']['username'];?></th>
-							<th style="min-width: 166px;"><?=$lang['admin']['admin_domains'];?></th>
-							<th style="min-width: 76px;"><?=$lang['admin']['active'];?></th>
-							<th style="min-width: 77px;" data-sortable="false"><?=$lang['admin']['action'];?></th>
+							<th class="sort-table" style="min-width: 100px;"><?=$lang['admin']['username'];?></th>
+							<th class="sort-table" style="min-width: 166px;"><?=$lang['admin']['admin_domains'];?></th>
+							<th class="sort-table" style="min-width: 76px;"><?=$lang['admin']['active'];?></th>
+							<th style="text-align: right; min-width: 200px;" data-sortable="false"><?=$lang['admin']['action'];?></th>
 						</tr>
 						</thead>
 						<tbody>
@@ -119,8 +119,12 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 								?>
 								</td>
 								<td><?=$row_user_state['active'];?></td>
-								<td><a href="delete.php?domainadmin=<?=$row_user_state['username'];?>"><?=$lang['admin']['remove'];?></a> |
-									<a href="edit.php?domainadmin=<?=$row_user_state['username'];?>"><?=$lang['admin']['edit'];?></a></td>
+								<td style="text-align: right;">
+									<div class="btn-group">
+										<a href="edit.php?domainadmin=<?=$row_user_state['username'];?>" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-pencil"></span> <?=$lang['admin']['edit'];?></a>
+										<a href="delete.php?domainadmin=<?=$row_user_state['username'];?>" class="btn-del btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span> <?=$lang['admin']['remove'];?></a>
+									</div>
+								</td>
 								</td>
 							</tr>
 
