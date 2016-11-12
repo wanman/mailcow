@@ -116,6 +116,9 @@ table[data-sortable] th:after {
   margin-left: 10px;
   float: right;
 }
+table[data-sortable] th[data-sortable="false"]:after {
+  display: none;
+}
 table[data-sortable] th[data-sorted="true"]:after {
   visibility: visible;
 }
@@ -143,6 +146,19 @@ table[data-sortable].sortable-theme-bootstrap th[data-sorted="true"][data-sorted
 }
 table[data-sortable].sortable-theme-bootstrap.sortable-theme-bootstrap-striped tbody > tr:nth-child(odd) > td {
   background-color: #f9f9f9;
+}
+.btn {
+   text-transform: none;
+}
+.btn-del, .btn-del:hover {
+	background-color: #F22613;
+	border-color: #CF3A24;
+}
+#data td, #no-data td {
+	vertical-align: middle;
+}
+.sort-table:hover {
+  border-bottom-color: #00B7DC !important;
 }
 </style>
 <?php
