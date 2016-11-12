@@ -121,7 +121,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 								<td style="text-align: right;">
 									<div class="btn-group">
 										<a href="/edit.php?domain=<?=urlencode($row['domain']);?>" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-pencil"></span> <?=$lang['mailbox']['edit'];?></a>
-										<a href="/delete.php?domain=<?=urlencode($row['domain']);?>" class="btn-del btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span> <?=$lang['mailbox']['remove'];?></a>
+										<a href="/delete.php?domain=<?=urlencode($row['domain']);?>" class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span> <?=$lang['mailbox']['remove'];?></a>
 									</div>
 								</td>
 							<?php
@@ -221,7 +221,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<td style="text-align: right;">
 								<div class="btn-group">
 									<a href="/edit.php?aliasdomain=<?=urlencode($row['alias_domain']);?>" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-pencil"></span> <?=$lang['mailbox']['edit'];?></a>
-									<a href="/delete.php?aliasdomain=<?=urlencode($row['alias_domain']);?>" class="btn-del btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span> <?=$lang['mailbox']['remove'];?></a>
+									<a href="/delete.php?aliasdomain=<?=urlencode($row['alias_domain']);?>" class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span> <?=$lang['mailbox']['remove'];?></a>
 								</div>
 							</td>
 						</tr>
@@ -351,7 +351,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<td style="text-align: right;">
 								<div class="btn-group">
 									<a href="/edit.php?mailbox=<?=urlencode($row['username']);?>" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-pencil"></span> <?=$lang['mailbox']['edit'];?></a>
-									<a href="/delete.php?mailbox=<?=urlencode($row['username']);?>" class="btn-del btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span> <?=$lang['mailbox']['remove'];?></a>
+									<a href="/delete.php?mailbox=<?=urlencode($row['username']);?>" class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span> <?=$lang['mailbox']['remove'];?></a>
 								</div>
 							</td>
 						</tr>
@@ -462,7 +462,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<td style="text-align: right;">
 								<div class="btn-group">
 									<a href="/edit.php?alias=<?=urlencode($row['address']);?>" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-pencil"></span> <?=$lang['mailbox']['edit'];?></a>
-									<a href="/delete.php?alias=<?=urlencode($row['address']);?>" class="btn-del btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span> <?=$lang['mailbox']['remove'];?></a>
+									<a href="/delete.php?alias=<?=urlencode($row['address']);?>" class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span> <?=$lang['mailbox']['remove'];?></a>
 								</div>
 							</td>
 						</tr>
