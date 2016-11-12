@@ -192,7 +192,6 @@ $lang['mailbox']['in_use'] = 'Em uso (%)';
 $lang['mailbox']['msg_num'] = 'Mensagens';
 $lang['mailbox']['remove'] = 'Remover';
 $lang['mailbox']['edit'] = 'Alterar';
-$lang['mailbox']['view'] = 'Abrir';
 $lang['mailbox']['archive'] = 'Arquivo';
 $lang['mailbox']['no_record'] = 'Nenhum registro';
 $lang['mailbox']['add_domain'] = 'Adicionar Domínio';
