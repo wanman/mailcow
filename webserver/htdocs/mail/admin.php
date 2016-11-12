@@ -122,7 +122,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 								<td style="text-align: right;">
 									<div class="btn-group">
 										<a href="edit.php?domainadmin=<?=$row_user_state['username'];?>" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-pencil"></span> <?=$lang['admin']['edit'];?></a>
-										<a href="delete.php?domainadmin=<?=$row_user_state['username'];?>" class="btn-del btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span> <?=$lang['admin']['remove'];?></a>
+										<a href="delete.php?domainadmin=<?=$row_user_state['username'];?>" class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span> <?=$lang['admin']['remove'];?></a>
 									</div>
 								</td>
 								</td>
