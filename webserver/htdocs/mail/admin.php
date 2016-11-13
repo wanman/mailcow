@@ -1,9 +1,9 @@
 <?php
+require_once("inc/prerequisites.inc.php");
+
+if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "admin") {
 require_once("inc/header.inc.php");
 $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
-?>
-<?php
-if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admin') {
 ?>
 <div class="container">
 <h4><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <?=$lang['admin']['access'];?></h4>
@@ -490,17 +490,13 @@ foreach($ssr_values_inactive as $ssr_value) {
 	</div>
 </div>
 </div>
-<?php
-}
-else {
-	header('Location: /');
-	die("Permission denied");
-}
-?>
 </div> <!-- /container -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js" integrity="sha384-YWP9O4NjmcGo4oEJFXvvYSEzuHIvey+LbXkBNJ1Kd0yfugEZN9NCQNpRYBVC1RvA" crossorigin="anonymous"></script>
 <script src="js/sorttable.js"></script>
 <script src="js/admin.js"></script>
 <?php
 require_once("inc/footer.inc.php");
+} else {
+	header('Location: /');
+}
 ?>
