@@ -1,5 +1,9 @@
 <?php
 require_once("inc/prerequisites.inc.php");
+$AuthUsers = array("admin", "domainadmin");
+if (!isset($_SESSION['mailcow_cc_role']) OR !in_array($_SESSION['mailcow_cc_role'], $AuthUsers)) {
+	header('Location: /');
+}
 require_once("inc/header.inc.php");
 ?>
 <div class="container">
