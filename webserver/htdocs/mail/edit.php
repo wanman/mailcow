@@ -1,4 +1,5 @@
 <?php
+require_once("inc/prerequisites.inc.php");
 require_once("inc/header.inc.php");
 ?>
 <div class="container">
