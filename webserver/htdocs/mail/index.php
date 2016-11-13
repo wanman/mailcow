@@ -1,7 +1,7 @@
 <?php
-require_once("inc/header.inc.php");
-$_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
-if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admin') {
+require_once("inc/prerequisites.inc.php");
+
+if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "admin") {
 	header('Location: /admin.php');
 }
 elseif (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "domainadmin") {
@@ -10,6 +10,8 @@ elseif (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "
 elseif (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == "user") {
 	header('Location: /user.php');
 }
+require_once("inc/header.inc.php");
+$_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 ?>
 <div class="container">
 	<div class="row">
