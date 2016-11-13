@@ -218,7 +218,7 @@ $lang['delete']['previous'] = 'Vorherige Seite';
 $lang['edit']['save'] = 'Änderungen speichern';
 $lang['edit']['archive'] = 'Archiv-Zugriff';
 $lang['edit']['max_mailboxes'] = 'Max. Mailboxanzahl:';
-$lang['edit']['title'] = 'Objekt einsehen und bearbeiten';
+$lang['edit']['title'] = 'Objekt bearbeiten';
 $lang['edit']['target_address'] = 'Ziel-Adresse(n) <small>(getrennt durch Komma)</small>:';
 $lang['edit']['active'] = 'Aktiv';
 $lang['edit']['target_domain'] = 'Ziel-Domain:';
@@ -254,7 +254,7 @@ $lang['edit']['previous'] = 'Vorherige Seite';
 $lang['edit']['unchanged_if_empty'] = 'Unverändert, wenn leer';
 $lang['edit']['dont_check_sender_acl'] = 'Absender für Domain %s nicht prüfen';
 
-$lang['add']['object'] = 'Objekt anlegen';
+$lang['add']['title'] = 'Objekt anlegen';
 $lang['add']['domain'] = 'Domain';
 $lang['add']['active'] = 'Aktiv';
 $lang['add']['save'] = 'Änderungen speichern';
