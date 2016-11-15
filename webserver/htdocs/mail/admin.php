@@ -29,11 +29,11 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 					);
 				}
 				?>
-					<input type="hidden" name="admin_user_now" value="<?=$AdminData['username'];?>">
+					<input type="hidden" name="admin_user_now" value="<?=htmlspecialchars($AdminData['username']);?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="admin_user"><?=$lang['admin']['admin'];?>:</label>
 						<div class="col-sm-10">
-							<input type="text" class="form-control" name="admin_user" id="admin_user" value="<?=$AdminData['username'];?>" required>
+							<input type="text" class="form-control" name="admin_user" id="admin_user" value="<?=htmlspecialchars($AdminData['username']);?>" required>
 							&rdsh; <kbd>a-z A-Z - _ .</kbd>
 						</div>
 					</div>
@@ -67,13 +67,13 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 			<div class="panel-body">
 				<form method="post">
 					<div class="table-responsive">
-					<table class="table table-striped" id="domainadminstable">
+					<table class="table table-striped sortable-theme-bootstrap" data-sortable id="domainadminstable">
 						<thead>
 						<tr>
-							<th><?=$lang['admin']['username'];?></th>
-							<th><?=$lang['admin']['admin_domains'];?></th>
-							<th><?=$lang['admin']['active'];?></th>
-							<th><?=$lang['admin']['action'];?></th>
+							<th class="sort-table" style="min-width: 100px;"><?=$lang['admin']['username'];?></th>
+							<th class="sort-table" style="min-width: 166px;"><?=$lang['admin']['admin_domains'];?></th>
+							<th class="sort-table" style="min-width: 76px;"><?=$lang['admin']['active'];?></th>
+							<th style="text-align: right; min-width: 200px;" data-sortable="false"><?=$lang['admin']['action'];?></th>
 						</tr>
 						</thead>
 						<tbody>
@@ -95,10 +95,11 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 									'msg' => 'MySQL: '.$e
 								);
 							}
+							if(!empty($rows_username)):
 							while ($row_user_state = array_shift($rows_username)):
 							?>
-							<tr>
-								<td><?=strtolower($row_user_state['username']);?></td>
+							<tr id="data">
+								<td><?=htmlspecialchars(strtolower($row_user_state['username']));?></td>
 								<td>
 								<?php
 								try {
@@ -113,18 +114,27 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 									);
 								}
 								while ($row_domain = array_shift($rows_domain)) {
-									echo $row_domain['domain'].'<br />';
+									echo htmlspecialchars($row_domain['domain']).'<br />';
 								}
 								?>
 								</td>
 								<td><?=$row_user_state['active'];?></td>
-								<td><a href="delete.php?domainadmin=<?=$row_user_state['username'];?>"><?=$lang['admin']['remove'];?></a> |
-									<a href="edit.php?domainadmin=<?=$row_user_state['username'];?>"><?=$lang['admin']['edit'];?></a></td>
+								<td style="text-align: right;">
+									<div class="btn-group">
+										<a href="edit.php?domainadmin=<?=$row_user_state['username'];?>" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-pencil"></span> <?=$lang['admin']['edit'];?></a>
+										<a href="delete.php?domainadmin=<?=$row_user_state['username'];?>" class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span> <?=$lang['admin']['remove'];?></a>
+									</div>
+								</td>
 								</td>
 							</tr>
 
 							<?php
 							endwhile;
+							else:
+							?>
+								<tr id="no-data"><td colspan="4" style="text-align: center; font-style: italic;"><?=$lang['admin']['no_record'];?></td></tr>
+							<?php
+							endif;
 							?>
 						</tbody>
 					</table>
@@ -156,7 +166,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'admi
 								);
 							}
 							while ($row = array_shift($rows)) {
-								echo "<option>".$row['domain']."</option>";
+								echo "<option>".htmlspecialchars($row['domain'])."</option>";
 							}
 							?>
 							</select>
@@ -314,7 +324,7 @@ foreach($ssr_values_inactive as $ssr_value) {
 	<div class="form-group">
 		<label class="control-label col-sm-4" for="location"><?=$lang['admin']['public_folder_name'];?>:</label>
 		<div class="col-sm-8">
-		<input type="text" class="form-control" name="public_folder_name" id="public_folder_name" value="<?=return_mailcow_config("public_folder_name");?>">
+		<input type="text" class="form-control" name="public_folder_name" id="public_folder_name" value="<?=htmlspecialchars(return_mailcow_config("public_folder_name"));?>">
 		</div>
 	</div>
 	<div class="form-group">
@@ -380,7 +390,7 @@ foreach($ssr_values_inactive as $ssr_value) {
 	?>
 		<div class="row">
 			<div class="col-xs-2">
-				<p>Domain: <strong><?=explode("_", $file)[1];?></strong> (<?=explode("_", $file)[0];?>._domainkey)</p>
+				<p>Domain: <strong><?=htmlspecialchars(explode("_", $file)[1]);?></strong> (<?=htmlspecialchars(explode("_", $file)[0]);?>._domainkey)</p>
 			</div>
 			<div class="col-xs-9">
 				<pre><?=$str;?></pre>
@@ -388,7 +398,7 @@ foreach($ssr_values_inactive as $ssr_value) {
 			<div class="col-xs-1">
 				<form class="form-inline" role="form" method="post">
 				<a href="#" onclick="$(this).closest('form').submit()"><span class="glyphicon glyphicon-remove-circle"></span></a>
-				<input type="hidden" name="delete_dkim_record" value="<?=$file;?>">
+				<input type="hidden" name="delete_dkim_record" value="<?=htmlspecialchars($file);?>">
 				</form>
 			</div>
 		</div>
@@ -424,7 +434,7 @@ foreach($ssr_values_inactive as $ssr_value) {
 <div id="collapseMsgSize" class="panel-collapse collapse">
 <div class="panel-body">
 <form class="form-inline" method="post">
-	<p><?=$lang['admin']['msg_size_limit'];?>: <strong><?=return_mailcow_config("maxmsgsize");?>MB</strong></p>
+	<p><?=$lang['admin']['msg_size_limit'];?>: <strong><?=intval(return_mailcow_config("maxmsgsize"));?> MB</strong></p>
 	<p><?=$lang['admin']['msg_size_limit_details'];?></p>
 	<div class="form-group">
 		<input type="number" class="form-control" id="maxmsgsize" name="maxmsgsize" placeholder="in MB" min="1" max="250" required>
@@ -489,6 +499,7 @@ else {
 ?>
 </div> <!-- /container -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js" integrity="sha384-YWP9O4NjmcGo4oEJFXvvYSEzuHIvey+LbXkBNJ1Kd0yfugEZN9NCQNpRYBVC1RvA" crossorigin="anonymous"></script>
+<script src="js/sorttable.js"></script>
 <script src="js/admin.js"></script>
 <?php
 require_once("inc/footer.inc.php");

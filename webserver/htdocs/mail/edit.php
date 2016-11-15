@@ -6,7 +6,7 @@ require_once("inc/header.inc.php");
 		<div class="col-md-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title"><?=reset($_GET);?> - <?=$lang['edit']['title'];?></h3>
+					<h3 class="panel-title"><?=htmlspecialchars(reset($_GET));?> - <?=$lang['edit']['title'];?></h3>
 				</div>
 				<div class="panel-body">
 <?php
@@ -46,11 +46,11 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 					<h4><?=$lang['edit']['alias'];?></h4>
 					<br />
 					<form class="form-horizontal" role="form" method="post" action="<?=($FORM_ACTION == "previous") ? $_SESSION['return_to'] : null;?>">
-					<input type="hidden" name="address" value="<?=$alias;?>">
+					<input type="hidden" name="address" value="<?=htmlspecialchars($alias);?>">
 						<div class="form-group">
 							<label class="control-label col-sm-2" for="goto"><?=$lang['edit']['target_address'];?></label>
 							<div class="col-sm-10">
-								<textarea class="form-control" autocapitalize="none" autocorrect="off" rows="10" id="goto" name="goto"><?=$result['goto'] ?></textarea>
+								<textarea class="form-control" autocapitalize="none" autocorrect="off" rows="10" id="goto" name="goto"><?=htmlspecialchars($result['goto']) ?></textarea>
 							</div>
 						</div>
 						<div class="form-group">
@@ -98,7 +98,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 				<h4><?=$lang['edit']['domain_admin'];?></h4>
 				<br />
 				<form class="form-horizontal" role="form" method="post" action="<?=($FORM_ACTION == "previous") ? $_SESSION['return_to'] : null;?>">
-				<input type="hidden" name="username" value="<?=$domain_admin;?>">
+				<input type="hidden" name="username" value="<?=htmlspecialchars($domain_admin);?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="domain"><?=$lang['edit']['domains'];?></label>
 						<div class="col-sm-10">
@@ -120,7 +120,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							}
 							while ($row_selected = array_shift($rows)):
 							?>
-								<option selected><?=$row_selected['domain'];?></option>
+								<option selected><?=htmlspecialchars($row_selected['domain']);?></option>
 							<?php
 							endwhile;
 							try {
@@ -139,7 +139,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							}
 							while ($row_unselected = array_shift($rows)):
 							?>
-								<option><?=$row_unselected['domain'];?></option>
+								<option><?=htmlspecialchars($row_unselected['domain']);?></option>
 							<?php
 							endwhile;
 							?>
@@ -209,7 +209,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			?>
 				<h4><?=$lang['edit']['domain'];?></h4>
 				<form class="form-horizontal" role="form" method="post" action="<?=($FORM_ACTION == "previous") ? $_SESSION['return_to'] : null;?>">
-				<input type="hidden" name="domain" value="<?=$domain;?>">
+				<input type="hidden" name="domain" value="<?=htmlspecialchars($domain);?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="description"><?=$lang['edit']['description'];?></label>
 						<div class="col-sm-10">
@@ -222,25 +222,25 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="aliases"><?=$lang['edit']['max_aliases'];?></label>
 						<div class="col-sm-10">
-							<input type="number" class="form-control" name="aliases" id="aliases" value="<?=$result['aliases'];?>">
+							<input type="number" class="form-control" name="aliases" id="aliases" value="<?=intval($result['aliases']);?>">
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="mailboxes"><?=$lang['edit']['max_mailboxes'];?></label>
 						<div class="col-sm-10">
-							<input type="number" class="form-control" name="mailboxes" id="mailboxes" value="<?=$result['mailboxes'];?>">
+							<input type="number" class="form-control" name="mailboxes" id="mailboxes" value="<?=intval($result['mailboxes']);?>">
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="maxquota"><?=$lang['edit']['max_quota'];?></label>
 						<div class="col-sm-10">
-							<input type="number" class="form-control" name="maxquota" id="maxquota" value="<?=$result['maxquota'];?>">
+							<input type="number" class="form-control" name="maxquota" id="maxquota" value="<?=intval($result['maxquota']);?>">
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="quota"><?=$lang['edit']['domain_quota'];?></label>
 						<div class="col-sm-10">
-							<input type="number" class="form-control" name="quota" id="quota" value="<?=$result['quota'];?>">
+							<input type="number" class="form-control" name="quota" id="quota" value="<?=intval($result['quota']);?>">
 						</div>
 					</div>
 					<div class="form-group">
@@ -289,11 +289,11 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							<div class="col-xs-10">
 								<div class="col-md-2"><b><?=$lang['edit']['dkim_txt_name'];?></b></div>
 								<div class="col-md-10">
-									<pre><?=explode("_", $file)[0];?>._domainkey</pre>
+									<pre><?=htmlspecialchars(explode("_", $file)[0]);?>._domainkey</pre>
 								</div>
 								<div class="col-md-2"><b><?=$lang['edit']['dkim_txt_value'];?></b></div>
 								<div class="col-md-10">
-									<pre><?=$str;?></pre>
+									<pre><?=htmlspecialchars($str);?></pre>
 									<?=$lang['edit']['dkim_record_info'];?>
 								</div>
 							</div>
@@ -340,7 +340,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			?>
 				<h4><?=$lang['edit']['edit_alias_domain'];?></h4>
 				<form class="form-horizontal" role="form" method="post" action="<?=($FORM_ACTION == "previous") ? $_SESSION['return_to'] : null;?>">
-					<input type="hidden" name="alias_domain_now" value="<?=$alias_domain;?>">
+					<input type="hidden" name="alias_domain_now" value="<?=htmlspecialchars($alias_domain);?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="alias_domain"><?=$lang['edit']['alias_domain'];?></label>
 						<div class="col-sm-10">
@@ -379,11 +379,11 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							<div class="col-xs-10">
 								<div class="col-md-2"><b><?=$lang['edit']['dkim_txt_name'];?></b></div>
 								<div class="col-md-10">
-									<pre><?=explode("_", $file)[0];?>._domainkey</pre>
+									<pre><?=htmlspecialchars(explode("_", $file)[0]);?>._domainkey</pre>
 								</div>
 								<div class="col-md-2"><b><?=$lang['edit']['dkim_txt_value'];?></b></div>
 								<div class="col-md-10">
-									<pre><?=$str;?></pre>
+									<pre><?=htmlspecialchars($str);?></pre>
 									<?=$lang['edit']['dkim_record_info'];?>
 								</div>
 							</div>
@@ -418,19 +418,19 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 			?>
 				<h4><?=$lang['edit']['mailbox'];?></h4>
 				<form class="form-horizontal" role="form" method="post" action="<?=($FORM_ACTION == "previous") ? $_SESSION['return_to'] : null;?>">
-				<input type="hidden" name="username" value="<?=$result['username'];?>">
+				<input type="hidden" name="username" value="<?=htmlspecialchars($result['username']);?>">
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="name"><?=$lang['edit']['full_name'];?>:</label>
 						<div class="col-sm-10">
-						<input type="text" class="form-control" name="name" id="name" value="<?=utf8_encode($result['name']);?>">
+						<input type="text" class="form-control" name="name" id="name" value="<?=htmlspecialchars($result['name'], ENT_QUOTES, 'UTF-8');?>">
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2" for="quota"><?=$lang['edit']['quota_mb'];?>:
-							<br /><span id="quotaBadge" class="badge">max. <?=$left_m?> MiB</span>
+							<br /><span id="quotaBadge" class="badge">max. <?=intval($left_m)?> MiB</span>
 						</label>
 						<div class="col-sm-10">
-							<input type="number" name="quota" id="quota" id="destroyable" style="width:100%" min="1" max="<?=$left_m;?>" value="<?=$result['quota'] / 1048576;?>" class="form-control">
+							<input type="number" name="quota" id="quota" id="destroyable" style="width:100%" min="1" max="<?=intval($left_m);?>" value="<?=intval($result['quota']) / 1048576;?>" class="form-control">
 						</div>
 					</div>
 					<div class="form-group">
@@ -441,7 +441,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							$rows = get_sender_acl_handles($mailbox, "preselected");
 							while ($row_goto_from_alias = array_shift($rows)):
 							?>
-								<option disabled selected><?=$row_goto_from_alias['address'];?></option>
+								<option disabled selected><?=htmlspecialchars($row_goto_from_alias['address']);?></option>
 							<?php
 							endwhile;
 
@@ -451,12 +451,12 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 									if (!filter_var($row_selected_sender_acl['send_as'], FILTER_VALIDATE_EMAIL)):
 									?>
 										<option data-divider="true"></option>
-											<option value="<?=$row_selected_sender_acl['send_as'];?>" selected><?=sprintf($lang['edit']['dont_check_sender_acl'], str_replace('@', '', $row_selected_sender_acl['send_as']));?></option>
+											<option value="<?=htmlspecialchars($row_selected_sender_acl['send_as']);?>" selected><?=htmlspecialchars(sprintf($lang['edit']['dont_check_sender_acl'], str_replace('@', '', $row_selected_sender_acl['send_as'])));?></option>
 										<option data-divider="true"></option>
 									<?php
 									else:
 									?>
-										<option selected><?=$row_selected_sender_acl['send_as'];?></option>
+										<option selected><?=htmlspecialchars($row_selected_sender_acl['send_as']);?></option>
 									<?php
 									endif;
 							endwhile;
@@ -466,7 +466,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							while ($row_unselected_sender_acl = array_shift($rows)):
 							?>
 								<option data-divider="true"></option>
-									<option value="@<?=$row_unselected_sender_acl['domain'];?>"><?=sprintf($lang['edit']['dont_check_sender_acl'], $row_unselected_sender_acl['domain']);?></option>
+									<option value="@<?=htmlspecialchars($row_unselected_sender_acl['domain']);?>"><?=htmlspecialchars(sprintf($lang['edit']['dont_check_sender_acl'], $row_unselected_sender_acl['domain']));?></option>
 								<option data-divider="true"></option>
 							<?php
 							endwhile;
@@ -475,7 +475,7 @@ if (isset($_SESSION['mailcow_cc_role']) && ($_SESSION['mailcow_cc_role'] == "adm
 							$rows = get_sender_acl_handles($mailbox, "unselected-addresses");
 							while ($row_unselected_sender_acl = array_shift($rows)):
 							?>
-								<option><?=$row_unselected_sender_acl['address'];?></option>
+								<option><?=htmlspecialchars($row_unselected_sender_acl['address']);?></option>
 							<?php
 							endwhile;
 							?>

@@ -56,14 +56,15 @@ require_once 'inc/triggers.inc.php';
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.0/jquery.min.js" integrity="sha384-XxcvoeNF5V0ZfksTnV+bejnCsJjOOIzN6UVwF85WBsAnU3zeYh5bloN+L4WLgeNE" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css">
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/<?=strtolower(trim($DEFAULT_THEME));?>/bootstrap.min.css">
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.9.4/css/bootstrap-select.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/7.0.2/css/bootstrap-slider.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.min.css" rel="stylesheet" />
-<link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700&subset=latin,latin-ext" rel="stylesheet" type="text/css">
-<link rel="stylesheet" href="/inc/languages.min.css" rel="stylesheet" />
-<link rel="shortcut icon" href="/favicon.png" type="image/png" />
-<link rel="icon" href="/favicon.png" type="image/png" />
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.9.4/css/bootstrap-select.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/7.0.2/css/bootstrap-slider.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.min.css">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700&subset=latin,latin-ext">
+<link rel="stylesheet" href="/inc/languages.min.css">
+<link rel="shortcut icon" href="/favicon.png" type="image/png">
+<link rel="icon" href="/favicon.png" type="image/png">
 <style>
+#maxmsgsize { min-width: 80px; }
 ul[id*="sortable"] { word-wrap: break-word; list-style-type: none; float: left; padding: 0 15px 0 0; width: 48%; cursor:move}
 ul[id$="sortable-active"] li {cursor:move; }
 ul[id$="sortable-inactive"] li {cursor:move }
@@ -78,6 +79,82 @@ ul[id$="sortable-inactive"] li {cursor:move }
 }
 #slider1 .slider-track-low {
 	background: #66CD00;
+}
+table[data-sortable] {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+table[data-sortable] th {
+  vertical-align: bottom;
+  font-weight: bold;
+}
+table[data-sortable] th, table[data-sortable] td {
+  text-align: left;
+  padding: 10px;
+}
+table[data-sortable] th:not([data-sortable="false"]) {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-touch-callout: none;
+  cursor: pointer;
+}
+table[data-sortable] th:after {
+  content: "";
+  visibility: hidden;
+  display: inline-block;
+  vertical-align: inherit;
+  height: 0;
+  width: 0;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent;
+  margin-right: 1px;
+  margin-left: 10px;
+  float: right;
+}
+table[data-sortable] th[data-sortable="false"]:after {
+  display: none;
+}
+table[data-sortable] th[data-sorted="true"]:after {
+  visibility: visible;
+}
+table[data-sortable] th[data-sorted-direction="descending"]:after {
+  border-top-color: inherit;
+  margin-top: 8px;
+}
+table[data-sortable] th[data-sorted-direction="ascending"]:after {
+  border-bottom-color: inherit;
+  margin-top: 3px;
+}
+table[data-sortable].sortable-theme-bootstrap thead th {
+  border-bottom: 2px solid #e0e0e0;
+}
+table[data-sortable].sortable-theme-bootstrap th[data-sorted="true"] {
+  color: #3a87ad;
+  background: #d9edf7;
+  border-bottom-color: #bce8f1;
+}
+table[data-sortable].sortable-theme-bootstrap th[data-sorted="true"][data-sorted-direction="descending"]:after {
+  border-top-color: #3a87ad;
+}
+table[data-sortable].sortable-theme-bootstrap th[data-sorted="true"][data-sorted-direction="ascending"]:after {
+  border-bottom-color: #3a87ad;
+}
+table[data-sortable].sortable-theme-bootstrap.sortable-theme-bootstrap-striped tbody > tr:nth-child(odd) > td {
+  background-color: #f9f9f9;
+}
+.btn {
+   text-transform: none;
+}
+#data td, #no-data td {
+	vertical-align: middle;
+}
+.sort-table:hover {
+  border-bottom-color: #00B7DC !important;
 }
 </style>
 <?php
@@ -97,6 +174,9 @@ if (preg_match("/mailbox.php/i", $_SERVER['REQUEST_URI'])):
 .clickable {
 	cursor: pointer;
 }
+.progress {
+	margin-bottom: 0px;
+}
 </style>
 <?php
 endif;
@@ -112,7 +192,7 @@ endif;
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="/"><img style="margin-top:-5px;" src="/img/xs_mailcow.png" /></a>
+			<a class="navbar-brand" href="/"><img alt="mailcow-logo" style="margin-top:-5px;" src="/img/xs_mailcow.png" /></a>
 		</div>
 		<div id="navbar" class="navbar-collapse collapse">
 			<ul class="nav navbar-nav navbar-right">
