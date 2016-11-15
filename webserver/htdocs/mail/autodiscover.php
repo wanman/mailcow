@@ -2,6 +2,7 @@
 header("Content-Type: application/xml");
 require_once "inc/vars.inc.php";
 $config = array(
+     'outlookAutodiscover' => 'yes',
      'autodiscoverType' => 'activesync',
      'imap' => array(
        'server' => 'MAILCOW_HOST.MAILCOW_DOMAIN',
@@ -17,15 +18,18 @@ $config = array(
        'url' => 'https://MAILCOW_HOST.MAILCOW_DOMAIN/Microsoft-Server-ActiveSync'
      )
 );
-if (strpos($_SERVER['HTTP_USER_AGENT'], 'Outlook')) {
-        $config['autodiscoverType'] = 'imap';
+// If outlookAutodiscover == no, the autodiscoverType option will be replaced to imap.
+if ($config['outlookAutodiscover'] == 'no') {
+	if (strpos($_SERVER['HTTP_USER_AGENT'], 'Outlook')) {
+		$config['autodiscoverType'] = 'imap';
+	}
 }
 // Workaround for short open tags
 echo '<?xml version="1.0" encoding="utf-8" ?>';
 ?>
 <Autodiscover xmlns="http://schemas.microsoft.com/exchange/autodiscover/responseschema/2006">
 <?php
-$data = file_get_contents("php://input");
+$data = trim(file_get_contents("php://input"));
 if(!$data) {
         list($usec, $sec) = explode(' ', microtime());
         echo '<Response>';
@@ -36,8 +40,8 @@ if(!$data) {
         exit(0);
 }
 
-preg_match("/\<EMailAddress\>(.*?)\<\/EMailAddress\>/", $data, $email);
-$email = $email[1];
+$discover = new SimpleXMLElement($data);
+$email = $discover->Request->EMailAddress;
 
 if ($config['autodiscoverType'] == 'imap') {
 ?>
