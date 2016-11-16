@@ -2,7 +2,7 @@
 header("Content-Type: application/xml");
 require_once "inc/vars.inc.php";
 $config = array(
-     'outlookAutodiscover' => 'yes',
+     'useEASforOutlook' => 'yes',
      'autodiscoverType' => 'activesync',
      'imap' => array(
        'server' => 'MAILCOW_HOST.MAILCOW_DOMAIN',
@@ -18,8 +18,8 @@ $config = array(
        'url' => 'https://MAILCOW_HOST.MAILCOW_DOMAIN/Microsoft-Server-ActiveSync'
      )
 );
-// If outlookAutodiscover == no, the autodiscoverType option will be replaced to imap.
-if ($config['outlookAutodiscover'] == 'no') {
+// If useEASforOutlook == no, the autodiscoverType option will be replaced to imap.
+if ($config['useEASforOutlook'] == 'no') {
 	if (strpos($_SERVER['HTTP_USER_AGENT'], 'Outlook')) {
 		$config['autodiscoverType'] = 'imap';
 	}
