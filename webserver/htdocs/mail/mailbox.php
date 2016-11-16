@@ -1,7 +1,8 @@
 <?php
-require_once "inc/header.inc.php";
+require_once "inc/prerequisites.inc.php";
 
 if ($_SESSION['mailcow_cc_role'] == "admin" || $_SESSION['mailcow_cc_role'] == "domainadmin") {
+require_once "inc/header.inc.php";
 $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 ?>
 <div class="container">
@@ -491,9 +492,8 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 <script src="js/sorttable.js"></script>
 <script src="js/mailbox.js"></script>
 <?php
-}
-else {
+require_once("inc/footer.inc.php");
+} else {
 	header('Location: /');
 }
-require_once("inc/footer.inc.php");
 ?>

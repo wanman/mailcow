@@ -1,7 +1,9 @@
 <?php
-require_once("inc/header.inc.php");
-$_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
+require_once("inc/prerequisites.inc.php");
+
 if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user') {
+	require_once("inc/header.inc.php");
+	$_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 	$username = $_SESSION['mailcow_cc_username'];
 	$get_tls_policy = get_tls_policy($_SESSION['mailcow_cc_username']);
 ?>
@@ -316,9 +318,8 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 <script src="js/sorttable.js"></script>
 <script src="js/user.js"></script>
 <?php
-}
-else {
+require_once("inc/footer.inc.php");
+} else {
 	header('Location: /');
 }
-require_once("inc/footer.inc.php");
 ?>

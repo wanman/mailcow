@@ -1,4 +1,9 @@
 <?php
+require_once("inc/prerequisites.inc.php");
+$AuthUsers = array("admin", "domainadmin");
+if (!isset($_SESSION['mailcow_cc_role']) OR !in_array($_SESSION['mailcow_cc_role'], $AuthUsers)) {
+	header('Location: /');
+}
 require_once("inc/header.inc.php");
 ?>
 <div class="container">
@@ -6,7 +11,7 @@ require_once("inc/header.inc.php");
 		<div class="col-md-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title"><?=$lang['add']['object'];?></h3>
+					<h3 class="panel-title"><?=$lang['add']['title'];?></h3>
 				</div>
 				<div class="panel-body">
 <?php

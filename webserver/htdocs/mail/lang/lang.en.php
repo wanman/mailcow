@@ -215,7 +215,7 @@ $lang['delete']['previous'] = 'Previous page';
 $lang['edit']['save'] = 'Save changes';
 $lang['edit']['archive'] = 'Archive access';
 $lang['edit']['max_mailboxes'] = 'Max. possible mailboxes:';
-$lang['edit']['title'] = 'Object details';
+$lang['edit']['title'] = 'Edit object';
 $lang['edit']['target_address'] = 'Goto address/es <small>(comma-separated)</small>:';
 $lang['edit']['active'] = 'Active';
 $lang['edit']['target_domain'] = 'Target domain:';
@@ -251,7 +251,7 @@ $lang['edit']['previous'] = 'Previous page';
 $lang['edit']['unchanged_if_empty'] = 'If unchanged leave blank';
 $lang['edit']['dont_check_sender_acl'] = 'Do not check sender for domain %s';
 
-$lang['add']['object'] = 'Add object';
+$lang['add']['title'] = 'Add object';
 $lang['add']['domain'] = 'Domain';
 $lang['add']['active'] = 'Active';
 $lang['add']['save'] = 'Save changes';
