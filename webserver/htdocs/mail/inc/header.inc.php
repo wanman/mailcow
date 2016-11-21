@@ -37,80 +37,80 @@ ul[id$="sortable-inactive"] li {cursor:move }
 	background: #66CD00;
 }
 table[data-sortable] {
-  border-collapse: collapse;
-  border-spacing: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
 }
 table[data-sortable] th {
-  vertical-align: bottom;
-  font-weight: bold;
+  vertical-align: bottom;
+  font-weight: bold;
 }
 table[data-sortable] th, table[data-sortable] td {
-  text-align: left;
-  padding: 10px;
+  text-align: left;
+  padding: 10px;
 }
 table[data-sortable] th:not([data-sortable="false"]) {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  -webkit-touch-callout: none;
-  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-touch-callout: none;
+  cursor: pointer;
 }
 table[data-sortable] th:after {
-  content: "";
-  visibility: hidden;
-  display: inline-block;
-  vertical-align: inherit;
-  height: 0;
-  width: 0;
-  border-width: 5px;
-  border-style: solid;
-  border-color: transparent;
-  margin-right: 1px;
-  margin-left: 10px;
-  float: right;
+  content: "";
+  visibility: hidden;
+  display: inline-block;
+  vertical-align: inherit;
+  height: 0;
+  width: 0;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent;
+  margin-right: 1px;
+  margin-left: 10px;
+  float: right;
 }
 table[data-sortable] th[data-sortable="false"]:after {
-  display: none;
+  display: none;
 }
 table[data-sortable] th[data-sorted="true"]:after {
-  visibility: visible;
+  visibility: visible;
 }
 table[data-sortable] th[data-sorted-direction="descending"]:after {
-  border-top-color: inherit;
-  margin-top: 8px;
+  border-top-color: inherit;
+  margin-top: 8px;
 }
 table[data-sortable] th[data-sorted-direction="ascending"]:after {
-  border-bottom-color: inherit;
-  margin-top: 3px;
+  border-bottom-color: inherit;
+  margin-top: 3px;
 }
 table[data-sortable].sortable-theme-bootstrap thead th {
-  border-bottom: 2px solid #e0e0e0;
+  border-bottom: 2px solid #e0e0e0;
 }
 table[data-sortable].sortable-theme-bootstrap th[data-sorted="true"] {
-  color: #3a87ad;
-  background: #d9edf7;
-  border-bottom-color: #bce8f1;
+  color: #3a87ad;
+  background: #d9edf7;
+  border-bottom-color: #bce8f1;
 }
 table[data-sortable].sortable-theme-bootstrap th[data-sorted="true"][data-sorted-direction="descending"]:after {
-  border-top-color: #3a87ad;
+  border-top-color: #3a87ad;
 }
 table[data-sortable].sortable-theme-bootstrap th[data-sorted="true"][data-sorted-direction="ascending"]:after {
-  border-bottom-color: #3a87ad;
+  border-bottom-color: #3a87ad;
 }
 table[data-sortable].sortable-theme-bootstrap.sortable-theme-bootstrap-striped tbody > tr:nth-child(odd) > td {
-  background-color: #f9f9f9;
+  background-color: #f9f9f9;
 }
 .btn {
-   text-transform: none;
+   text-transform: none;
 }
 #data td, #no-data td {
 	vertical-align: middle;
 }
 .sort-table:hover {
-  border-bottom-color: #00B7DC !important;
+  border-bottom-color: #00B7DC !important;
 }
 </style>
 <?php
@@ -139,7 +139,7 @@ endif;
 ?>
 </head>
 <body style="padding-top:70px">
-<nav class="navbar navbar-default navbar-fixed-top"  role="navigation">
+<nav class="navbar navbar-default navbar-fixed-top"  role="navigation">
 	<div class="container-fluid">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
