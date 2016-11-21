@@ -43,9 +43,9 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 									<span class="lang-sm lang-lbl" lang="<?=$_SESSION['mailcow_locale'];?>"></span> <span class="caret"></span>
 								</button>
 								<ul class="dropdown-menu">
-									<li <?=($_SESSION['mailcow_locale'] == 'de') ? 'class="active"' : ''?>><a href="#" onClick="setLang('de')"><span class="lang-xs lang-lbl-full" lang="de"></span></a></li>
-									<li <?=($_SESSION['mailcow_locale'] == 'en') ? 'class="active"' : ''?>><a href="#" onClick="setLang('en')"><span class="lang-xs lang-lbl-full" lang="en"></span></a></li>
-									<li <?=($_SESSION['mailcow_locale'] == 'pt') ? 'class="active"' : ''?>><a href="#" onClick="setLang('pt')"><span class="lang-xs lang-lbl-full" lang="pt"></span></a></li>
+									<li <?=($_SESSION['mailcow_locale'] == 'de') ? 'class="active"' : ''?>><a href="?<?= http_build_query(array_merge($_GET, array("lang" => "de"))) ?>"><span class="lang-xs lang-lbl-full" lang="de"></span></a></li>
+									<li <?=($_SESSION['mailcow_locale'] == 'en') ? 'class="active"' : ''?>><a href="?<?= http_build_query(array_merge($_GET, array("lang" => "en"))) ?>"><span class="lang-xs lang-lbl-full" lang="en"></span></a></li>
+									<li <?=($_SESSION['mailcow_locale'] == 'pt') ? 'class="active"' : ''?>><a href="?<?= http_build_query(array_merge($_GET, array("lang" => "pt"))) ?>"><span class="lang-xs lang-lbl-full" lang="pt"></span></a></li>
 								</ul>
 							</div>
 						</div>

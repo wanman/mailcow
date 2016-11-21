@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="<?= $_SESSION['mailcow_locale'] ?>">
 <head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -158,9 +158,9 @@ endif;
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="lang-sm lang-lbl" lang="<?=$_SESSION['mailcow_locale'];?>"></span><span class="caret"></span></a>
 					<ul class="dropdown-menu" role="menu">
-						<li <?=($_SESSION['mailcow_locale'] == 'de') ? 'class="active"' : ''?>> <a href="#" onClick="setLang('de')"><span class="lang-xs lang-lbl-full" lang="de"></span></a></li>
-						<li <?=($_SESSION['mailcow_locale'] == 'en') ? 'class="active"' : ''?>> <a href="#" onClick="setLang('en')"><span class="lang-xs lang-lbl-full" lang="en"></span></a></li>
-						<li <?=($_SESSION['mailcow_locale'] == 'pt') ? 'class="active"' : ''?>> <a href="#" onClick="setLang('pt')"><span class="lang-xs lang-lbl-full" lang="pt"></span></a></li>
+						<li <?=($_SESSION['mailcow_locale'] == 'de') ? 'class="active"' : ''?>> <a href="?<?= http_build_query(array_merge($_GET, array("lang" => "de"))) ?>"><span class="lang-xs lang-lbl-full" lang="de"></span></a></li>
+						<li <?=($_SESSION['mailcow_locale'] == 'en') ? 'class="active"' : ''?>> <a href="?<?= http_build_query(array_merge($_GET, array("lang" => "en"))) ?>"><span class="lang-xs lang-lbl-full" lang="en"></span></a></li>
+						<li <?=($_SESSION['mailcow_locale'] == 'pt') ? 'class="active"' : ''?>> <a href="?<?= http_build_query(array_merge($_GET, array("lang" => "pt"))) ?>"><span class="lang-xs lang-lbl-full" lang="pt"></span></a></li>
 					</ul>
 				</li>
 				<?php
