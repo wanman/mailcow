@@ -20,21 +20,39 @@ $opt = [
 ];
 $pdo = new PDO($dsn, $database_user, $database_pass, $opt);
 
-if (isset($_POST['lang'])) {
-	switch ($_POST['lang']) {
+$_SESSION['mailcow_locale'] = strtolower(trim($DEFAULT_LANG));
+setcookie('language', $DEFAULT_LANG);
+if (isset($_COOKIE['language'])) {
+	switch ($_COOKIE['language']) {
 		case "de":
 			$_SESSION['mailcow_locale'] = 'de';
+			setcookie('language', 'de');
 		break;
 		case "en":
 			$_SESSION['mailcow_locale'] = 'en';
+			setcookie('language', 'en');
 		break;
 		case "pt":
 			$_SESSION['mailcow_locale'] = 'pt';
+			setcookie('language', 'pt');
 		break;
 	}
 }
-if (!isset($_SESSION['mailcow_locale'])) {
-	$_SESSION['mailcow_locale'] = strtolower(trim($DEFAULT_LANG));
+if (isset($_GET['lang'])) {
+	switch ($_GET['lang']) {
+		case "de":
+			$_SESSION['mailcow_locale'] = 'de';
+			setcookie('language', 'de');
+		break;
+		case "en":
+			$_SESSION['mailcow_locale'] = 'en';
+			setcookie('language', 'en');
+		break;
+		case "pt":
+			$_SESSION['mailcow_locale'] = 'pt';
+			setcookie('language', 'pt');
+		break;
+	}
 }
 require_once 'lang/lang.en.php';
 include 'lang/lang.'.$_SESSION['mailcow_locale'].'.php';
