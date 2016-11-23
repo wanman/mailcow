@@ -52,13 +52,13 @@ or
     * Full groupware with ActiveSync and Card-/CalDAV support
 
 # System Requirements
-Please check, if your system has enough free resources to run Mailcow
+Please check, if your system meets the following system resources:
 
 |                         | Mailcow with Roundcube | Mailcow with SOGo |
 | ----------------------- | ---------------------- | ----------------- |
 | CPU                     | 1vCPU                  | 1vCPU             |
-| RAM                     | ?                      | 1000 MiB          |
-| Disk without Mailboxes! | ?                      | 3,6 GiB           |
+| RAM                     | 800 MiB                | 1000 MiB          |
+| Disk                    | 5 GiB                  | 5 GiB             |
 
 # Before You Begin: Prerequisites
 - **Please remove any web and mail services** running on your server. I recommend using a clean Debian minimal installation.
