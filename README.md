@@ -54,11 +54,11 @@ or
 # System Requirements
 Please check, if your system meets the following system resources:
 
-|                         | Mailcow with Roundcube | Mailcow with SOGo |
-| ----------------------- | ---------------------- | ----------------- |
-| CPU                     | 1vCPU                  | 1vCPU             |
-| RAM                     | 800 MiB                | 1000 MiB          |
-| Disk                    | 5 GiB                  | 5 GiB             |
+| Resource                | mailcow (Roundcube) | mailcow (SOGo) |
+| ----------------------- | ------------------- | -------------- |
+| CPU                     | 1vCPU               | 1vCPU          |
+| RAM                     | 800 MiB             | 1000 MiB       |
+| Disk                    | 5 GiB               | 5 GiB          |
 
 # Before You Begin: Prerequisites
 - **Please remove any web and mail services** running on your server. I recommend using a clean Debian minimal installation.
