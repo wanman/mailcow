@@ -347,7 +347,9 @@ $lang['admin']['unchanged_if_empty'] = 'Deixar em branco para não alterar';
 $lang['admin']['yes'] = '&#10004;';
 $lang['admin']['no'] = '&#10008;';
 $lang['admin']['access'] = 'Acessos';
+$lang['admin']['invalid_max_msg_size'] = 'Invalid max. message size'; // NEEDS TRANSLATION
 $lang['admin']['site_not_found'] = 'Não foi possível localizar as configuração do site Mailcow';
+$lang['admin']['public_folder_empty'] = 'Public folder name must not be empty'; // NEEDS TRANSLATION
 $lang['admin']['set_rr_failed'] = 'Não foi possível alterar Postfix Restrictions';
 $lang['admin']['no_record'] = 'Nenhum registro';
 ?>
