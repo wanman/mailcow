@@ -190,7 +190,7 @@ function set_mailcow_config($s, $v = '') {
 			if (!ctype_alnum($v)) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
-					'msg' => 'Invalid max. message size'
+					'msg' => $lang['admin']['invalid_max_msg_size']
 				);
 				break;
 			}
@@ -221,7 +221,7 @@ function set_mailcow_config($s, $v = '') {
 			if (!ctype_alnum(str_replace("/", "", $v['public_folder_name']))) {
 				$_SESSION['return'] = array(
 					'type' => 'danger',
-					'msg' => 'Public folder name must not be empty'
+					'msg' => $lang['admin']['public_folder_empty']
 				);
 				break;
 			}
