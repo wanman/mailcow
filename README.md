@@ -4,6 +4,7 @@
 
 - [mailcow](#mailcow)
 - [Introduction](#introduction)
+- [System Requirements](#system-requirements)
 - [Before You Begin (Prerequisites)](#before-you-begin-prerequisites)
 - [Installation](#installation)
 - [Upgrade](#upgrade)
@@ -49,6 +50,15 @@ Comes with...
 or
 * SOGo
     * Full groupware with ActiveSync and Card-/CalDAV support
+
+# System Requirements
+Please check, if your system has enough free resources to run Mailcow
+
+|                         | Mailcow with Roundcube | Mailcow with SOGo |
+| ----------------------- | ---------------------- | ----------------- |
+| CPU                     | 1vCPU                  | 1vCPU             |
+| RAM                     | ?                      | 1000 MiB          |
+| Disk without Mailboxes! | ?                      | 3,6 GiB           |
 
 # Before You Begin: Prerequisites
 - **Please remove any web and mail services** running on your server. I recommend using a clean Debian minimal installation.
