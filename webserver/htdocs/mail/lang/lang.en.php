@@ -353,7 +353,9 @@ $lang['admin']['unchanged_if_empty'] = 'If unchanged leave blank';
 $lang['admin']['yes'] = '&#10004;';
 $lang['admin']['no'] = '&#10008;';
 $lang['admin']['access'] = 'Access';
+$lang['admin']['invalid_max_msg_size'] = 'Invalid max. message size';
 $lang['admin']['site_not_found'] = 'Cannot locate mailcow site configuration';
+$lang['admin']['public_folder_empty'] = 'Public folder name must not be empty';
 $lang['admin']['set_rr_failed'] = 'Cannot set Postfix restrictions';
 $lang['admin']['no_record'] = 'No Record';
 ?>
