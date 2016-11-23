@@ -51,7 +51,7 @@ or
     * Full groupware with ActiveSync and Card-/CalDAV support
 
 # Before You Begin: Prerequisites
-- **Please remove any web- and mail services** running on your server. I recommend using a clean Debian minimal installation.
+- **Please remove any web and mail services** running on your server. I recommend using a clean Debian minimal installation.
 Remember to purge Debians default MTA Exim4:
 ```
 apt-get purge exim4*
@@ -159,7 +159,7 @@ Again, please check you setup all DNS records accordingly.
 
 ## Web UI configuration variables
 
-Some settings can be changed be overwriting defaults of `/var/www/mail/inc/vars.inc.php` in `/var/www/mail/inc/vars.local.inc.php`.
+Some settings can be changed by overwriting defaults of `/var/www/mail/inc/vars.inc.php` in `/var/www/mail/inc/vars.local.inc.php`.
 
 Changes to `/var/www/mail/inc/vars.local.inc.php` will not be overwritten when upgrading mailcow.
 
