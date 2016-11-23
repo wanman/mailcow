@@ -57,7 +57,7 @@ Please check, if your system meets the following system resources:
 | Resource                | mailcow (Roundcube) | mailcow (SOGo) |
 | ----------------------- | ------------------- | -------------- |
 | CPU                     | 1vCPU               | 1vCPU          |
-| RAM                     | 800 MiB             | 1000 MiB       |
+| RAM                     | 800 MiB             | 1 GiB          |
 | Disk                    | 5 GiB               | 5 GiB          |
 
 # Before You Begin: Prerequisites
