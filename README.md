@@ -59,6 +59,7 @@ Please check, if your system meets the following system resources:
 | CPU                     | 1vCPU               | 1vCPU          |
 | RAM                     | 800 MiB             | 1 GiB          |
 | Disk                    | 5 GiB               | 5 GiB          |
+| OS Type                 | x86 or x86_64       | x86_64         |
 
 # Before You Begin: Prerequisites
 - **Please remove any web and mail services** running on your server. I recommend using a clean Debian minimal installation.
