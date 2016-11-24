@@ -321,5 +321,6 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 require_once("inc/footer.inc.php");
 } else {
 	header('Location: /');
+	exit();
 }
 ?>

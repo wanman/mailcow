@@ -498,5 +498,6 @@ foreach($ssr_values_inactive as $ssr_value) {
 require_once("inc/footer.inc.php");
 } else {
 	header('Location: /');
+	exit();
 }
 ?>
