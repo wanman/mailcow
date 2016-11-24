@@ -23,7 +23,7 @@ $MC_PUB_FOLDER = "/etc/dovecot/mailcow_public_folder.conf";
 $MC_ODKIM_TXT = "/etc/opendkim/dnstxt";
 $PFLOG = "/var/log/pflogsumm.log";
 
-// Change default language, "en", "pt" or "de"
+// Change default language, "en", "pt", "de" or "nl"
 $DEFAULT_LANG = "en";
 
 // Change theme (default: lumen)
