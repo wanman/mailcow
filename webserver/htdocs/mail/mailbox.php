@@ -495,5 +495,6 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 require_once("inc/footer.inc.php");
 } else {
 	header('Location: /');
+	exit();
 }
 ?>
