@@ -63,12 +63,12 @@ Please check, if your system meets the following system resources:
 
 # Before You Begin: Prerequisites
 - **Please remove any web and mail services** running on your server. I recommend using a clean Debian minimal installation.
-Remember to purge Debians default MTA Exim4:
+Remember to purge Debian's default MTA Exim4:
 ```
 apt-get purge exim4*
 ``` 
 
-- If there is any firewall, unblock the following ports for incoming connections:
+- If there is a firewall, unblock the following ports for incoming connections:
 
 | Service               | Protocol | Port   |
 | -------------------   |:--------:|:-------|
@@ -111,8 +111,8 @@ You will find them ready to copy and paste to your DNS servers configuration.
 
 - Next it is important that you **do not use Google DNS** or another public DNS which is known to be blocked by DNS-based Blackhole List (DNSBL) providers.
 
-I recommend PowerDNS Recursor as a local recursor with DNSSEC capabilities. See https://repo.powerdns.com/
-Though any non-blocked or ratelimited DNS server your ISP gave you *should* be fine.
+I recommend PowerDNS Recursor as a local recursor with DNSSEC capabilities. See https://repo.powerdns.com/.
+Though any non-blocked or rate limited DNS server your ISP gave you *should* be fine.
 
 # Installation
 **Please run all commands as root**
@@ -156,7 +156,7 @@ You are ready to start the script:
 ```
 ./install.sh
 ```
-Just be patient and confirm every step by pressing [ENTER] or [CTRL-C] to interrupt the installation.
+Just be patient and confirm every step by pressing [ENTER] or [CTRL+C] to interrupt the installation.
 If you run into problems, try to locate the error with "inst_debug" enabled in your configuration.
 Please contact me when you need help or found a bug.
 
@@ -164,7 +164,7 @@ More debugging is about to come. Though everything should work as intended.
 
 After the installation, visit your dashboard @ **https://hostname.example.com**, use the logged credentials in `./installer.log`
 
-Remember to create an alias- or a mailbox for `postmaster`.
+Remember to create an alias or a mailbox for `postmaster`.
 
 Again, please check you setup all DNS records accordingly.
 
