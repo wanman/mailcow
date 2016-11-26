@@ -701,6 +701,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			defaults write sogod SOGoTrashFolderName Trash;
 			defaults write sogod SOGoIMAPServer 'imap://127.0.0.1:143/';
 			defaults write sogod SOGoSMTPServer 127.0.0.1:588;
+			defaults write sogod SOGoSieveFolderEncoding = 'UTF-8';
 			defaults write sogod SOGoMailingMechanism smtp;
 			defaults write sogod SOGoMailCustomFromEnabled YES;
 			defaults write sogod SOGoPasswordChangeEnabled NO;
@@ -712,6 +713,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			defaults write sogod WOListenQueueSize 300;
 			defaults write sogod WOPidFile = '/var/run/sogo.pid';
 			defaults write sogod WOWatchDogRequestTimeout 10;
+			defaults write sogod NGImap4ConnectionStringSeparator = '/';
 			defaults write sogod SOGoMaximumPingInterval 354;
 			defaults write sogod SOGoMaximumSyncInterval 354;
 			defaults write sogod SOGoMaximumSyncResponseSize 1024;
