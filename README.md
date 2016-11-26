@@ -37,7 +37,7 @@ mailcow supports **Debian 8 (Jessie), Ubuntu LTS 14.04 (Trusty Tahr) and Ubuntu 
 * Incoming and outgoing spam and virus protection with FuGlu as pre-queue content filter; [Heinlein Support](https://www.heinlein-support.de/) spamassassin rules included; Advanced ClamAV malware filters
 * Sieve/ManageSieve (default filter: move spam to "Junk" folder, move tagged mail to folder "tag")
 * Public folder support via control center
-* per-user ACL
+* Per-user ACL
 * Shared Namespace
 * Quotas
 * Auto-configuration for ActiveSync + Thunderbird (and its derivates)
