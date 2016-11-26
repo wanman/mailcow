@@ -17,7 +17,7 @@ mailcow
 
 mailcow is a mail server suite based on Dovecot, Postfix and other open source software, that provides a modern web UI for user/server administration.
 
-mailcow supports **Debian 8 Jessie, Ubuntu LTS 14.04 Trusty and Ubuntu LTS 16.04 Xenial**
+mailcow supports **Debian 8 (Jessie), Ubuntu LTS 14.04 (Trusty Tahr) and Ubuntu LTS 16.04 (Xenial Xerus)**
 
 [Everybody loves screenshots (v0.14)](http://imgur.com/a/lWX2V)
 
@@ -37,7 +37,7 @@ mailcow supports **Debian 8 Jessie, Ubuntu LTS 14.04 Trusty and Ubuntu LTS 16.04
 * Incoming and outgoing spam and virus protection with FuGlu as pre-queue content filter; [Heinlein Support](https://www.heinlein-support.de/) spamassassin rules included; Advanced ClamAV malware filters
 * Sieve/ManageSieve (default filter: move spam to "Junk" folder, move tagged mail to folder "tag")
 * Public folder support via control center
-* per-user ACL
+* Per-user ACL
 * Shared Namespace
 * Quotas
 * Auto-configuration for ActiveSync + Thunderbird (and its derivates)
