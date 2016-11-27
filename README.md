@@ -156,7 +156,7 @@ You are ready to start the script:
 ```
 ./install.sh
 ```
-Just be patient and confirm every step by pressing [ENTER] or [CTRL+C] to interrupt the installation.
+Just be patient and confirm every step by pressing [ENTER] or [CTRL-C] to interrupt the installation.
 If you run into problems, try to locate the error with "inst_debug" enabled in your configuration.
 Please contact me when you need help or found a bug.
 
