@@ -12,7 +12,7 @@
   touchDevice = 'ontouchstart' in document.documentElement;
 
   if (touchDevice) {
-    clickEvents.push('touchstart');
+    clickEvents = ['touchstart'];
   }
 
   addEventListener = function(el, event, handler) {
