@@ -206,7 +206,7 @@ function set_mailcow_config($s, $v = '') {
 			break;
 		case "anonymize":
 			if ($v == "on") {
-                $template = file_get_contents($GLOBAL["MC_ANON_HEADERS"].".template");
+ 				$template = file_get_contents($GLOBALS["MC_ANON_HEADERS"].".template");
 				file_put_contents($GLOBALS["MC_ANON_HEADERS"], $template);
 			} else {
 				file_put_contents($GLOBALS["MC_ANON_HEADERS"], "");
