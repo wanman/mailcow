@@ -205,13 +205,8 @@ function set_mailcow_config($s, $v = '') {
 			}
 			break;
 		case "anonymize":
-			$template = '/^\s*(Received: from)[^\n]*(.*)/ REPLACE $1 [127.0.0.1] (localhost [127.0.0.1])$2
-/^\s*User-Agent/        IGNORE
-/^\s*X-Enigmail/        IGNORE
-/^\s*X-Mailer/          IGNORE
-/^\s*X-Originating-IP/  IGNORE
-		';
 			if ($v == "on") {
+                $template = file_get_contents($GLOBAL["MC_ANON_HEADERS"].".template");
 				file_put_contents($GLOBALS["MC_ANON_HEADERS"], $template);
 			} else {
 				file_put_contents($GLOBALS["MC_ANON_HEADERS"], "");
