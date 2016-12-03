@@ -1,4 +1,6 @@
-/^\s*Received: from \S+ \(\S+ \[\S+\]\)(.*)/ REPLACE Received: from [127.0.0.1] (localhost [127.0.0.1])$1
+/^\s*Received:[^\)]+\)\s+\(Authenticated sender:(.+)/
+	REPLACE Received: from localhost (localhost [127.0.0.1]) (Authenticated sender:$1
+
 /^\s*User-Agent/        IGNORE
 /^\s*X-Enigmail/        IGNORE
 /^\s*X-Mailer/          IGNORE

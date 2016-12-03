@@ -47,6 +47,9 @@ smtpd_delay_reject = yes
 # Enable elliptic curve cryptography, "ultra" needs more cpu time
 smtpd_tls_eecdh_grade = strong
 
+# Default: Anonymize outgoing mail headers
+smtp_header_checks = pcre:/etc/postfix/mailcow_anonymize_headers.pcre
+
 # Sender, recipient, client and data restrictions
 smtpd_sender_restrictions = reject_authenticated_sender_login_mismatch,
    permit_mynetworks,
