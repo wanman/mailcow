@@ -179,7 +179,7 @@ server {
 		alias /usr/lib/GNUstep/SOGo/$1.SOGo/Resources/$2;
 	}
 
-	location (^/SOGo/so/ControlPanel/Products/[^/]*UI/Resources/.*\.(jpg|png|gif|css|js)$ {
+	location (^/SOGo/so/ControlPanel/Products/[^/]*UI/Resources/.*\.(jpg|png|gif|css|js)$) {
 		alias /usr/lib/GNUstep/SOGo/$1.SOGo/Resources/$2;
 	}
 
