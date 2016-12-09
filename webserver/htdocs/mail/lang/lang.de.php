@@ -305,9 +305,9 @@ $lang['login']['otp'] = 'Einmalpasswort';
 $lang['login']['trash_login'] = 'Login verwerfen';
 
 $lang['admin']['search_domain_da'] = 'Domains durchsuchen';
-$lang['admin']['restrictions'] = 'Postifx Restriktionen';
-$lang['admin']['rr'] = 'Postifx Recipient Restriktionen';
-$lang['admin']['sr'] = 'Postifx Sender Restriktionen';
+$lang['admin']['restrictions'] = 'Postfix Restriktionen';
+$lang['admin']['rr'] = 'Postfix Recipient Restriktionen';
+$lang['admin']['sr'] = 'Postfix Sender Restriktionen';
 $lang['admin']['reset_defaults'] = 'Standard wiederherstellen';
 $lang['admin']['r_inactive'] = 'Inaktive Restriktionen';
 $lang['admin']['r_active'] = 'Aktive Restriktionen';
