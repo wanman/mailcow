@@ -21,24 +21,19 @@ $opt = [
 $pdo = new PDO($dsn, $database_user, $database_pass, $opt);
 
 $_SESSION['mailcow_locale'] = strtolower(trim($DEFAULT_LANG));
-setcookie('language', $DEFAULT_LANG, time()+7776000);
 if (isset($_COOKIE['language'])) {
 	switch ($_COOKIE['language']) {
 		case "de":
 			$_SESSION['mailcow_locale'] = 'de';
-			setcookie('language', 'de', time()+7776000);
 		break;
 		case "en":
 			$_SESSION['mailcow_locale'] = 'en';
-			setcookie('language', 'en', time()+7776000);
 		break;
 		case "nl":
 			$_SESSION['mailcow_locale'] = 'nl';
-			setcookie('language', 'nl', time()+7776000);
 		break;
 		case "pt":
 			$_SESSION['mailcow_locale'] = 'pt';
-			setcookie('language', 'pt', time()+7776000);
 		break;
 	}
 }
@@ -46,22 +41,19 @@ if (isset($_GET['lang'])) {
 	switch ($_GET['lang']) {
 		case "de":
 			$_SESSION['mailcow_locale'] = 'de';
-			setcookie('language', 'de', time()+7776000);
 		break;
 		case "en":
 			$_SESSION['mailcow_locale'] = 'en';
-			setcookie('language', 'en', time()+7776000);
 		break;
 		case "nl":
 			$_SESSION['mailcow_locale'] = 'nl';
-			setcookie('language', 'nl', time()+7776000);
 		break;
 		case "pt":
 			$_SESSION['mailcow_locale'] = 'pt';
-			setcookie('language', 'pt', time()+7776000);
 		break;
 	}
 }
+setcookie('language', $_SESSION['mailcow_locale'], time()+7776000);
 require_once 'lang/lang.en.php';
 include 'lang/lang.'.$_SESSION['mailcow_locale'].'.php';
 require_once 'inc/functions.inc.php';
