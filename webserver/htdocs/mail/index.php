@@ -22,7 +22,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 			<div class="panel panel-default">
 				<div class="panel-heading"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <?=$lang['login']['login'];?></div>
 				<div class="panel-body">
-				  <img style="margin-left: auto; margin-right: auto;" class="img-responsive" src="img/200.png" alt="mailcow">
+					<a href="/"><img style="margin-left: auto; margin-right: auto;" class="img-responsive" src="img/200.png" alt="mailcow"></a>
 					<legend>mailcow UI</legend>
 						<form method="post" autofill="off">
 						<div class="form-group">
