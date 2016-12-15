@@ -328,7 +328,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<td><?=htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8');?></td>
 							<td><?=htmlspecialchars($row['domain']);?></td>
 							<td data-value="<?=intval($row['bytes']);?>"><?=formatBytes(intval($row['bytes']), 2);?> / <?=formatBytes(intval($row['quota']), 2);?></td>
-							<td style="min-width:120px;">
+							<td data-value="<?=intval($row['bytes']);?>" style="min-width:120px;">
 								<?php
 								$percentInUse = round((intval($row['bytes']) / intval($row['quota'])) * 100);
 								if ($percentInUse >= 90) {
