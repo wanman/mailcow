@@ -106,8 +106,8 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<td><?=htmlspecialchars($row['domain']);?></td>
 							<td><?=intval($AliasData['count']);?> / <?=intval($row['aliases']);?></td>
 							<td><?=$MailboxData['count'];?> / <?=$row['mailboxes'];?></td>
-							<td><?=formatBytes(intval($row['maxquota']), 2);?></td>
-							<td><?=formatBytes(intval($MailboxData['quota']), 2);?> / <?=formatBytes(intval($row['quota']));?></td>
+							<td data-value="<?=intval($row['maxquota']);?>"><?=formatBytes(intval($row['maxquota']), 2);?></td>
+							<td data-value="<?=intval($MailboxData['quota']);?>"><?=formatBytes(intval($MailboxData['quota']), 2);?> / <?=formatBytes(intval($row['quota']));?></td>
 							<?php
 							if ($_SESSION['mailcow_cc_role'] == "admin"):
 							?>
@@ -327,7 +327,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							?>
 							<td><?=htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8');?></td>
 							<td><?=htmlspecialchars($row['domain']);?></td>
-							<td><?=formatBytes(intval($row['bytes']), 2);?> / <?=formatBytes(intval($row['quota']), 2);?></td>
+							<td data-value="<?=intval($row['bytes']);?>"><?=formatBytes(intval($row['bytes']), 2);?> / <?=formatBytes(intval($row['quota']), 2);?></td>
 							<td style="min-width:120px;">
 								<?php
 								$percentInUse = round((intval($row['bytes']) / intval($row['quota'])) * 100);
