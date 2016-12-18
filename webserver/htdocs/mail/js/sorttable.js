@@ -1,3 +1,4 @@
+
 (function() {
   var SELECTOR, addEventListener, clickEvents, numberRegExp, sortable, touchDevice, trimRegExp;
 
@@ -9,12 +10,14 @@
 
   clickEvents = ['click'];
 
+/*
   touchDevice = 'ontouchstart' in document.documentElement;
 
   if (touchDevice) {
-    clickEvents = ['touchstart'];
+    clickEvents.push('touchstart');
   }
-
+*/
+  
   addEventListener = function(el, event, handler) {
     if (el.addEventListener != null) {
       return el.addEventListener(event, handler, false);
