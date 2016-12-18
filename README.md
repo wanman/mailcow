@@ -77,6 +77,8 @@ apt-get purge exim4*
 | Postfix SMTP          | TCP      | 25     |
 | Dovecot IMAP          | TCP      | 143    |
 | Dovecot IMAPS         | TCP      | 993    |
+| Dovecot POP3          | TCP      | 110    |
+| Dovecot POP3S         | TCP      | 995    |
 | Dovecot ManageSieve   | TCP      | 4190   |
 | HTTP(S)               | TCP      | 80/443 |
 
