@@ -51,7 +51,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" name="trigger_set_admin" class="btn btn-default"><?=$lang['admin']['save'];?></button>
+							<button type="submit" name="trigger_set_admin" class="btn btn-success"><?=$lang['admin']['save'];?></button>
 						</div>
 					</div>
 				</form>
@@ -193,7 +193,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="submit" name="trigger_add_domain_admin" class="btn btn-default"><?=$lang['admin']['add'];?></button>
+							<button type="submit" name="trigger_add_domain_admin" class="btn btn-success"><?=$lang['admin']['add'];?></button>
 						</div>
 					</div>
 				</form>
@@ -251,7 +251,7 @@ foreach($srr_values_inactive as $srr_value) {
 		</div>
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-10">
-				<button type="submit" name="srr" class="btn btn-default"><?=$lang['admin']['save'];?></button>
+				<button type="submit" name="srr" class="btn btn-success"><?=$lang['admin']['save'];?></button>
 				<button type="submit" name="reset-srr" class="btn btn-primary"><?=$lang['admin']['reset_defaults'];?></button>
 			</div>
 		</div>
@@ -295,7 +295,7 @@ foreach($ssr_values_inactive as $ssr_value) {
 		</div>
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-10">
-				<button type="submit" name="ssr" class="btn btn-default"><?=$lang['admin']['save'];?></button>
+				<button type="submit" name="ssr" class="btn btn-success"><?=$lang['admin']['save'];?></button>
 				<button type="submit" name="reset-ssr" class="btn btn-primary"><?=$lang['admin']['reset_defaults'];?></button>
 			</div>
 		</div>
@@ -338,7 +338,7 @@ foreach($ssr_values_inactive as $ssr_value) {
 	<div class="form-group">
 	<input type="hidden" name="trigger_public_folder">
 		<div class="col-sm-8">
-			<button type="submit" class="btn btn-default"><?=$lang['admin']['save'];?></button>
+			<button type="submit" class="btn btn-success"><?=$lang['admin']['save'];?></button>
 		</div>
 	</div>
 </form>
@@ -363,7 +363,7 @@ foreach($ssr_values_inactive as $ssr_value) {
 	</div>
 	<div class="form-group">
 		<div class="col-sm-8">
-			<button type="submit" name="trigger_anonymize" class="btn btn-default"><?=$lang['admin']['save'];?></button>
+			<button type="submit" name="trigger_anonymize" class="btn btn-success"><?=$lang['admin']['save'];?></button>
 		</div>
 	</div>
 </form>
@@ -421,7 +421,7 @@ foreach($ssr_values_inactive as $ssr_value) {
 				<option>2048</option>
 			</select>
 		</div>
-		<button type="submit" name="add_dkim_record" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> <?=$lang['admin']['add'];?></button>
+		<button type="submit" name="add_dkim_record" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> <?=$lang['admin']['add'];?></button>
 	</form>
 </div>
 </div>
@@ -439,7 +439,7 @@ foreach($ssr_values_inactive as $ssr_value) {
 	<div class="form-group">
 		<input type="number" class="form-control" id="maxmsgsize" name="maxmsgsize" placeholder="in MB" min="1" max="250" required>
 	</div>
-	<button type="submit" class="btn btn-default"><?=$lang['admin']['save'];?></button>
+	<button type="submit" class="btn btn-success"><?=$lang['admin']['save'];?></button>
 </form>
 </div>
 </div>
