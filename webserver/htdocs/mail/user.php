@@ -50,7 +50,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 	</div>
 	<div class="form-group">
 		<div class="col-sm-offset-3 col-sm-9">
-			<button type="submit" name="trigger_set_user_account" class="btn btn-success btn-default"><?=$lang['user']['save_changes'];?></button>
+			<button type="submit" name="trigger_set_user_account" class="btn btn-success"><?=$lang['user']['save_changes'];?></button>
 		</div>
 	</div>
 </form>
@@ -305,7 +305,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 		</div>
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-10">
-				<button type="submit" id="trigger_set_tls_policy" name="trigger_set_tls_policy" class="btn btn-default"><?=$lang['user']['save_changes'];?></button>
+				<button type="submit" id="trigger_set_tls_policy" name="trigger_set_tls_policy" class="btn btn-success"><?=$lang['user']['save_changes'];?></button>
 			</div>
 		</div>
 	</form>
