@@ -1,4 +1,3 @@
-
 <?php
 /*
 //
@@ -154,7 +153,7 @@ $lang['start']['imap_smtp_server_auth_info'] = 'Utilisez votre adresse mail comp
 Vos informations de connection seront chiffrées par le cryptage obligatoire coté serveur.';
 $lang['start']['managesieve'] = 'ManageSieve';
 $lang['start']['managesieve_badge'] = 'Filtre Email';
-$lang['start']['managesieve_description'] = 'Merci d\'utiliser <b>Mozilla Thunderbird</b> avec l\'<a style="text-decoration:none" target="_blank" href="%s"><b>extension sieve (nightly)</b></a>.<br />Démarer Thunderbird, ouvir les paramètres d'extension et déposez le fichier xpi téléchargé dans la fenetre.<br />Le nom du serveur est <b>%s</b>, avec le port <b>4190</b> si il est demandé. L'identifiant est votre adresse mail.';
+$lang['start']['managesieve_description'] = 'Merci d\'utiliser <b>Mozilla Thunderbird</b> avec l\'<a style="text-decoration:none" target="_blank" href="%s"><b>extension sieve (nightly)</b></a>.<br />Démarer Thunderbird, ouvir les paramètres d\'extension et déposez le fichier xpi téléchargé dans la fenetre.<br />Le nom du serveur est <b>%s</b>, avec le port <b>4190</b> si il est demandé. L\'identifiant est votre adresse mail.';
 $lang['start']['service'] = 'Service';
 $lang['start']['encryption'] = 'Methode de chiffrement';
 $lang['start']['help'] = 'Afficher/Masquer le panneau d\'aide';
