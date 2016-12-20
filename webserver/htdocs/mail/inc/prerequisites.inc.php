@@ -29,6 +29,9 @@ if (isset($_COOKIE['language'])) {
 		case "en":
 			$_SESSION['mailcow_locale'] = 'en';
 		break;
+		case "fr":
+			$_SESSION['mailcow_locale'] = 'fr';
+		break;
 		case "nl":
 			$_SESSION['mailcow_locale'] = 'nl';
 		break;
@@ -44,6 +47,9 @@ if (isset($_GET['lang'])) {
 		break;
 		case "en":
 			$_SESSION['mailcow_locale'] = 'en';
+		break;
+		case "fr":
+			$_SESSION['mailcow_locale'] = 'fr';
 		break;
 		case "nl":
 			$_SESSION['mailcow_locale'] = 'nl';
