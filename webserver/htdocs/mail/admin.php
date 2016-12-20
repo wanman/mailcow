@@ -473,6 +473,12 @@ foreach($ssr_values_inactive as $ssr_value) {
 				</div>
 			</div>
 		</div>
+ 	  	<legend><span class="glyphicon glyphicon-stats" aria-hidden="true"></span> CPU <?=sys_info('cpu');?>%</legend>
+				<div class="progress">
+				  <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="<?php echo sys_info('cpu');?>"
+				  aria-valuemin="0" aria-valuemax="100" style="width:<?=sys_info('cpu');?>%">
+				  </div>
+				</div>
 		<legend>Postqueue</legend>
 			<pre><?php echo sys_info("mailq");?></pre>
 		<legend>Pflogsumm <code>/var/log/mail.log</code></legend>

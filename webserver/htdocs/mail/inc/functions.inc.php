@@ -371,6 +371,12 @@ function sys_info($what) {
 			$du = $dt - $df;
 			return sprintf('%.2f',($du / $dt) * 100);
 			break;
+    		case "cpu":
+		      	$exec_loads = sys_getloadavg();
+		      	$exec_cores = trim(shell_exec("grep -P '^processor' /proc/cpuinfo|wc -l"));
+		      	$cpu = round($exec_loads[1]/($exec_cores + 1)*100, 0);
+		      	return $cpu;
+		      	break;
 		case "pflog":
 			$pflog_content = file_get_contents($GLOBALS['PFLOG']);
 			if (!file_exists($GLOBALS['PFLOG'])) {
