@@ -455,6 +455,12 @@ foreach($ssr_values_inactive as $ssr_value) {
 	</div>
 	<div id="collapseSysinfo" class="panel-collapse collapse">
 	<div class="panel-body">
+	<div>
+			<h3>
+				Uptime: <?=sys_info('uptime')['days']?> day(s), <?=sys_info('uptime')['hours']?> hour(s), <?=sys_info('uptime')['minutes']?> minute(s), <?=sys_info('uptime')['seconds']?> second(s)
+			</h3>
+			<hr>
+		</div>
 		<div class="row">
 			<div class="col-md-6">
 				<legend><span class="glyphicon glyphicon-hdd" data-toggle="tooltip" title="/var/vmail" aria-hidden="true"></span> Disk <?=formatBytes(disk_total_space('/var/vmail')-disk_free_space("/var/vmail"));?> / <?=formatBytes(disk_total_space('/var/vmail'))?></legend>
