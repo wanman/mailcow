@@ -455,11 +455,23 @@ foreach($ssr_values_inactive as $ssr_value) {
 	</div>
 	<div id="collapseSysinfo" class="panel-collapse collapse">
 	<div class="panel-body">
-	<div>
-			<h3>
-				Uptime: <?=sys_info('uptime')['days']?> day(s), <?=sys_info('uptime')['hours']?> hour(s), <?=sys_info('uptime')['minutes']?> minute(s), <?=sys_info('uptime')['seconds']?> second(s)
-			</h3>
-			<hr>
+		<legend><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> System Info</legend>
+		<div class="row">
+			<div class="col-md-6">
+				<blockquote>
+					<strong>Uptime:</strong> <?=sys_info('uptime')['days'].' <i>day(s)</i> '.sys_info('uptime')['hours'].' <i>hour(s)</i> '.sys_info('uptime')['minutes'].' <i>minute(s)</i> '?>
+				</blockquote>
+			</div>
+			<div class="col-md-6">
+				<blockquote>
+					<strong>Hostname:</strong> <?=gethostname()?>
+				</blockquote>
+			</div>
+			<div class="col-md-6">
+				<blockquote>
+					<strong>mailcow version:</strong> <?=file_get_contents("/etc/mailcow_version")?>
+				</blockquote>
+			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-6">
