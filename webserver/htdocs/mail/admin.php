@@ -455,11 +455,11 @@ foreach($ssr_values_inactive as $ssr_value) {
 	</div>
 	<div id="collapseSysinfo" class="panel-collapse collapse">
 	<div class="panel-body">
-		<legend><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> System Info</legend>
+		<legend><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> About Server</legend>
 		<div class="row">
 			<div class="col-md-6">
 				<blockquote>
-					<strong>Uptime:</strong> <?=sys_info('uptime')['days'].' <i>day(s)</i> '.sys_info('uptime')['hours'].' <i>hour(s)</i> '.sys_info('uptime')['minutes'].' <i>minute(s)</i> '?>
+					<strong>Uptime:</strong> <?=sys_info('uptime')['days'].' <i>day(s)</i>, '.sys_info('uptime')['hours'].' <i>hour(s)</i>, '.sys_info('uptime')['minutes'].' <i>minute(s)</i> '?>
 				</blockquote>
 			</div>
 			<div class="col-md-6">
