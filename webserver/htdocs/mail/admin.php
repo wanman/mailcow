@@ -455,7 +455,7 @@ foreach($ssr_values_inactive as $ssr_value) {
 	</div>
 	<div id="collapseSysinfo" class="panel-collapse collapse">
 	<div class="panel-body">
-		<legend><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Server</legend>
+		<legend><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> About Server</legend>
 		<div class="row">
 			<div class="col-md-6">
 				<blockquote>
