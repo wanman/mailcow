@@ -288,7 +288,7 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			update-ca-certificates
 			;;
 		ssl_le)
-			curled_ip="$(curl -4s ifconfig.co)"
+			curled_ip="$(curl -4s https://api.ipify.org?format=text)"
 			for ip in $(dig ${sys_hostname}.${sys_domain} a +short)
 			do
 				if [[ "${ip}" == "${curled_ip}" ]]; then
