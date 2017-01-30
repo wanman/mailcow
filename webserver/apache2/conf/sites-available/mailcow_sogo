@@ -71,8 +71,6 @@ Listen 127.0.0.1:81
 		SSLEngine on
 		SSLCertificateFile      /etc/ssl/mail/mail.crt
 		SSLCertificateKeyFile   /etc/ssl/mail/mail.key
-		RewriteEngine on
-		RewriteCond %{REQUEST_URI} !^/\.well\-known/acme\-challenge/
 		<FilesMatch "\.(cgi|shtml|phtml|php)$">
 			SSLOptions +StdEnvVars
 		</FilesMatch>
