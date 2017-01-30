@@ -138,7 +138,8 @@ if (preg_match("/mailbox.php/i", $_SERVER['REQUEST_URI'])):
 endif;
 ?>
 </head>
-<body style="padding-top:70px">
+<body style="padding-top: <?php if(basename($_SERVER["SCRIPT_FILENAME"]) === "index.php"){echo "20px";}else{echo "70px";} ?>">
+<?php if(basename($_SERVER["SCRIPT_FILENAME"]) !== "index.php"): ?>
 <nav class="navbar navbar-default navbar-fixed-top"  role="navigation">
 	<div class="container-fluid">
 		<div class="navbar-header">
@@ -205,4 +206,5 @@ endif;
 		</div><!--/.nav-collapse -->
 	</div><!--/.container-fluid -->
 </nav>
+<?php endif; ?>
 <form action="/" method="post" id="logout"><input type="hidden" name="logout"></form>
