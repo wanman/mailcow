@@ -149,7 +149,7 @@ endif;
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="/"><img alt="mailcow-logo" style="max-width: 50px; max-height: 30px; margin-top:-5px;" src="/img/mailcow.svg" /></a>
+			<a class="navbar-brand" href="/"><img alt="mailcow-logo" style="max-width: 50px; max-height: 30px; margin-top:-5px;" src="/img/xs_mailcow.png" /></a>
 		</div>
 		<div id="navbar" class="navbar-collapse collapse">
 			<ul class="nav navbar-nav navbar-right">
