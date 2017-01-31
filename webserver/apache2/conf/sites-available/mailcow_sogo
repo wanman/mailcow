@@ -61,6 +61,9 @@ Listen 127.0.0.1:81
         	SSLUseStapling on
 	</VirtualHost>
 	<VirtualHost *:443>
+		ServerSignature off
+		TraceEnable off
+		AddDefaultCharset utf-8
 		ServerName "autodiscover.MAILCOW_DOMAIN"
 		ErrorLog ${APACHE_LOG_DIR}/error.log
 		CustomLog ${APACHE_LOG_DIR}/access.log combined
@@ -68,9 +71,6 @@ Listen 127.0.0.1:81
 		SSLEngine on
 		SSLCertificateFile      /etc/ssl/mail/mail.crt
 		SSLCertificateKeyFile   /etc/ssl/mail/mail.key
-		RewriteEngine on
-		RewriteCond %{REQUEST_URI} !^/\.well\-known/acme\-challenge/
-		RewriteRule . autodiscover.php [L]
 		<FilesMatch "\.(cgi|shtml|phtml|php)$">
 			SSLOptions +StdEnvVars
 		</FilesMatch>
