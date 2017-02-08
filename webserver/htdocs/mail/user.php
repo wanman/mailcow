@@ -257,7 +257,7 @@ if (isset($_SESSION['mailcow_cc_role']) && $_SESSION['mailcow_cc_role'] == 'user
 					<form class="form-inline" method="post">
 					<div class="col-sm-6"><?=htmlspecialchars($blacklistRow['value']);?></div>
 					<div class="col-sm-6">
-						<input type="hidden" name="wlid" value="<?=$blacklistRow['prefid'];?>">
+						<input type="hidden" name="blid" value="<?=$blacklistRow['prefid'];?>">
 						<button type="submit" id="trigger_delete_blacklist" name="trigger_delete_blacklist" style="margin-bottom:1px;" class="btn btn-xs btn-danger"><?=$lang['user']['spamfilter_table_remove'];?></button>
 					</div>
 					</form>
