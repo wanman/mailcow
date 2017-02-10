@@ -717,8 +717,6 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			defaults write sogod NGImap4ConnectionStringSeparator = '/';
 			defaults write sogod SOGoMaximumPingInterval 354;
 			defaults write sogod SOGoMaximumSyncInterval 354;
-			defaults write sogod SOGoMaximumSyncResponseSize 1024;
-			defaults write sogod SOGoMaximumSyncWindowSize 15480;
 			defaults write sogod SOGoInternalSyncInterval 30;"
 			# ~1 for 10 users, more when AS is enabled - 384M is the absolute max. it may reach
 			# Set static worker count as workaround
