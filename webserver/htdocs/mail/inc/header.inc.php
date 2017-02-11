@@ -17,8 +17,8 @@
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.min.css">
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700&subset=latin,latin-ext">
 <link rel="stylesheet" href="/inc/languages.min.css">
-<link rel="shortcut icon" href="/favicon.png" type="image/png">
-<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="shortcut icon" href="/img/mailcow-icon.png" type="image/png">
+<link rel="icon" href="/img/mailcow-icon.png" type="image/png">
 <style>
 #maxmsgsize { min-width: 80px; }
 ul[id*="sortable"] { word-wrap: break-word; list-style-type: none; float: left; padding: 0 15px 0 0; width: 48%; cursor:move}
@@ -149,7 +149,7 @@ endif;
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="/"><img alt="mailcow-logo" style="max-width: 50px; max-height: 30px; margin-top:-5px;" src="/img/xs_mailcow.png" /></a>
+			<a class="navbar-brand" href="/"><img alt="mailcow-logo" style="max-width: 54px; margin-top:-14px;" src="/img/mailcow-icon.svg" /></a>
 		</div>
 		<div id="navbar" class="navbar-collapse collapse">
 			<ul class="nav navbar-nav navbar-right">
