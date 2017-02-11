@@ -1,19 +1,19 @@
 <?php
 $config = array(
-     'useEASforOutlook' => 'no',
+     'useEASforOutlook' => 'yes',
      'autodiscoverType' => 'activesync',
      'imap' => array(
-       'server' => 'server.phoenixpeca.xyz',
+       'server' => 'MAILCOW_HOST.MAILCOW_DOMAIN',
        'port' => '993',
        'ssl' => 'on',
      ),
      'smtp' => array(
-       'server' => 'server.phoenixpeca.xyz',
+       'server' => 'MAILCOW_HOST.MAILCOW_DOMAIN',
        'port' => '465',
        'ssl' => 'on'
      ),
      'activesync' => array(
-       'url' => 'https://server.phoenixpeca.xyz/Microsoft-Server-ActiveSync'
+       'url' => 'https://MAILCOW_HOST.MAILCOW_DOMAIN/Microsoft-Server-ActiveSync'
      )
 );
 
