@@ -9,12 +9,16 @@ function setLang(sel) {
 	window.location.href = window.location.pathname + window.location.search;
 }
 
+$('.nav-tabs > li > a').click(function(event){
+	$('#login_role').val(event.target.id);
+});
+
 $(document).ready(function() {
 	// Hide alerts after n seconds
 	$("#alert-fade").fadeTo(7000, 500).slideUp(500, function(){
 		$("#alert-fade").alert('close');
 	});
-	
+
 	// Disable submit after submitting form
 	$('form').submit(function() {
 		if ($('form button[type="submit"]').data('submitted') == '1') {
@@ -28,8 +32,8 @@ $(document).ready(function() {
 	});
 
 	// IE fix to hide scrollbars when table body is empty
-	$('tbody').filter(function (index) { 
-		return $(this).children().length < 1; 
+	$('tbody').filter(function (index) {
+		return $(this).children().length < 1;
 	}).remove();
 
 	// Init Bootstrap Selectpicker

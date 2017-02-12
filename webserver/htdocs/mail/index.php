@@ -22,8 +22,13 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 			<div class="panel panel-default">
 				<div class="panel-heading"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <?=$lang['login']['login'];?></div>
 				<div class="panel-body">
-					<a href="/"><img style="max-width: 200px; max-height; 120px; margin-left: auto; margin-right: auto;" class="img-responsive" src="img/mailcow.svg" alt="mailcow"></a>
+					<a href="/"><img style="max-width: 250px; margin-left: auto; margin-right: auto;" class="img-responsive" src="img/mailcow.svg" alt="mailcow"></a>
 					<legend>mailcow UI</legend>
+						<ul class="nav nav-tabs">
+							<li class="active"><a data-toggle="tab" href="" id="domainadmin" aria-expanded="true">Domain administrator</a></li>
+							<li class=""><a data-toggle="tab" href="" id="mailboxuser" aria-expanded="false">Mailbox user</a></li>
+						</ul>
+						<br>
 						<form method="post" autofill="off">
 						<div class="form-group">
 							<label class="sr-only" for="login_user"><?=$lang['login']['username'];?></label>
@@ -40,6 +45,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							</div>
 						</div>
 						<div class="form-group">
+							<input type="hidden" id="login_role" name="login_role" value="domainadmin">
 							<button type="submit" class="btn btn-success" value="Login"><?=$lang['login']['login'];?></button>
 							<div class="btn-group pull-right">
 								<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
