@@ -25,8 +25,8 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					<a href="/"><img style="max-width: 250px; margin-left: auto; margin-right: auto;" class="img-responsive" src="img/mailcow.svg" alt="mailcow"></a>
 					<legend>mailcow UI</legend>
 						<ul class="nav nav-tabs">
-							<li class="active"><a data-toggle="tab" href="" id="domainadmin" aria-expanded="true">Domain administrator</a></li>
-							<li class=""><a data-toggle="tab" href="" id="mailboxuser" aria-expanded="false">Mailbox user</a></li>
+							<li class="active"><a data-toggle="tab" href="" id="domainadmin" aria-expanded="true"><?=$lang['start']['domainadmin'];?></a></li>
+							<li class=""><a data-toggle="tab" href="" id="mailboxuser" aria-expanded="false"><?=$lang['start']['mailboxuser'];?></a></li>
 						</ul>
 						<br>
 						<form method="post" autofill="off">

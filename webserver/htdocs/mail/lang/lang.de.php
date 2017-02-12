@@ -163,6 +163,9 @@ $lang['start']['help'] = 'Hilfe ein-/ausblenden';
 $lang['start']['hostname'] = 'Hostname';
 $lang['start']['port'] = 'Port';
 $lang['start']['footer'] = '';
+$lang['start']['domainadmin'] = 'Domain-Administrator';
+$lang['start']['mailboxuser'] = 'Mailbox-Benutzer';
+
 $lang['header']['mailcow_settings'] = 'Konfiguration';
 $lang['header']['administration'] = 'Administration';
 $lang['header']['mailboxes'] = 'Mailboxen';
