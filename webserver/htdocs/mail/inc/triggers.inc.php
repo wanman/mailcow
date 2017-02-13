@@ -6,7 +6,7 @@ if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
 		$_SESSION['mailcow_cc_username'] = $login_user;
 		$_SESSION['mailcow_cc_role'] = "admin";
 		if(isset($_POST["remember_user"]) && $_POST["remember_user"]) {
-			setcookie("domainadmin", $login_user);
+			setcookie("admin", $login_user, time() + (86400 * 5));
 		}
 		header("Location: /admin.php");
 	}
@@ -14,7 +14,7 @@ if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
 		$_SESSION['mailcow_cc_username'] = $login_user;
 		$_SESSION['mailcow_cc_role'] = "domainadmin";
 		if(isset($_POST["remember_user"]) && $_POST["remember_user"]) {
-			setcookie("domainadmin", $login_user);
+			setcookie("admin", $login_user, time() + (86400 * 5));
 		}
 		header("Location: /mailbox.php");
 	}
@@ -22,7 +22,7 @@ if (isset($_POST["login_user"]) && isset($_POST["pass_user"])) {
 		$_SESSION['mailcow_cc_username'] = $login_user;
 		$_SESSION['mailcow_cc_role'] = "user";
 		if(isset($_POST["remember_user"]) && $_POST["remember_user"]) {
-			setcookie("user", $login_user);
+			setcookie("user", $login_user, time() + (86400 * 5));
 		}
 		header("Location: /user.php");
 	}

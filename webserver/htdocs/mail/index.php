@@ -34,7 +34,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<label class="sr-only" for="login_user"><?=$lang['login']['username'];?></label>
 							<div class="input-group">
 								<div class="input-group-addon"><i class="glyphicon glyphicon-user"></i></div>
-								<input name="login_user" autocorrect="off" autocapitalize="none" type="name" id="login_user" class="form-control" placeholder="<?=$lang['login']['username'];?>" required="" autofocus="">
+								<input name="login_user" value="<?=$AdminLogin?>" autocorrect="off" autocapitalize="none" type="name" id="login_user" class="form-control" placeholder="<?=$lang['login']['username'];?>" required="" autofocus="">
 							</div>
 						</div>
 						<div class="form-group">
@@ -42,6 +42,11 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<div class="input-group">
 								<div class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></div>
 								<input name="pass_user" type="password" id="pass_user" class="form-control" placeholder="<?=$lang['login']['password'];?>" required="">
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="checkbox">
+								<label><input data-toggle="tooltip" title="Remember username for 5 days" type="checkbox" name="remember_user"> Remember me</label>
 							</div>
 						</div>
 						<div class="form-group">

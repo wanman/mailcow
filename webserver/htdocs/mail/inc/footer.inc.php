@@ -3,14 +3,17 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/7.0.2/bootstrap-slider.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.9.4/js/bootstrap-select.js"></script>
 <script>
-// Select language and reopen active URL without POST
-function setLang(sel) {
-	$.post( "<?=$_SERVER['REQUEST_URI'];?>", {lang: sel} );
-	window.location.href = window.location.pathname + window.location.search;
-}
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+});
 
-$('.nav-tabs > li > a').click(function(event){
+$('.nav-tabs > li > #domainadmin').click(function(event){
 	$('#login_role').val(event.target.id);
+	$('#login_user').val('<?=$AdminLogin?>');
+});
+$('.nav-tabs > li > #mailboxuser').click(function(event){
+	$('#login_role').val(event.target.id);
+	$('#login_user').val('<?=$UserLogin?>');
 });
 
 $(document).ready(function() {

@@ -20,6 +20,17 @@ $opt = [
 ];
 $pdo = new PDO($dsn, $database_user, $database_pass, $opt);
 
+if(isset($_COOKIE['admin']))	{
+	$AdminLogin = $_COOKIE['admin'];
+} else {
+	$AdminLogin = '';
+}
+if(isset($_COOKIE['user']))	{
+	$UserLogin = $_COOKIE['user'];
+} else {
+	$UserLogin = '';
+}
+
 $_SESSION['mailcow_locale'] = strtolower(trim($DEFAULT_LANG));
 if (isset($_COOKIE['language'])) {
 	switch ($_COOKIE['language']) {
