@@ -34,6 +34,8 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<label class="sr-only" for="login_user"><?=$lang['login']['username'];?></label>
 							<div class="input-group">
 								<div class="input-group-addon"><i class="glyphicon glyphicon-user"></i></div>
+								<input type="hidden" id="admin_un_cache" value="<?=$AdminLogin?>">
+								<input type="hidden" id="user_un_cache" value="<?=$UserLogin?>">
 								<input name="login_user" value="<?=$AdminLogin?>" autocorrect="off" autocapitalize="none" type="name" id="login_user" class="form-control" placeholder="<?=$lang['login']['username'];?>" required="" autofocus="">
 							</div>
 						</div>
@@ -41,6 +43,8 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<label class="sr-only" for="pass_user"><?=$lang['login']['password'];?></label>
 							<div class="input-group">
 								<div class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></div>
+								<input type="hidden" id="admin_pw_cache">
+								<input type="hidden" id="user_pw_cache">
 								<input name="pass_user" type="password" id="pass_user" class="form-control" placeholder="<?=$lang['login']['password'];?>" required="">
 							</div>
 						</div>
