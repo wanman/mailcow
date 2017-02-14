@@ -4,18 +4,27 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.9.4/js/bootstrap-select.js"></script>
 <script>
 $(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip(); 
+    $('[data-toggle="tooltip"]').tooltip();
 });
-	
+
 $('.nav-tabs > li > #domainadmin').click(function(event){
 	$('#login_role').val(event.target.id);
-	$('#login_user').val('<?=$AdminLogin?>');
-	$('#pass_user').val('');
+	
+	$('#user_un_cache').val(document.getElementById('login_user').value);
+	$('#login_user').val(document.getElementById('admin_un_cache').value);
+	
+	$('#user_pw_cache').val(document.getElementById('pass_user').value);
+	$('#pass_user').val(document.getElementById('admin_pw_cache').value);
 });
+	
 $('.nav-tabs > li > #mailboxuser').click(function(event){
 	$('#login_role').val(event.target.id);
-	$('#login_user').val('<?=$UserLogin?>');
-	$('#pass_user').val('');
+	
+	$('#admin_un_cache').val(document.getElementById('login_user').value);
+	$('#login_user').val(document.getElementById('user_un_cache').value);
+	
+	$('#admin_pw_cache').val(document.getElementById('pass_user').value);
+	$('#pass_user').val(document.getElementById('user_pw_cache').value);
 });
 
 $(document).ready(function() {
