@@ -1,4 +1,6 @@
 <?php
+require_once 'inc/vars.inc.php';
+
 $config = array(
      'useEASforOutlook' => 'yes',
      'autodiscoverType' => 'activesync',
@@ -24,7 +26,6 @@ if ($config['useEASforOutlook'] == 'no') {
 		$config['autodiscoverType'] = 'imap';
 	}
 }
-require_once 'inc/vars.inc.php';
 if(file_exists('inc/vars.local.inc.php')) {
 	include_once 'inc/vars.local.inc.php';
 }
