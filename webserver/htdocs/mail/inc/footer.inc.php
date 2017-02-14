@@ -4,16 +4,18 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.9.4/js/bootstrap-select.js"></script>
 <script>
 $(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip();
+    $('[data-toggle="tooltip"]').tooltip(); 
 });
-
+	
 $('.nav-tabs > li > #domainadmin').click(function(event){
 	$('#login_role').val(event.target.id);
 	$('#login_user').val('<?=$AdminLogin?>');
+	$('#pass_user').val('');
 });
 $('.nav-tabs > li > #mailboxuser').click(function(event){
 	$('#login_role').val(event.target.id);
 	$('#login_user').val('<?=$UserLogin?>');
+	$('#pass_user').val('');
 });
 
 $(document).ready(function() {
