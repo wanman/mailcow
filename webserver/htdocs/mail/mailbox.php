@@ -271,7 +271,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 							<th class="sort-table" style="min-width: 86px;"><?=$lang['mailbox']['domain'];?></th>
 							<th class="sort-table" style="min-width: 75px;"><?=$lang['mailbox']['quota'];?></th>
 							<th class="sort-table" style="min-width: 99px;"><?=$lang['mailbox']['in_use'];?></th>
-							<th class="sort-table" style="min-width: 121px;">Temp. Aliases</th>
+							<th class="sort-table" style="min-width: 121px;"><?=$lang['mailbox']['temp_aliases'];?></th>
 							<th class="sort-table" style="min-width: 100px;"><?=$lang['mailbox']['msg_num'];?></th>
 							<th class="sort-table" style="min-width: 76px;"><?=$lang['mailbox']['active'];?></th>
 							<th style="text-align: right; min-width: 200px;" data-sortable="false"><?=$lang['mailbox']['action'];?></th>
