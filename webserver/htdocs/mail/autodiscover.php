@@ -1,5 +1,6 @@
 <?php
 require_once 'inc/vars.inc.php';
+require_once 'inc/functions.inc.php';
 
 $config = array(
      'useEASforOutlook' => 'yes',
@@ -15,9 +16,13 @@ $config = array(
        'ssl' => 'on'
      ),
      'activesync' => array(
-       'url' => 'https://MAILCOW_HOST.MAILCOW_DOMAIN/Microsoft-Server-ActiveSync'
+       'url' => 'https://'.'MAILCOW_HOST.MAILCOW_DOMAIN'.'/Microsoft-Server-ActiveSync'
      )
 );
+
+if(file_exists('inc/vars.local.inc.php')) {
+	include_once 'inc/vars.local.inc.php';
+}
 
 /* ---------- DO NOT MODIFY ANYTHING BEYOND THIS LINE. IGNORE AT YOUR OWN RISK. ---------- */
 
@@ -26,10 +31,6 @@ if ($config['useEASforOutlook'] == 'no') {
 		$config['autodiscoverType'] = 'imap';
 	}
 }
-if(file_exists('inc/vars.local.inc.php')) {
-	include_once 'inc/vars.local.inc.php';
-}
-require_once 'inc/functions.inc.php';
 
 $dsn = "$database_type:host=$database_host;dbname=$database_name";
 $opt = [
