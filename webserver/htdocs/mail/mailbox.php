@@ -386,7 +386,7 @@ $_SESSION['return_to'] = $_SERVER['REQUEST_URI'];
 					</tbody>
 					<tfoot>
 						<tr id="no-data">
-							<td colspan="8" style="text-align: center; border-top: 1px solid #e7e7e7;">
+							<td colspan="9" style="text-align: center; border-top: 1px solid #e7e7e7;">
 								<a href="/add.php?mailbox"><?=$lang['mailbox']['add_mailbox'];?></a>
 							</td>
 						</tr>
