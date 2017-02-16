@@ -138,6 +138,8 @@ $lang['user']['tls_enforce_in'] = 'TLS eingehend erzwingen';
 $lang['user']['tls_enforce_out'] = 'TLS ausgehend erzwingen';
 $lang['user']['no_record'] = 'Kein Eintrag';
 
+$lang['start']['remember_me'] = 'Benutzername merken';
+$lang['start']['remember_me_tooltip'] = 'Benutzername für 5 Tage merken';
 $lang['user']['misc_settings'] = 'Sonstige Kontoeinstellungen';
 $lang['user']['misc_delete_profile'] = 'Sonstige Kontoeinstellungen';
 $lang['start']['dashboard'] = '%s - Dashboard';
