@@ -8,23 +8,27 @@ $(document).ready(function(){
 });
 
 $('.nav-tabs > li > #domainadmin').click(function(event){
-	$('#login_role').val(event.target.id);
-	
-	$('#user_un_cache').val(document.getElementById('login_user').value);
-	$('#login_user').val(document.getElementById('admin_un_cache').value);
-	
-	$('#user_pw_cache').val(document.getElementById('pass_user').value);
-	$('#pass_user').val(document.getElementById('admin_pw_cache').value);
+	if(document.getElementById('admin_un_cache').value != document.getElementById('login_user').value) {
+		$('#login_role').val(event.target.id);
+
+		$('#user_un_cache').val(document.getElementById('login_user').value);
+		$('#login_user').val(document.getElementById('admin_un_cache').value);
+
+		$('#user_pw_cache').val(document.getElementById('pass_user').value);
+		$('#pass_user').val(document.getElementById('admin_pw_cache').value);
+	}
 });
-	
+
 $('.nav-tabs > li > #mailboxuser').click(function(event){
-	$('#login_role').val(event.target.id);
-	
-	$('#admin_un_cache').val(document.getElementById('login_user').value);
-	$('#login_user').val(document.getElementById('user_un_cache').value);
-	
-	$('#admin_pw_cache').val(document.getElementById('pass_user').value);
-	$('#pass_user').val(document.getElementById('user_pw_cache').value);
+	if(document.getElementById('user_un_cache').value != document.getElementById('login_user').value) {
+		$('#login_role').val(event.target.id);
+
+		$('#admin_un_cache').val(document.getElementById('login_user').value);
+		$('#login_user').val(document.getElementById('user_un_cache').value);
+
+		$('#admin_pw_cache').val(document.getElementById('pass_user').value);
+		$('#pass_user').val(document.getElementById('user_pw_cache').value);
+	}
 });
 
 $(document).ready(function() {
