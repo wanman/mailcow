@@ -138,6 +138,8 @@ $lang['user']['tls_enforce_in'] = 'TLS eingehend erzwingen';
 $lang['user']['tls_enforce_out'] = 'TLS ausgehend erzwingen';
 $lang['user']['no_record'] = 'Kein Eintrag';
 
+$lang['start']['remember_me'] = 'Benutzername merken';
+$lang['start']['remember_me_tooltip'] = 'Benutzername für 5 Tage merken';
 $lang['user']['misc_settings'] = 'Sonstige Kontoeinstellungen';
 $lang['user']['misc_delete_profile'] = 'Sonstige Kontoeinstellungen';
 $lang['start']['dashboard'] = '%s - Dashboard';
@@ -163,6 +165,9 @@ $lang['start']['help'] = 'Hilfe ein-/ausblenden';
 $lang['start']['hostname'] = 'Hostname';
 $lang['start']['port'] = 'Port';
 $lang['start']['footer'] = '';
+$lang['start']['domainadmin'] = 'Domain-Administrator';
+$lang['start']['mailboxuser'] = 'Mailbox-Benutzer';
+
 $lang['header']['mailcow_settings'] = 'Konfiguration';
 $lang['header']['administration'] = 'Administration';
 $lang['header']['mailboxes'] = 'Mailboxen';

@@ -135,6 +135,8 @@ $lang['user']['tls_enforce_in'] = 'Enforce TLS incoming';
 $lang['user']['tls_enforce_out'] = 'Enforce TLS outgoing';
 $lang['user']['no_record'] = 'No Record';
 
+$lang['start']['remember_me'] = 'Remember me';
+$lang['start']['remember_me_tooltip'] = 'Remember username for 5 days';
 $lang['user']['misc_settings'] = 'Other profile settings';
 $lang['user']['misc_delete_profile'] = 'Other profile settings';
 $lang['start']['dashboard'] = '%s - dashboard';
@@ -160,6 +162,9 @@ $lang['start']['help'] = 'Show/Hide help panel';
 $lang['start']['hostname'] = 'Hostname';
 $lang['start']['port'] = 'Port';
 $lang['start']['footer'] = '';
+$lang['start']['domainadmin'] = 'Domain administrator';
+$lang['start']['mailboxuser'] = 'Mailbox user';
+
 $lang['header']['mailcow_settings'] = 'Configuration';
 $lang['header']['administration'] = 'Administration';
 $lang['header']['mailboxes'] = 'Mailboxes';
@@ -197,6 +202,7 @@ $lang['mailbox']['add_domain'] = 'Add domain';
 $lang['mailbox']['add_domain_alias'] = 'Add domain alias';
 $lang['mailbox']['add_mailbox'] = 'Add mailbox';
 $lang['mailbox']['add_alias'] = 'Add alias';
+$lang['mailbox']['temp_aliases'] = 'Temp. Aliases';
 
 $lang['info']['no_action'] = 'No action applicable';
 

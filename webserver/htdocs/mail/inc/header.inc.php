@@ -17,8 +17,8 @@
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.min.css">
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700&subset=latin,latin-ext">
 <link rel="stylesheet" href="/inc/languages.min.css">
-<link rel="shortcut icon" href="/favicon.png" type="image/png">
-<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="shortcut icon" href="/img/mailcow-icon.png" type="image/png">
+<link rel="icon" href="/img/mailcow-icon.png" type="image/png">
 <style>
 #maxmsgsize { min-width: 80px; }
 ul[id*="sortable"] { word-wrap: break-word; list-style-type: none; float: left; padding: 0 15px 0 0; width: 48%; cursor:move}
@@ -138,7 +138,8 @@ if (preg_match("/mailbox.php/i", $_SERVER['REQUEST_URI'])):
 endif;
 ?>
 </head>
-<body style="padding-top:70px">
+<body style="padding-top: <?php if(basename($_SERVER["SCRIPT_FILENAME"]) === "index.php"){echo "20px";}else{echo "70px";} ?>">
+<?php if(basename($_SERVER["SCRIPT_FILENAME"]) !== "index.php"): ?>
 <nav class="navbar navbar-default navbar-fixed-top"  role="navigation">
 	<div class="container-fluid">
 		<div class="navbar-header">
@@ -148,7 +149,7 @@ endif;
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="/"><img alt="mailcow-logo" style="max-width: 50px; max-height: 30px; margin-top:-5px;" src="/img/mailcow.svg" /></a>
+			<a class="navbar-brand" href="/"><img alt="mailcow-logo" style="max-width: 54px; margin-top:-14px;" src="/img/mailcow-icon.svg" /></a>
 		</div>
 		<div id="navbar" class="navbar-collapse collapse">
 			<ul class="nav navbar-nav navbar-right">
@@ -205,4 +206,5 @@ endif;
 		</div><!--/.nav-collapse -->
 	</div><!--/.container-fluid -->
 </nav>
+<?php endif; ?>
 <form action="/" method="post" id="logout"><input type="hidden" name="logout"></form>

@@ -3,18 +3,38 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/7.0.2/bootstrap-slider.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.9.4/js/bootstrap-select.js"></script>
 <script>
-// Select language and reopen active URL without POST
-function setLang(sel) {
-	$.post( "<?=$_SERVER['REQUEST_URI'];?>", {lang: sel} );
-	window.location.href = window.location.pathname + window.location.search;
-}
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+});
+
+$('.nav-tabs > li > #domainadmin').click(function(event){
+	if(document.getElementById('admin_un_cache').value != document.getElementById('login_user').value) {
+		$('#user_un_cache').val(document.getElementById('login_user').value);
+		$('#login_user').val(document.getElementById('admin_un_cache').value);
+
+		$('#user_pw_cache').val(document.getElementById('pass_user').value);
+		$('#pass_user').val(document.getElementById('admin_pw_cache').value);
+	}
+	$('#login_role').val(event.target.id);
+});
+
+$('.nav-tabs > li > #mailboxuser').click(function(event){
+	if(document.getElementById('user_un_cache').value != document.getElementById('login_user').value) {
+		$('#admin_un_cache').val(document.getElementById('login_user').value);
+		$('#login_user').val(document.getElementById('user_un_cache').value);
+
+		$('#admin_pw_cache').val(document.getElementById('pass_user').value);
+		$('#pass_user').val(document.getElementById('user_pw_cache').value);
+	}
+	$('#login_role').val(event.target.id);
+});
 
 $(document).ready(function() {
 	// Hide alerts after n seconds
 	$("#alert-fade").fadeTo(7000, 500).slideUp(500, function(){
 		$("#alert-fade").alert('close');
 	});
-	
+
 	// Disable submit after submitting form
 	$('form').submit(function() {
 		if ($('form button[type="submit"]').data('submitted') == '1') {
@@ -28,8 +48,8 @@ $(document).ready(function() {
 	});
 
 	// IE fix to hide scrollbars when table body is empty
-	$('tbody').filter(function (index) { 
-		return $(this).children().length < 1; 
+	$('tbody').filter(function (index) {
+		return $(this).children().length < 1;
 	}).remove();
 
 	// Init Bootstrap Selectpicker
