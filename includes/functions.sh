@@ -332,6 +332,8 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 					ln -s /etc/ssl/mail/certs/${sys_hostname}.${sys_domain}/privkey.pem /etc/ssl/mail/mail.key
 				fi
 				service ${httpd_platform} restart
+				service dovecot restart
+				service postfix restart
 			fi
 			;;
 		mysql)
