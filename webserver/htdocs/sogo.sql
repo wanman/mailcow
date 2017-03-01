@@ -1,6 +1,7 @@
 DROP VIEW IF EXISTS grouped_mail_aliases;
 DROP VIEW IF EXISTS grouped_sender_acl;
 DROP VIEW IF EXISTS sogo_view;
+DROP VIEW IF EXISTS grouped_domain_alias_address;
 
 CREATE VIEW grouped_mail_aliases (username, aliases) AS
 SELECT goto, IFNULL(GROUP_CONCAT(address SEPARATOR ' '), '') AS address FROM alias
