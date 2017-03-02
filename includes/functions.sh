@@ -253,7 +253,7 @@ php-net-socket php-net-url php-pear php-soap ${PHP} ${PHP}-cli ${PHP}-common ${P
 ${PHP}-intl ${PHP}-xsl ${PHP}-mcrypt ${PHP}-mysql libawl-php ${PHP}-xmlrpc ${DATABASE_BACKEND} ${WEBSERVER_BACKEND} mailutils pyzor razor \
 postfix postfix-mysql postfix-pcre postgrey pflogsumm spamassassin spamc sa-compile libdbd-mysql-perl opendkim opendkim-tools clamav-daemon \
 python-magic liblockfile-simple-perl libdbi-perl libmime-base64-urlsafe-perl libtest-tempdir-perl liblogger-syslog-perl \
-${OPENJDK}-jre-headless libcurl4-openssl-dev libexpat1-dev solr-jetty > /dev/null
+${OPENJDK}-jre-headless libcurl4-openssl-dev libexpat1-dev solr-jetty python-sqlalchemy python-beautifulsoup python-mysqldb > /dev/null
 			if [ "$?" -ne "0" ]; then
 				echo "$(redb [ERR]) - Package installation failed:"
 				tail -n 20 /var/log/dpkg.log

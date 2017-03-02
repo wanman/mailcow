@@ -260,5 +260,6 @@ systemctl disable fuglu
 rm -rf /usr/local/lib/python2.7/dist-packages/fuglu*
 update-rc.d -f fuglu remove
 userdel fuglu
+# FuGlu dependencies
+python-sqlalchemy python-beautifulsoup python-mysqldb
 ```
-
