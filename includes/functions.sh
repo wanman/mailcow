@@ -412,6 +412,10 @@ DEBIAN_FRONTEND=noninteractive ${APT} -y install dovecot-common dovecot-core dov
 			tar xf fuglu/inst/${fuglu_version}.tar -C fuglu/inst/ 2> /dev/null
 			(cd fuglu/inst/${fuglu_version} ; python setup.py -q install)
 			cp -R fuglu/conf/* /etc/fuglu/
+			sed -i "s/my_mailcowpass/${my_mailcowpass}/g" /etc/fuglu/fuglu.conf
+			sed -i "s/my_mailcowuser/${my_mailcowuser}/g" /etc/fuglu/fuglu.conf
+			sed -i "s/my_mailcowdb/${my_mailcowdb}/g" /etc/fuglu/fuglu.conf
+			sed -i "s/my_dbhost/${my_dbhost}/g" /etc/fuglu/fuglu.conf
 			if [[ -f /lib/systemd/systemd ]]; then
 				cp fuglu/inst/${fuglu_version}/scripts/startscripts/debian/8/fuglu.service /etc/systemd/system/fuglu.service
 				systemctl disable fuglu
