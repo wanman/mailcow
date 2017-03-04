@@ -685,16 +685,9 @@ function mailbox_add_alias($postarray) {
 function mailbox_add_alias_domain($postarray) {
 	global $lang;
 	global $pdo;
+	$domains = array_map('trim', preg_split('/[;, \n]+/', $postarray['alias_domain']));
 	isset($postarray['active']) ? $active = '1' : $active = '0';
-
-	if (!is_valid_domain_name($postarray['alias_domain'])) {
-		$_SESSION['return'] = array(
-			'type' => 'danger',
-			'msg' => sprintf($lang['danger']['alias_domain_invalid'])
-		);
-		return false;
-	}
-
+	
 	if (!is_valid_domain_name($postarray['target_domain'])) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -702,7 +695,7 @@ function mailbox_add_alias_domain($postarray) {
 		);
 		return false;
 	}
-
+	
 	if (!hasDomainAccess($_SESSION['mailcow_cc_username'], $_SESSION['mailcow_cc_role'], $postarray['target_domain'])) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
@@ -710,8 +703,17 @@ function mailbox_add_alias_domain($postarray) {
 		);
 		return false;
 	}
+	
+foreach($domains as $domain) {
+	if (!is_valid_domain_name($domain)) {
+		$_SESSION['return'] = array(
+			'type' => 'danger',
+			'msg' => sprintf($lang['danger']['alias_domain_invalid'])
+		);
+		return false;
+	}
 
-	if ($postarray['alias_domain'] == $postarray['target_domain']) {
+	if ($domain == $postarray['target_domain']) {
 		$_SESSION['return'] = array(
 			'type' => 'danger',
 			'msg' => sprintf($lang['danger']['aliasd_targetd_identical'])
@@ -719,7 +721,7 @@ function mailbox_add_alias_domain($postarray) {
 		return false;
 	}
 
-	$alias_domain	= strtolower(trim($postarray['alias_domain']));
+	$alias_domain	= strtolower(trim($domain));
 	$target_domain	= strtolower(trim($postarray['target_domain']));
 
 	try {
@@ -787,7 +789,7 @@ function mailbox_add_alias_domain($postarray) {
 		);
 		return false;
 	}
-
+}
 }
 function mailbox_edit_alias_domain($postarray) {
 	global $lang;
@@ -2905,5 +2907,10 @@ function is_valid_domain_name($domain_name) {
 	return (preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $domain_name)
 		   && preg_match("/^.{1,253}$/", $domain_name)
 		   && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $domain_name));
+}
+function paginate($array, $pageSize, $page = 1) {
+		$page = $page < 1 ? 1 : $page;
+		$start = ($page - 1) * $pageSize;
+		return array_slice($array, $start, $pageSize);
 }
 ?>
