@@ -2908,9 +2908,4 @@ function is_valid_domain_name($domain_name) {
 		   && preg_match("/^.{1,253}$/", $domain_name)
 		   && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $domain_name));
 }
-function paginate($array, $pageSize, $page = 1) {
-		$page = $page < 1 ? 1 : $page;
-		$start = ($page - 1) * $pageSize;
-		return array_slice($array, $start, $pageSize);
-}
 ?>
