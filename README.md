@@ -102,14 +102,9 @@ You do not need to setup `autodiscover` when not using SOGo with ActiveSync.
 
 **Hint:** ActiveSync auto-discovery is setup to configure desktop clients with IMAP!
 
-The following records are optional but recommended:
+Further DNS records for SPF and DKIM are recommended. These entries will raise trust in your mailserver, reduce abuse of your domain name and increase authenticity.
 
-Please setup a SPF TXT record according to docs you will find on the internet.
-SPF is broken by design and a huge headache when it comes to forwarding.
-Try to not push yourself with a `-all` record but prefer `?all`. Also known as "I use SPF but I do not actually care". :-)
-
-After finishing the installation, head to the mailcow web UI, log in as admin and create DKIM TXT records for your domains.
-You will find them ready to copy and paste to your DNS servers configuration.
+Find more details about mailcow DNS entries and SPF/DKIM related configuration in our wiki article on [DNS Records](https://github.com/andryyy/mailcow/wiki/DNS-records).
 
 - Next it is important that you **do not use Google DNS** or another public DNS which is known to be blocked by DNS-based Blackhole List (DNSBL) providers.
 
